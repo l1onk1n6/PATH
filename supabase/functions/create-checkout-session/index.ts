@@ -1,7 +1,3 @@
-// Secrets required in Supabase Dashboard → Edge Functions → Secrets:
-//   STRIPE_SECRET_KEY   = sk_live_...
-//   (SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY are auto-injected)
-
 import Stripe from 'npm:stripe@14'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
@@ -14,27 +10,27 @@ const cors = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
+/** Decode JWT payload without re-verifying (gateway already verified) */
+function jwtPayload(token: string): Record<string, unknown> {
+  const part = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+  return JSON.parse(atob(part))
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
 
   try {
+    const authHeader = req.headers.get('Authorization') ?? ''
+    const token = authHeader.replace('Bearer ', '').trim()
+    if (!token) return new Response('Unauthorized', { status: 401, headers: cors })
+
+    // Extract user info from JWT claims (already verified by gateway)
+    const payload = jwtPayload(token)
+    const userId = payload.sub as string
+    const userEmail = payload.email as string | undefined
+    if (!userId) return new Response('Unauthorized', { status: 401, headers: cors })
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!)
-
-    // Extract JWT from Authorization header and verify directly
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader?.startsWith('Bearer ')) {
-      return new Response('Unauthorized', { status: 401, headers: cors })
-    }
-    const token = authHeader.replace('Bearer ', '')
-
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-    )
-    const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
-    if (authErr || !user) return new Response('Unauthorized', { status: 401, headers: cors })
-
-    // Service-role client for stripe_customers table
     const admin = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
@@ -44,19 +40,19 @@ Deno.serve(async (req) => {
     const { data: existing } = await admin
       .from('stripe_customers')
       .select('stripe_customer_id')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single()
 
     let customerId = existing?.stripe_customer_id
 
     if (!customerId) {
       const customer = await stripe.customers.create({
-        email: user.email,
-        metadata: { user_id: user.id },
+        email: userEmail,
+        metadata: { user_id: userId },
       })
       customerId = customer.id
       await admin.from('stripe_customers').insert({
-        user_id: user.id,
+        user_id: userId,
         stripe_customer_id: customerId,
       })
     }
@@ -67,7 +63,7 @@ Deno.serve(async (req) => {
       mode:                  'subscription',
       success_url:           `${APP_URL}/#/account?success=1`,
       cancel_url:            `${APP_URL}/#/account`,
-      metadata:              { user_id: user.id },
+      metadata:              { user_id: userId },
       allow_promotion_codes: true,
     })
 

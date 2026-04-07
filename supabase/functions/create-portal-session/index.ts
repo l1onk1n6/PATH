@@ -11,24 +11,26 @@ const cors = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
+/** Decode JWT payload without re-verifying (gateway already verified) */
+function jwtPayload(token: string): Record<string, unknown> {
+  const part = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+  return JSON.parse(atob(part))
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
 
   try {
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!)
 
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader?.startsWith('Bearer ')) {
-      return new Response('Unauthorized', { status: 401, headers: cors })
-    }
-    const token = authHeader.replace('Bearer ', '')
+    const authHeader = req.headers.get('Authorization') ?? ''
+    const token = authHeader.replace('Bearer ', '').trim()
+    if (!token) return new Response('Unauthorized', { status: 401, headers: cors })
 
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-    )
-    const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
-    if (authErr || !user) return new Response('Unauthorized', { status: 401, headers: cors })
+    // Extract user info from JWT claims (already verified by gateway)
+    const payload = jwtPayload(token)
+    const userId = payload.sub as string
+    if (!userId) return new Response('Unauthorized', { status: 401, headers: cors })
 
     const admin = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -38,7 +40,7 @@ Deno.serve(async (req) => {
     const { data } = await admin
       .from('stripe_customers')
       .select('stripe_customer_id')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single()
 
     if (!data?.stripe_customer_id) {
