@@ -5,7 +5,19 @@
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AICV – Lebenslauf-Editor</title>
-    <script type="module" crossorigin src="./assets/index-C88WM-KA.js"></script>
+    <!-- Content Security Policy: blocks injected scripts, plugins, and base-tag hijacking -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self';
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: https: blob:;
+      connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+      font-src 'self' data:;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+    " />
+    <script type="module" crossorigin src="./assets/index-CcvtDSOd.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/chunk-B3K2TuZy.js">
     <link rel="modulepreload" crossorigin href="./assets/preload-helper-2ej06EnG.js">
     <link rel="stylesheet" crossorigin href="./assets/index-lJaOB4Xs.css">
