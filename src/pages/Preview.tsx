@@ -1,51 +1,129 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FileEdit, FileText } from 'lucide-react';
+import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FileEdit, FileText, FolderDown } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ResumePreview from '../components/templates/ResumePreview';
 import { TEMPLATES } from '../components/templates/templateConfig';
 import { useIsMobile } from '../hooks/useBreakpoint';
+import type { Resume } from '../types/resume';
 
-async function exportPDF(element: HTMLElement, filename: string) {
+const MAX_PDF_BYTES = 5 * 1024 * 1024; // 5 MB
+
+// Renders an HTML element to jsPDF pages, returns the doc
+async function renderElementToPdfDoc(
+  element: HTMLElement,
+  quality = 0.92,
+): Promise<{ pdfBytes: Uint8Array; pageCount: number }> {
   const html2canvas = (await import('html2canvas')).default;
   const jsPDF = (await import('jspdf')).default;
 
   const canvas = await html2canvas(element, {
-    scale: 2,
-    useCORS: true,
-    allowTaint: true,
-    backgroundColor: '#ffffff',
-    width: 794,
-    height: element.scrollHeight,
+    scale: 2, useCORS: true, allowTaint: true,
+    backgroundColor: '#ffffff', width: 794, height: element.scrollHeight,
   });
 
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = pdf.internal.pageSize.getHeight();
-  const imgWidth = canvas.width;
-  const imgHeight = canvas.height;
-  const ratio = pdfWidth / (imgWidth / 2);
-  const contentHeight = (imgHeight / 2) * ratio;
+  const pdfW = pdf.internal.pageSize.getWidth();
+  const pdfH = pdf.internal.pageSize.getHeight();
+  const ratio = pdfW / (canvas.width / 2);
+  const contentH = (canvas.height / 2) * ratio;
 
   let yOffset = 0;
   let pageCount = 0;
-
-  while (yOffset < contentHeight) {
+  while (yOffset < contentH) {
     if (pageCount > 0) pdf.addPage();
-    const sourceY = (yOffset / ratio) * 2;
-    const sourceH = Math.min((pdfHeight / ratio) * 2, imgHeight - sourceY);
-    const pageCanvas = document.createElement('canvas');
-    pageCanvas.width = imgWidth;
-    pageCanvas.height = sourceH;
-    const ctx = pageCanvas.getContext('2d')!;
-    ctx.drawImage(canvas, 0, sourceY, imgWidth, sourceH, 0, 0, imgWidth, sourceH);
-    const pageImg = pageCanvas.toDataURL('image/jpeg', 0.95);
-    pdf.addImage(pageImg, 'JPEG', 0, 0, pdfWidth, sourceH * ratio / 2);
-    yOffset += pdfHeight;
+    const srcY = (yOffset / ratio) * 2;
+    const srcH = Math.min((pdfH / ratio) * 2, canvas.height - srcY);
+    const pg = document.createElement('canvas');
+    pg.width = canvas.width; pg.height = srcH;
+    pg.getContext('2d')!.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
+    pdf.addImage(pg.toDataURL('image/jpeg', quality), 'JPEG', 0, 0, pdfW, srcH * ratio / 2);
+    yOffset += pdfH;
     pageCount++;
   }
 
-  pdf.save(filename);
+  return { pdfBytes: pdf.output('arraybuffer') as unknown as Uint8Array, pageCount };
+}
+
+// Merge multiple PDFs (as Uint8Array/ArrayBuffer) using pdf-lib
+async function mergePdfs(parts: Uint8Array[]): Promise<Uint8Array> {
+  const { PDFDocument } = await import('pdf-lib');
+  const merged = await PDFDocument.create();
+
+  for (const part of parts) {
+    try {
+      const src = await PDFDocument.load(part, { ignoreEncryption: true });
+      const pages = await merged.copyPages(src, src.getPageIndices());
+      pages.forEach(p => merged.addPage(p));
+    } catch { /* skip corrupt/encrypted pages */ }
+  }
+
+  return merged.save();
+}
+
+// Embed an image dataUrl as a full A4 page in a new PDF
+async function imageToPdfBytes(dataUrl: string): Promise<Uint8Array | null> {
+  try {
+    const { PDFDocument } = await import('pdf-lib');
+    const doc = await PDFDocument.create();
+    const isJpeg = dataUrl.includes('data:image/jpeg') || dataUrl.includes('data:image/jpg');
+    const base64 = dataUrl.split(',')[1];
+    const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+    const img = isJpeg ? await doc.embedJpg(bytes) : await doc.embedPng(bytes);
+    const a4w = 595.28, a4h = 841.89; // pts
+    const scale = Math.min(a4w / img.width, a4h / img.height);
+    const w = img.width * scale, h = img.height * scale;
+    const page = doc.addPage([a4w, a4h]);
+    page.drawImage(img, { x: (a4w - w) / 2, y: (a4h - h) / 2, width: w, height: h });
+    return doc.save();
+  } catch { return null; }
+}
+
+// Adaptive quality: reduce JPEG quality until under MAX_PDF_BYTES
+async function exportAdaptive(
+  parts: HTMLElement[],
+  docDataUrls: { dataUrl: string; type: string }[],
+): Promise<Uint8Array> {
+  let quality = 0.92;
+
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const pdfParts: Uint8Array[] = [];
+
+    for (const el of parts) {
+      const { pdfBytes } = await renderElementToPdfDoc(el, quality);
+      pdfParts.push(pdfBytes);
+    }
+
+    for (const { dataUrl, type } of docDataUrls) {
+      if (type === 'application/pdf' || dataUrl.startsWith('data:application/pdf')) {
+        const base64 = dataUrl.split(',')[1];
+        const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+        pdfParts.push(bytes);
+      } else {
+        const imgPdf = await imageToPdfBytes(dataUrl);
+        if (imgPdf) pdfParts.push(imgPdf);
+      }
+    }
+
+    const merged = await mergePdfs(pdfParts);
+    if (merged.length <= MAX_PDF_BYTES || quality <= 0.55) return merged;
+    quality -= 0.12;
+  }
+
+  // Fallback – merge with lowest quality
+  const pdfParts: Uint8Array[] = [];
+  for (const el of parts) {
+    const { pdfBytes } = await renderElementToPdfDoc(el, 0.55);
+    pdfParts.push(pdfBytes);
+  }
+  return mergePdfs(pdfParts);
+}
+
+function buildFilename(resume: Resume): string {
+  const first = resume.personalInfo.firstName || '';
+  const last = resume.personalInfo.lastName || '';
+  const name = [first, last].filter(Boolean).join('_') || 'Bewerbung';
+  return `${name}_Bewerbungsmappe.pdf`;
 }
 
 export default function Preview() {
@@ -58,6 +136,8 @@ export default function Preview() {
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const [activeView, setActiveView] = useState<'resume' | 'cover-letter'>('resume');
   const previewRef = useRef<HTMLDivElement>(null);
+  const resumePageRef = useRef<HTMLDivElement>(null);
+  const coverLetterRef = useRef<HTMLDivElement>(null);
 
   if (!resume) {
     return (
@@ -69,19 +149,51 @@ export default function Preview() {
     );
   }
 
+  // Export current view only
   const handleExport = async () => {
     if (!previewRef.current || exporting) return;
     setExporting(true);
     try {
-      const firstName = resume.personalInfo.firstName || 'Lebenslauf';
-      const lastName = resume.personalInfo.lastName || '';
-      const filename = `${firstName}${lastName ? '_' + lastName : ''}_CV.pdf`;
-      await exportPDF(previewRef.current, filename);
-    } catch (err) {
-      console.error('PDF export failed:', err);
-    } finally {
-      setExporting(false);
-    }
+      const { pdfBytes } = await renderElementToPdfDoc(previewRef.current);
+      const blob = new Blob([pdfBytes as BlobPart], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url;
+      const first = resume.personalInfo.firstName || 'Lebenslauf';
+      const last = resume.personalInfo.lastName ? '_' + resume.personalInfo.lastName : '';
+      a.download = `${first}${last}_CV.pdf`;
+      a.click(); URL.revokeObjectURL(url);
+    } catch (err) { console.error('PDF export failed:', err); }
+    finally { setExporting(false); }
+  };
+
+  // Export full Bewerbungsmappe: cover letter + resume + documents
+  const handleExportMappe = async () => {
+    if (!previewRef.current || exporting) return;
+    setExporting(true);
+    try {
+      const elements: HTMLElement[] = [];
+
+      // 1. Cover letter (if content exists)
+      const cl = resume.coverLetter;
+      const hasContent = cl?.body || cl?.subject || cl?.recipient;
+      if (hasContent && coverLetterRef.current) {
+        elements.push(coverLetterRef.current);
+      }
+
+      // 2. Resume (always)
+      const resumeEl = resumePageRef.current;
+      if (resumeEl) elements.push(resumeEl);
+
+      const docs = (resume.documents ?? []).map(d => ({ dataUrl: d.dataUrl, type: d.type }));
+      const merged = await exportAdaptive(elements, docs);
+
+      const blob = new Blob([merged.buffer as BlobPart], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url;
+      a.download = buildFilename(resume);
+      a.click(); URL.revokeObjectURL(url);
+    } catch (err) { console.error('Mappe export failed:', err); }
+    finally { setExporting(false); }
   };
 
   const cl = resume.coverLetter ?? { recipient: '', subject: '', body: '', closing: 'Mit freundlichen Grüssen' };
@@ -229,17 +341,33 @@ export default function Preview() {
             </button>
           </div>
 
-          <button
-            className="btn-glass btn-primary btn-sm"
-            onClick={handleExport}
-            disabled={exporting}
-            style={{ opacity: exporting ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 6 }}
-          >
-            {exporting
-              ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />{!isMobile && ' Exportiere…'}</>
-              : <><Download size={13} />{!isMobile && ' PDF exportieren'}</>
-            }
-          </button>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              className="btn-glass btn-sm"
+              onClick={handleExport}
+              disabled={exporting}
+              title="Nur aktuelle Seite exportieren"
+              style={{ opacity: exporting ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 5 }}
+            >
+              {exporting
+                ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />
+                : <Download size={13} />
+              }
+              {!isMobile && ' PDF'}
+            </button>
+            <button
+              className="btn-glass btn-primary btn-sm"
+              onClick={handleExportMappe}
+              disabled={exporting}
+              title="Ganze Bewerbungsmappe exportieren (Anschreiben + CV + Dokumente)"
+              style={{ opacity: exporting ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 5 }}
+            >
+              {exporting
+                ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />{!isMobile && ' Exportiere…'}</>
+                : <><FolderDown size={13} />{!isMobile && ' Ganze Mappe'}</>
+              }
+            </button>
+          </div>
         </div>
 
         {/* Preview scroll area */}
@@ -254,9 +382,15 @@ export default function Preview() {
           }}>
             <div ref={previewRef}>
               {activeView === 'resume'
-                ? <ResumePreview resume={resume} />
-                : <CoverLetterPage />
+                ? <div ref={resumePageRef}><ResumePreview resume={resume} /></div>
+                : <div ref={coverLetterRef}><CoverLetterPage /></div>
               }
+            </div>
+            {/* Hidden off-screen renders for Mappe export */}
+            <div style={{ position: 'absolute', left: -9999, top: 0, pointerEvents: 'none' }}>
+              <div ref={activeView === 'resume' ? coverLetterRef : resumePageRef}>
+                {activeView === 'resume' ? <CoverLetterPage /> : <ResumePreview resume={resume} />}
+              </div>
             </div>
           </div>
         </div>
