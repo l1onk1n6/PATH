@@ -148,7 +148,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const supabase = getSupabase();
       const { error } = await supabase.rpc('delete_user');
       if (error) throw error;
-      await supabase.auth.signOut();
+      // Sign out after successful deletion (session is invalid anyway)
+      await supabase.auth.signOut().catch(() => {});
       set({ user: null, session: null, loading: false });
     } catch (e) {
       set({ error: toGermanError(e), loading: false });

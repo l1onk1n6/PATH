@@ -72,3 +72,33 @@ $$;
 create trigger resumes_updated_at
   before update on public.resumes
   for each row execute procedure public.set_updated_at();
+
+-- ── DSGVO: Account-Löschung ────────────────────────────────
+-- Löscht den angemeldeten User + alle seine Daten (CASCADE).
+-- SECURITY DEFINER: läuft als postgres, darf auth.users schreiben.
+-- set search_path = '': verhindert Search-Path-Injection.
+create or replace function public.delete_user()
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'Not authenticated';
+  end if;
+
+  -- App-Daten explizit löschen (CASCADE würde es auch tun,
+  -- aber explizit für Audit-Trail und DSGVO-Dokumentation)
+  delete from public.documents where user_id = auth.uid();
+  delete from public.resumes   where user_id = auth.uid();
+  delete from public.persons   where user_id = auth.uid();
+
+  -- Auth-User löschen → triggert CASCADE auf alle verknüpften Tabellen
+  delete from auth.users where id = auth.uid();
+end;
+$$;
+
+-- Nur angemeldete User dürfen diese Funktion aufrufen
+grant execute on function public.delete_user() to authenticated;
+revoke execute on function public.delete_user() from anon, public;
