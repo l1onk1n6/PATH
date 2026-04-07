@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp,
   FolderPlus, Pencil, Copy, Search, ExternalLink, Clock,
-  Download, Share2, CheckCircle, LayoutGrid, List, X,
+  Download, Share2, CheckCircle, LayoutGrid, List, X, BarChart2,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import {
@@ -13,10 +13,46 @@ import {
 import { calcCompleteness, completenessColor } from '../lib/completeness';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { v4 as uuidv4 } from 'uuid';
-import ProGate from '../components/ui/ProGate';
+import { UpgradeModal } from '../components/ui/ProGate';
 import { usePlan } from '../lib/plan';
 
 const ALL_STATUSES: ApplicationStatus[] = ['entwurf', 'gesendet', 'interview', 'abgelehnt', 'angenommen'];
+
+// ── ATS button ─────────────────────────────────────────────
+function AtsButton() {
+  const { isPro } = usePlan();
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const [showSoon, setShowSoon] = useState(false);
+
+  return (
+    <>
+      {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} highlightId="ats" />}
+      {showSoon && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSoon(false)}>
+          <div className="glass-card animate-scale-in" style={{ padding: '24px 28px', maxWidth: 320, textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>📊</div>
+            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>ATS-Score — bald verfügbar</div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 16 }}>
+              Lebenslauf gegen Stellenbeschreibung matchen & Keywords optimieren. Dieses Feature ist in Entwicklung.
+            </div>
+            <button className="btn-glass btn-primary btn-sm" onClick={() => setShowSoon(false)}>Schliessen</button>
+          </div>
+        </div>
+      )}
+      <button
+        className="btn-glass btn-sm"
+        onClick={() => isPro ? setShowSoon(true) : setShowUpgrade(true)}
+        style={{ gap: 5, position: 'relative' }}
+        title="ATS-Score prüfen"
+      >
+        <BarChart2 size={13} /> ATS
+        {!isPro && (
+          <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 4px', borderRadius: 3, background: 'linear-gradient(135deg, #FF9F0A, #FF375F)', color: '#fff', marginLeft: 2 }}>PRO</span>
+        )}
+      </button>
+    </>
+  );
+}
 
 // ── Share modal ────────────────────────────────────────────
 function ShareModal({ resumeId, token, onClose }: { resumeId: string; token?: string; onClose: () => void }) {
@@ -123,23 +159,23 @@ function TrackerView() {
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))',
-      gap: 12,
+      gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+      gap: 16,
       alignItems: 'start',
     }}>
       {ALL_STATUSES.map((status) => {
         const statusResumes = resumes.filter(r => (r.status ?? 'entwurf') === status);
         const color = APPLICATION_STATUS_COLORS[status];
         return (
-          <div key={status} className="glass-card" style={{ padding: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: color, flexShrink: 0 }} />
-              <span style={{ fontSize: 12, fontWeight: 600 }}>{APPLICATION_STATUS_LABELS[status]}</span>
-              <span className="badge" style={{ marginLeft: 'auto', fontSize: 10 }}>{statusResumes.length}</span>
+          <div key={status} className="glass-card" style={{ padding: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+              <span style={{ width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0 }} />
+              <span style={{ fontSize: 14, fontWeight: 700 }}>{APPLICATION_STATUS_LABELS[status]}</span>
+              <span className="badge" style={{ marginLeft: 'auto', fontSize: 11, padding: '2px 8px' }}>{statusResumes.length}</span>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {statusResumes.length === 0 && (
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', textAlign: 'center', padding: '8px 0' }}>—</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '16px 0' }}>Keine Einträge</div>
               )}
               {statusResumes.map((r) => {
                 const person = persons.find(p => p.resumeIds.includes(r.id));
@@ -147,34 +183,34 @@ function TrackerView() {
                   <div
                     key={r.id}
                     className="glass-card"
-                    style={{ padding: '8px 10px', cursor: 'pointer', borderRadius: 8 }}
+                    style={{ padding: '12px 14px', cursor: 'pointer', borderRadius: 10 }}
                     onClick={() => {
                       if (person) setActivePerson(person.id);
                       setActiveResume(r.id);
                       navigate('/editor');
                     }}
                   >
-                    <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {r.name || 'Bewerbungsmappe'}
                     </div>
                     {person && (
-                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>
                         {person.name}
                       </div>
                     )}
                     {r.deadline && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 4, fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>
-                        <Clock size={9} />
-                        {new Date(r.deadline).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit' })}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6, fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
+                        <Clock size={11} />
+                        {new Date(r.deadline).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: '2-digit' })}
                       </div>
                     )}
-                    <div style={{ display: 'flex', gap: 4, marginTop: 6, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: 5, marginTop: 10, flexWrap: 'wrap' }}>
                       {ALL_STATUSES.filter(s => s !== status).map(s => (
                         <button
                           key={s}
                           title={APPLICATION_STATUS_LABELS[s]}
                           className="btn-glass"
-                          style={{ padding: '2px 6px', fontSize: 10, borderRadius: 4 }}
+                          style={{ padding: '4px 9px', fontSize: 11, borderRadius: 6 }}
                           onClick={(e) => { e.stopPropagation(); setResumeStatus(r.id, s); }}
                         >
                           → {APPLICATION_STATUS_LABELS[s]}
@@ -332,20 +368,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* ATS Score — Pro feature teaser */}
-      <ProGate featureId="ats">
-        <div className="glass-card" style={{ padding: isMobile ? '12px 14px' : '14px 18px', marginBottom: isMobile ? 12 : 16, display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ fontSize: 28 }}>📊</div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2 }}>ATS-Score prüfen</div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>Lebenslauf gegen Stellenbeschreibung matchen & Keywords optimieren</div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 8, background: 'rgba(0,122,255,0.15)', border: '1px solid rgba(0,122,255,0.3)', fontSize: 13, fontWeight: 600, flexShrink: 0 }}>
-            Score prüfen →
-          </div>
-        </div>
-      </ProGate>
-
       {/* Section header + controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 8, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -363,6 +385,7 @@ export default function Dashboard() {
           >
             <LayoutGrid size={13} /> Tracker
           </button>
+          <AtsButton />
           {/* Limit counters */}
           {[
             { used: persons.length, max: limits.persons, label: 'P' },
