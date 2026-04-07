@@ -59,7 +59,7 @@ function applyTranslations(r: Resume, t: Record<string, string>): void {
   } : r.coverLetter;
 
   // Mutate via store
-  return Object.assign(r, {
+  Object.assign(r, {
     personalInfo:   { ...r.personalInfo, ...upd },
     workExperience: updatedExp,
     education:      updatedEdu,
@@ -79,10 +79,8 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
   const [loading, setLoading]   = useState(false);
   const [done, setDone]         = useState(false);
   const [error, setError]       = useState('');
-  const [showUpgrade, setShowUpgrade] = useState(!isPro);
-
   if (!resume) return null;
-  if (showUpgrade) return <UpgradeModal onClose={onClose} highlightId="translate" />;
+  if (!isPro) return <UpgradeModal onClose={onClose} highlightId="translate" />;
 
   const targetLang = language === 'Andere…' ? custom : language;
 

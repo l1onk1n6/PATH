@@ -7,10 +7,9 @@ import ProGate from '../ui/ProGate';
 import { UpgradeModal } from '../ui/ProGate';
 
 export default function CoverLetterEditor() {
-  const { getActiveResume, getActivePerson, updateCoverLetter, updateResume } = useResumeStore();
+  const { getActiveResume, updateCoverLetter, updateResume } = useResumeStore();
   const { isPro } = usePlan();
   const resume = getActiveResume();
-  const person = getActivePerson();
 
   const [showAiPanel, setShowAiPanel] = useState(false);
   const [aiJobTitle, setAiJobTitle] = useState('');
