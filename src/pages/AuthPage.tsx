@@ -64,11 +64,11 @@ export default function AuthPage({ onSetup }: { onSetup: () => void }) {
       <div className="glass-card animate-scale-in" style={{ width: '100%', maxWidth: 420, padding: 36 }}>
         {/* Logo */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
-          <div style={{ filter: 'drop-shadow(0 6px 18px rgba(52,199,89,0.5))', marginBottom: 14 }}>
+          <div style={{ marginBottom: 14 }}>
             <LogoIcon size={52} />
           </div>
           <h1 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 4px', letterSpacing: '-0.4px' }}>Path</h1>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, margin: 0 }}>Lebenslauf-Editor · by pixmatic</p>
+          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12, margin: 0, fontWeight: 400 }}>by pixmatic</p>
         </div>
 
         {/* Tab */}
