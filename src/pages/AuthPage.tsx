@@ -8,7 +8,7 @@ import {
 
 const limiter = new RateLimiter(5, 30_000);
 
-export default function AuthPage({ onSetup }: { onSetup: () => void }) {
+export default function AuthPage() {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

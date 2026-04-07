@@ -155,7 +155,7 @@ export default function App() {
   }
 
   if (!user) {
-    return <HashRouter><AuthPage onSetup={() => setShowSetup(true)} /></HashRouter>;
+    return <HashRouter><AuthPage /></HashRouter>;
   }
 
   return (
