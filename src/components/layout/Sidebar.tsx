@@ -3,11 +3,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Users, FileText, Plus, ChevronRight, Trash2,
   LayoutDashboard, Eye, FilePlus, LogOut,
-  PanelLeftClose, PanelLeftOpen, Mail,
+  PanelLeftClose, PanelLeftOpen, Mail, Sparkles, UserCircle,
 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useAuthStore } from '../../store/authStore';
 import { LogoFull, LogoIcon } from './Logo';
+import { usePlan } from '../../lib/plan';
+import { UpgradeModal } from '../ui/ProGate';
 
 interface SidebarProps {
   onClose?: () => void;          // mobile drawer close
@@ -20,7 +22,9 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
   const location = useLocation();
   const [addingPerson, setAddingPerson] = useState(false);
   const [newName, setNewName] = useState('');
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const { user, signOut } = useAuthStore();
+  const { isPro } = usePlan();
 
 
   const {
@@ -83,6 +87,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
           { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
           { path: '/editor', icon: FileText, label: 'Editor' },
           { path: '/preview', icon: Eye, label: 'Vorschau' },
+          { path: '/account', icon: UserCircle, label: 'Konto' },
         ].map(({ path, icon: Icon, label }) => (
           <button
             key={path}
@@ -142,6 +147,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
           { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
           { path: '/editor', icon: FileText, label: 'Editor' },
           { path: '/preview', icon: Eye, label: 'Vorschau' },
+          { path: '/account', icon: UserCircle, label: 'Konto' },
         ].map(({ path, icon: Icon, label }) => (
           <button
             key={path}
@@ -314,6 +320,33 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
       </div>
 
       <div className="divider" />
+
+      {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
+
+      {/* Plan badge */}
+      {!isPro && (
+        <button
+          onClick={() => setShowUpgrade(true)}
+          className="btn-glass"
+          style={{
+            width: '100%', justifyContent: 'flex-start', padding: '9px 12px', marginBottom: 8,
+            background: 'linear-gradient(135deg, rgba(255,159,10,0.12), rgba(255,55,95,0.1))',
+            border: '1px solid rgba(255,159,10,0.25)', boxShadow: 'none', fontSize: 12, gap: 8,
+          }}
+        >
+          <Sparkles size={13} style={{ color: '#FF9F0A' }} />
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ fontWeight: 600, color: '#FF9F0A', fontSize: 11 }}>Auf Pro upgraden</div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>KI, Analytics & mehr</div>
+          </div>
+        </button>
+      )}
+      {isPro && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 8px', marginBottom: 6, fontSize: 11, color: '#FF9F0A' }}>
+          <Sparkles size={12} />
+          <span style={{ fontWeight: 700 }}>PATH Pro</span>
+        </div>
+      )}
 
       {user && (
         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 6, paddingLeft: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

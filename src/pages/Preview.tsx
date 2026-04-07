@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FileEdit, FileText, FolderDown } from 'lucide-react';
+import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FileEdit, FileText, FolderDown, Lock } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { useResumeStore } from '../store/resumeStore';
+import ProGate from '../components/ui/ProGate';
 import ResumePreview from '../components/templates/ResumePreview';
 import { TEMPLATES } from '../components/templates/templateConfig';
 import { useIsMobile } from '../hooks/useBreakpoint';
@@ -355,6 +356,11 @@ export default function Preview() {
               }
               {!isMobile && ' PDF'}
             </button>
+            <ProGate featureId="password" badge>
+              <button className="btn-glass btn-sm" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <Lock size={13} />{!isMobile && ' Passwort'}
+              </button>
+            </ProGate>
             <button
               className="btn-glass btn-primary btn-sm"
               onClick={handleExportMappe}

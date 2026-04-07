@@ -1,5 +1,6 @@
-import { Link, Calendar } from 'lucide-react';
+import { Link, Calendar, Sparkles, Bell } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
+import ProGate from '../ui/ProGate';
 
 export default function CoverLetterEditor() {
   const { getActiveResume, updateCoverLetter, updateResume } = useResumeStore();
@@ -42,13 +43,20 @@ export default function CoverLetterEditor() {
           <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
             <Calendar size={11} /> Bewerbungsfrist
           </label>
-          <input
-            className="input-glass"
-            type="date"
-            value={resume.deadline ?? ''}
-            onChange={(e) => updateResume(resume.id, { deadline: e.target.value })}
-            style={{ width: '100%', color: deadlineColor ?? undefined }}
-          />
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <input
+              className="input-glass"
+              type="date"
+              value={resume.deadline ?? ''}
+              onChange={(e) => updateResume(resume.id, { deadline: e.target.value })}
+              style={{ flex: 1, color: deadlineColor ?? undefined }}
+            />
+            <ProGate featureId="reminder" badge>
+              <button className="btn-glass btn-icon" style={{ padding: 8 }} title="Deadline-Reminder">
+                <Bell size={13} />
+              </button>
+            </ProGate>
+          </div>
           {resume.deadline && deadlineColor === 'var(--ios-red)' && (
             <div style={{ fontSize: 11, color: 'var(--ios-red)', marginTop: 4 }}>Frist abgelaufen</div>
           )}
@@ -84,9 +92,16 @@ export default function CoverLetterEditor() {
       </div>
 
       <div>
-        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
-          Anschreiben-Text
-        </label>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+          <label style={{ fontSize: 12, fontWeight: 600, opacity: 0.7 }}>
+            Anschreiben-Text
+          </label>
+          <ProGate featureId="ai" badge>
+            <button className="btn-glass btn-sm" style={{ fontSize: 11, gap: 5 }}>
+              <Sparkles size={11} /> KI generieren
+            </button>
+          </ProGate>
+        </div>
         <textarea
           className="input-glass"
           placeholder={"Sehr geehrte Damen und Herren,\n\nmit grossem Interesse habe ich Ihre Stellenausschreibung gelesen...\n\nIch freue mich auf ein persönliches Gespräch."}

@@ -9,6 +9,7 @@ import Preview from './pages/Preview';
 import AuthPage from './pages/AuthPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import SharedResumePage from './pages/SharedResumePage';
+import AccountPage from './pages/AccountPage';
 import { useAuthStore } from './store/authStore';
 import { useResumeStore } from './store/resumeStore';
 import { isSupabaseConfigured } from './lib/supabase';
@@ -95,6 +96,7 @@ function AppShell() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/editor" element={<Editor />} />
               <Route path="/preview" element={<Preview />} />
+              <Route path="/account" element={<AccountPage />} />
               <Route path="/shared" element={<SharedResumePage />} />
             </Routes>
           </div>

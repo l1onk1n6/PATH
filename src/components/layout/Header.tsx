@@ -1,6 +1,9 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Eye, Edit3, Menu, Cloud, Loader } from 'lucide-react';
+import { Eye, Edit3, Menu, Cloud, Loader, Sparkles } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
+import { usePlan } from '../../lib/plan';
+import { useState } from 'react';
+import { UpgradeModal } from '../ui/ProGate';
 
 interface Props {
   isMobile?: boolean;
@@ -11,6 +14,8 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
   const { getActivePerson, getActiveResume, savePending, syncing } = useResumeStore();
+  const { plan, isPro } = usePlan();
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   const person = getActivePerson();
   const resume = getActiveResume();
@@ -19,7 +24,7 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
     '/': 'Dashboard',
     '/editor': 'Editor',
     '/preview': 'Vorschau',
-    '/settings': 'Einstellungen',
+    '/account': 'Konto',
   };
 
   const title = pageTitle[location.pathname] ?? 'Path';
@@ -67,6 +72,27 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
       </div>
 
       <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+        {/* Plan badge */}
+        {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
+        <button
+          onClick={() => !isPro && setShowUpgrade(true)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20,
+            fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', cursor: isPro ? 'default' : 'pointer',
+            background: isPro
+              ? 'linear-gradient(135deg, rgba(255,159,10,0.25), rgba(255,55,95,0.2))'
+              : 'rgba(255,255,255,0.08)',
+            border: isPro
+              ? '1px solid rgba(255,159,10,0.4)'
+              : '1px solid rgba(255,255,255,0.15)',
+            color: isPro ? '#FF9F0A' : 'rgba(255,255,255,0.45)',
+          }}
+          title={isPro ? 'PATH Pro — alle Features aktiv' : 'Upgrade auf PATH Pro'}
+        >
+          {isPro && <Sparkles size={11} />}
+          {isPro ? 'PRO' : plan.toUpperCase()}
+        </button>
+
         {/* Sync status — always visible when active */}
         {(savePending || syncing) ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>

@@ -13,6 +13,7 @@ import {
 import { calcCompleteness, completenessColor } from '../lib/completeness';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { v4 as uuidv4 } from 'uuid';
+import ProGate from '../components/ui/ProGate';
 
 const ALL_STATUSES: ApplicationStatus[] = ['entwurf', 'gesendet', 'interview', 'abgelehnt', 'angenommen'];
 
@@ -301,6 +302,20 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
+
+      {/* ATS Score — Pro feature teaser */}
+      <ProGate featureId="ats">
+        <div className="glass-card" style={{ padding: isMobile ? '12px 14px' : '14px 18px', marginBottom: isMobile ? 12 : 16, display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ fontSize: 28 }}>📊</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2 }}>ATS-Score prüfen</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>Lebenslauf gegen Stellenbeschreibung matchen & Keywords optimieren</div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 8, background: 'rgba(0,122,255,0.15)', border: '1px solid rgba(0,122,255,0.3)', fontSize: 13, fontWeight: 600, flexShrink: 0 }}>
+            Score prüfen →
+          </div>
+        </div>
+      </ProGate>
 
       {/* Section header + controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 8, flexWrap: 'wrap' }}>
