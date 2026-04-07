@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Mail, Lock, User, Eye, EyeOff, Settings, ShieldAlert } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, ShieldAlert } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { LogoIcon } from '../components/layout/Logo';
 import {
@@ -15,6 +15,16 @@ export default function AuthPage({ onSetup }: { onSetup: () => void }) {
   const [name, setName] = useState('');
   const [showPw, setShowPw] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const [logoTaps, setLogoTaps] = useState(0);
+  const logoTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handleLogoTap() {
+    const next = logoTaps + 1;
+    setLogoTaps(next);
+    if (logoTapTimer.current) clearTimeout(logoTapTimer.current);
+    if (next >= 5) { setLogoTaps(0); onSetup(); return; }
+    logoTapTimer.current = setTimeout(() => setLogoTaps(0), 2000);
+  }
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { signIn, signUp, loading, error, clearError } = useAuthStore();
@@ -64,7 +74,10 @@ export default function AuthPage({ onSetup }: { onSetup: () => void }) {
       <div className="glass-card animate-scale-in" style={{ width: '100%', maxWidth: 420, padding: 36 }}>
         {/* Logo */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
-          <div style={{ marginBottom: 14 }}>
+          <div
+            style={{ marginBottom: 14, cursor: 'default', userSelect: 'none' }}
+            onClick={handleLogoTap}
+          >
             <LogoIcon size={52} />
           </div>
           <h1 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 4px', letterSpacing: '-0.4px' }}>Path</h1>
@@ -189,15 +202,6 @@ export default function AuthPage({ onSetup }: { onSetup: () => void }) {
           </button>
         </form>
 
-        <div className="divider" style={{ margin: '20px 0' }} />
-
-        <button
-          className="btn-glass btn-sm"
-          onClick={onSetup}
-          style={{ width: '100%', justifyContent: 'center', fontSize: 12, opacity: 0.6 }}
-        >
-          <Settings size={12} /> Supabase neu konfigurieren
-        </button>
       </div>
     </div>
   );
