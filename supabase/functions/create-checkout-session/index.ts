@@ -20,13 +20,18 @@ Deno.serve(async (req) => {
   try {
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!)
 
-    // Verify calling user via their JWT
+    // Extract JWT from Authorization header and verify directly
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response('Unauthorized', { status: 401, headers: cors })
+    }
+    const token = authHeader.replace('Bearer ', '')
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } } },
     )
-    const { data: { user }, error: authErr } = await supabase.auth.getUser()
+    const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
     if (authErr || !user) return new Response('Unauthorized', { status: 401, headers: cors })
 
     // Service-role client for stripe_customers table
