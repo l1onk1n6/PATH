@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useAuthStore } from '../../store/authStore';
+import { LogoFull } from './Logo';
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -44,20 +45,8 @@ export default function Sidebar() {
   return (
     <aside className="flex flex-col h-full w-64 shrink-0 animate-slide-left" style={{ padding: '16px 12px' }}>
       {/* Logo */}
-      <div className="flex items-center gap-3 mb-6 px-2">
-        <div style={{
-          width: 36, height: 36,
-          background: 'linear-gradient(135deg, var(--ios-blue), var(--ios-indigo))',
-          borderRadius: 10,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 4px 16px rgba(0,122,255,0.4)',
-        }}>
-          <FileText size={18} color="#fff" />
-        </div>
-        <div>
-          <div style={{ fontWeight: 700, fontSize: 16, letterSpacing: '-0.3px' }}>AICV</div>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: -1 }}>Lebenslauf-Editor</div>
-        </div>
+      <div style={{ marginBottom: 24, paddingLeft: 4 }}>
+        <LogoFull size={36} />
       </div>
 
       {/* Navigation */}
