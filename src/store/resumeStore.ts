@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import type {
   Person, Resume, PersonalInfo, CoverLetter, WorkExperience, Education,
   Skill, Language, Project, Certificate, UploadedDocument, TemplateId, EditorSection,
+  ApplicationStatus,
 } from '../types/resume';
 import * as db from '../lib/db';
 
@@ -50,10 +51,12 @@ interface ResumeStore {
 
   // Resume actions
   addResume: (personId: string, name?: string) => Resume;
+  duplicateResume: (id: string) => Resume;
   updateResume: (id: string, data: Partial<Resume>) => void;
   deleteResume: (id: string) => void;
   setActiveResume: (id: string) => void;
   renameResume: (id: string, name: string) => void;
+  setResumeStatus: (id: string, status: ApplicationStatus) => void;
   setTemplate: (resumeId: string, templateId: TemplateId) => void;
   setAccentColor: (resumeId: string, color: string) => void;
 
@@ -90,7 +93,7 @@ interface ResumeStore {
 function createDefaultResume(personId: string, name = 'Bewerbungsmappe'): Resume {
   return {
     id: uuidv4(), personId,
-    name,
+    name, status: 'entwurf',
     templateId: 'minimal', accentColor: '#007AFF',
     personalInfo: { firstName: '', lastName: '', title: '', email: '', phone: '', location: '', website: '', linkedin: '', github: '', summary: '' },
     coverLetter: { recipient: '', subject: '', body: '', closing: 'Mit freundlichen Grüssen' },
@@ -217,8 +220,34 @@ export const useResumeStore = create<ResumeStore>()(
         set((s) => ({ activeResumeId: id, persons: s.persons.map(p => p.id === resume.personId ? { ...p, activeResumeId: id } : p) }));
       },
 
+      duplicateResume: (id) => {
+        const original = get().resumes.find(r => r.id === id);
+        if (!original) throw new Error('Resume not found');
+        const copy: Resume = {
+          ...JSON.parse(JSON.stringify(original)),
+          id: uuidv4(),
+          name: `${original.name} (Kopie)`,
+          status: 'entwurf' as ApplicationStatus,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          documents: [],
+        };
+        set((s) => ({
+          resumes: [...s.resumes, copy],
+          persons: s.persons.map(p => p.id === copy.personId ? { ...p, resumeIds: [...p.resumeIds, copy.id], activeResumeId: copy.id } : p),
+          activeResumeId: copy.id,
+        }));
+        db.upsertResume(copy);
+        return copy;
+      },
+
       renameResume: (id, name) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === id ? { ...r, name, updatedAt: new Date().toISOString() } : r) }));
+        queueSave(`resume-${id}`, () => { const r = get().resumes.find(r => r.id === id); if (r) db.upsertResume(r); });
+      },
+
+      setResumeStatus: (id, status) => {
+        set((s) => ({ resumes: s.resumes.map(r => r.id === id ? { ...r, status, updatedAt: new Date().toISOString() } : r) }));
         queueSave(`resume-${id}`, () => { const r = get().resumes.find(r => r.id === id); if (r) db.upsertResume(r); });
       },
 

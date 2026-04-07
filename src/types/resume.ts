@@ -103,6 +103,7 @@ export interface Resume {
   id: string;
   personId: string;
   name: string;
+  status: ApplicationStatus;
   templateId: TemplateId;
   accentColor: string;
   personalInfo: PersonalInfo;
@@ -126,6 +127,24 @@ export interface Person {
   activeResumeId: string;
   createdAt: string;
 }
+
+export type ApplicationStatus = 'entwurf' | 'gesendet' | 'interview' | 'abgelehnt' | 'angenommen';
+
+export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
+  entwurf:    'Entwurf',
+  gesendet:   'Gesendet',
+  interview:  'Interview',
+  abgelehnt:  'Abgelehnt',
+  angenommen: 'Angenommen',
+};
+
+export const APPLICATION_STATUS_COLORS: Record<ApplicationStatus, string> = {
+  entwurf:    'rgba(255,255,255,0.3)',
+  gesendet:   'var(--ios-blue)',
+  interview:  'var(--ios-yellow, #FF9F0A)',
+  abgelehnt:  'var(--ios-red)',
+  angenommen: 'var(--ios-green)',
+};
 
 export interface CoverLetter {
   recipient: string;

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X } from 'lucide-react';
+import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FileEdit, FileText } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ResumePreview from '../components/templates/ResumePreview';
@@ -56,6 +56,7 @@ export default function Preview() {
   const [zoom, setZoom] = useState(isMobile ? 0.42 : 0.7);
   const [exporting, setExporting] = useState(false);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+  const [activeView, setActiveView] = useState<'resume' | 'cover-letter'>('resume');
   const previewRef = useRef<HTMLDivElement>(null);
 
   if (!resume) {
@@ -82,6 +83,58 @@ export default function Preview() {
       setExporting(false);
     }
   };
+
+  const cl = resume.coverLetter ?? { recipient: '', subject: '', body: '', closing: 'Mit freundlichen Grüssen' };
+  const pi = resume.personalInfo;
+  const senderName = [pi.firstName, pi.lastName].filter(Boolean).join(' ');
+
+  const CoverLetterPage = () => (
+    <div style={{
+      width: 794, minHeight: 1123, background: '#fff', color: '#111',
+      fontFamily: 'Georgia, "Times New Roman", serif',
+      fontSize: 13, lineHeight: 1.7, padding: '80px 80px 60px',
+      boxSizing: 'border-box',
+    }}>
+      {/* Sender info top right */}
+      <div style={{ textAlign: 'right', marginBottom: 40, fontSize: 12, color: '#555' }}>
+        {senderName && <div style={{ fontWeight: 700, fontSize: 14, color: '#111' }}>{senderName}</div>}
+        {pi.title && <div>{pi.title}</div>}
+        {pi.location && <div>{pi.location}</div>}
+        {pi.email && <div>{pi.email}</div>}
+        {pi.phone && <div>{pi.phone}</div>}
+      </div>
+
+      {/* Recipient */}
+      {cl.recipient && (
+        <div style={{ marginBottom: 32, whiteSpace: 'pre-line', fontSize: 13 }}>
+          {cl.recipient}
+        </div>
+      )}
+
+      {/* Date */}
+      <div style={{ textAlign: 'right', marginBottom: 28, color: '#555', fontSize: 12 }}>
+        {pi.location ? pi.location + ', ' : ''}{new Date().toLocaleDateString('de-CH', { day: '2-digit', month: 'long', year: 'numeric' })}
+      </div>
+
+      {/* Subject */}
+      {cl.subject && (
+        <div style={{ fontWeight: 700, marginBottom: 24, fontSize: 14 }}>
+          {cl.subject}
+        </div>
+      )}
+
+      {/* Body */}
+      <div style={{ whiteSpace: 'pre-wrap', marginBottom: 40 }}>
+        {cl.body || <span style={{ color: '#aaa' }}>Kein Anschreiben-Text vorhanden.</span>}
+      </div>
+
+      {/* Closing */}
+      <div>
+        <div style={{ marginBottom: 48 }}>{cl.closing || 'Mit freundlichen Grüssen'}</div>
+        {senderName && <div style={{ fontWeight: 700 }}>{senderName}</div>}
+      </div>
+    </div>
+  );
 
   const TemplatePicker = () => (
     <>
@@ -128,8 +181,34 @@ export default function Preview() {
           borderBottom: '1px solid rgba(255,255,255,0.1)', flexShrink: 0, gap: 8,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {/* Mobile: template picker toggle */}
-            {isMobile && (
+            {/* View tabs */}
+            <button
+              className="btn-glass btn-sm"
+              onClick={() => setActiveView('resume')}
+              style={{
+                padding: '5px 10px', gap: 5,
+                background: activeView === 'resume' ? 'rgba(0,122,255,0.2)' : undefined,
+                borderColor: activeView === 'resume' ? 'rgba(0,122,255,0.4)' : undefined,
+              }}
+            >
+              <FileText size={12} />{!isMobile && ' Lebenslauf'}
+            </button>
+            <button
+              className="btn-glass btn-sm"
+              onClick={() => setActiveView('cover-letter')}
+              style={{
+                padding: '5px 10px', gap: 5,
+                background: activeView === 'cover-letter' ? 'rgba(0,122,255,0.2)' : undefined,
+                borderColor: activeView === 'cover-letter' ? 'rgba(0,122,255,0.4)' : undefined,
+              }}
+            >
+              <FileEdit size={12} />{!isMobile && ' Anschreiben'}
+            </button>
+
+            <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.15)', margin: '0 2px' }} />
+
+            {/* Mobile: template picker toggle (only for resume view) */}
+            {isMobile && activeView === 'resume' && (
               <button
                 className="btn-glass btn-sm btn-icon"
                 onClick={() => setTemplatePickerOpen(true)}
@@ -174,7 +253,10 @@ export default function Preview() {
             marginBottom: `calc((${zoom} - 1) * -100%)`,
           }}>
             <div ref={previewRef}>
-              <ResumePreview resume={resume} />
+              {activeView === 'resume'
+                ? <ResumePreview resume={resume} />
+                : <CoverLetterPage />
+              }
             </div>
           </div>
         </div>

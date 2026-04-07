@@ -4,7 +4,7 @@
  * damit die App offline weiter funktioniert.
  */
 import { getSupabase, isSupabaseConfigured } from './supabase';
-import type { Person, Resume, UploadedDocument } from '../types/resume';
+import type { Person, Resume, UploadedDocument, ApplicationStatus } from '../types/resume';
 
 function sb() {
   return getSupabase();
@@ -80,6 +80,7 @@ export async function upsertResume(resume: Resume): Promise<void> {
       person_id: resume.personId,
       user_id: uid,
       name: resume.name,
+      status: resume.status ?? 'entwurf',
       template_id: resume.templateId,
       accent_color: resume.accentColor,
       personal_info: resume.personalInfo,
@@ -167,6 +168,7 @@ function rowToResume(row: Record<string, unknown>): Resume {
     id: row.id as string,
     personId: row.person_id as string,
     name: (row.name as string) || 'Bewerbungsmappe',
+    status: ((row.status as ApplicationStatus) || 'entwurf'),
     templateId: row.template_id as Resume['templateId'],
     accentColor: row.accent_color as string,
     personalInfo: (row.personal_info as Resume['personalInfo']) ?? {},

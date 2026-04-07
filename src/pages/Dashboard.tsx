@@ -1,26 +1,37 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp, FolderPlus, Pencil } from 'lucide-react';
+import {
+  Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp,
+  FolderPlus, Pencil, Copy, Search,
+} from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
+import {
+  APPLICATION_STATUS_LABELS, APPLICATION_STATUS_COLORS,
+  type ApplicationStatus,
+} from '../types/resume';
 import { useIsMobile } from '../hooks/useBreakpoint';
+
+const ALL_STATUSES: ApplicationStatus[] = ['entwurf', 'gesendet', 'interview', 'abgelehnt', 'angenommen'];
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const {
     persons, resumes, addPerson, deletePerson, setActivePerson, activePersonId,
-    addResume, deleteResume, setActiveResume, renameResume,
+    addResume, deleteResume, setActiveResume, renameResume, duplicateResume, setResumeStatus,
   } = useResumeStore();
+
   const [newName, setNewName] = useState('');
   const [showAdd, setShowAdd] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // Adding a new Bewerbungsmappe per person
   const [addingResumeForPersonId, setAddingResumeForPersonId] = useState<string | null>(null);
   const [newResumeName, setNewResumeName] = useState('');
 
-  // Renaming a resume inline
   const [renamingResumeId, setRenamingResumeId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
+
+  const [statusMenuResumeId, setStatusMenuResumeId] = useState<string | null>(null);
 
   function handleAdd() {
     if (!newName.trim()) return;
@@ -47,14 +58,61 @@ export default function Dashboard() {
   const totalResumes = resumes.length;
   const totalSections = resumes.reduce((acc, r) => acc + r.workExperience.length + r.education.length + r.skills.length, 0);
 
+  const filteredPersons = searchQuery.trim()
+    ? persons.filter(p =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        resumes.filter(r => p.resumeIds.includes(r.id)).some(r =>
+          r.name.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      )
+    : persons;
+
   return (
     <div className="animate-fade-in" style={{ height: '100%', overflow: 'auto', padding: isMobile ? '0 0 16px' : undefined }}>
+
+      {/* Status menu overlay */}
+      {statusMenuResumeId && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 100 }}
+          onClick={() => setStatusMenuResumeId(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="glass-card animate-scale-in"
+            style={{
+              position: 'fixed', top: '50%', left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 101, padding: 16, minWidth: 200,
+            }}
+          >
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, opacity: 0.7 }}>Status setzen</div>
+            {ALL_STATUSES.map(s => (
+              <button
+                key={s}
+                className="btn-glass"
+                style={{
+                  width: '100%', justifyContent: 'flex-start', marginBottom: 6,
+                  gap: 10, fontSize: 13,
+                }}
+                onClick={() => { setResumeStatus(statusMenuResumeId, s); setStatusMenuResumeId(null); }}
+              >
+                <span style={{
+                  width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                  background: APPLICATION_STATUS_COLORS[s],
+                }} />
+                {APPLICATION_STATUS_LABELS[s]}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Stats Row */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(3, 1fr)',
         gap: isMobile ? 8 : 12,
-        marginBottom: isMobile ? 16 : 24,
+        marginBottom: isMobile ? 12 : 20,
       }}>
         {[
           { icon: Users, label: 'Personen', value: persons.length, color: 'var(--ios-blue)' },
@@ -69,8 +127,7 @@ export default function Dashboard() {
               </div>
               <div style={{
                 width: isMobile ? 32 : 44, height: isMobile ? 32 : 44, borderRadius: isMobile ? 8 : 12,
-                background: `${color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0,
+                background: `${color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
                 <Icon size={isMobile ? 16 : 20} style={{ color }} />
               </div>
@@ -79,15 +136,29 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Section header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <h2 style={{ margin: 0, fontSize: isMobile ? 16 : 18, fontWeight: 700, letterSpacing: '-0.3px' }}>
-          Personen & Bewerbungsmappen
+      {/* Section header + Search */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 8 }}>
+        <h2 style={{ margin: 0, fontSize: isMobile ? 16 : 18, fontWeight: 700, letterSpacing: '-0.3px', flexShrink: 0 }}>
+          {isMobile ? 'Personen' : 'Personen & Bewerbungsmappen'}
         </h2>
-        <button className="btn-glass btn-primary btn-sm" onClick={() => setShowAdd(true)}>
+        <button className="btn-glass btn-primary btn-sm" style={{ flexShrink: 0 }} onClick={() => setShowAdd(true)}>
           <Plus size={14} /> {!isMobile && 'Neue '}Person
         </button>
       </div>
+
+      {/* Search bar */}
+      {persons.length > 1 && (
+        <div style={{ position: 'relative', marginBottom: 12 }}>
+          <Search size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', opacity: 0.4, pointerEvents: 'none' }} />
+          <input
+            className="input-glass"
+            placeholder="Personen oder Mappen suchen…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ width: '100%', paddingLeft: 30, fontSize: 13 }}
+          />
+        </div>
+      )}
 
       {/* Add person form */}
       {showAdd && (
@@ -115,10 +186,8 @@ export default function Dashboard() {
       {persons.length === 0 && !showAdd && (
         <div className="glass-card" style={{ padding: isMobile ? '32px 20px' : '48px 24px', textAlign: 'center' }}>
           <div style={{
-            width: 56, height: 56, borderRadius: 16,
-            background: 'rgba(0,122,255,0.15)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px',
+            width: 56, height: 56, borderRadius: 16, background: 'rgba(0,122,255,0.15)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px',
           }}>
             <Users size={24} style={{ color: 'var(--ios-blue)' }} />
           </div>
@@ -138,7 +207,7 @@ export default function Dashboard() {
         gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))',
         gap: isMobile ? 10 : 14,
       }}>
-        {persons.map((person) => {
+        {filteredPersons.map((person) => {
           const personResumes = resumes.filter((r) => person.resumeIds.includes(r.id));
           const isActive = person.id === activePersonId;
 
@@ -147,8 +216,7 @@ export default function Dashboard() {
               key={person.id}
               className="glass-card"
               style={{
-                padding: isMobile ? 16 : 20,
-                cursor: 'pointer',
+                padding: isMobile ? 16 : 20, cursor: 'pointer',
                 border: isActive ? '1px solid rgba(0,122,255,0.4)' : undefined,
               }}
               onClick={() => { setActivePerson(person.id); navigate('/editor'); }}
@@ -182,6 +250,8 @@ export default function Dashboard() {
               <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
                 {personResumes.map((r) => {
                   const isActiveResume = r.id === person.activeResumeId;
+                  const statusColor = APPLICATION_STATUS_COLORS[r.status ?? 'entwurf'];
+
                   if (renamingResumeId === r.id) {
                     return (
                       <input
@@ -200,19 +270,27 @@ export default function Dashboard() {
                       />
                     );
                   }
+
                   return (
                     <span
                       key={r.id}
                       style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 3,
-                        padding: '3px 7px',
-                        borderRadius: 6,
-                        fontSize: 11,
+                        display: 'inline-flex', alignItems: 'center', gap: 4,
+                        padding: '3px 7px', borderRadius: 6, fontSize: 11,
                         border: `1px solid ${isActiveResume ? 'rgba(0,122,255,0.5)' : 'rgba(255,255,255,0.15)'}`,
-                        background: isActiveResume ? 'rgba(0,122,255,0.2)' : 'rgba(255,255,255,0.07)',
+                        background: isActiveResume ? 'rgba(0,122,255,0.15)' : 'rgba(255,255,255,0.07)',
                         color: isActiveResume ? 'var(--ios-blue)' : undefined,
                       }}
                     >
+                      {/* Status dot */}
+                      <span
+                        title={`Status: ${APPLICATION_STATUS_LABELS[r.status ?? 'entwurf']} – klicken zum Ändern`}
+                        style={{
+                          width: 7, height: 7, borderRadius: '50%', background: statusColor,
+                          flexShrink: 0, cursor: 'pointer',
+                        }}
+                        onClick={(e) => { e.stopPropagation(); setStatusMenuResumeId(r.id); }}
+                      />
                       <FileText
                         size={9}
                         style={{ cursor: 'pointer', flexShrink: 0 }}
@@ -224,18 +302,28 @@ export default function Dashboard() {
                       >
                         {r.name || 'Bewerbungsmappe'}
                       </span>
+                      {/* Rename */}
                       <span
                         title="Umbenennen"
-                        style={{ cursor: 'pointer', opacity: 0.5, display: 'flex', alignItems: 'center' }}
+                        style={{ cursor: 'pointer', opacity: 0.45, display: 'flex', alignItems: 'center' }}
                         onClick={(e) => { e.stopPropagation(); setRenamingResumeId(r.id); setRenameValue(r.name || 'Bewerbungsmappe'); }}
                       >
                         <Pencil size={9} />
                       </span>
+                      {/* Duplicate */}
+                      <span
+                        title="Duplizieren"
+                        style={{ cursor: 'pointer', opacity: 0.45, display: 'flex', alignItems: 'center' }}
+                        onClick={(e) => { e.stopPropagation(); duplicateResume(r.id); }}
+                      >
+                        <Copy size={9} />
+                      </span>
+                      {/* Delete (only if more than 1) */}
                       {personResumes.length > 1 && (
                         <span
-                          title="Mappe löschen"
+                          title="Löschen"
                           style={{ cursor: 'pointer', opacity: 0.4, lineHeight: 1, fontSize: 13 }}
-                          onClick={(e) => { e.stopPropagation(); if (confirm(`"${r.name || 'Bewerbungsmappe'}" wirklich löschen?`)) deleteResume(r.id); }}
+                          onClick={(e) => { e.stopPropagation(); if (confirm(`"${r.name || 'Bewerbungsmappe'}" löschen?`)) deleteResume(r.id); }}
                         >×</span>
                       )}
                     </span>
@@ -246,7 +334,7 @@ export default function Dashboard() {
                 {addingResumeForPersonId === person.id ? (
                   <input
                     className="input-glass"
-                    placeholder="Name der Mappe..."
+                    placeholder="Name der Mappe…"
                     value={newResumeName}
                     autoFocus
                     onClick={(e) => e.stopPropagation()}
@@ -302,6 +390,13 @@ export default function Dashboard() {
           );
         })}
       </div>
+
+      {/* No search results */}
+      {searchQuery && filteredPersons.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '32px 0', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
+          Keine Ergebnisse für „{searchQuery}"
+        </div>
+      )}
     </div>
   );
 }
