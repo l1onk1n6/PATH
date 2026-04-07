@@ -116,10 +116,21 @@ function AppShell() {
   );
 }
 
+// Admin-only: ?setup in der URL öffnet die Konfigurationsseite.
+// URL-Param wird sofort aus der History entfernt, damit er nicht in Logs auftaucht.
+function checkAdminSetupParam(): boolean {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('setup')) {
+    window.history.replaceState({}, '', window.location.pathname + window.location.hash);
+    return true;
+  }
+  return false;
+}
+
 export default function App() {
   const { user, loading, initialize } = useAuthStore();
   const { syncFromCloud } = useResumeStore();
-  const [showSetup, setShowSetup] = useState(false);
+  const [showSetup, setShowSetup] = useState(() => checkAdminSetupParam());
 
   useEffect(() => {
     initialize();
