@@ -116,7 +116,7 @@ function AppShell() {
 }
 
 export default function App() {
-  const { user, loading, initialize } = useAuthStore();
+  const { user, loading, initialize, passwordRecovery } = useAuthStore();
   const { syncFromCloud } = useResumeStore();
 
   useEffect(() => {
@@ -148,7 +148,7 @@ export default function App() {
     );
   }
 
-  if (!user) {
+  if (!user || passwordRecovery) {
     return <HashRouter><AuthPage /></HashRouter>;
   }
 
