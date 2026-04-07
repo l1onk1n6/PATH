@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   User, Shield, Lock, Sparkles, Mail, ExternalLink,
   ChevronRight, AlertTriangle, Download, Trash2, KeyRound,
+  CreditCard, Loader2, CheckCircle,
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useResumeStore } from '../store/resumeStore';
@@ -9,6 +11,7 @@ import { usePlan, PRO_FEATURES, LIMITS } from '../lib/plan';
 import { UpgradeModal } from '../components/ui/ProGate';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { getPdfExportCount } from '../lib/pdfExports';
+import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 
 type Section = 'plan' | 'account' | 'security' | 'privacy';
 
@@ -23,13 +26,55 @@ const NAV: { id: Section; label: string; icon: React.ComponentType<{ size: numbe
 function PlanSection() {
   const { isPro, plan, limits } = usePlan();
   const { persons, resumes } = useResumeStore();
+  const { refreshUser, user } = useAuthStore();
+  const location = useLocation();
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const pdfCount = getPdfExportCount();
   const activeShareLinks = resumes.filter(r => r.shareToken).length;
+  const isGift = user?.user_metadata?.gift_pro === true;
+
+  // Detect Stripe success redirect
+  useEffect(() => {
+    if (location.search.includes('success=1') || location.hash.includes('success=1')) {
+      setShowSuccess(true);
+      refreshUser();
+      // Clean up the URL param
+      window.history.replaceState(null, '', window.location.pathname + window.location.hash.replace('?success=1', ''));
+    }
+  }, []);
+
+  async function handlePortal() {
+    if (!isSupabaseConfigured()) return;
+    setPortalLoading(true);
+    try {
+      const supabase = getSupabase();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const { data, error } = await supabase.functions.invoke('create-portal-session', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (!error && data?.url) window.location.href = data.url;
+    } finally {
+      setPortalLoading(false);
+    }
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
+
+      {/* Payment success banner */}
+      {showSuccess && (
+        <div className="glass-card" style={{ padding: '14px 16px', border: '1px solid rgba(52,199,89,0.4)', background: 'rgba(52,199,89,0.1)', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <CheckCircle size={18} style={{ color: 'var(--ios-green)', flexShrink: 0 }} />
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ios-green)' }}>Willkommen bei PATH Pro!</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>Dein Upgrade war erfolgreich. Alle Pro-Features sind jetzt aktiv.</div>
+          </div>
+        </div>
+      )}
 
       {/* Current plan card */}
       <div className="glass-card" style={{ padding: 20 }}>
@@ -47,12 +92,29 @@ function PlanSection() {
                 {isPro ? '✦ PRO' : 'FREE'}
               </span>
             </div>
-            <div style={{ fontSize: 18, fontWeight: 700 }}>PATH {isPro ? 'Pro' : 'Free'}</div>
+            <div style={{ fontSize: 18, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+              PATH {isPro ? 'Pro' : 'Free'}
+              {isGift && (
+                <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'rgba(52,199,89,0.15)', border: '1px solid rgba(52,199,89,0.3)', color: 'var(--ios-green)' }}>
+                  Geschenkt ✦
+                </span>
+              )}
+            </div>
             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
               {isPro ? 'Alle Features freigeschaltet' : 'Grundfunktionen — kostenlos'}
             </div>
           </div>
-          {!isPro && (
+          {isPro && !isGift ? (
+            <button
+              className="btn-glass btn-sm"
+              onClick={handlePortal}
+              disabled={portalLoading}
+              style={{ padding: '8px 14px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+              {portalLoading ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <CreditCard size={12} />}
+              Abo verwalten
+            </button>
+          ) : !isPro ? (
             <button
               className="btn-glass"
               onClick={() => setShowUpgrade(true)}
@@ -64,7 +126,7 @@ function PlanSection() {
             >
               <Sparkles size={14} /> Upgrade
             </button>
-          )}
+          ) : null}
         </div>
 
         <div className="divider" style={{ margin: '12px 0' }} />
@@ -136,21 +198,7 @@ function PlanSection() {
         </div>
       </div>
 
-      {!isPro && (
-        <div className="glass-card" style={{ padding: 16 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Pro anfragen</div>
-          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
-            PATH Pro ist aktuell im Early Access. Schreib uns für Infos zu Preisen und Verfügbarkeit.
-          </p>
-          <a
-            href="mailto:info@pixmatic.ch?subject=PATH Pro – Interesse"
-            className="btn-glass"
-            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}
-          >
-            <Mail size={14} /> info@pixmatic.ch
-          </a>
-        </div>
-      )}
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

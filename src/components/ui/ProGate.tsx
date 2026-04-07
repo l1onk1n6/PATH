@@ -1,9 +1,42 @@
 import { useState } from 'react';
-import { Lock, X, Sparkles, Mail } from 'lucide-react';
+import { Lock, X, Sparkles, Loader2 } from 'lucide-react';
 import { usePlan, PRO_FEATURES } from '../../lib/plan';
+import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
+
+// ── Checkout helper ────────────────────────────────────────
+async function startCheckout(): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null;
+  const supabase = getSupabase();
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return null;
+
+  const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+  if (error || !data?.url) {
+    console.error('Checkout error:', error ?? data);
+    return null;
+  }
+  return data.url as string;
+}
 
 // ── Upgrade Modal ──────────────────────────────────────────
 export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; highlightId?: string }) {
+  const [loading, setLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState('');
+
+  async function handleUpgrade() {
+    setLoading(true);
+    setCheckoutError('');
+    const url = await startCheckout();
+    if (url) {
+      window.location.href = url;
+    } else {
+      setCheckoutError('Fehler beim Starten des Checkouts. Bitte versuche es erneut oder kontaktiere uns.');
+      setLoading(false);
+    }
+  }
+
   return (
     <div
       style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
@@ -54,23 +87,38 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
 
         {/* CTA */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <a
-            href="mailto:info@pixmatic.ch?subject=PATH Pro Anfrage"
+          <button
+            onClick={handleUpgrade}
+            disabled={loading}
             className="btn-glass"
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              padding: '12px 20px', borderRadius: 12, textDecoration: 'none', fontSize: 14, fontWeight: 600,
-              background: 'linear-gradient(135deg, rgba(255,159,10,0.3), rgba(255,55,95,0.25))',
-              border: '1px solid rgba(255,159,10,0.4)',
+              padding: '13px 20px', borderRadius: 12, fontSize: 15, fontWeight: 700,
+              background: loading
+                ? 'rgba(255,159,10,0.15)'
+                : 'linear-gradient(135deg, rgba(255,159,10,0.4), rgba(255,55,95,0.35))',
+              border: '1px solid rgba(255,159,10,0.5)',
+              color: '#fff', opacity: loading ? 0.8 : 1, cursor: loading ? 'not-allowed' : 'pointer',
             }}
           >
-            <Mail size={14} /> Pro anfragen · info@pixmatic.ch
-          </a>
+            {loading
+              ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> Weiterleitung zu Stripe…</>
+              : <><Sparkles size={14} /> Jetzt upgraden — PATH Pro</>
+            }
+          </button>
+
+          {checkoutError && (
+            <p style={{ margin: 0, fontSize: 12, color: '#FF6B6B', textAlign: 'center' }}>
+              {checkoutError}
+            </p>
+          )}
+
           <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>
-            Demnächst verfügbar — frühzeitig anfragen für Early-Access
+            Sichere Zahlung via Stripe · Jederzeit kündbar
           </p>
         </div>
       </div>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

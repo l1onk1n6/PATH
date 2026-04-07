@@ -18,6 +18,7 @@ interface AuthStore {
   sendPasswordReset: (email: string) => Promise<void>;
   updatePassword: (newPassword: string) => Promise<void>;
   resendConfirmation: (email: string) => Promise<void>;
+  refreshUser: () => Promise<void>;
   clearError: () => void;
 }
 
@@ -143,6 +144,17 @@ export const useAuthStore = create<AuthStore>((set) => ({
     } catch (e) {
       set({ error: toGermanError(e), loading: false });
     }
+  },
+
+  refreshUser: async () => {
+    if (!isSupabaseConfigured()) return;
+    try {
+      const supabase = getSupabase();
+      const { data } = await supabase.auth.refreshSession();
+      if (data.session) {
+        set({ session: data.session, user: data.session.user });
+      }
+    } catch { /* ignore */ }
   },
 
   clearError: () => set({ error: null }),
