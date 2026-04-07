@@ -275,8 +275,8 @@ export default function Dashboard() {
                     <span
                       key={r.id}
                       style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 4,
-                        padding: '3px 7px', borderRadius: 6, fontSize: 11,
+                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                        padding: '6px 10px', borderRadius: 8, fontSize: 13,
                         border: `1px solid ${isActiveResume ? 'rgba(0,122,255,0.5)' : 'rgba(255,255,255,0.15)'}`,
                         background: isActiveResume ? 'rgba(0,122,255,0.15)' : 'rgba(255,255,255,0.07)',
                         color: isActiveResume ? 'var(--ios-blue)' : undefined,
@@ -286,18 +286,18 @@ export default function Dashboard() {
                       <span
                         title={`Status: ${APPLICATION_STATUS_LABELS[r.status ?? 'entwurf']} – klicken zum Ändern`}
                         style={{
-                          width: 7, height: 7, borderRadius: '50%', background: statusColor,
+                          width: 10, height: 10, borderRadius: '50%', background: statusColor,
                           flexShrink: 0, cursor: 'pointer',
                         }}
                         onClick={(e) => { e.stopPropagation(); setStatusMenuResumeId(r.id); }}
                       />
                       <FileText
-                        size={11}
+                        size={14}
                         style={{ cursor: 'pointer', flexShrink: 0 }}
                         onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); setActiveResume(r.id); }}
                       />
                       <span
-                        style={{ cursor: 'pointer' }}
+                        style={{ cursor: 'pointer', fontWeight: 500 }}
                         onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); setActiveResume(r.id); }}
                       >
                         {r.name || 'Bewerbungsmappe'}
@@ -308,7 +308,7 @@ export default function Dashboard() {
                         style={{ cursor: 'pointer', opacity: 0.5, display: 'flex', alignItems: 'center' }}
                         onClick={(e) => { e.stopPropagation(); setRenamingResumeId(r.id); setRenameValue(r.name || 'Bewerbungsmappe'); }}
                       >
-                        <Pencil size={11} />
+                        <Pencil size={14} />
                       </span>
                       {/* Duplicate */}
                       <span
@@ -316,7 +316,7 @@ export default function Dashboard() {
                         style={{ cursor: 'pointer', opacity: 0.5, display: 'flex', alignItems: 'center' }}
                         onClick={(e) => { e.stopPropagation(); duplicateResume(r.id); }}
                       >
-                        <Copy size={11} />
+                        <Copy size={14} />
                       </span>
                       {/* Job URL */}
                       {r.jobUrl && (
@@ -325,10 +325,10 @@ export default function Dashboard() {
                           target="_blank"
                           rel="noopener noreferrer"
                           title="Stellenausschreibung öffnen"
-                          style={{ opacity: 0.5, display: 'flex', alignItems: 'center' }}
+                          style={{ opacity: 0.55, display: 'flex', alignItems: 'center' }}
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <ExternalLink size={9} />
+                          <ExternalLink size={14} />
                         </a>
                       )}
                       {/* Deadline */}
@@ -338,8 +338,8 @@ export default function Dashboard() {
                         const label = diff < 0 ? 'Abgelaufen' : `${Math.ceil(diff)}T`;
                         return (
                           <span title={`Frist: ${new Date(r.deadline).toLocaleDateString('de-CH')}`}
-                            style={{ display: 'flex', alignItems: 'center', gap: 2, color, fontSize: 10 }}>
-                            <Clock size={8} />{label}
+                            style={{ display: 'flex', alignItems: 'center', gap: 3, color, fontSize: 12 }}>
+                            <Clock size={12} />{label}
                           </span>
                         );
                       })()}
@@ -347,7 +347,7 @@ export default function Dashboard() {
                       {personResumes.length > 1 && (
                         <span
                           title="Löschen"
-                          style={{ cursor: 'pointer', opacity: 0.4, lineHeight: 1, fontSize: 13 }}
+                          style={{ cursor: 'pointer', opacity: 0.45, lineHeight: 1, fontSize: 16 }}
                           onClick={(e) => { e.stopPropagation(); if (confirm(`"${r.name || 'Bewerbungsmappe'}" löschen?`)) deleteResume(r.id); }}
                         >×</span>
                       )}
@@ -376,12 +376,15 @@ export default function Dashboard() {
                   />
                 ) : (
                   <span
-                    className="badge"
                     title="Neue Bewerbungsmappe"
-                    style={{ cursor: 'pointer', opacity: 0.6 }}
+                    style={{
+                      cursor: 'pointer', opacity: 0.6, display: 'inline-flex', alignItems: 'center',
+                      padding: '6px 10px', borderRadius: 8, border: '1px dashed rgba(255,255,255,0.25)',
+                      background: 'rgba(255,255,255,0.05)',
+                    }}
                     onClick={(e) => { e.stopPropagation(); setAddingResumeForPersonId(person.id); setNewResumeName(''); }}
                   >
-                    <FolderPlus size={9} />
+                    <FolderPlus size={14} />
                   </span>
                 )}
               </div>
