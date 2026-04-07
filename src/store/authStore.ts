@@ -28,12 +28,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
     }
     try {
       const supabase = getSupabase();
-      const { data: { session } } = await supabase.auth.getSession();
-      set({ session, user: session?.user ?? null, loading: false });
 
+      // Listener ZUERST registrieren – damit SIGNED_IN vom Magic Link nicht verpasst wird
       supabase.auth.onAuthStateChange((_event, session) => {
-        set({ session, user: session?.user ?? null });
+        set({ session, user: session?.user ?? null, loading: false });
       });
+
+      // getSession() löst URL-Token-Verarbeitung aus und feuert onAuthStateChange
+      await supabase.auth.getSession();
     } catch {
       set({ loading: false });
     }
