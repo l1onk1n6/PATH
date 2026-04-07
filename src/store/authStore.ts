@@ -95,6 +95,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   signOut: async () => {
+    // Reset route before logout so next login always starts at Dashboard
+    window.location.hash = '#/';
     try {
       const supabase = getSupabase();
       await supabase.auth.signOut();
