@@ -80,6 +80,7 @@ export async function upsertResume(resume: Resume): Promise<void> {
       id: resume.id,
       person_id: resume.personId,
       user_id: uid,
+      name: resume.name,
       template_id: resume.templateId,
       accent_color: resume.accentColor,
       personal_info: resume.personalInfo,
@@ -121,6 +122,7 @@ function rowToResume(row: Record<string, unknown>): Resume {
   return {
     id: row.id as string,
     personId: row.person_id as string,
+    name: (row.name as string) || 'Bewerbungsmappe',
     templateId: row.template_id as Resume['templateId'],
     accentColor: row.accent_color as string,
     personalInfo: (row.personal_info as Resume['personalInfo']) ?? {},

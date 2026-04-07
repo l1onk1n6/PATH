@@ -102,6 +102,7 @@ export type TemplateId =
 export interface Resume {
   id: string;
   personId: string;
+  name: string;
   templateId: TemplateId;
   accentColor: string;
   personalInfo: PersonalInfo;

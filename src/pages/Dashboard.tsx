@@ -1,15 +1,26 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp } from 'lucide-react';
+import { Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp, FolderPlus } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import { useIsMobile } from '../hooks/useBreakpoint';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { persons, resumes, addPerson, deletePerson, setActivePerson, activePersonId } = useResumeStore();
+  const {
+    persons, resumes, addPerson, deletePerson, setActivePerson, activePersonId,
+    addResume, deleteResume, setActiveResume, renameResume,
+  } = useResumeStore();
   const [newName, setNewName] = useState('');
   const [showAdd, setShowAdd] = useState(false);
+
+  // Adding a new Bewerbungsmappe per person
+  const [addingResumeForPersonId, setAddingResumeForPersonId] = useState<string | null>(null);
+  const [newResumeName, setNewResumeName] = useState('');
+
+  // Renaming a resume inline
+  const [renamingResumeId, setRenamingResumeId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
 
   function handleAdd() {
     if (!newName.trim()) return;
@@ -17,6 +28,20 @@ export default function Dashboard() {
     setNewName('');
     setShowAdd(false);
     navigate('/editor');
+  }
+
+  function handleAddResume(personId: string) {
+    if (!newResumeName.trim()) return;
+    addResume(personId, newResumeName.trim());
+    setAddingResumeForPersonId(null);
+    setNewResumeName('');
+    navigate('/editor');
+  }
+
+  function handleRenameCommit(resumeId: string) {
+    if (renameValue.trim()) renameResume(resumeId, renameValue.trim());
+    setRenamingResumeId(null);
+    setRenameValue('');
   }
 
   const totalResumes = resumes.length;
@@ -27,13 +52,13 @@ export default function Dashboard() {
       {/* Stats Row */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(3, 1fr)',
+        gridTemplateColumns: 'repeat(3, 1fr)',
         gap: isMobile ? 8 : 12,
         marginBottom: isMobile ? 16 : 24,
       }}>
         {[
           { icon: Users, label: 'Personen', value: persons.length, color: 'var(--ios-blue)' },
-          { icon: FileText, label: 'Lebensläufe', value: totalResumes, color: 'var(--ios-purple)' },
+          { icon: FileText, label: 'Mappen', value: totalResumes, color: 'var(--ios-purple)' },
           { icon: TrendingUp, label: isMobile ? 'Einträge' : 'Einträge gesamt', value: totalSections, color: 'var(--ios-green)' },
         ].map(({ icon: Icon, label, value, color }) => (
           <div key={label} className="glass-card" style={{ padding: isMobile ? '12px 14px' : '18px 20px' }}>
@@ -57,7 +82,7 @@ export default function Dashboard() {
       {/* Section header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <h2 style={{ margin: 0, fontSize: isMobile ? 16 : 18, fontWeight: 700, letterSpacing: '-0.3px' }}>
-          Personen & Lebensläufe
+          Personen & Bewerbungsmappen
         </h2>
         <button className="btn-glass btn-primary btn-sm" onClick={() => setShowAdd(true)}>
           <Plus size={14} /> {!isMobile && 'Neue '}Person
@@ -110,12 +135,11 @@ export default function Dashboard() {
       {/* Persons Grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))',
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))',
         gap: isMobile ? 10 : 14,
       }}>
         {persons.map((person) => {
           const personResumes = resumes.filter((r) => person.resumeIds.includes(r.id));
-          const activeResume = personResumes.find((r) => r.id === person.activeResumeId) ?? personResumes[0];
           const isActive = person.id === activePersonId;
 
           return (
@@ -141,9 +165,9 @@ export default function Dashboard() {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 700, fontSize: 15 }}>{person.name}</div>
-                  {activeResume?.personalInfo.title && (
+                  {personResumes[0]?.personalInfo.title && (
                     <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {activeResume.personalInfo.title}
+                      {personResumes[0].personalInfo.title}
                     </div>
                   )}
                 </div>
@@ -154,14 +178,96 @@ export default function Dashboard() {
                 )}
               </div>
 
-              {/* Resume badges */}
-              <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
-                {personResumes.map((r) => (
-                  <span key={r.id} className="badge">
-                    <FileText size={9} style={{ marginRight: 4 }} />
-                    {r.personalInfo.firstName || 'Lebenslauf'}
+              {/* Bewerbungsmappe badges */}
+              <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+                {personResumes.map((r) => {
+                  const isActiveResume = r.id === person.activeResumeId;
+                  if (renamingResumeId === r.id) {
+                    return (
+                      <input
+                        key={r.id}
+                        className="input-glass"
+                        value={renameValue}
+                        autoFocus
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => setRenameValue(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleRenameCommit(r.id);
+                          if (e.key === 'Escape') { setRenamingResumeId(null); setRenameValue(''); }
+                        }}
+                        onBlur={() => handleRenameCommit(r.id)}
+                        style={{ fontSize: 11, padding: '2px 8px', height: 24, width: 160 }}
+                      />
+                    );
+                  }
+                  return (
+                    <span
+                      key={r.id}
+                      className="badge"
+                      title="Klicken zum Aktivieren, Doppelklick zum Umbenennen"
+                      style={{
+                        cursor: 'pointer',
+                        background: isActiveResume ? 'rgba(0,122,255,0.2)' : undefined,
+                        borderColor: isActiveResume ? 'rgba(0,122,255,0.5)' : undefined,
+                        color: isActiveResume ? 'var(--ios-blue)' : undefined,
+                        display: 'flex', alignItems: 'center', gap: 4,
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActivePerson(person.id);
+                        setActiveResume(r.id);
+                      }}
+                      onDoubleClick={(e) => {
+                        e.stopPropagation();
+                        setRenamingResumeId(r.id);
+                        setRenameValue(r.name);
+                      }}
+                    >
+                      <FileText size={9} />
+                      {r.name || 'Bewerbungsmappe'}
+                      {personResumes.length > 1 && (
+                        <span
+                          title="Mappe löschen"
+                          style={{ marginLeft: 2, opacity: 0.5, lineHeight: 1 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm(`"${r.name}" wirklich löschen?`)) deleteResume(r.id);
+                          }}
+                        >×</span>
+                      )}
+                    </span>
+                  );
+                })}
+
+                {/* Add new Bewerbungsmappe */}
+                {addingResumeForPersonId === person.id ? (
+                  <input
+                    className="input-glass"
+                    placeholder="Name der Mappe..."
+                    value={newResumeName}
+                    autoFocus
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => setNewResumeName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleAddResume(person.id);
+                      if (e.key === 'Escape') { setAddingResumeForPersonId(null); setNewResumeName(''); }
+                    }}
+                    onBlur={() => {
+                      if (newResumeName.trim()) handleAddResume(person.id);
+                      else { setAddingResumeForPersonId(null); setNewResumeName(''); }
+                    }}
+                    style={{ fontSize: 11, padding: '2px 8px', height: 24, width: 160 }}
+                  />
+                ) : (
+                  <span
+                    className="badge"
+                    title="Neue Bewerbungsmappe"
+                    style={{ cursor: 'pointer', opacity: 0.6 }}
+                    onClick={(e) => { e.stopPropagation(); setAddingResumeForPersonId(person.id); setNewResumeName(''); }}
+                  >
+                    <FolderPlus size={9} />
                   </span>
-                ))}
+                )}
               </div>
 
               <div className="divider" style={{ margin: '10px 0' }} />
@@ -182,11 +288,11 @@ export default function Dashboard() {
                   <Eye size={13} /> {!isMobile && 'Vorschau'}
                 </button>
                 <button
-                  className="btn-glass btn-danger btn-sm btn-icon"
+                  className="btn-glass btn-danger btn-icon"
                   onClick={(e) => { e.stopPropagation(); if (confirm(`"${person.name}" wirklich löschen?`)) deletePerson(person.id); }}
-                  style={{ padding: 7 }}
+                  style={{ width: 34, height: 34, borderRadius: '50%', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
                 >
-                  <Trash2 size={13} />
+                  <Trash2 size={14} />
                 </button>
               </div>
             </div>

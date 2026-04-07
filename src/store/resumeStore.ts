@@ -34,10 +34,11 @@ interface ResumeStore {
   setActivePerson: (id: string) => void;
 
   // Resume actions
-  addResume: (personId: string) => Resume;
+  addResume: (personId: string, name?: string) => Resume;
   updateResume: (id: string, data: Partial<Resume>) => void;
   deleteResume: (id: string) => void;
   setActiveResume: (id: string) => void;
+  renameResume: (id: string, name: string) => void;
   setTemplate: (resumeId: string, templateId: TemplateId) => void;
   setAccentColor: (resumeId: string, color: string) => void;
 
@@ -70,9 +71,10 @@ interface ResumeStore {
 }
 
 // ── Default resume ────────────────────────────────────────
-function createDefaultResume(personId: string): Resume {
+function createDefaultResume(personId: string, name = 'Bewerbungsmappe'): Resume {
   return {
     id: uuidv4(), personId,
+    name,
     templateId: 'minimal', accentColor: '#007AFF',
     personalInfo: { firstName: '', lastName: '', title: '', email: '', phone: '', location: '', website: '', linkedin: '', github: '', summary: '' },
     workExperience: [], education: [], skills: [], languages: [],
@@ -117,7 +119,7 @@ export const useResumeStore = create<ResumeStore>()(
 
       // ── Persons ─────────────────────────────────────────
       addPerson: (name) => {
-        const resume = createDefaultResume('');
+        const resume = createDefaultResume('', 'Bewerbungsmappe 1');
         const person: Person = { id: uuidv4(), name, resumeIds: [resume.id], activeResumeId: resume.id, createdAt: new Date().toISOString() };
         resume.personId = person.id;
         set((s) => ({ persons: [...s.persons, person], resumes: [...s.resumes, resume], activePersonId: person.id, activeResumeId: resume.id }));
@@ -152,8 +154,10 @@ export const useResumeStore = create<ResumeStore>()(
       },
 
       // ── Resumes ─────────────────────────────────────────
-      addResume: (personId) => {
-        const resume = createDefaultResume(personId);
+      addResume: (personId, name) => {
+        const existing = get().resumes.filter(r => r.personId === personId).length;
+        const resumeName = name || `Bewerbungsmappe ${existing + 1}`;
+        const resume = createDefaultResume(personId, resumeName);
         set((s) => ({
           resumes: [...s.resumes, resume],
           persons: s.persons.map((p) => p.id === personId ? { ...p, resumeIds: [...p.resumeIds, resume.id], activeResumeId: resume.id } : p),
@@ -187,6 +191,11 @@ export const useResumeStore = create<ResumeStore>()(
         const resume = get().resumes.find(r => r.id === id);
         if (!resume) return;
         set((s) => ({ activeResumeId: id, persons: s.persons.map(p => p.id === resume.personId ? { ...p, activeResumeId: id } : p) }));
+      },
+
+      renameResume: (id, name) => {
+        set((s) => ({ resumes: s.resumes.map(r => r.id === id ? { ...r, name, updatedAt: new Date().toISOString() } : r) }));
+        debounced(`resume-${id}`, () => { const r = get().resumes.find(r => r.id === id); if (r) db.upsertResume(r); });
       },
 
       setTemplate: (resumeId, templateId) => {
