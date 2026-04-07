@@ -130,7 +130,7 @@ function checkAdminSetupParam(): boolean {
 export default function App() {
   const { user, loading, initialize } = useAuthStore();
   const { syncFromCloud } = useResumeStore();
-  const [showSetup, setShowSetup] = useState(() => checkAdminSetupParam());
+  const [showSetup] = useState(() => checkAdminSetupParam());
 
   useEffect(() => {
     initialize();
