@@ -82,10 +82,10 @@ export default function AuthPage() {
   return (
     <div style={{
       minHeight: '100dvh',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       padding: '20px 16px', boxSizing: 'border-box', overflow: 'auto',
     }}>
-      <div className="glass-card animate-scale-in" style={{ width: '100%', maxWidth: 380, padding: '24px 22px', margin: 'auto' }}>
+      <div className="glass-card animate-scale-in" style={{ width: '100%', maxWidth: 380, padding: '24px 22px' }}>
 
         {/* Logo */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 18 }}>
@@ -307,6 +307,15 @@ export default function AuthPage() {
         )}
 
       </div>
+
+      <footer style={{
+        marginTop: 20,
+        fontSize: 11,
+        color: 'rgba(255,255,255,0.2)',
+        userSelect: 'none',
+      }}>
+        by pixmatic · v1.3.0
+      </footer>
     </div>
   );
 }
