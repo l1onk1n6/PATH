@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Users, FileText, Plus, ChevronRight, Trash2,
-  LayoutDashboard, Eye, FilePlus, LogOut, Cloud,
+  LayoutDashboard, Eye, FilePlus, LogOut,
   PanelLeftClose, PanelLeftOpen,
 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
@@ -21,7 +21,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
   const [addingPerson, setAddingPerson] = useState(false);
   const [newName, setNewName] = useState('');
   const { user, signOut } = useAuthStore();
-  const { syncing, syncFromCloud } = useResumeStore();
+
 
   const {
     persons, resumes, activePersonId, activeResumeId,
@@ -103,15 +103,6 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         <div style={{ flex: 1 }} />
 
         {/* Footer icons */}
-        <button
-          className="btn-glass btn-icon"
-          onClick={() => syncFromCloud()}
-          disabled={syncing}
-          title="Synchronisieren"
-          style={{ padding: 9, boxShadow: 'none', marginBottom: 6 }}
-        >
-          <Cloud size={15} style={{ animation: syncing ? 'spin 1s linear infinite' : 'none' }} />
-        </button>
         <button
           className="btn-glass btn-icon"
           onClick={() => signOut()}
@@ -327,16 +318,6 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
       )}
 
       <div style={{ display: 'flex', gap: 6 }}>
-        <button
-          className="btn-glass btn-sm"
-          onClick={() => syncFromCloud()}
-          disabled={syncing}
-          title="Mit Cloud synchronisieren"
-          style={{ flex: 1, justifyContent: 'center', padding: '8px 10px', boxShadow: 'none', fontSize: 12 }}
-        >
-          <Cloud size={13} style={{ animation: syncing ? 'spin 1s linear infinite' : 'none' }} />
-          {syncing ? 'Sync…' : 'Sync'}
-        </button>
         <button
           className="btn-glass btn-sm"
           onClick={() => signOut()}
