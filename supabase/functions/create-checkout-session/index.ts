@@ -21,14 +21,30 @@ Deno.serve(async (req) => {
 
   try {
     const authHeader = req.headers.get('Authorization') ?? ''
-    const token = authHeader.replace('Bearer ', '').trim()
-    if (!token) return new Response('Unauthorized', { status: 401, headers: cors })
+    console.log('[checkout] auth header present:', authHeader.length > 0, '| starts with Bearer:', authHeader.startsWith('Bearer '))
 
-    // Extract user info from JWT claims (already verified by gateway)
-    const payload = jwtPayload(token)
+    const token = authHeader.replace('Bearer ', '').trim()
+    if (!token) {
+      console.log('[checkout] no token → 401')
+      return new Response('Unauthorized', { status: 401, headers: cors })
+    }
+
+    let payload: Record<string, unknown>
+    try {
+      payload = jwtPayload(token)
+    } catch (e) {
+      console.log('[checkout] JWT decode failed:', e)
+      return new Response('Unauthorized', { status: 401, headers: cors })
+    }
+
     const userId = payload.sub as string
     const userEmail = payload.email as string | undefined
-    if (!userId) return new Response('Unauthorized', { status: 401, headers: cors })
+    console.log('[checkout] userId:', userId ?? 'MISSING', '| role:', payload.role)
+
+    if (!userId) {
+      console.log('[checkout] no sub in JWT → 401')
+      return new Response('Unauthorized', { status: 401, headers: cors })
+    }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!)
     const admin = createClient(
@@ -67,11 +83,12 @@ Deno.serve(async (req) => {
       allow_promotion_codes: true,
     })
 
+    console.log('[checkout] session created:', session.id)
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...cors, 'Content-Type': 'application/json' },
     })
   } catch (err) {
-    console.error(err)
+    console.error('[checkout] error:', err)
     return new Response(JSON.stringify({ error: String(err) }), {
       status: 500,
       headers: { ...cors, 'Content-Type': 'application/json' },
