@@ -246,11 +246,13 @@ export default function Dashboard() {
                 )}
               </div>
 
-              {/* Bewerbungsmappe badges */}
-              <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+              {/* Bewerbungsmappen – vollbreite Listenzeilen */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
                 {personResumes.map((r) => {
                   const isActiveResume = r.id === person.activeResumeId;
                   const statusColor = APPLICATION_STATUS_COLORS[r.status ?? 'entwurf'];
+                  const deadlineDiff = r.deadline ? (new Date(r.deadline).getTime() - Date.now()) / 86400000 : null;
+                  const deadlineColor = deadlineDiff === null ? undefined : deadlineDiff < 0 ? 'var(--ios-red)' : deadlineDiff <= 7 ? '#FF9F0A' : 'rgba(255,255,255,0.4)';
 
                   if (renamingResumeId === r.id) {
                     return (
@@ -266,96 +268,78 @@ export default function Dashboard() {
                           if (e.key === 'Escape') { setRenamingResumeId(null); setRenameValue(''); }
                         }}
                         onBlur={() => handleRenameCommit(r.id)}
-                        style={{ fontSize: 11, padding: '2px 8px', height: 24, width: 160 }}
+                        style={{ fontSize: 14, padding: '8px 12px', width: '100%' }}
                       />
                     );
                   }
 
                   return (
-                    <span
+                    <div
                       key={r.id}
                       style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 6,
-                        padding: '6px 10px', borderRadius: 8, fontSize: 13,
-                        border: `1px solid ${isActiveResume ? 'rgba(0,122,255,0.5)' : 'rgba(255,255,255,0.15)'}`,
-                        background: isActiveResume ? 'rgba(0,122,255,0.15)' : 'rgba(255,255,255,0.07)',
-                        color: isActiveResume ? 'var(--ios-blue)' : undefined,
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '9px 12px', borderRadius: 10, fontSize: 14,
+                        border: `1px solid ${isActiveResume ? 'rgba(0,122,255,0.5)' : 'rgba(255,255,255,0.1)'}`,
+                        background: isActiveResume ? 'rgba(0,122,255,0.12)' : 'rgba(255,255,255,0.05)',
+                        cursor: 'pointer',
                       }}
+                      onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); setActiveResume(r.id); }}
                     >
                       {/* Status dot */}
                       <span
                         title={`Status: ${APPLICATION_STATUS_LABELS[r.status ?? 'entwurf']} – klicken zum Ändern`}
-                        style={{
-                          width: 10, height: 10, borderRadius: '50%', background: statusColor,
-                          flexShrink: 0, cursor: 'pointer',
-                        }}
+                        style={{ width: 11, height: 11, borderRadius: '50%', background: statusColor, flexShrink: 0, cursor: 'pointer' }}
                         onClick={(e) => { e.stopPropagation(); setStatusMenuResumeId(r.id); }}
                       />
-                      <FileText
-                        size={14}
-                        style={{ cursor: 'pointer', flexShrink: 0 }}
-                        onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); setActiveResume(r.id); }}
-                      />
-                      <span
-                        style={{ cursor: 'pointer', fontWeight: 500 }}
-                        onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); setActiveResume(r.id); }}
-                      >
-                        {r.name || 'Bewerbungsmappe'}
-                      </span>
-                      {/* Rename */}
-                      <span
-                        title="Umbenennen"
-                        style={{ cursor: 'pointer', opacity: 0.5, display: 'flex', alignItems: 'center' }}
-                        onClick={(e) => { e.stopPropagation(); setRenamingResumeId(r.id); setRenameValue(r.name || 'Bewerbungsmappe'); }}
-                      >
-                        <Pencil size={14} />
-                      </span>
-                      {/* Duplicate */}
-                      <span
-                        title="Duplizieren"
-                        style={{ cursor: 'pointer', opacity: 0.5, display: 'flex', alignItems: 'center' }}
-                        onClick={(e) => { e.stopPropagation(); duplicateResume(r.id); }}
-                      >
-                        <Copy size={14} />
-                      </span>
-                      {/* Job URL */}
-                      {r.jobUrl && (
-                        <a
-                          href={r.jobUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title="Stellenausschreibung öffnen"
-                          style={{ opacity: 0.55, display: 'flex', alignItems: 'center' }}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <ExternalLink size={14} />
-                        </a>
-                      )}
-                      {/* Deadline */}
-                      {r.deadline && (() => {
-                        const diff = (new Date(r.deadline).getTime() - Date.now()) / 86400000;
-                        const color = diff < 0 ? 'var(--ios-red)' : diff <= 7 ? '#FF9F0A' : 'rgba(255,255,255,0.4)';
-                        const label = diff < 0 ? 'Abgelaufen' : `${Math.ceil(diff)}T`;
-                        return (
-                          <span title={`Frist: ${new Date(r.deadline).toLocaleDateString('de-CH')}`}
-                            style={{ display: 'flex', alignItems: 'center', gap: 3, color, fontSize: 12 }}>
-                            <Clock size={12} />{label}
+                      <FileText size={15} style={{ opacity: 0.6, flexShrink: 0 }} />
+
+                      {/* Name + meta */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: isActiveResume ? 'var(--ios-blue)' : undefined }}>
+                          {r.name || 'Bewerbungsmappe'}
+                        </div>
+                        {(r.deadline || r.jobUrl) && (
+                          <div style={{ display: 'flex', gap: 8, marginTop: 3, alignItems: 'center' }}>
+                            {r.deadline && (
+                              <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, color: deadlineColor }}>
+                                <Clock size={11} />
+                                {deadlineDiff! < 0 ? 'Abgelaufen' : `${Math.ceil(deadlineDiff!)} Tage`}
+                              </span>
+                            )}
+                            {r.jobUrl && (
+                              <a href={r.jobUrl} target="_blank" rel="noopener noreferrer"
+                                style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <ExternalLink size={11} /> Stelle
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Actions */}
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+                        <span title="Umbenennen" style={{ cursor: 'pointer', opacity: 0.45, display: 'flex' }}
+                          onClick={(e) => { e.stopPropagation(); setRenamingResumeId(r.id); setRenameValue(r.name || 'Bewerbungsmappe'); }}>
+                          <Pencil size={15} />
+                        </span>
+                        <span title="Duplizieren" style={{ cursor: 'pointer', opacity: 0.45, display: 'flex' }}
+                          onClick={(e) => { e.stopPropagation(); duplicateResume(r.id); }}>
+                          <Copy size={15} />
+                        </span>
+                        {personResumes.length > 1 && (
+                          <span title="Löschen" style={{ cursor: 'pointer', opacity: 0.4, display: 'flex' }}
+                            onClick={(e) => { e.stopPropagation(); if (confirm(`"${r.name || 'Bewerbungsmappe'}" löschen?`)) deleteResume(r.id); }}>
+                            <Trash2 size={15} />
                           </span>
-                        );
-                      })()}
-                      {/* Delete (only if more than 1) */}
-                      {personResumes.length > 1 && (
-                        <span
-                          title="Löschen"
-                          style={{ cursor: 'pointer', opacity: 0.45, lineHeight: 1, fontSize: 16 }}
-                          onClick={(e) => { e.stopPropagation(); if (confirm(`"${r.name || 'Bewerbungsmappe'}" löschen?`)) deleteResume(r.id); }}
-                        >×</span>
-                      )}
-                    </span>
+                        )}
+                      </div>
+                    </div>
                   );
                 })}
 
-                {/* Add new Bewerbungsmappe */}
+                {/* Neue Mappe hinzufügen */}
                 {addingResumeForPersonId === person.id ? (
                   <input
                     className="input-glass"
@@ -372,20 +356,21 @@ export default function Dashboard() {
                       if (newResumeName.trim()) handleAddResume(person.id);
                       else { setAddingResumeForPersonId(null); setNewResumeName(''); }
                     }}
-                    style={{ fontSize: 11, padding: '2px 8px', height: 24, width: 160 }}
+                    style={{ fontSize: 14, padding: '8px 12px', width: '100%' }}
                   />
                 ) : (
-                  <span
+                  <div
                     title="Neue Bewerbungsmappe"
                     style={{
-                      cursor: 'pointer', opacity: 0.6, display: 'inline-flex', alignItems: 'center',
-                      padding: '6px 10px', borderRadius: 8, border: '1px dashed rgba(255,255,255,0.25)',
-                      background: 'rgba(255,255,255,0.05)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                      padding: '8px 12px', borderRadius: 10, fontSize: 13,
+                      border: '1px dashed rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.03)',
+                      cursor: 'pointer', opacity: 0.6, color: 'rgba(255,255,255,0.6)',
                     }}
                     onClick={(e) => { e.stopPropagation(); setAddingResumeForPersonId(person.id); setNewResumeName(''); }}
                   >
-                    <FolderPlus size={14} />
-                  </span>
+                    <FolderPlus size={15} /> Neue Bewerbungsmappe
+                  </div>
                 )}
               </div>
 
