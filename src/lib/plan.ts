@@ -48,17 +48,26 @@ export interface ProFeature {
   label: string;
   description: string;
   icon: string;
+  available: boolean;   // true = already live, false = coming soon
 }
 
 export const PRO_FEATURES: ProFeature[] = [
-  { id: 'ai',          label: 'KI-Assistent',            icon: '✦', description: 'Anschreiben generieren & Texte mit Claude KI verbessern' },
-  { id: 'translate',   label: 'Mehrsprachige CVs',        icon: '🌍', description: 'Automatische Übersetzung in jede Sprache' },
-  { id: 'ats',         label: 'ATS-Score',                icon: '📊', description: 'Lebenslauf gegen Stellenbeschreibung prüfen' },
-  { id: 'password',    label: 'PDF-Passwortschutz',       icon: '🔐', description: 'Bewerbungs-PDFs verschlüsselt versenden' },
-  { id: 'reminder',    label: 'Deadline-Reminder',        icon: '⏰', description: 'E-Mail-Benachrichtigung vor Bewerbungsschluss' },
-  { id: 'analytics',   label: 'Link-Analytics',           icon: '📈', description: 'Sehen wer deinen geteilten Lebenslauf aufgerufen hat' },
-  { id: 'history',     label: 'CV-Versionshistorie',      icon: '🕓', description: 'Frühere Versionen deines Lebenslaufs wiederherstellen' },
-  { id: 'video',       label: 'Video-Intro',              icon: '🎬', description: 'Kurzes Video-Profil zur Bewerbung hinzufügen' },
+  // ── Already live ──────────────────────────────────────────
+  { id: 'persons',   label: '5 Personen & 60 Mappen',  icon: '👥', description: 'Bis zu 5 Profile mit je 60 Bewerbungsmappen (Free: 1 / 10)',          available: true },
+  { id: 'templates', label: 'Alle Templates',           icon: '🎨', description: 'Zugriff auf alle Premium-Designs (Free: 6 Templates)',                  available: true },
+  { id: 'sections',  label: 'Eigene Sektionen',         icon: '📋', description: 'Beliebig viele eigene Sektionen im Lebenslauf (Free: keine)',           available: true },
+  { id: 'share',     label: '10 Share-Links',           icon: '🔗', description: 'Bis zu 10 aktive öffentliche Links gleichzeitig (Free: 1)',             available: true },
+  { id: 'pdf',       label: '20 PDF-Exports / Monat',  icon: '📄', description: 'Mehr PDF-Exporte pro Monat (Free: 5)',                                   available: true },
+  { id: 'photo',     label: '10 MB Foto-Upload',        icon: '🖼️', description: 'Grössere Profilfotos hochladen (Free: 1 MB)',                           available: true },
+  // ── Coming soon ───────────────────────────────────────────
+  { id: 'ai',        label: 'KI-Assistent',             icon: '✦', description: 'Anschreiben generieren & Texte mit Claude KI verbessern',               available: false },
+  { id: 'ats',       label: 'ATS-Score',                icon: '📊', description: 'Lebenslauf gegen Stellenbeschreibung prüfen & Keywords optimieren',     available: false },
+  { id: 'history',   label: 'CV-Versionshistorie',      icon: '🕓', description: 'Frühere Versionen wiederherstellen',                                     available: false },
+  { id: 'analytics', label: 'Link-Analytics',           icon: '📈', description: 'Sehen wer deinen geteilten Lebenslauf aufgerufen hat',                  available: false },
+  { id: 'translate', label: 'Mehrsprachige CVs',        icon: '🌍', description: 'Automatische Übersetzung in jede Sprache',                              available: false },
+  { id: 'password',  label: 'PDF-Passwortschutz',       icon: '🔐', description: 'Bewerbungs-PDFs verschlüsselt versenden',                               available: false },
+  { id: 'reminder',  label: 'Deadline-Reminder',        icon: '⏰', description: 'E-Mail-Benachrichtigung vor Bewerbungsschluss',                         available: false },
+  { id: 'video',     label: 'Video-Intro',              icon: '🎬', description: 'Kurzes Video-Profil zur Bewerbung hinzufügen',                          available: false },
 ];
 
 export function usePlan(): { plan: PlanType; isPro: boolean; limits: PlanLimits } {

@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Users, FileText, Plus, ChevronRight, Trash2,
   LayoutDashboard, Eye, FilePlus, LogOut,
-  PanelLeftClose, PanelLeftOpen, Sparkles, UserCircle,
+  PanelLeftClose, PanelLeftOpen, Sparkles, UserCircle, Lock,
 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useAuthStore } from '../../store/authStore';
@@ -25,7 +25,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [expandedPersonIds, setExpandedPersonIds] = useState<Set<string>>(new Set());
   const { signOut } = useAuthStore();
-  const { isPro } = usePlan();
+  const { isPro, limits } = usePlan();
 
   function toggleExpand(id: string) {
     setExpandedPersonIds(prev => {
@@ -41,6 +41,13 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
     addPerson, setActivePerson,
     addResume, setActiveResume, deleteResume,
   } = useResumeStore();
+
+  const frozenPersonIds = new Set(
+    limits.persons < Infinity ? persons.slice(limits.persons).map(p => p.id) : []
+  );
+  const frozenResumeIds = new Set(
+    limits.resumes < Infinity ? resumes.slice(limits.resumes).map(r => r.id) : []
+  );
 
   function go(path: string) {
     navigate(path);
@@ -236,9 +243,10 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
             const isExpanded = expandedPersonIds.has(person.id) || isActiveP;
             const personResumes = resumes.filter((r) => person.resumeIds.includes(r.id));
             const photo = personResumes[0]?.personalInfo?.photo;
+            const isPersonFrozen = frozenPersonIds.has(person.id);
 
             return (
-              <div key={person.id} style={{ marginBottom: 4 }}>
+              <div key={person.id} style={{ marginBottom: 4, opacity: isPersonFrozen ? 0.55 : 1 }}>
                 {/* Person row */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                   {/* Expand/collapse toggle */}
@@ -255,33 +263,48 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
                     />
                   </button>
 
-                  {/* Avatar + name — click to activate */}
+                  {/* Avatar + name — click to activate (blocked if frozen) */}
                   <button
                     className="btn-glass"
-                    onClick={() => { handleSelectPerson(person.id); if (!isExpanded) toggleExpand(person.id); }}
+                    onClick={() => {
+                      if (isPersonFrozen) return;
+                      handleSelectPerson(person.id);
+                      if (!isExpanded) toggleExpand(person.id);
+                    }}
                     style={{
                       flex: 1, justifyContent: 'space-between', padding: '7px 10px',
                       borderRadius: 'var(--radius-sm)',
-                      background: isActiveP ? 'rgba(0,122,255,0.15)' : 'rgba(255,255,255,0.04)',
-                      border: isActiveP ? '1px solid rgba(0,122,255,0.3)' : '1px solid rgba(255,255,255,0.07)',
-                      boxShadow: 'none', minWidth: 0,
+                      background: isPersonFrozen
+                        ? 'rgba(255,159,10,0.07)'
+                        : isActiveP ? 'rgba(0,122,255,0.15)' : 'rgba(255,255,255,0.04)',
+                      border: isPersonFrozen
+                        ? '1px solid rgba(255,159,10,0.2)'
+                        : isActiveP ? '1px solid rgba(0,122,255,0.3)' : '1px solid rgba(255,255,255,0.07)',
+                      boxShadow: 'none', minWidth: 0, cursor: isPersonFrozen ? 'default' : 'pointer',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-                      <div style={{
-                        width: 24, height: 24, borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
-                        background: photo ? 'transparent' : `linear-gradient(135deg, hsl(${person.name.charCodeAt(0) * 10 % 360}, 65%, 48%), hsl(${person.name.charCodeAt(0) * 15 % 360}, 55%, 38%))`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 11, fontWeight: 700, color: '#fff',
-                      }}>
-                        {photo
-                          ? <img src={photo} alt={person.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          : person.name.charAt(0).toUpperCase()
-                        }
-                      </div>
+                      {isPersonFrozen ? (
+                        <div style={{ width: 24, height: 24, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,159,10,0.15)' }}>
+                          <Lock size={11} style={{ color: '#FF9F0A' }} />
+                        </div>
+                      ) : (
+                        <div style={{
+                          width: 24, height: 24, borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
+                          background: photo ? 'transparent' : `linear-gradient(135deg, hsl(${person.name.charCodeAt(0) * 10 % 360}, 65%, 48%), hsl(${person.name.charCodeAt(0) * 15 % 360}, 55%, 38%))`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 11, fontWeight: 700, color: '#fff',
+                        }}>
+                          {photo
+                            ? <img src={photo} alt={person.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            : person.name.charAt(0).toUpperCase()
+                          }
+                        </div>
+                      )}
                       <span style={{
-                        fontSize: 12, fontWeight: isActiveP ? 600 : 400,
-                        opacity: isActiveP ? 1 : 0.8,
+                        fontSize: 12, fontWeight: isActiveP && !isPersonFrozen ? 600 : 400,
+                        color: isPersonFrozen ? '#FF9F0A' : undefined,
+                        opacity: isPersonFrozen ? 0.85 : isActiveP ? 1 : 0.8,
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
                         {person.name}
@@ -296,23 +319,28 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
                   <div style={{ marginLeft: 18, marginTop: 3, paddingLeft: 8, borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
                     {personResumes.map((resume) => {
                       const isActiveR = resume.id === activeResumeId;
+                      const isResumeFrozen = isPersonFrozen || frozenResumeIds.has(resume.id);
                       const name = resume.name || `Bewerbungsmappe ${personResumes.indexOf(resume) + 1}`;
                       return (
-                        <div key={resume.id} style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 2 }}>
+                        <div key={resume.id} style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 2, opacity: isResumeFrozen ? 0.5 : 1 }}>
                           <button
                             className="btn-glass"
-                            onClick={() => { setActiveResume(resume.id); go('/editor'); }}
+                            onClick={() => { if (!isResumeFrozen) { setActiveResume(resume.id); go('/editor'); } }}
                             style={{
                               flex: 1, justifyContent: 'flex-start', padding: '6px 8px',
                               borderRadius: 6,
-                              background: isActiveR ? 'rgba(0,122,255,0.2)' : 'transparent',
-                              border: isActiveR ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
+                              background: isActiveR && !isResumeFrozen ? 'rgba(0,122,255,0.2)' : 'transparent',
+                              border: isActiveR && !isResumeFrozen ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
                               boxShadow: 'none', gap: 5, minWidth: 0,
+                              cursor: isResumeFrozen ? 'default' : 'pointer',
                             }}
                           >
-                            <FileText size={10} style={{ opacity: 0.5, flexShrink: 0 }} />
+                            {isResumeFrozen
+                              ? <Lock size={10} style={{ opacity: 0.5, flexShrink: 0 }} />
+                              : <FileText size={10} style={{ opacity: 0.5, flexShrink: 0 }} />
+                            }
                             <span style={{
-                              fontSize: 11, opacity: isActiveR ? 1 : 0.65,
+                              fontSize: 11, opacity: isActiveR && !isResumeFrozen ? 1 : 0.65,
                               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                             }}>
                               {name}
@@ -329,17 +357,19 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
                         </div>
                       );
                     })}
-                    <button
-                      onClick={() => handleAddResume(person.id)}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 5, width: '100%',
-                        background: 'none', border: 'none', borderTop: '1px dashed rgba(255,255,255,0.1)',
-                        cursor: 'pointer', color: 'rgba(255,255,255,0.4)', fontSize: 11,
-                        padding: '5px 6px', marginTop: 2,
-                      }}
-                    >
-                      <FilePlus size={10} /> Mappe hinzufügen
-                    </button>
+                    {!isPersonFrozen && (
+                      <button
+                        onClick={() => handleAddResume(person.id)}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 5, width: '100%',
+                          background: 'none', border: 'none', borderTop: '1px dashed rgba(255,255,255,0.1)',
+                          cursor: 'pointer', color: 'rgba(255,255,255,0.4)', fontSize: 11,
+                          padding: '5px 6px', marginTop: 2,
+                        }}
+                      >
+                        <FilePlus size={10} /> Mappe hinzufügen
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
