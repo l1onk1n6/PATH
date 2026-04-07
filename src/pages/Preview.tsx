@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2 } from 'lucide-react';
+import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ResumePreview from '../components/templates/ResumePreview';
 import { TEMPLATES } from '../components/templates/templateConfig';
+import { useIsMobile } from '../hooks/useBreakpoint';
 
 async function exportPDF(element: HTMLElement, filename: string) {
   const html2canvas = (await import('html2canvas')).default;
@@ -19,12 +20,11 @@ async function exportPDF(element: HTMLElement, filename: string) {
   });
 
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-
   const pdfWidth = pdf.internal.pageSize.getWidth();
   const pdfHeight = pdf.internal.pageSize.getHeight();
   const imgWidth = canvas.width;
   const imgHeight = canvas.height;
-  const ratio = pdfWidth / (imgWidth / 2); // canvas is 2x scale
+  const ratio = pdfWidth / (imgWidth / 2);
   const contentHeight = (imgHeight / 2) * ratio;
 
   let yOffset = 0;
@@ -32,19 +32,15 @@ async function exportPDF(element: HTMLElement, filename: string) {
 
   while (yOffset < contentHeight) {
     if (pageCount > 0) pdf.addPage();
-
     const sourceY = (yOffset / ratio) * 2;
     const sourceH = Math.min((pdfHeight / ratio) * 2, imgHeight - sourceY);
-
     const pageCanvas = document.createElement('canvas');
     pageCanvas.width = imgWidth;
     pageCanvas.height = sourceH;
     const ctx = pageCanvas.getContext('2d')!;
     ctx.drawImage(canvas, 0, sourceY, imgWidth, sourceH, 0, 0, imgWidth, sourceH);
-
     const pageImg = pageCanvas.toDataURL('image/jpeg', 0.95);
     pdf.addImage(pageImg, 'JPEG', 0, 0, pdfWidth, sourceH * ratio / 2);
-
     yOffset += pdfHeight;
     pageCount++;
   }
@@ -54,10 +50,12 @@ async function exportPDF(element: HTMLElement, filename: string) {
 
 export default function Preview() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { getActiveResume, setTemplate } = useResumeStore();
   const resume = getActiveResume();
-  const [zoom, setZoom] = useState(0.7);
+  const [zoom, setZoom] = useState(isMobile ? 0.42 : 0.7);
   const [exporting, setExporting] = useState(false);
+  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
   if (!resume) {
@@ -85,60 +83,68 @@ export default function Preview() {
     }
   };
 
-  return (
-    <div className="animate-fade-in" style={{ display: 'flex', gap: 16, height: '100%', overflow: 'hidden' }}>
-      {/* Template picker sidebar */}
-      <aside style={{ width: 160, flexShrink: 0, overflow: 'auto' }}>
-        <div className="section-label" style={{ marginBottom: 8 }}>Templates</div>
-        {TEMPLATES.map((tmpl) => {
-          const isSelected = resume.templateId === tmpl.id;
-          return (
-            <button
-              key={tmpl.id}
-              onClick={() => setTemplate(resume.id, tmpl.id)}
-              style={{
-                width: '100%', background: 'transparent', border: 'none',
-                cursor: 'pointer', padding: 0, marginBottom: 6,
-              }}
+  const TemplatePicker = () => (
+    <>
+      {TEMPLATES.map((tmpl) => {
+        const isSelected = resume.templateId === tmpl.id;
+        return (
+          <button
+            key={tmpl.id}
+            onClick={() => { setTemplate(resume.id, tmpl.id); if (isMobile) setTemplatePickerOpen(false); }}
+            style={{ width: '100%', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 6 }}
+          >
+            <div
+              className="glass-card"
+              style={{ padding: 10, border: isSelected ? `2px solid ${resume.accentColor}` : '1px solid rgba(255,255,255,0.12)' }}
             >
-              <div
-                className="glass-card"
-                style={{
-                  padding: 10,
-                  border: isSelected ? `2px solid ${resume.accentColor}` : '1px solid rgba(255,255,255,0.12)',
-                }}
-              >
-                <div style={{ height: 50, borderRadius: 6, background: tmpl.preview, marginBottom: 6 }} />
-                <div style={{ fontSize: 11, fontWeight: isSelected ? 700 : 500, textAlign: 'left' }}>{tmpl.name}</div>
-              </div>
-            </button>
-          );
-        })}
-      </aside>
+              <div style={{ height: 40, borderRadius: 6, background: tmpl.preview, marginBottom: 6 }} />
+              <div style={{ fontSize: 11, fontWeight: isSelected ? 700 : 500, textAlign: 'left' }}>{tmpl.name}</div>
+            </div>
+          </button>
+        );
+      })}
+    </>
+  );
 
-      {/* Preview area */}
+  return (
+    <div className="animate-fade-in" style={{ display: 'flex', gap: 16, height: '100%', overflow: 'hidden', position: 'relative' }}>
+      {/* ── Desktop: template sidebar ── */}
+      {!isMobile && (
+        <aside style={{ width: 160, flexShrink: 0, overflow: 'auto' }}>
+          <div className="section-label" style={{ marginBottom: 8 }}>Templates</div>
+          <TemplatePicker />
+        </aside>
+      )}
+
+      {/* ── Preview area ── */}
       <div
         className="glass"
-        style={{
-          flex: 1,
-          borderRadius: 'var(--radius-lg)',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
+        style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
       >
         {/* Toolbar */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '10px 16px',
-          borderBottom: '1px solid rgba(255,255,255,0.1)',
-          flexShrink: 0,
+          padding: isMobile ? '8px 12px' : '10px 16px',
+          borderBottom: '1px solid rgba(255,255,255,0.1)', flexShrink: 0, gap: 8,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button className="btn-glass btn-sm btn-icon" onClick={() => setZoom(Math.max(0.3, zoom - 0.1))} style={{ padding: 7 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {/* Mobile: template picker toggle */}
+            {isMobile && (
+              <button
+                className="btn-glass btn-sm btn-icon"
+                onClick={() => setTemplatePickerOpen(true)}
+                style={{ padding: 7 }}
+                title="Templates"
+              >
+                <Layers size={14} />
+              </button>
+            )}
+            <button className="btn-glass btn-sm btn-icon" onClick={() => setZoom(Math.max(0.25, zoom - 0.1))} style={{ padding: 7 }}>
               <ZoomOut size={13} />
             </button>
-            <span style={{ fontSize: 12, minWidth: 42, textAlign: 'center' }}>{Math.round(zoom * 100)}%</span>
+            <span style={{ fontSize: 11, minWidth: 36, textAlign: 'center', color: 'rgba(255,255,255,0.6)' }}>
+              {Math.round(zoom * 100)}%
+            </span>
             <button className="btn-glass btn-sm btn-icon" onClick={() => setZoom(Math.min(1.2, zoom + 0.1))} style={{ padding: 7 }}>
               <ZoomIn size={13} />
             </button>
@@ -151,14 +157,14 @@ export default function Preview() {
             style={{ opacity: exporting ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 6 }}
           >
             {exporting
-              ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> Exportiere…</>
-              : <><Download size={13} /> PDF exportieren</>
+              ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />{!isMobile && ' Exportiere…'}</>
+              : <><Download size={13} />{!isMobile && ' PDF exportieren'}</>
             }
           </button>
         </div>
 
         {/* Preview scroll area */}
-        <div style={{ flex: 1, overflow: 'auto', padding: 24, background: '#555' }}>
+        <div style={{ flex: 1, overflow: 'auto', padding: isMobile ? 12 : 24, background: '#555' }}>
           <div style={{
             width: 794,
             margin: '0 auto',
@@ -173,6 +179,34 @@ export default function Preview() {
           </div>
         </div>
       </div>
+
+      {/* ── Mobile: template picker modal ── */}
+      {isMobile && templatePickerOpen && (
+        <>
+          <div
+            onClick={() => setTemplatePickerOpen(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 50, backdropFilter: 'blur(4px)' }}
+          />
+          <div style={{
+            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 51,
+            maxHeight: '70vh', display: 'flex', flexDirection: 'column',
+          }}>
+            <div className="glass" style={{ borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0', overflow: 'hidden', display: 'flex', flexDirection: 'column', maxHeight: '70vh' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 12px', flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                <span style={{ fontWeight: 700, fontSize: 16 }}>Templates</span>
+                <button className="btn-glass btn-icon btn-sm" onClick={() => setTemplatePickerOpen(false)} style={{ padding: 6 }}>
+                  <X size={16} />
+                </button>
+              </div>
+              <div style={{ overflowY: 'auto', padding: '12px 16px 24px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                <TemplatePicker />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

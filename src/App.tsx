@@ -11,18 +11,84 @@ import SetupPage from './pages/SetupPage';
 import { useAuthStore } from './store/authStore';
 import { useResumeStore } from './store/resumeStore';
 import { isSupabaseConfigured } from './lib/supabase';
+import { useIsMobile } from './hooks/useBreakpoint';
 
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.3.0';
 
 function AppShell() {
+  const isMobile = useIsMobile();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Close drawer on resize to desktop
+  useEffect(() => {
+    if (!isMobile) setDrawerOpen(false);
+  }, [isMobile]);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden', padding: '12px 12px 0', gap: 12 }}>
-        <div className="glass" style={{ borderRadius: 'var(--radius-xl)', overflow: 'hidden', flexShrink: 0 }}>
-          <Sidebar />
+
+      {/* ── Mobile: backdrop ───────────────────────────────── */}
+      {isMobile && drawerOpen && (
+        <div
+          onClick={() => setDrawerOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 40,
+            background: 'rgba(0,0,0,0.55)',
+            backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)',
+          }}
+        />
+      )}
+
+      {/* ── Mobile: slide-in drawer ────────────────────────── */}
+      {isMobile && (
+        <div style={{
+          position: 'fixed', left: 0, top: 0, bottom: 0, zIndex: 50,
+          transform: drawerOpen ? 'translateX(0)' : 'translateX(-100%)',
+          transition: 'transform 0.32s cubic-bezier(0.34, 1.2, 0.64, 1)',
+          willChange: 'transform',
+        }}>
+          <div
+            className="glass"
+            style={{ height: '100%', borderRadius: '0 var(--radius-xl) var(--radius-xl) 0', overflow: 'hidden' }}
+          >
+            <Sidebar onClose={() => setDrawerOpen(false)} />
+          </div>
         </div>
+      )}
+
+      {/* ── Main area ──────────────────────────────────────── */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        overflow: 'hidden',
+        padding: isMobile ? '8px 8px 0' : '12px 12px 0',
+        gap: 12,
+      }}>
+        {/* Desktop sidebar (always visible, collapsible) */}
+        {!isMobile && (
+          <div
+            className="glass"
+            style={{
+              borderRadius: 'var(--radius-xl)', overflow: 'hidden', flexShrink: 0,
+              width: sidebarCollapsed ? 60 : 240,
+              transition: 'width 0.28s cubic-bezier(0.34, 1.2, 0.64, 1)',
+            }}
+          >
+            <Sidebar
+              collapsed={sidebarCollapsed}
+              onToggleCollapse={() => setSidebarCollapsed(v => !v)}
+            />
+          </div>
+        )}
+
+        {/* Content column */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
-          <Header />
+          <Header
+            isMobile={isMobile}
+            onMenuToggle={() => setDrawerOpen(v => !v)}
+          />
           <div style={{ flex: 1, overflow: 'hidden' }}>
             <Routes>
               <Route path="/" element={<Dashboard />} />
@@ -32,13 +98,15 @@ function AppShell() {
           </div>
         </div>
       </div>
+
+      {/* ── Footer ────────────────────────────────────────── */}
       <footer style={{
-        padding: '6px 20px',
+        padding: isMobile ? '4px 14px' : '6px 20px',
         display: 'flex',
         justifyContent: 'flex-end',
         alignItems: 'center',
         fontSize: 11,
-        color: 'rgba(255,255,255,0.25)',
+        color: 'rgba(255,255,255,0.2)',
         flexShrink: 0,
         userSelect: 'none',
       }}>
@@ -57,17 +125,14 @@ export default function App() {
     initialize();
   }, [initialize]);
 
-  // Wenn eingeloggt → Daten aus Cloud laden
   useEffect(() => {
     if (user) syncFromCloud();
   }, [user, syncFromCloud]);
 
-  // Supabase nicht konfiguriert → Setup-Seite
   if (!isSupabaseConfigured() || showSetup) {
     return <HashRouter><SetupPage /></HashRouter>;
   }
 
-  // Lädt Auth-Status
   if (loading) {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
@@ -78,12 +143,10 @@ export default function App() {
     );
   }
 
-  // Nicht eingeloggt → Login/Register
   if (!user) {
     return <HashRouter><AuthPage onSetup={() => setShowSetup(true)} /></HashRouter>;
   }
 
-  // Eingeloggt → App
   return (
     <HashRouter>
       <AppShell />

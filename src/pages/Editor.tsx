@@ -13,19 +13,21 @@ import SkillsEditor from '../components/editor/SkillsEditor';
 import ProjectsEditor from '../components/editor/ProjectsEditor';
 import DocumentUpload from '../components/editor/DocumentUpload';
 import TemplateSelector from '../components/templates/TemplateSelector';
+import { useIsMobile } from '../hooks/useBreakpoint';
 
-const SECTIONS: { id: EditorSection; label: string; icon: React.ComponentType<LucideProps> }[] = [
-  { id: 'personal', label: 'Persönliche Daten', icon: User },
-  { id: 'experience', label: 'Berufserfahrung', icon: Briefcase },
-  { id: 'education', label: 'Ausbildung', icon: GraduationCap },
-  { id: 'skills', label: 'Fähigkeiten', icon: Zap },
-  { id: 'projects', label: 'Projekte & Zertifikate', icon: FolderOpen },
-  { id: 'documents', label: 'Dokumente', icon: Upload },
-  { id: 'template', label: 'Design & Template', icon: Palette },
+const SECTIONS: { id: EditorSection; label: string; short: string; icon: React.ComponentType<LucideProps> }[] = [
+  { id: 'personal',   label: 'Persönliche Daten',     short: 'Person',    icon: User },
+  { id: 'experience', label: 'Berufserfahrung',        short: 'Erfahrung', icon: Briefcase },
+  { id: 'education',  label: 'Ausbildung',             short: 'Bildung',   icon: GraduationCap },
+  { id: 'skills',     label: 'Fähigkeiten',            short: 'Skills',    icon: Zap },
+  { id: 'projects',   label: 'Projekte & Zertifikate', short: 'Projekte',  icon: FolderOpen },
+  { id: 'documents',  label: 'Dokumente',              short: 'Dokumente', icon: Upload },
+  { id: 'template',   label: 'Design & Template',      short: 'Design',    icon: Palette },
 ];
 
 export default function Editor() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { getActiveResume, getActivePerson, activeSection, setActiveSection } = useResumeStore();
   const resume = getActiveResume();
   const person = getActivePerson();
@@ -47,17 +49,81 @@ export default function Editor() {
 
   const renderSection = () => {
     switch (activeSection) {
-      case 'personal': return <PersonalInfoEditor />;
+      case 'personal':   return <PersonalInfoEditor />;
       case 'experience': return <ExperienceEditor />;
-      case 'education': return <EducationEditor />;
-      case 'skills': return <SkillsEditor />;
-      case 'projects': return <ProjectsEditor />;
-      case 'documents': return <DocumentUpload />;
-      case 'template': return <TemplateSelector />;
-      default: return null;
+      case 'education':  return <EducationEditor />;
+      case 'skills':     return <SkillsEditor />;
+      case 'projects':   return <ProjectsEditor />;
+      case 'documents':  return <DocumentUpload />;
+      case 'template':   return <TemplateSelector />;
+      default:           return null;
     }
   };
 
+  const currentSection = SECTIONS.find(s => s.id === activeSection);
+
+  // ── Mobile layout: horizontal tab bar ─────────────────────
+  if (isMobile) {
+    return (
+      <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+        {/* Horizontal scrollable tab bar */}
+        <div style={{
+          display: 'flex',
+          overflowX: 'auto',
+          gap: 6,
+          paddingBottom: 8,
+          flexShrink: 0,
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}>
+          {SECTIONS.map(({ id, short, icon: Icon }) => {
+            const isActive = activeSection === id;
+            return (
+              <button
+                key={id}
+                className="btn-glass"
+                onClick={() => setActiveSection(id)}
+                style={{
+                  flexShrink: 0,
+                  padding: '8px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  boxShadow: 'none',
+                  background: isActive
+                    ? 'linear-gradient(135deg, rgba(0,122,255,0.3), rgba(88,86,214,0.25))'
+                    : 'rgba(255,255,255,0.07)',
+                  border: isActive
+                    ? '1px solid rgba(0,122,255,0.45)'
+                    : '1px solid rgba(255,255,255,0.1)',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <Icon size={13} style={{ opacity: isActive ? 1 : 0.55 }} />
+                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, opacity: isActive ? 1 : 0.65 }}>
+                  {short}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Editor content */}
+        <div
+          className="glass"
+          style={{
+            flex: 1,
+            borderRadius: 'var(--radius-lg)',
+            overflow: 'auto',
+            padding: '16px 16px',
+          }}
+        >
+          {renderSection()}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Desktop layout: vertical sidebar ──────────────────────
   return (
     <div className="animate-fade-in" style={{ display: 'flex', gap: 16, height: '100%', overflow: 'hidden' }}>
       {/* Section nav */}
@@ -95,33 +161,22 @@ export default function Editor() {
       {/* Editor content */}
       <div
         className="glass"
-        style={{
-          flex: 1,
-          borderRadius: 'var(--radius-lg)',
-          overflow: 'auto',
-          padding: '20px 22px',
-        }}
+        style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: '20px 22px' }}
       >
         {/* Section header */}
         <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-          {(() => {
-            const section = SECTIONS.find(s => s.id === activeSection);
-            const Icon = section?.icon;
-            return (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                {Icon && (
-                  <div style={{
-                    width: 32, height: 32, borderRadius: 8,
-                    background: 'rgba(0,122,255,0.2)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    <Icon size={15} />
-                  </div>
-                )}
-                <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{section?.label}</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {currentSection?.icon && (
+              <div style={{
+                width: 32, height: 32, borderRadius: 8,
+                background: 'rgba(0,122,255,0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <currentSection.icon size={15} />
               </div>
-            );
-          })()}
+            )}
+            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{currentSection?.label}</h2>
+          </div>
         </div>
 
         {renderSection()}

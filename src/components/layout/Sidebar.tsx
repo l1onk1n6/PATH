@@ -3,12 +3,19 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Users, FileText, Plus, ChevronRight, Trash2,
   LayoutDashboard, Eye, FilePlus, LogOut, Cloud,
+  PanelLeftClose, PanelLeftOpen,
 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useAuthStore } from '../../store/authStore';
-import { LogoFull } from './Logo';
+import { LogoFull, LogoIcon } from './Logo';
 
-export default function Sidebar() {
+interface SidebarProps {
+  onClose?: () => void;          // mobile drawer close
+  collapsed?: boolean;            // desktop collapse state
+  onToggleCollapse?: () => void;  // desktop collapse toggle
+}
+
+export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const [addingPerson, setAddingPerson] = useState(false);
@@ -22,31 +29,119 @@ export default function Sidebar() {
     addResume, setActiveResume, deleteResume,
   } = useResumeStore();
 
+  function go(path: string) {
+    navigate(path);
+    onClose?.();
+  }
+
   function handleAddPerson() {
     if (!newName.trim()) return;
     addPerson(newName.trim());
     setNewName('');
     setAddingPerson(false);
-    navigate('/editor');
+    go('/editor');
   }
 
   function handleSelectPerson(id: string) {
     setActivePerson(id);
-    navigate('/editor');
+    go('/editor');
   }
 
   function handleAddResume(personId: string) {
     addResume(personId);
-    navigate('/editor');
+    go('/editor');
   }
 
   const isActive = (path: string) => location.pathname === path;
 
+  // ── Collapsed (icon-only) sidebar ──────────────────────────
+  if (collapsed) {
+    return (
+      <aside style={{
+        width: 60, height: '100%', display: 'flex', flexDirection: 'column',
+        alignItems: 'center', padding: '16px 0', gap: 4,
+      }}>
+        {/* Logo icon */}
+        <div style={{ marginBottom: 16, filter: 'drop-shadow(0 3px 8px rgba(52,199,89,0.4))' }}>
+          <LogoIcon size={32} />
+        </div>
+
+        {/* Expand button */}
+        <button
+          className="btn-glass btn-icon"
+          onClick={onToggleCollapse}
+          title="Seitenleiste einblenden"
+          style={{ padding: 8, marginBottom: 8, boxShadow: 'none', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+        >
+          <PanelLeftOpen size={15} />
+        </button>
+
+        <div style={{ width: '70%', height: 1, background: 'rgba(255,255,255,0.1)', margin: '4px 0 8px' }} />
+
+        {/* Nav icons */}
+        {[
+          { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+          { path: '/editor', icon: FileText, label: 'Editor' },
+          { path: '/preview', icon: Eye, label: 'Vorschau' },
+        ].map(({ path, icon: Icon, label }) => (
+          <button
+            key={path}
+            onClick={() => go(path)}
+            className="btn-glass btn-icon"
+            title={label}
+            style={{
+              padding: 10, boxShadow: 'none',
+              background: isActive(path) ? 'rgba(0,122,255,0.2)' : 'transparent',
+              border: isActive(path) ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
+            }}
+          >
+            <Icon size={17} style={{ opacity: isActive(path) ? 1 : 0.55 }} />
+          </button>
+        ))}
+
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+
+        {/* Footer icons */}
+        <button
+          className="btn-glass btn-icon"
+          onClick={() => syncFromCloud()}
+          disabled={syncing}
+          title="Synchronisieren"
+          style={{ padding: 9, boxShadow: 'none', marginBottom: 6 }}
+        >
+          <Cloud size={15} style={{ animation: syncing ? 'spin 1s linear infinite' : 'none' }} />
+        </button>
+        <button
+          className="btn-glass btn-icon"
+          onClick={() => signOut()}
+          title="Abmelden"
+          style={{ padding: 9, boxShadow: 'none' }}
+        >
+          <LogOut size={15} />
+        </button>
+
+        <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+      </aside>
+    );
+  }
+
+  // ── Full sidebar ────────────────────────────────────────────
   return (
-    <aside className="flex flex-col h-full w-64 shrink-0 animate-slide-left" style={{ padding: '16px 12px' }}>
-      {/* Logo */}
-      <div style={{ marginBottom: 24, paddingLeft: 4 }}>
-        <LogoFull size={36} />
+    <aside style={{ display: 'flex', flexDirection: 'column', height: '100%', width: 240, flexShrink: 0, padding: '16px 12px' }}>
+      {/* Logo + collapse button */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, paddingLeft: 4 }}>
+        <LogoFull size={32} />
+        {onToggleCollapse && (
+          <button
+            className="btn-glass btn-icon btn-sm"
+            onClick={onToggleCollapse}
+            title="Seitenleiste einklappen"
+            style={{ padding: 6, boxShadow: 'none', opacity: 0.6, background: 'transparent', border: 'none', flexShrink: 0 }}
+          >
+            <PanelLeftClose size={15} />
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -59,14 +154,11 @@ export default function Sidebar() {
         ].map(({ path, icon: Icon, label }) => (
           <button
             key={path}
-            onClick={() => navigate(path)}
+            onClick={() => go(path)}
             className="btn-glass"
             style={{
-              width: '100%',
-              justifyContent: 'flex-start',
-              borderRadius: 'var(--radius-sm)',
-              padding: '10px 12px',
-              marginBottom: 4,
+              width: '100%', justifyContent: 'flex-start',
+              borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 4,
               background: isActive(path)
                 ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))'
                 : 'transparent',
@@ -139,14 +231,11 @@ export default function Sidebar() {
 
             return (
               <div key={person.id} style={{ marginBottom: 6 }}>
-                {/* Person row */}
                 <button
                   className="btn-glass"
                   onClick={() => handleSelectPerson(person.id)}
                   style={{
-                    width: '100%',
-                    justifyContent: 'space-between',
-                    padding: '9px 12px',
+                    width: '100%', justifyContent: 'space-between', padding: '9px 12px',
                     borderRadius: 'var(--radius-sm)',
                     background: isActiveP ? 'rgba(0,122,255,0.15)' : 'transparent',
                     border: isActiveP ? '1px solid rgba(0,122,255,0.3)' : '1px solid transparent',
@@ -155,25 +244,23 @@ export default function Sidebar() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{
-                      width: 28, height: 28,
-                      borderRadius: '50%',
+                      width: 28, height: 28, borderRadius: '50%',
                       background: `linear-gradient(135deg, hsl(${person.name.charCodeAt(0) * 10 % 360}, 70%, 50%), hsl(${person.name.charCodeAt(0) * 15 % 360}, 60%, 40%))`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 12, fontWeight: 600, color: '#fff', flexShrink: 0,
                     }}>
                       {person.name.charAt(0).toUpperCase()}
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 500, opacity: isActiveP ? 1 : 0.75, textAlign: 'left' }}>
+                    <span style={{ fontSize: 13, fontWeight: 500, opacity: isActiveP ? 1 : 0.75, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {person.name}
                     </span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
                     <span className="badge" style={{ fontSize: 10 }}>{personResumes.length}</span>
                     <ChevronRight size={12} style={{ opacity: 0.5, transform: isActiveP ? 'rotate(90deg)' : 'none', transition: '0.2s' }} />
                   </div>
                 </button>
 
-                {/* Resumes under active person */}
                 {isActiveP && (
                   <div style={{ paddingLeft: 12, marginTop: 4 }}>
                     {personResumes.map((resume) => {
@@ -186,16 +273,13 @@ export default function Sidebar() {
                         <div key={resume.id} style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 3 }}>
                           <button
                             className="btn-glass"
-                            onClick={() => { setActiveResume(resume.id); navigate('/editor'); }}
+                            onClick={() => { setActiveResume(resume.id); go('/editor'); }}
                             style={{
-                              flex: 1,
-                              justifyContent: 'flex-start',
-                              padding: '7px 10px',
+                              flex: 1, justifyContent: 'flex-start', padding: '7px 10px',
                               borderRadius: 'var(--radius-xs)',
                               background: isActiveR ? 'rgba(0,122,255,0.2)' : 'rgba(255,255,255,0.04)',
                               border: isActiveR ? '1px solid rgba(0,122,255,0.35)' : '1px solid rgba(255,255,255,0.08)',
-                              boxShadow: 'none',
-                              gap: 6,
+                              boxShadow: 'none', gap: 6,
                             }}
                           >
                             <FileText size={11} style={{ opacity: 0.6, flexShrink: 0 }} />
@@ -238,7 +322,6 @@ export default function Sidebar() {
 
       <div className="divider" />
 
-      {/* Footer */}
       {user && (
         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 8, paddingLeft: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {user.email}

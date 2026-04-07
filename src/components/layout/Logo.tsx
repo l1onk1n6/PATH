@@ -82,7 +82,7 @@ export function LogoFull({ size = 36 }: LogoProps) {
           lineHeight: 1,
           color: '#fff',
         }}>
-          AICV
+          Path
         </div>
         <div style={{
           fontSize: size * 0.28,

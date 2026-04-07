@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
+import { useIsMobile } from '../hooks/useBreakpoint';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { persons, resumes, addPerson, deletePerson, setActivePerson, activePersonId } = useResumeStore();
   const [newName, setNewName] = useState('');
   const [showAdd, setShowAdd] = useState(false);
@@ -21,26 +23,31 @@ export default function Dashboard() {
   const totalSections = resumes.reduce((acc, r) => acc + r.workExperience.length + r.education.length + r.skills.length, 0);
 
   return (
-    <div className="animate-fade-in" style={{ height: '100%', overflow: 'auto' }}>
+    <div className="animate-fade-in" style={{ height: '100%', overflow: 'auto', padding: isMobile ? '0 0 16px' : undefined }}>
       {/* Stats Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 24 }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(3, 1fr)',
+        gap: isMobile ? 8 : 12,
+        marginBottom: isMobile ? 16 : 24,
+      }}>
         {[
           { icon: Users, label: 'Personen', value: persons.length, color: 'var(--ios-blue)' },
           { icon: FileText, label: 'Lebensläufe', value: totalResumes, color: 'var(--ios-purple)' },
-          { icon: TrendingUp, label: 'Einträge gesamt', value: totalSections, color: 'var(--ios-green)' },
+          { icon: TrendingUp, label: isMobile ? 'Einträge' : 'Einträge gesamt', value: totalSections, color: 'var(--ios-green)' },
         ].map(({ icon: Icon, label, value, color }) => (
-          <div key={label} className="glass-card" style={{ padding: '18px 20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div key={label} className="glass-card" style={{ padding: isMobile ? '12px 14px' : '18px 20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
               <div>
-                <div style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-1px' }}>{value}</div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{label}</div>
+                <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, letterSpacing: '-1px' }}>{value}</div>
+                <div style={{ fontSize: isMobile ? 10 : 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{label}</div>
               </div>
               <div style={{
-                width: 44, height: 44, borderRadius: 12,
-                background: `${color}25`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: isMobile ? 32 : 44, height: isMobile ? 32 : 44, borderRadius: isMobile ? 8 : 12,
+                background: `${color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
               }}>
-                <Icon size={20} style={{ color }} />
+                <Icon size={isMobile ? 16 : 20} style={{ color }} />
               </div>
             </div>
           </div>
@@ -48,18 +55,20 @@ export default function Dashboard() {
       </div>
 
       {/* Section header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, letterSpacing: '-0.3px' }}>Personen & Lebensläufe</h2>
-        <button className="btn-glass btn-primary" onClick={() => setShowAdd(true)}>
-          <Plus size={15} /> Neue Person
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+        <h2 style={{ margin: 0, fontSize: isMobile ? 16 : 18, fontWeight: 700, letterSpacing: '-0.3px' }}>
+          Personen & Lebensläufe
+        </h2>
+        <button className="btn-glass btn-primary btn-sm" onClick={() => setShowAdd(true)}>
+          <Plus size={14} /> {!isMobile && 'Neue '}Person
         </button>
       </div>
 
       {/* Add person form */}
       {showAdd && (
-        <div className="glass-card animate-scale-in" style={{ padding: 20, marginBottom: 16 }}>
-          <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 600 }}>Neue Person anlegen</h3>
-          <div style={{ display: 'flex', gap: 10 }}>
+        <div className="glass-card animate-scale-in" style={{ padding: isMobile ? 14 : 20, marginBottom: 14 }}>
+          <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 600 }}>Neue Person anlegen</h3>
+          <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 8 }}>
             <input
               className="input-glass"
               placeholder="Vollständiger Name..."
@@ -67,23 +76,26 @@ export default function Dashboard() {
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
               autoFocus
+              style={{ flex: 1 }}
             />
-            <button className="btn-glass btn-primary" onClick={handleAdd}>Erstellen</button>
-            <button className="btn-glass" onClick={() => { setShowAdd(false); setNewName(''); }}>Abbruch</button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn-glass btn-primary" onClick={handleAdd} style={{ flex: 1 }}>Erstellen</button>
+              <button className="btn-glass" onClick={() => { setShowAdd(false); setNewName(''); }}>Abbruch</button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Empty state */}
       {persons.length === 0 && !showAdd && (
-        <div className="glass-card" style={{ padding: '48px 24px', textAlign: 'center' }}>
+        <div className="glass-card" style={{ padding: isMobile ? '32px 20px' : '48px 24px', textAlign: 'center' }}>
           <div style={{
-            width: 64, height: 64, borderRadius: 16,
+            width: 56, height: 56, borderRadius: 16,
             background: 'rgba(0,122,255,0.15)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 16px',
           }}>
-            <Users size={28} style={{ color: 'var(--ios-blue)' }} />
+            <Users size={24} style={{ color: 'var(--ios-blue)' }} />
           </div>
           <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 700 }}>Noch keine Profile</h3>
           <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, marginBottom: 20 }}>
@@ -96,7 +108,11 @@ export default function Dashboard() {
       )}
 
       {/* Persons Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))',
+        gap: isMobile ? 10 : 14,
+      }}>
         {persons.map((person) => {
           const personResumes = resumes.filter((r) => person.resumeIds.includes(r.id));
           const activeResume = personResumes.find((r) => r.id === person.activeResumeId) ?? personResumes[0];
@@ -107,19 +123,19 @@ export default function Dashboard() {
               key={person.id}
               className="glass-card"
               style={{
-                padding: 20,
+                padding: isMobile ? 16 : 20,
                 cursor: 'pointer',
                 border: isActive ? '1px solid rgba(0,122,255,0.4)' : undefined,
               }}
               onClick={() => { setActivePerson(person.id); navigate('/editor'); }}
             >
               {/* Avatar + Name */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                 <div style={{
-                  width: 48, height: 48, borderRadius: '50%', flexShrink: 0,
+                  width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
                   background: `linear-gradient(135deg, hsl(${person.name.charCodeAt(0) * 10 % 360}, 70%, 45%), hsl(${person.name.charCodeAt(0) * 15 % 360}, 60%, 35%))`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 18, fontWeight: 700, color: '#fff',
+                  fontSize: 17, fontWeight: 700, color: '#fff',
                 }}>
                   {person.name.charAt(0).toUpperCase()}
                 </div>
@@ -132,14 +148,14 @@ export default function Dashboard() {
                   )}
                 </div>
                 {isActive && (
-                  <div className="badge" style={{ background: 'rgba(0,122,255,0.2)', borderColor: 'rgba(0,122,255,0.4)', color: 'var(--ios-blue)', fontSize: 10 }}>
+                  <div className="badge" style={{ background: 'rgba(0,122,255,0.2)', borderColor: 'rgba(0,122,255,0.4)', color: 'var(--ios-blue)', fontSize: 10, flexShrink: 0 }}>
                     Aktiv
                   </div>
                 )}
               </div>
 
-              {/* Resume count */}
-              <div style={{ display: 'flex', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
+              {/* Resume badges */}
+              <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
                 {personResumes.map((r) => (
                   <span key={r.id} className="badge">
                     <FileText size={9} style={{ marginRight: 4 }} />
@@ -148,7 +164,7 @@ export default function Dashboard() {
                 ))}
               </div>
 
-              <div className="divider" style={{ margin: '12px 0' }} />
+              <div className="divider" style={{ margin: '10px 0' }} />
 
               {/* Actions */}
               <div style={{ display: 'flex', gap: 8 }}>
@@ -163,7 +179,7 @@ export default function Dashboard() {
                   className="btn-glass btn-sm"
                   onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); navigate('/preview'); }}
                 >
-                  <Eye size={13} /> Vorschau
+                  <Eye size={13} /> {!isMobile && 'Vorschau'}
                 </button>
                 <button
                   className="btn-glass btn-danger btn-sm btn-icon"

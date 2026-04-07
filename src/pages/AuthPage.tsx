@@ -67,8 +67,8 @@ export default function AuthPage({ onSetup }: { onSetup: () => void }) {
           <div style={{ filter: 'drop-shadow(0 6px 18px rgba(52,199,89,0.5))', marginBottom: 14 }}>
             <LogoIcon size={52} />
           </div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 4px', letterSpacing: '-0.4px' }}>AICV</h1>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, margin: 0 }}>by pixmatic</p>
+          <h1 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 4px', letterSpacing: '-0.4px' }}>Path</h1>
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, margin: 0 }}>Lebenslauf-Editor · by pixmatic</p>
         </div>
 
         {/* Tab */}
