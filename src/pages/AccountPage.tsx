@@ -368,7 +368,7 @@ export default function AccountPage() {
           {NAV.map(({ id, label, icon: Icon }) => {
             const isActive = section === id;
             return (
-              <button key={id} className="btn-glass" onClick={() => setSection(id)}
+              <button key={id} className="btn-glass btn-nav" onClick={() => setSection(id)}
                 style={{ flexShrink: 0, padding: '8px 12px', borderRadius: 'var(--radius-sm)', boxShadow: 'none', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6,
                   background: isActive ? 'linear-gradient(135deg, rgba(0,122,255,0.3), rgba(88,86,214,0.25))' : 'rgba(255,255,255,0.07)',
                   border: isActive ? '1px solid rgba(0,122,255,0.45)' : '1px solid rgba(255,255,255,0.1)',
@@ -393,7 +393,7 @@ export default function AccountPage() {
         {NAV.map(({ id, label, icon: Icon }) => {
           const isActive = section === id;
           return (
-            <button key={id} className="btn-glass" onClick={() => setSection(id)}
+            <button key={id} className="btn-glass btn-nav" onClick={() => setSection(id)}
               style={{ justifyContent: 'space-between', padding: '10px 12px', borderRadius: 'var(--radius-sm)', boxShadow: 'none',
                 background: isActive ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'rgba(255,255,255,0.05)',
                 border: isActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid rgba(255,255,255,0.08)',

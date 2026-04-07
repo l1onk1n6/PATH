@@ -133,6 +133,10 @@ body::before {
 
 .btn-glass:active { transform: scale(0.97); }
 
+/* Nav pills (sidebar/tabs) — no scale on hover to prevent overlap */
+.btn-nav:hover { transform: none; box-shadow: none; }
+.btn-nav:active { transform: scale(0.98); }
+
 .btn-primary {
   background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo)) !important;
 }
