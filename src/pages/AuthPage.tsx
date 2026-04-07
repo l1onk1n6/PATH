@@ -59,16 +59,21 @@ export default function AuthPage() {
 
   return (
     <div style={{
-      height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+      minHeight: '100vh',
+      minHeight: '100dvh' as never,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '16px 20px',
     }}>
-      <div className="glass-card animate-scale-in" style={{ width: '100%', maxWidth: 420, padding: 36 }}>
+      <div className="glass-card animate-scale-in" style={{ width: '100%', maxWidth: 420, padding: '28px 28px' }}>
         {/* Logo */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
-          <div style={{ marginBottom: 14 }}>
-            <LogoIcon size={52} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 22 }}>
+          <div style={{ marginBottom: 10 }}>
+            <LogoIcon size={44} />
           </div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 4px', letterSpacing: '-0.4px' }}>Path</h1>
-          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12, margin: 0, fontWeight: 400 }}>by pixmatic</p>
+          <h1 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 3px', letterSpacing: '-0.4px' }}>Path</h1>
+          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, margin: 0, fontWeight: 400 }}>by pixmatic</p>
         </div>
 
         {/* Tab */}
