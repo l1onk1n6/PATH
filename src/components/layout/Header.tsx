@@ -94,10 +94,10 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
             {!isMobile && ' Bearbeiten'}
           </button>
         )}
-        {location.pathname === '/' && (
+        {location.pathname === '/' && resume && (
           <button className="btn-glass btn-primary btn-sm" onClick={() => navigate('/editor')}>
             <Edit3 size={14} />
-            {!isMobile && ' Öffnen'}
+            {!isMobile && ' Bearbeiten'}
           </button>
         )}
       </div>
