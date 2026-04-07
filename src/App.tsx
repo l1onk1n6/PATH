@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Cloud, Loader } from 'lucide-react';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 import Dashboard from './pages/Dashboard';
@@ -21,6 +21,7 @@ function AppShell() {
   const isMobile = useIsMobile();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { savePending, syncing } = useResumeStore();
 
   // Close drawer on resize to desktop
   useEffect(() => {
@@ -107,14 +108,25 @@ function AppShell() {
       <footer style={{
         padding: isMobile ? '4px 14px' : '6px 20px',
         display: 'flex',
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between',
         alignItems: 'center',
         fontSize: 11,
         color: 'rgba(255,255,255,0.2)',
         flexShrink: 0,
         userSelect: 'none',
       }}>
-        by pixmatic · v{APP_VERSION}
+        <span>by pixmatic · v{APP_VERSION}</span>
+        {(savePending || syncing) ? (
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'rgba(255,255,255,0.35)' }}>
+            <Loader size={11} style={{ animation: 'spin 1s linear infinite' }} />
+            Speichert…
+          </span>
+        ) : (
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Cloud size={11} />
+            Gespeichert
+          </span>
+        )}
       </footer>
     </div>
   );

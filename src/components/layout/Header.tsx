@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Eye, Edit3, Menu, Cloud, Loader, Sparkles } from 'lucide-react';
+import { Eye, Edit3, Menu, Sparkles } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { useState } from 'react';
@@ -13,7 +13,7 @@ interface Props {
 export default function Header({ isMobile, onMenuToggle }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { getActivePerson, getActiveResume, savePending, syncing } = useResumeStore();
+  const { getActivePerson, getActiveResume } = useResumeStore();
   const { plan, isPro } = usePlan();
   const [showUpgrade, setShowUpgrade] = useState(false);
 
@@ -72,7 +72,6 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
       </div>
 
       <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
-        {/* Plan badge */}
         {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
         <button
           onClick={() => !isPro && setShowUpgrade(true)}
@@ -92,19 +91,6 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
           {isPro && <Sparkles size={11} />}
           {isPro ? 'PRO' : plan.toUpperCase()}
         </button>
-
-        {/* Sync status — always visible when active */}
-        {(savePending || syncing) ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>
-            <Loader size={13} style={{ animation: 'spin 1s linear infinite' }} />
-            {!isMobile && 'Speichert…'}
-          </div>
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
-            <Cloud size={13} />
-            {!isMobile && 'Gespeichert'}
-          </div>
-        )}
 
         {location.pathname === '/editor' && (
           <>
