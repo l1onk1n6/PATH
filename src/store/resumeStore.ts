@@ -187,9 +187,13 @@ export const useResumeStore = create<ResumeStore>()(
 
       // ── Resumes ─────────────────────────────────────────
       addResume: (personId, name) => {
-        const existing = get().resumes.filter(r => r.personId === personId).length;
-        const resumeName = name || `Bewerbungsmappe ${existing + 1}`;
+        const existing = get().resumes.filter(r => r.personId === personId);
+        const resumeName = name || `Bewerbungsmappe ${existing.length + 1}`;
         const resume = createDefaultResume(personId, resumeName);
+        // Inherit personalInfo from an existing resume of this person
+        if (existing.length > 0) {
+          resume.personalInfo = { ...existing[0].personalInfo };
+        }
         set((s) => ({
           resumes: [...s.resumes, resume],
           persons: s.persons.map((p) => p.id === personId ? { ...p, resumeIds: [...p.resumeIds, resume.id], activeResumeId: resume.id } : p),
@@ -268,8 +272,20 @@ export const useResumeStore = create<ResumeStore>()(
 
       // ── Section mutations (alle sync-fähig via updateResume-Debounce) ──
       updatePersonalInfo: (resumeId, data) => {
-        set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, personalInfo: { ...r.personalInfo, ...data }, updatedAt: new Date().toISOString() } : r) }));
-        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        // Sync personalInfo across all resumes of the same person
+        const personId = get().resumes.find(r => r.id === resumeId)?.personId;
+        set((s) => ({
+          resumes: s.resumes.map(r => {
+            if (personId && r.personId === personId) {
+              return { ...r, personalInfo: { ...r.personalInfo, ...data }, updatedAt: new Date().toISOString() };
+            }
+            return r;
+          }),
+        }));
+        // Persist all affected resumes
+        get().resumes
+          .filter(r => personId && r.personId === personId)
+          .forEach(r => queueSave(`resume-${r.id}`, () => { const fresh = get().resumes.find(x => x.id === r.id); if (fresh) db.upsertResume(fresh); }));
       },
 
       updateCoverLetter: (resumeId, data) => {
