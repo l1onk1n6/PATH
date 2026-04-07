@@ -7,7 +7,6 @@ import Dashboard from './pages/Dashboard';
 import Editor from './pages/Editor';
 import Preview from './pages/Preview';
 import AuthPage from './pages/AuthPage';
-import SetupPage from './pages/SetupPage';
 import { useAuthStore } from './store/authStore';
 import { useResumeStore } from './store/resumeStore';
 import { isSupabaseConfigured } from './lib/supabase';
@@ -116,21 +115,9 @@ function AppShell() {
   );
 }
 
-// Admin-only: ?setup in der URL öffnet die Konfigurationsseite.
-// URL-Param wird sofort aus der History entfernt, damit er nicht in Logs auftaucht.
-function checkAdminSetupParam(): boolean {
-  const params = new URLSearchParams(window.location.search);
-  if (params.has('setup')) {
-    window.history.replaceState({}, '', window.location.pathname + window.location.hash);
-    return true;
-  }
-  return false;
-}
-
 export default function App() {
   const { user, loading, initialize } = useAuthStore();
   const { syncFromCloud } = useResumeStore();
-  const [showSetup] = useState(() => checkAdminSetupParam());
 
   useEffect(() => {
     initialize();
@@ -140,8 +127,15 @@ export default function App() {
     if (user) syncFromCloud();
   }, [user, syncFromCloud]);
 
-  if (!isSupabaseConfigured() || showSetup) {
-    return <HashRouter><SetupPage /></HashRouter>;
+  if (!isSupabaseConfigured()) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, padding: 24, textAlign: 'center' }}>
+        <span style={{ fontSize: 32 }}>⚙️</span>
+        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, maxWidth: 320 }}>
+          App nicht konfiguriert.<br />Bitte VITE_SUPABASE_URL und VITE_SUPABASE_ANON_KEY als GitHub Secrets setzen.
+        </p>
+      </div>
+    );
   }
 
   if (loading) {
