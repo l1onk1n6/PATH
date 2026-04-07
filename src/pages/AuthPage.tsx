@@ -59,26 +59,28 @@ export default function AuthPage() {
 
   return (
     <div style={{
-      minHeight: '100svh',
+      minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '16px 20px',
+      padding: '20px 16px',
+      boxSizing: 'border-box',
+      overflow: 'auto',
     }}>
-      <div className="glass-card animate-scale-in" style={{ width: '100%', maxWidth: 420, padding: '28px 28px' }}>
+      <div className="glass-card animate-scale-in" style={{ width: '100%', maxWidth: 380, padding: '24px 22px', margin: 'auto' }}>
         {/* Logo */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 22 }}>
-          <div style={{ marginBottom: 10 }}>
-            <LogoIcon size={44} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 18 }}>
+          <div style={{ marginBottom: 8 }}>
+            <LogoIcon size={40} />
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 3px', letterSpacing: '-0.4px' }}>Path</h1>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 2px', letterSpacing: '-0.4px' }}>Path</h1>
           <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, margin: 0, fontWeight: 400 }}>by pixmatic</p>
         </div>
 
         {/* Tab */}
         <div style={{
           display: 'flex', background: 'rgba(255,255,255,0.06)', borderRadius: 'var(--radius-full)',
-          padding: 3, marginBottom: 24,
+          padding: 3, marginBottom: 16,
         }}>
           {(['login', 'register'] as const).map((m) => (
             <button
@@ -119,7 +121,7 @@ export default function AuthPage() {
             />
           </div>
 
-          <div style={{ marginBottom: strength ? 8 : 24, position: 'relative' }}>
+          <div style={{ marginBottom: strength ? 6 : 16, position: 'relative' }}>
             <label className="section-label"><Lock size={9} style={{ display: 'inline', marginRight: 3 }} />Passwort</label>
             <input
               className="input-glass"
