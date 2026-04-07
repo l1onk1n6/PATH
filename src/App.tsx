@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Editor from './pages/Editor';
 import Preview from './pages/Preview';
 import AuthPage from './pages/AuthPage';
+import AuthCallbackPage from './pages/AuthCallbackPage';
 import { useAuthStore } from './store/authStore';
 import { useResumeStore } from './store/resumeStore';
 import { isSupabaseConfigured } from './lib/supabase';
@@ -115,17 +116,33 @@ function AppShell() {
   );
 }
 
+// Detect auth type from URL params (set by Supabase email links)
+function getAuthTypeFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const hash = new URLSearchParams(window.location.hash.replace(/^#\/?/, ''));
+  const type = params.get('type') || hash.get('type');
+  const hasToken = params.get('token_hash') || params.get('code') || hash.get('access_token');
+  if (!hasToken && !type) return null;
+  if (type === 'signup') return 'signup' as const;
+  if (type === 'magiclink') return 'magiclink' as const;
+  if (type === 'recovery') return 'recovery' as const;
+  if (type === 'invite') return 'invite' as const;
+  if (hasToken) return 'unknown' as const;
+  return null;
+}
+
 export default function App() {
   const { user, loading, initialize, passwordRecovery } = useAuthStore();
   const { syncFromCloud } = useResumeStore();
+  const [authType] = useState(() => getAuthTypeFromUrl());
 
   useEffect(() => {
     initialize();
   }, [initialize]);
 
   useEffect(() => {
-    if (user) syncFromCloud();
-  }, [user, syncFromCloud]);
+    if (user && !passwordRecovery) syncFromCloud();
+  }, [user, passwordRecovery, syncFromCloud]);
 
   if (!isSupabaseConfigured()) {
     return (
@@ -148,7 +165,17 @@ export default function App() {
     );
   }
 
-  if (!user || passwordRecovery) {
+  // Show callback landing page while processing email link tokens
+  if (authType && (loading || !user || passwordRecovery)) {
+    return <HashRouter><AuthCallbackPage authType={authType} /></HashRouter>;
+  }
+
+  // Show reset form after PASSWORD_RECOVERY event
+  if (passwordRecovery) {
+    return <HashRouter><AuthPage /></HashRouter>;
+  }
+
+  if (!user) {
     return <HashRouter><AuthPage /></HashRouter>;
   }
 
