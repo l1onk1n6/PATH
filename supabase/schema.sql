@@ -13,14 +13,16 @@ create table if not exists public.persons (
   created_at  timestamptz default now() not null
 );
 
--- Lebensläufe (Inhalt als JSONB für Flexibilität)
+-- Bewerbungsmappen (Inhalt als JSONB für Flexibilität)
 create table if not exists public.resumes (
   id               uuid primary key default gen_random_uuid(),
   person_id        uuid references public.persons(id) on delete cascade not null,
   user_id          uuid references auth.users(id) on delete cascade not null,
+  name             text default 'Bewerbungsmappe' not null,
   template_id      text default 'minimal' not null,
   accent_color     text default '#007AFF' not null,
   personal_info    jsonb default '{}' not null,
+  cover_letter     jsonb default '{}',
   work_experience  jsonb default '[]' not null,
   education        jsonb default '[]' not null,
   skills           jsonb default '[]' not null,

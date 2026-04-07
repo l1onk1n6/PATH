@@ -4,14 +4,13 @@
  * damit die App offline weiter funktioniert.
  */
 import { getSupabase, isSupabaseConfigured } from './supabase';
-import type { Person, Resume } from '../types/resume';
+import type { Person, Resume, UploadedDocument } from '../types/resume';
 
 function sb() {
   return getSupabase();
 }
 
-function userId() {
-  // Wird synchron aus dem Session-Cache gelesen
+async function userId(): Promise<string | null> {
   return sb().auth.getUser().then((r) => r.data.user?.id ?? null);
 }
 
@@ -106,6 +105,50 @@ export async function deleteResume(id: string): Promise<void> {
   }
 }
 
+// ── Documents ──────────────────────────────────────────────
+
+export async function fetchDocuments(): Promise<(UploadedDocument & { resumeId: string })[]> {
+  if (!isSupabaseConfigured()) return [];
+  try {
+    const { data, error } = await sb().from('documents').select('*').order('uploaded_at');
+    if (error) throw error;
+    return (data ?? []).map(rowToDocument);
+  } catch (e) {
+    console.warn('[db] fetchDocuments', e);
+    return [];
+  }
+}
+
+export async function upsertDocument(resumeId: string, doc: UploadedDocument): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  try {
+    const uid = await userId();
+    if (!uid) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (sb().from('documents') as any).upsert({
+      id: doc.id,
+      resume_id: resumeId,
+      user_id: uid,
+      name: doc.name,
+      type: doc.type,
+      size: doc.size,
+      category: doc.category,
+      data_url: doc.dataUrl,
+    });
+  } catch (e) {
+    console.warn('[db] upsertDocument', e);
+  }
+}
+
+export async function deleteDocument(id: string): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  try {
+    await sb().from('documents').delete().eq('id', id);
+  } catch (e) {
+    console.warn('[db] deleteDocument', e);
+  }
+}
+
 // ── Row mappers ────────────────────────────────────────────
 
 function rowToPerson(row: Record<string, unknown>): Person {
@@ -134,8 +177,21 @@ function rowToResume(row: Record<string, unknown>): Resume {
     languages: (row.languages as Resume['languages']) ?? [],
     projects: (row.projects as Resume['projects']) ?? [],
     certificates: (row.certificates as Resume['certificates']) ?? [],
-    documents: [],           // Dokumente separat laden wenn nötig
+    documents: [],           // werden separat via fetchDocuments geladen
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
+  };
+}
+
+function rowToDocument(row: Record<string, unknown>): UploadedDocument & { resumeId: string } {
+  return {
+    resumeId: row.resume_id as string,
+    id: row.id as string,
+    name: row.name as string,
+    type: row.type as string,
+    size: row.size as number,
+    category: row.category as UploadedDocument['category'],
+    dataUrl: row.data_url as string,
+    uploadedAt: row.uploaded_at as string,
   };
 }

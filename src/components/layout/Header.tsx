@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Eye, Edit3, Download, Save, Menu } from 'lucide-react';
+import { Eye, Edit3, Download, Menu, Cloud, Loader } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 export default function Header({ isMobile, onMenuToggle }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { getActivePerson, getActiveResume } = useResumeStore();
+  const { getActivePerson, getActiveResume, savePending, syncing } = useResumeStore();
 
   const person = getActivePerson();
   const resume = getActiveResume();
@@ -67,15 +67,24 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
       </div>
 
       <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+        {/* Sync status — always visible when active */}
+        {(savePending || syncing) ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>
+            <Loader size={13} style={{ animation: 'spin 1s linear infinite' }} />
+            {!isMobile && 'Speichert…'}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+            <Cloud size={13} />
+            {!isMobile && 'Gespeichert'}
+          </div>
+        )}
+
         {location.pathname === '/editor' && (
           <>
             <button className="btn-glass btn-sm" onClick={() => navigate('/preview')}>
               <Eye size={14} />
               {!isMobile && ' Vorschau'}
-            </button>
-            <button className="btn-glass btn-success btn-sm" onClick={() => {}}>
-              <Save size={14} />
-              {!isMobile && ' Gespeichert'}
             </button>
           </>
         )}

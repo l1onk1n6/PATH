@@ -205,6 +205,11 @@ select.input-glass option { background: #1a1a2e; color: #fff; }
   100% { background-position: 200% center; }
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
 .animate-slide-left { animation: slideInLeft 0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
 .animate-scale-in { animation: scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }

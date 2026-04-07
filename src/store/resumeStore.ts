@@ -7,12 +7,26 @@ import type {
 } from '../types/resume';
 import * as db from '../lib/db';
 
-// ── Debounce helper ───────────────────────────────────────
+// ── Debounce helper with savePending tracking ─────────────
 const debounceMap = new Map<string, ReturnType<typeof setTimeout>>();
-function debounced(key: string, fn: () => void, ms = 1200) {
+let pendingCount = 0;
+// Will be set after store creation to update savePending state
+let notifySaving: ((v: boolean) => void) | null = null;
+
+function queueSave(key: string, fn: () => void, ms = 1200) {
+  const isNew = !debounceMap.has(key);
   const existing = debounceMap.get(key);
   if (existing) clearTimeout(existing);
-  debounceMap.set(key, setTimeout(() => { fn(); debounceMap.delete(key); }, ms));
+  if (isNew) {
+    pendingCount++;
+    notifySaving?.(true);
+  }
+  debounceMap.set(key, setTimeout(() => {
+    fn();
+    debounceMap.delete(key);
+    pendingCount = Math.max(0, pendingCount - 1);
+    if (pendingCount === 0) notifySaving?.(false);
+  }, ms));
 }
 
 // ── Types ─────────────────────────────────────────────────
@@ -23,6 +37,7 @@ interface ResumeStore {
   activeResumeId: string | null;
   activeSection: EditorSection;
   syncing: boolean;
+  savePending: boolean;
 
   // Cloud sync
   syncFromCloud: () => Promise<void>;
@@ -90,29 +105,36 @@ export const useResumeStore = create<ResumeStore>()(
   persist(
     (set, get) => ({
       persons: [], resumes: [], activePersonId: null, activeResumeId: null,
-      activeSection: 'personal', syncing: false,
+      activeSection: 'personal', syncing: false, savePending: false,
 
       // ── Cloud sync ──────────────────────────────────────
       syncFromCloud: async () => {
+        notifySaving = (v) => set({ savePending: v });
         set({ syncing: true });
         try {
-          const [cloudPersons, cloudResumes] = await Promise.all([
-            db.fetchPersons(), db.fetchResumes(),
+          const [cloudPersons, cloudResumes, cloudDocs] = await Promise.all([
+            db.fetchPersons(), db.fetchResumes(), db.fetchDocuments(),
           ]);
           if (cloudPersons.length === 0 && cloudResumes.length === 0) {
             // Neues Konto: lokale Daten hochladen
             const { persons, resumes } = get();
+            const allDocs = resumes.flatMap(r => r.documents.map(d => ({ resumeId: r.id, doc: d })));
             await Promise.all([
               ...persons.map(db.upsertPerson),
               ...resumes.map(db.upsertResume),
+              ...allDocs.map(({ resumeId, doc }) => db.upsertDocument(resumeId, doc)),
             ]);
           } else {
-            // resumeIds aus Cloud-Daten rekonstruieren
+            // resumeIds aus Cloud-Daten rekonstruieren + Dokumente einfügen
             const persons = cloudPersons.map(p => ({
               ...p,
               resumeIds: cloudResumes.filter(r => r.personId === p.id).map(r => r.id),
             }));
-            set({ persons, resumes: cloudResumes });
+            const resumes = cloudResumes.map(r => ({
+              ...r,
+              documents: cloudDocs.filter(d => d.resumeId === r.id).map(({ resumeId: _rid, ...d }) => d),
+            }));
+            set({ persons, resumes });
           }
         } finally {
           set({ syncing: false });
@@ -132,7 +154,7 @@ export const useResumeStore = create<ResumeStore>()(
 
       updatePerson: (id, data) => {
         set((s) => ({ persons: s.persons.map((p) => p.id === id ? { ...p, ...data } : p) }));
-        debounced(`person-${id}`, () => {
+        queueSave(`person-${id}`, () => {
           const p = get().persons.find(p => p.id === id);
           if (p) db.upsertPerson(p);
         });
@@ -171,7 +193,7 @@ export const useResumeStore = create<ResumeStore>()(
 
       updateResume: (id, data) => {
         set((s) => ({ resumes: s.resumes.map((r) => r.id === id ? { ...r, ...data, updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${id}`, () => {
+        queueSave(`resume-${id}`, () => {
           const r = get().resumes.find(r => r.id === id);
           if (r) db.upsertResume(r);
         });
@@ -197,135 +219,135 @@ export const useResumeStore = create<ResumeStore>()(
 
       renameResume: (id, name) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === id ? { ...r, name, updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${id}`, () => { const r = get().resumes.find(r => r.id === id); if (r) db.upsertResume(r); });
+        queueSave(`resume-${id}`, () => { const r = get().resumes.find(r => r.id === id); if (r) db.upsertResume(r); });
       },
 
       setTemplate: (resumeId, templateId) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, templateId, updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       setAccentColor: (resumeId, color) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, accentColor: color, updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       // ── Section mutations (alle sync-fähig via updateResume-Debounce) ──
       updatePersonalInfo: (resumeId, data) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, personalInfo: { ...r.personalInfo, ...data }, updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       updateCoverLetter: (resumeId, data) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, coverLetter: { ...r.coverLetter, ...data }, updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       addWorkExperience: (resumeId) => {
         const item: WorkExperience = { id: uuidv4(), company: '', position: '', location: '', startDate: '', endDate: '', current: false, description: '', highlights: [] };
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, workExperience: [...r.workExperience, item], updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       updateWorkExperience: (resumeId, id, data) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, workExperience: r.workExperience.map(w => w.id === id ? { ...w, ...data } : w), updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       removeWorkExperience: (resumeId, id) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, workExperience: r.workExperience.filter(w => w.id !== id), updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       addEducation: (resumeId) => {
         const item: Education = { id: uuidv4(), institution: '', degree: '', field: '', location: '', startDate: '', endDate: '', grade: '', description: '' };
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, education: [...r.education, item], updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       updateEducation: (resumeId, id, data) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, education: r.education.map(e => e.id === id ? { ...e, ...data } : e), updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       removeEducation: (resumeId, id) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, education: r.education.filter(e => e.id !== id), updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       addSkill: (resumeId) => {
         const item: Skill = { id: uuidv4(), name: '', level: 3, category: 'Allgemein' };
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, skills: [...r.skills, item], updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       updateSkill: (resumeId, id, data) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, skills: r.skills.map(sk => sk.id === id ? { ...sk, ...data } : sk), updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       removeSkill: (resumeId, id) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, skills: r.skills.filter(sk => sk.id !== id), updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       addLanguage: (resumeId) => {
         const item: Language = { id: uuidv4(), name: '', level: 'Fließend' };
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, languages: [...r.languages, item], updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       updateLanguage: (resumeId, id, data) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, languages: r.languages.map(l => l.id === id ? { ...l, ...data } : l), updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       removeLanguage: (resumeId, id) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, languages: r.languages.filter(l => l.id !== id), updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       addProject: (resumeId) => {
         const item: Project = { id: uuidv4(), name: '', description: '', url: '', technologies: [], startDate: '', endDate: '' };
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, projects: [...r.projects, item], updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       updateProject: (resumeId, id, data) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, projects: r.projects.map(p => p.id === id ? { ...p, ...data } : p), updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       removeProject: (resumeId, id) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, projects: r.projects.filter(p => p.id !== id), updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       addCertificate: (resumeId) => {
         const item: Certificate = { id: uuidv4(), name: '', issuer: '', date: '', url: '' };
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, certificates: [...r.certificates, item], updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       updateCertificate: (resumeId, id, data) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, certificates: r.certificates.map(c => c.id === id ? { ...c, ...data } : c), updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       removeCertificate: (resumeId, id) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, certificates: r.certificates.filter(c => c.id !== id), updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
       addDocument: (resumeId, doc) => {
         const item: UploadedDocument = { ...doc, id: uuidv4(), uploadedAt: new Date().toISOString() };
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, documents: [...r.documents, item], updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        db.upsertDocument(resumeId, item);
       },
 
       removeDocument: (resumeId, id) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, documents: r.documents.filter(d => d.id !== id), updatedAt: new Date().toISOString() } : r) }));
-        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+        db.deleteDocument(id);
       },
 
       setActiveSection: (section) => set({ activeSection: section }),
