@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 import Dashboard from './pages/Dashboard';
@@ -7,7 +7,7 @@ import Preview from './pages/Preview';
 
 export default function App() {
   return (
-    <BrowserRouter basename="/aicv">
+    <HashRouter>
       <div style={{
         display: 'flex',
         height: '100vh',
@@ -35,6 +35,6 @@ export default function App() {
           </div>
         </div>
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
