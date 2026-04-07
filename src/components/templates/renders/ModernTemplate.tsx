@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SkillBar } from './shared';
+import { fullName, formatDate, SkillBar, SafeImg } from './shared';
 
 export default function ModernTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
@@ -15,7 +15,7 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, paddingBottom: 20, borderBottom: `1px solid #f0f0f0` }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-            {info.photo && <img src={info.photo} alt="" style={{ width: 72, height: 72, borderRadius: 12, objectFit: 'cover' }} />}
+            {info.photo && <SafeImg src={info.photo} alt="" style={{ width: 72, height: 72, borderRadius: 12, objectFit: 'cover' }} />}
             <div>
               <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, letterSpacing: '-0.8px', color: '#0d0d0d' }}>{name}</h1>
               {info.title && <div style={{ fontSize: 13, color, fontWeight: 600, marginTop: 3, letterSpacing: '0.02em' }}>{info.title}</div>}

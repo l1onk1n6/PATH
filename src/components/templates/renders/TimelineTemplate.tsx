@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate } from './shared';
+import { fullName, formatDate, SafeImg } from './shared';
 
 export default function TimelineTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
@@ -10,7 +10,7 @@ export default function TimelineTemplate({ resume }: { resume: Resume }) {
     <div style={{ fontFamily: '"Inter", Arial, sans-serif', background: '#fff', minHeight: '297mm', padding: '24px 28px', color: '#1a1a1a' }}>
       {/* Header */}
       <div style={{ display: 'flex', gap: 20, alignItems: 'center', marginBottom: 24, paddingBottom: 16, borderBottom: `1px solid #eee` }}>
-        {info.photo && <img src={info.photo} alt="" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${color}` }} />}
+        {info.photo && <SafeImg src={info.photo} alt="" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${color}` }} />}
         <div style={{ flex: 1 }}>
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, letterSpacing: '-0.5px' }}>{name}</h1>
           {info.title && <div style={{ fontSize: 13, color, fontWeight: 600, marginTop: 2 }}>{info.title}</div>}

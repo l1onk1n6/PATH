@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate } from './shared';
+import { fullName, formatDate, SafeImg } from './shared';
 
 export default function BoldTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
@@ -13,7 +13,7 @@ export default function BoldTemplate({ resume }: { resume: Resume }) {
       <div style={{ padding: '24px 28px', background: '#111' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-            {info.photo && <img src={info.photo} alt="" style={{ width: 72, height: 72, borderRadius: 8, objectFit: 'cover' }} />}
+            {info.photo && <SafeImg src={info.photo} alt="" style={{ width: 72, height: 72, borderRadius: 8, objectFit: 'cover' }} />}
             <div>
               <h1 style={{ margin: 0, fontSize: 32, fontWeight: 900, letterSpacing: '-1.5px', textTransform: 'uppercase' }}>{name}</h1>
               {info.title && <div style={{ fontSize: 13, color, fontWeight: 700, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.15em' }}>{info.title}</div>}

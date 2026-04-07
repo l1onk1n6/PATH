@@ -1,10 +1,12 @@
-import { useCallback } from 'react';
-import { User, Mail, Phone, MapPin, Globe, Link2, FileText, Camera } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { User, Mail, Phone, MapPin, Globe, Link2, FileText, Camera, AlertCircle } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
+import { validatePhotoFile, sanitizePhotoUrl } from '../../lib/security';
 
 export default function PersonalInfoEditor() {
   const { getActiveResume, updatePersonalInfo } = useResumeStore();
   const resume = getActiveResume();
+  const [photoError, setPhotoError] = useState('');
 
   const update = useCallback((field: string, value: string) => {
     if (!resume) return;
@@ -18,8 +20,19 @@ export default function PersonalInfoEditor() {
   function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !resume) return;
+    const { valid, error } = validatePhotoFile(file);
+    if (!valid) {
+      setPhotoError(error ?? 'Ungültige Datei.');
+      e.target.value = '';
+      return;
+    }
+    setPhotoError('');
     const reader = new FileReader();
-    reader.onload = () => updatePersonalInfo(resume.id, { photo: reader.result as string });
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      const safe = sanitizePhotoUrl(dataUrl);
+      if (safe) updatePersonalInfo(resume.id, { photo: safe });
+    };
     reader.readAsDataURL(file);
   }
 
@@ -28,7 +41,7 @@ export default function PersonalInfoEditor() {
       {/* Photo + Name row */}
       <div style={{ display: 'flex', gap: 20, marginBottom: 20, alignItems: 'flex-start' }}>
         {/* Photo */}
-        <div style={{ flexShrink: 0 }}>
+        <div style={{ flexShrink: 0, position: 'relative' }}>
           <label style={{ cursor: 'pointer' }}>
             <div style={{
               width: 80, height: 80, borderRadius: '50%',
@@ -47,9 +60,18 @@ export default function PersonalInfoEditor() {
                 </div>
               )}
             </div>
-            <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} />
+            <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handlePhotoUpload} style={{ display: 'none' }} />
           </label>
         </div>
+
+        {photoError && (
+          <div style={{
+            position: 'absolute', bottom: -24, left: 0, right: 0,
+            fontSize: 10, color: '#ff6b6b', display: 'flex', alignItems: 'center', gap: 4,
+          }}>
+            <AlertCircle size={10} /> {photoError}
+          </div>
+        )}
 
         {/* Name fields */}
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>

@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SkillDots } from './shared';
+import { fullName, formatDate, SkillDots, SafeImg } from './shared';
 
 export default function CorporateTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
@@ -9,7 +9,7 @@ export default function CorporateTemplate({ resume }: { resume: Resume }) {
   return (
     <div style={{ fontFamily: 'Georgia, serif', background: '#fff', minHeight: '297mm', display: 'flex' }}>
       <div style={{ width: '32%', background: '#1e3a5f', color: '#fff', padding: '24px 16px' }}>
-        {info.photo && <img src={info.photo} alt="" style={{ width: '80%', borderRadius: 4, marginBottom: 14, display: 'block', margin: '0 auto 14px' }} />}
+        {info.photo && <SafeImg src={info.photo} alt="" style={{ width: '80%', borderRadius: 4, marginBottom: 14, display: 'block', margin: '0 auto 14px' }} />}
         <h1 style={{ fontSize: 16, fontWeight: 700, textAlign: 'center', marginBottom: 4 }}>{name}</h1>
         {info.title && <div style={{ fontSize: 11, textAlign: 'center', color, marginBottom: 16 }}>{info.title}</div>}
 

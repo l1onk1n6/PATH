@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate } from './shared';
+import { fullName, formatDate, SafeImg } from './shared';
 
 export default function VibrantTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
@@ -18,7 +18,7 @@ export default function VibrantTemplate({ resume }: { resume: Resume }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
           {info.photo ? (
-            <img src={info.photo} alt="" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid rgba(255,255,255,0.6)', flexShrink: 0 }} />
+            <SafeImg src={info.photo} alt="" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid rgba(255,255,255,0.6)', flexShrink: 0 }} />
           ) : (
             <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, fontWeight: 800 }}>
               {name.charAt(0)}

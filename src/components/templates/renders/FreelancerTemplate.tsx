@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate } from './shared';
+import { fullName, formatDate, SafeImg } from './shared';
 
 export default function FreelancerTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, projects, certificates } = resume;
@@ -20,7 +20,7 @@ export default function FreelancerTemplate({ resume }: { resume: Resume }) {
           </div>
           <div style={{ textAlign: 'right' }}>
             {info.photo && (
-              <img src={info.photo} alt="" style={{ width: 70, height: 70, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${color}`, marginBottom: 8, display: 'block', marginLeft: 'auto' }} />
+              <SafeImg src={info.photo} alt="" style={{ width: 70, height: 70, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${color}`, marginBottom: 8, display: 'block', marginLeft: 'auto' }} />
             )}
             <div style={{ fontSize: 11, color: '#666', lineHeight: 1.8 }}>
               {[info.email, info.phone, info.location].filter(Boolean).map((v, i) => <div key={i}>{v}</div>)}

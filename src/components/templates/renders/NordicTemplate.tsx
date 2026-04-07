@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SkillBar } from './shared';
+import { fullName, formatDate, SkillBar, SafeImg } from './shared';
 
 export default function NordicTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
@@ -12,7 +12,7 @@ export default function NordicTemplate({ resume }: { resume: Resume }) {
       <div style={{ marginBottom: 28, paddingBottom: 20, borderBottom: `1px solid #e2e8f0` }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-            {info.photo && <img src={info.photo} alt="" style={{ width: 68, height: 68, borderRadius: 8, objectFit: 'cover' }} />}
+            {info.photo && <SafeImg src={info.photo} alt="" style={{ width: 68, height: 68, borderRadius: 8, objectFit: 'cover' }} />}
             <div>
               <h1 style={{ margin: 0, fontSize: 24, fontWeight: 300, letterSpacing: '-0.5px', color: '#1a202c' }}>{name}</h1>
               {info.title && <div style={{ fontSize: 13, color, fontWeight: 500, marginTop: 3 }}>{info.title}</div>}

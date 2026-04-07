@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, WorkEntry, EduEntry, SkillBar } from './shared';
+import { fullName, formatDate, WorkEntry, EduEntry, SkillBar, SafeImg } from './shared';
 
 export default function MinimalTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
@@ -20,7 +20,7 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
       <div style={{ marginBottom: 20, borderBottom: `2px solid ${color}`, paddingBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           {info.photo && (
-            <img src={info.photo} alt="" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${color}` }} />
+            <SafeImg src={info.photo} alt="" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${color}` }} />
           )}
           <div>
             <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.5px' }}>{name}</h1>

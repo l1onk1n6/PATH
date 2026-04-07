@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SkillBar } from './shared';
+import { fullName, formatDate, SkillBar, SafeImg } from './shared';
 
 export default function MagazineTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, projects } = resume;
@@ -11,7 +11,7 @@ export default function MagazineTemplate({ resume }: { resume: Resume }) {
       {/* Left column */}
       <div style={{ background: '#1a1a1a', color: '#fff', padding: '28px 20px' }}>
         {info.photo ? (
-          <img src={info.photo} alt="" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', marginBottom: 16, display: 'block' }} />
+          <SafeImg src={info.photo} alt="" style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', marginBottom: 16, display: 'block' }} />
         ) : (
           <div style={{ width: '100%', aspectRatio: '1', background: `${color}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, fontWeight: 900, color, marginBottom: 16 }}>
             {name.charAt(0)}

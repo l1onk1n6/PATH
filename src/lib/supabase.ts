@@ -15,7 +15,11 @@ function getConfig() {
 
 export function isSupabaseConfigured(): boolean {
   const { url, key } = getConfig();
-  return url.startsWith('https://') && key.length > 20;
+  return (
+    /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/.test(url.trim()) &&
+    key.trim().startsWith('eyJ') &&
+    key.trim().length > 100
+  );
 }
 
 export function saveSupabaseConfig(url: string, key: string) {

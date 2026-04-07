@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SkillBar } from './shared';
+import { fullName, formatDate, SkillBar, SafeImg } from './shared';
 
 export default function ElegantTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
@@ -10,7 +10,7 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
     <div style={{ fontFamily: '"Palatino Linotype", Palatino, Georgia, serif', background: '#fdfcfb', minHeight: '297mm', padding: '28px 28px', color: '#2c2c2c' }}>
       {/* Elegant Header */}
       <div style={{ textAlign: 'center', marginBottom: 24, paddingBottom: 20 }}>
-        {info.photo && <img src={info.photo} alt="" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${color}`, marginBottom: 12 }} />}
+        {info.photo && <SafeImg src={info.photo} alt="" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${color}`, marginBottom: 12 }} />}
         <h1 style={{ fontSize: 30, fontWeight: 400, letterSpacing: '0.05em', margin: '0 0 6px', color: '#1a1a1a' }}>{name}</h1>
         {info.title && <div style={{ fontSize: 13, color, fontStyle: 'italic', marginBottom: 10 }}>{info.title}</div>}
         <div style={{ width: 60, height: 1, background: color, margin: '0 auto 10px' }} />

@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate } from './shared';
+import { fullName, formatDate, SafeImg } from './shared';
 
 export default function PastelTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
@@ -28,7 +28,7 @@ export default function PastelTemplate({ resume }: { resume: Resume }) {
             {info.title && <div style={{ fontSize: 13, color, fontWeight: 600, marginTop: 4 }}>{info.title}</div>}
           </div>
           {info.photo && (
-            <img src={info.photo} alt="" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: `3px solid ${color}50` }} />
+            <SafeImg src={info.photo} alt="" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: `3px solid ${color}50` }} />
           )}
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 14 }}>

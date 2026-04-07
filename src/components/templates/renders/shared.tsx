@@ -1,4 +1,12 @@
 import type { Resume, WorkExperience, Education, Skill } from '../../../types/resume';
+import { sanitizePhotoUrl } from '../../../lib/security';
+
+// Safe img wrapper — rejects non-image URLs to prevent XSS via javascript: or data: non-image URIs
+export function SafeImg({ src, alt, style }: { src: string; alt: string; style?: React.CSSProperties }) {
+  const safe = sanitizePhotoUrl(src);
+  if (!safe) return null;
+  return <img src={safe} alt={alt} style={style} />;
+}
 
 export function formatDate(dateStr: string) {
   if (!dateStr) return '';

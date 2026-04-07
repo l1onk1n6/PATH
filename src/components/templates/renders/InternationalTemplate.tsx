@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate } from './shared';
+import { fullName, formatDate, SafeImg } from './shared';
 
 export default function InternationalTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
@@ -23,7 +23,7 @@ export default function InternationalTemplate({ resume }: { resume: Resume }) {
             </div>
           </div>
           {info.photo && (
-            <img src={info.photo} alt="" style={{ width: 88, height: 110, objectFit: 'cover', border: `1px solid #ccc`, marginLeft: 20 }} />
+            <SafeImg src={info.photo} alt="" style={{ width: 88, height: 110, objectFit: 'cover', border: `1px solid #ccc`, marginLeft: 20 }} />
           )}
         </div>
       </div>

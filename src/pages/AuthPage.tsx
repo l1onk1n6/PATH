@@ -1,6 +1,12 @@
-import { useState } from 'react';
-import { FileText, Mail, Lock, User, Eye, EyeOff, Settings } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Mail, Lock, User, Eye, EyeOff, Settings, ShieldAlert } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import { LogoIcon } from '../components/layout/Logo';
+import {
+  passwordStrength, STRENGTH_LABEL, STRENGTH_COLOR, RateLimiter,
+} from '../lib/security';
+
+const limiter = new RateLimiter(5, 30_000);
 
 export default function AuthPage({ onSetup }: { onSetup: () => void }) {
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -8,14 +14,44 @@ export default function AuthPage({ onSetup }: { onSetup: () => void }) {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [showPw, setShowPw] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { signIn, signUp, loading, error, clearError } = useAuthStore();
+
+  // Countdown tick while locked
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    cooldownRef.current = setInterval(() => {
+      const secs = limiter.secondsRemaining();
+      setCooldown(secs);
+      if (secs <= 0 && cooldownRef.current) clearInterval(cooldownRef.current);
+    }, 500);
+    return () => { if (cooldownRef.current) clearInterval(cooldownRef.current); };
+  }, [cooldown]);
+
+  const isLocked = limiter.isLocked();
+  const strength = mode === 'register' && password.length > 0 ? passwordStrength(password) : null;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     clearError();
+
+    if (limiter.isLocked()) return;
+
+    if (mode === 'register' && password.length < 8) return;
+
     if (mode === 'login') {
       await signIn(email, password);
+      // Record failure if error appears after the call
+      setTimeout(() => {
+        if (useAuthStore.getState().error) {
+          limiter.recordFailure();
+          if (limiter.isLocked()) setCooldown(limiter.secondsRemaining());
+        } else {
+          limiter.reset();
+        }
+      }, 0);
     } else {
       await signUp(email, password, name);
     }
@@ -27,17 +63,12 @@ export default function AuthPage({ onSetup }: { onSetup: () => void }) {
     }}>
       <div className="glass-card animate-scale-in" style={{ width: '100%', maxWidth: 420, padding: 36 }}>
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{
-            width: 52, height: 52, borderRadius: 14, margin: '0 auto 14px',
-            background: 'linear-gradient(135deg, var(--ios-blue), var(--ios-indigo))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 8px 24px rgba(0,122,255,0.4)',
-          }}>
-            <FileText size={24} color="#fff" />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
+          <div style={{ filter: 'drop-shadow(0 6px 18px rgba(52,199,89,0.5))', marginBottom: 14 }}>
+            <LogoIcon size={52} />
           </div>
           <h1 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 4px', letterSpacing: '-0.4px' }}>AICV</h1>
-          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }}>Lebenslauf-Editor</p>
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, margin: 0 }}>by pixmatic</p>
         </div>
 
         {/* Tab */}
@@ -48,7 +79,7 @@ export default function AuthPage({ onSetup }: { onSetup: () => void }) {
           {(['login', 'register'] as const).map((m) => (
             <button
               key={m}
-              onClick={() => { setMode(m); clearError(); }}
+              onClick={() => { setMode(m); clearError(); setPassword(''); }}
               className="btn-glass"
               style={{
                 flex: 1, borderRadius: 'var(--radius-full)', padding: '8px 0', boxShadow: 'none',
@@ -72,20 +103,29 @@ export default function AuthPage({ onSetup }: { onSetup: () => void }) {
 
           <div style={{ marginBottom: 12 }}>
             <label className="section-label"><Mail size={9} style={{ display: 'inline', marginRight: 3 }} />E-Mail</label>
-            <input className="input-glass" type="email" placeholder="max@beispiel.de" value={email}
-              onChange={(e) => setEmail(e.target.value)} required autoFocus={mode === 'login'} />
+            <input
+              className="input-glass"
+              type="email"
+              placeholder="max@beispiel.de"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoFocus={mode === 'login'}
+              autoComplete={mode === 'login' ? 'username' : 'email'}
+            />
           </div>
 
-          <div style={{ marginBottom: 24, position: 'relative' }}>
+          <div style={{ marginBottom: strength ? 8 : 24, position: 'relative' }}>
             <label className="section-label"><Lock size={9} style={{ display: 'inline', marginRight: 3 }} />Passwort</label>
             <input
               className="input-glass"
               type={showPw ? 'text' : 'password'}
-              placeholder="Mindestens 6 Zeichen"
+              placeholder={mode === 'register' ? 'Mindestens 8 Zeichen' : 'Passwort eingeben'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={mode === 'register' ? 8 : 1}
+              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
               style={{ paddingRight: 42 }}
             />
             <button
@@ -100,7 +140,36 @@ export default function AuthPage({ onSetup }: { onSetup: () => void }) {
             </button>
           </div>
 
-          {error && (
+          {/* Password strength meter (register only) */}
+          {strength && (
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ height: 3, background: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden', marginBottom: 4 }}>
+                <div style={{
+                  height: '100%', borderRadius: 2,
+                  width: strength === 'weak' ? '33%' : strength === 'medium' ? '66%' : '100%',
+                  background: STRENGTH_COLOR[strength],
+                  transition: 'width 0.3s, background 0.3s',
+                }} />
+              </div>
+              <span style={{ fontSize: 11, color: STRENGTH_COLOR[strength] }}>
+                Passwortstärke: {STRENGTH_LABEL[strength]}
+              </span>
+            </div>
+          )}
+
+          {/* Rate-limit lockout banner */}
+          {isLocked && (
+            <div style={{
+              background: 'rgba(255,149,0,0.15)', border: '1px solid rgba(255,149,0,0.35)',
+              borderRadius: 'var(--radius-sm)', padding: '10px 14px', marginBottom: 16,
+              fontSize: 13, color: '#ff9500', display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <ShieldAlert size={15} />
+              Zu viele Versuche. Bitte warte {cooldown} Sekunden.
+            </div>
+          )}
+
+          {error && !isLocked && (
             <div style={{
               background: 'rgba(255,59,48,0.15)', border: '1px solid rgba(255,59,48,0.3)',
               borderRadius: 'var(--radius-sm)', padding: '10px 14px', marginBottom: 16,
@@ -113,13 +182,10 @@ export default function AuthPage({ onSetup }: { onSetup: () => void }) {
           <button
             type="submit"
             className="btn-glass btn-primary"
-            disabled={loading}
-            style={{ width: '100%', justifyContent: 'center', padding: '13px 20px', opacity: loading ? 0.7 : 1 }}
+            disabled={loading || isLocked || (mode === 'register' && password.length < 8)}
+            style={{ width: '100%', justifyContent: 'center', padding: '13px 20px', opacity: (loading || isLocked) ? 0.7 : 1 }}
           >
-            {loading
-              ? 'Bitte warten…'
-              : mode === 'login' ? 'Anmelden' : 'Konto erstellen'
-            }
+            {loading ? 'Bitte warten…' : mode === 'login' ? 'Anmelden' : 'Konto erstellen'}
           </button>
         </form>
 

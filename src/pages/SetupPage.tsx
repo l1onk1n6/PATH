@@ -1,17 +1,27 @@
 import { useState } from 'react';
-import { Database, ExternalLink, CheckCircle } from 'lucide-react';
+import { Database, ExternalLink, CheckCircle, AlertCircle } from 'lucide-react';
 import { saveSupabaseConfig, resetSupabaseClient, isSupabaseConfigured } from '../lib/supabase';
 import { useAuthStore } from '../store/authStore';
+import { validateSupabaseUrl, validateSupabaseKey } from '../lib/security';
 
 export default function SetupPage() {
   const [url, setUrl] = useState(localStorage.getItem('aicv-supabase-url') || '');
   const [key, setKey] = useState(localStorage.getItem('aicv-supabase-key') || '');
   const [saved, setSaved] = useState(false);
+  const [validationError, setValidationError] = useState('');
   const { initialize } = useAuthStore();
 
   async function handleSave() {
-    if (!url.trim() || !key.trim()) return;
-    saveSupabaseConfig(url, key);
+    setValidationError('');
+    if (!validateSupabaseUrl(url)) {
+      setValidationError('Ungültige URL. Format: https://xxx.supabase.co');
+      return;
+    }
+    if (!validateSupabaseKey(key)) {
+      setValidationError('Ungültiger API-Key. Muss mit "eyJ" beginnen.');
+      return;
+    }
+    saveSupabaseConfig(url.trim(), key.trim());
     resetSupabaseClient();
     await initialize();
     setSaved(true);
@@ -79,6 +89,16 @@ export default function SetupPage() {
             type="password"
           />
         </div>
+
+        {validationError && (
+          <div style={{
+            background: 'rgba(255,59,48,0.15)', border: '1px solid rgba(255,59,48,0.3)',
+            borderRadius: 'var(--radius-sm)', padding: '10px 14px', marginBottom: 16,
+            fontSize: 13, color: '#ff6b6b', display: 'flex', alignItems: 'center', gap: 8,
+          }}>
+            <AlertCircle size={14} /> {validationError}
+          </div>
+        )}
 
         <button
           className={`btn-glass btn-primary ${saved ? 'btn-success' : ''}`}

@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SkillDots } from './shared';
+import { fullName, formatDate, SkillDots, SafeImg } from './shared';
 
 export default function ExecutiveTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
@@ -12,7 +12,7 @@ export default function ExecutiveTemplate({ resume }: { resume: Resume }) {
       <div style={{ width: '35%', background: '#1a1a2e', color: '#fff', padding: '24px 18px', flexShrink: 0 }}>
         {info.photo && (
           <div style={{ textAlign: 'center', marginBottom: 16 }}>
-            <img src={info.photo} alt="" style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', border: `3px solid ${color}` }} />
+            <SafeImg src={info.photo} alt="" style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', border: `3px solid ${color}` }} />
           </div>
         )}
         <h1 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 4, lineHeight: 1.2 }}>{name}</h1>

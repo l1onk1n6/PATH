@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate } from './shared';
+import { fullName, formatDate, SafeImg } from './shared';
 
 export default function StartupTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, projects } = resume;
@@ -16,7 +16,7 @@ export default function StartupTemplate({ resume }: { resume: Resume }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid #f0f0f0' }}>
           <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
             {info.photo ? (
-              <img src={info.photo} alt="" style={{ width: 64, height: 64, borderRadius: 16, objectFit: 'cover' }} />
+              <SafeImg src={info.photo} alt="" style={{ width: 64, height: 64, borderRadius: 16, objectFit: 'cover' }} />
             ) : (
               <div style={{ width: 64, height: 64, borderRadius: 16, background: `linear-gradient(135deg, ${color}, #34C759)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 800, color: '#fff' }}>
                 {name.charAt(0)}
