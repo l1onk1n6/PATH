@@ -55,9 +55,16 @@ create policy "own resumes"   on public.resumes   for all using (auth.uid() = us
 create policy "own documents" on public.documents for all using (auth.uid() = user_id);
 
 -- ── updated_at automatisch setzen ──────────────────────────
+-- security definer + set search_path = '' verhindert Search-Path-Injection
 create or replace function public.set_updated_at()
-returns trigger language plpgsql as $$
-begin new.updated_at = now(); return new; end;
+returns trigger language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
 $$;
 
 create trigger resumes_updated_at
