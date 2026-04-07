@@ -1,15 +1,64 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Download, ZoomIn, ZoomOut } from 'lucide-react';
-import { useState } from 'react';
+import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2 } from 'lucide-react';
+import { useState, useRef } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ResumePreview from '../components/templates/ResumePreview';
 import { TEMPLATES } from '../components/templates/templateConfig';
+
+async function exportPDF(element: HTMLElement, filename: string) {
+  const html2canvas = (await import('html2canvas')).default;
+  const jsPDF = (await import('jspdf')).default;
+
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: '#ffffff',
+    width: 794,
+    height: element.scrollHeight,
+  });
+
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = pdf.internal.pageSize.getHeight();
+  const imgWidth = canvas.width;
+  const imgHeight = canvas.height;
+  const ratio = pdfWidth / (imgWidth / 2); // canvas is 2x scale
+  const contentHeight = (imgHeight / 2) * ratio;
+
+  let yOffset = 0;
+  let pageCount = 0;
+
+  while (yOffset < contentHeight) {
+    if (pageCount > 0) pdf.addPage();
+
+    const sourceY = (yOffset / ratio) * 2;
+    const sourceH = Math.min((pdfHeight / ratio) * 2, imgHeight - sourceY);
+
+    const pageCanvas = document.createElement('canvas');
+    pageCanvas.width = imgWidth;
+    pageCanvas.height = sourceH;
+    const ctx = pageCanvas.getContext('2d')!;
+    ctx.drawImage(canvas, 0, sourceY, imgWidth, sourceH, 0, 0, imgWidth, sourceH);
+
+    const pageImg = pageCanvas.toDataURL('image/jpeg', 0.95);
+    pdf.addImage(pageImg, 'JPEG', 0, 0, pdfWidth, sourceH * ratio / 2);
+
+    yOffset += pdfHeight;
+    pageCount++;
+  }
+
+  pdf.save(filename);
+}
 
 export default function Preview() {
   const navigate = useNavigate();
   const { getActiveResume, setTemplate } = useResumeStore();
   const resume = getActiveResume();
   const [zoom, setZoom] = useState(0.7);
+  const [exporting, setExporting] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   if (!resume) {
     return (
@@ -20,6 +69,21 @@ export default function Preview() {
       </div>
     );
   }
+
+  const handleExport = async () => {
+    if (!previewRef.current || exporting) return;
+    setExporting(true);
+    try {
+      const firstName = resume.personalInfo.firstName || 'Lebenslauf';
+      const lastName = resume.personalInfo.lastName || '';
+      const filename = `${firstName}${lastName ? '_' + lastName : ''}_CV.pdf`;
+      await exportPDF(previewRef.current, filename);
+    } catch (err) {
+      console.error('PDF export failed:', err);
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', gap: 16, height: '100%', overflow: 'hidden' }}>
@@ -80,8 +144,16 @@ export default function Preview() {
             </button>
           </div>
 
-          <button className="btn-glass btn-primary btn-sm" onClick={() => window.print()}>
-            <Download size={13} /> PDF exportieren
+          <button
+            className="btn-glass btn-primary btn-sm"
+            onClick={handleExport}
+            disabled={exporting}
+            style={{ opacity: exporting ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            {exporting
+              ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> Exportiere…</>
+              : <><Download size={13} /> PDF exportieren</>
+            }
           </button>
         </div>
 
@@ -95,7 +167,9 @@ export default function Preview() {
             transform: `scale(${zoom})`,
             marginBottom: `calc((${zoom} - 1) * -100%)`,
           }}>
-            <ResumePreview resume={resume} />
+            <div ref={previewRef}>
+              <ResumePreview resume={resume} />
+            </div>
           </div>
         </div>
       </div>

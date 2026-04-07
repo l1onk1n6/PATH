@@ -9,6 +9,16 @@ import ElegantTemplate from './renders/ElegantTemplate';
 import BoldTemplate from './renders/BoldTemplate';
 import AcademicTemplate from './renders/AcademicTemplate';
 import StartupTemplate from './renders/StartupTemplate';
+import ModernTemplate from './renders/ModernTemplate';
+import VibrantTemplate from './renders/VibrantTemplate';
+import VintageTemplate from './renders/VintageTemplate';
+import MagazineTemplate from './renders/MagazineTemplate';
+import TimelineTemplate from './renders/TimelineTemplate';
+import CompactTemplate from './renders/CompactTemplate';
+import PastelTemplate from './renders/PastelTemplate';
+import GeometricTemplate from './renders/GeometricTemplate';
+import FreelancerTemplate from './renders/FreelancerTemplate';
+import InternationalTemplate from './renders/InternationalTemplate';
 
 interface Props {
   resume: Resume;
@@ -27,6 +37,16 @@ export default function ResumePreview({ resume, scale = 1 }: Props) {
     bold: BoldTemplate,
     academic: AcademicTemplate,
     startup: StartupTemplate,
+    modern: ModernTemplate,
+    vibrant: VibrantTemplate,
+    vintage: VintageTemplate,
+    magazine: MagazineTemplate,
+    timeline: TimelineTemplate,
+    compact: CompactTemplate,
+    pastel: PastelTemplate,
+    geometric: GeometricTemplate,
+    freelancer: FreelancerTemplate,
+    international: InternationalTemplate,
   };
 
   const Template = templates[resume.templateId] ?? MinimalTemplate;
