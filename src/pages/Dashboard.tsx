@@ -4,6 +4,7 @@ import {
   Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp,
   FolderPlus, Pencil, Copy, Search, ExternalLink, Clock,
   Download, Share2, CheckCircle, LayoutGrid, List, X, BarChart2,
+  Lock, AlertTriangle,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import {
@@ -252,6 +253,14 @@ export default function Dashboard() {
   const [statusMenuResumeId, setStatusMenuResumeId] = useState<string | null>(null);
   const [shareModalResumeId, setShareModalResumeId] = useState<string | null>(null);
 
+  // Resumes beyond the plan limit are frozen (read-only)
+  const frozenResumeIds = new Set(
+    limits.resumes < Infinity
+      ? resumes.slice(limits.resumes).map(r => r.id)
+      : []
+  );
+  const frozenCount = frozenResumeIds.size;
+
   async function handleAdd() {
     if (!newName.trim()) return;
     const person = await addPerson(newName.trim());
@@ -367,6 +376,26 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
+
+      {/* Frozen resumes warning */}
+      {frozenCount > 0 && (
+        <div className="glass-card" style={{
+          padding: '12px 16px', marginBottom: 12,
+          border: '1px solid rgba(255,159,10,0.35)',
+          background: 'rgba(255,159,10,0.08)',
+          display: 'flex', alignItems: 'center', gap: 12,
+        }}>
+          <AlertTriangle size={16} style={{ color: '#FF9F0A', flexShrink: 0 }} />
+          <div style={{ flex: 1, fontSize: 13 }}>
+            <span style={{ fontWeight: 600, color: '#FF9F0A' }}>{frozenCount} Mappe{frozenCount > 1 ? 'n' : ''} eingefroren</span>
+            <span style={{ color: 'rgba(255,255,255,0.5)' }}> — dein Free-Plan erlaubt max. {limits.resumes}. Eingefrorene Mappen können nicht bearbeitet werden.</span>
+          </div>
+          <button className="btn-glass btn-sm" style={{ flexShrink: 0, fontSize: 12, color: '#FF9F0A', border: '1px solid rgba(255,159,10,0.4)' }}
+            onClick={() => navigate('/account')}>
+            Upgrade →
+          </button>
+        </div>
+      )}
 
       {/* Section header + controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 8, flexWrap: 'wrap' }}>
@@ -521,11 +550,12 @@ export default function Dashboard() {
                     {personResumes.map((r) => {
                       const completeness = calcCompleteness(r);
                       const isActiveResume = r.id === person.activeResumeId;
+                      const frozen = frozenResumeIds.has(r.id);
                       const statusColor = APPLICATION_STATUS_COLORS[r.status ?? 'entwurf'];
                       const deadlineDiff = r.deadline ? (new Date(r.deadline).getTime() - Date.now()) / 86400000 : null;
                       const deadlineColor = deadlineDiff === null ? undefined : deadlineDiff < 0 ? 'var(--ios-red)' : deadlineDiff <= 7 ? '#FF9F0A' : 'rgba(255,255,255,0.4)';
 
-                      if (renamingResumeId === r.id) {
+                      if (renamingResumeId === r.id && !frozen) {
                         return (
                           <input key={r.id} className="input-glass" value={renameValue} autoFocus
                             onClick={(e) => e.stopPropagation()}
@@ -543,25 +573,43 @@ export default function Dashboard() {
                       return (
                         <div key={r.id} style={{
                           padding: '9px 12px', borderRadius: 10, fontSize: 14,
-                          border: `1px solid ${isActiveResume ? 'rgba(0,122,255,0.5)' : 'rgba(255,255,255,0.1)'}`,
-                          background: isActiveResume ? 'rgba(0,122,255,0.12)' : 'rgba(255,255,255,0.05)',
-                          cursor: 'pointer',
+                          border: frozen
+                            ? '1px solid rgba(255,159,10,0.25)'
+                            : `1px solid ${isActiveResume ? 'rgba(0,122,255,0.5)' : 'rgba(255,255,255,0.1)'}`,
+                          background: frozen
+                            ? 'rgba(255,159,10,0.05)'
+                            : isActiveResume ? 'rgba(0,122,255,0.12)' : 'rgba(255,255,255,0.05)',
+                          cursor: frozen ? 'default' : 'pointer',
+                          opacity: frozen ? 0.7 : 1,
                         }}
-                          onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); setActiveResume(r.id); }}>
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!frozen) { setActivePerson(person.id); setActiveResume(r.id); }
+                          }}>
 
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            {/* Status dot */}
-                            <span title={`Status: ${APPLICATION_STATUS_LABELS[r.status ?? 'entwurf']} – klicken zum Ändern`}
-                              style={{ width: 11, height: 11, borderRadius: '50%', background: statusColor, flexShrink: 0, cursor: 'pointer' }}
-                              onClick={(e) => { e.stopPropagation(); setStatusMenuResumeId(r.id); }} />
+                            {/* Frozen icon or status dot */}
+                            {frozen
+                              ? <Lock size={12} style={{ color: '#FF9F0A', flexShrink: 0 }} />
+                              : <span title={`Status: ${APPLICATION_STATUS_LABELS[r.status ?? 'entwurf']} – klicken zum Ändern`}
+                                  style={{ width: 11, height: 11, borderRadius: '50%', background: statusColor, flexShrink: 0, cursor: 'pointer' }}
+                                  onClick={(e) => { e.stopPropagation(); setStatusMenuResumeId(r.id); }} />
+                            }
                             <FileText size={15} style={{ opacity: 0.6, flexShrink: 0 }} />
 
                             {/* Name + meta */}
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: isActiveResume ? 'var(--ios-blue)' : undefined }}>
-                                {r.name || 'Bewerbungsmappe'}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+                                <span style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: frozen ? '#FF9F0A' : isActiveResume ? 'var(--ios-blue)' : undefined }}>
+                                  {r.name || 'Bewerbungsmappe'}
+                                </span>
+                                {frozen && (
+                                  <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(255,159,10,0.2)', border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', flexShrink: 0 }}>
+                                    EINGEFROREN
+                                  </span>
+                                )}
                               </div>
-                              {(r.deadline || r.jobUrl) && (
+                              {!frozen && (r.deadline || r.jobUrl) && (
                                 <div style={{ display: 'flex', gap: 8, marginTop: 3, alignItems: 'center' }}>
                                   {r.deadline && (
                                     <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, color: deadlineColor }}>
@@ -578,22 +626,31 @@ export default function Dashboard() {
                                   )}
                                 </div>
                               )}
+                              {frozen && (
+                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
+                                  Upgrade auf Pro zum Bearbeiten
+                                </div>
+                              )}
                             </div>
 
                             {/* Actions */}
                             <div style={{ display: 'flex', gap: 5, alignItems: 'center', flexShrink: 0 }}>
-                              <span title="Teilen" style={{ cursor: 'pointer', opacity: 0.45, display: 'flex' }}
-                                onClick={(e) => { e.stopPropagation(); setShareModalResumeId(r.id); }}>
-                                <Share2 size={14} />
-                              </span>
-                              <span title="Umbenennen" style={{ cursor: 'pointer', opacity: 0.45, display: 'flex' }}
-                                onClick={(e) => { e.stopPropagation(); setRenamingResumeId(r.id); setRenameValue(r.name || 'Bewerbungsmappe'); }}>
-                                <Pencil size={14} />
-                              </span>
-                              <span title="Duplizieren" style={{ cursor: 'pointer', opacity: 0.45, display: 'flex' }}
-                                onClick={(e) => { e.stopPropagation(); duplicateResume(r.id); }}>
-                                <Copy size={14} />
-                              </span>
+                              {!frozen && (
+                                <>
+                                  <span title="Teilen" style={{ cursor: 'pointer', opacity: 0.45, display: 'flex' }}
+                                    onClick={(e) => { e.stopPropagation(); setShareModalResumeId(r.id); }}>
+                                    <Share2 size={14} />
+                                  </span>
+                                  <span title="Umbenennen" style={{ cursor: 'pointer', opacity: 0.45, display: 'flex' }}
+                                    onClick={(e) => { e.stopPropagation(); setRenamingResumeId(r.id); setRenameValue(r.name || 'Bewerbungsmappe'); }}>
+                                    <Pencil size={14} />
+                                  </span>
+                                  <span title="Duplizieren" style={{ cursor: 'pointer', opacity: 0.45, display: 'flex' }}
+                                    onClick={(e) => { e.stopPropagation(); duplicateResume(r.id); }}>
+                                    <Copy size={14} />
+                                  </span>
+                                </>
+                              )}
                               {personResumes.length > 1 && (
                                 <span title="Löschen" style={{ cursor: 'pointer', opacity: 0.4, display: 'flex' }}
                                   onClick={(e) => { e.stopPropagation(); if (confirm(`"${r.name || 'Bewerbungsmappe'}" löschen?`)) deleteResume(r.id); }}>
@@ -603,10 +660,12 @@ export default function Dashboard() {
                             </div>
                           </div>
 
-                          {/* Completeness bar */}
-                          <div style={{ marginTop: 8 }}>
-                            <CompletenessBar score={completeness.score} />
-                          </div>
+                          {/* Completeness bar — only for active resumes */}
+                          {!frozen && (
+                            <div style={{ marginTop: 8 }}>
+                              <CompletenessBar score={completeness.score} />
+                            </div>
+                          )}
                         </div>
                       );
                     })}

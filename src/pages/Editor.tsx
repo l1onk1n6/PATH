@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import {
   User, Briefcase, GraduationCap, Zap, FolderOpen,
-  Upload, Palette, AlertCircle, FileEdit, LayoutList,
+  Upload, Palette, AlertCircle, FileEdit, LayoutList, Lock,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
+import { usePlan } from '../lib/plan';
 import type { EditorSection } from '../types/resume';
 import type { LucideProps } from 'lucide-react';
 import PersonalInfoEditor from '../components/editor/PersonalInfoEditor';
@@ -32,9 +33,14 @@ const SECTIONS: { id: EditorSection; label: string; short: string; icon: React.C
 export default function Editor() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { getActiveResume, getActivePerson, activeSection, setActiveSection } = useResumeStore();
+  const { getActiveResume, getActivePerson, activeSection, setActiveSection, resumes } = useResumeStore();
+  const { limits } = usePlan();
   const resume = getActiveResume();
   const person = getActivePerson();
+
+  // Check if the active resume is frozen (beyond plan limit)
+  const resumeIndex = resume ? resumes.findIndex(r => r.id === resume.id) : -1;
+  const isFrozen = limits.resumes < Infinity && resumeIndex >= limits.resumes;
 
   if (!resume || !person) {
     return (
@@ -67,6 +73,32 @@ export default function Editor() {
   };
 
   const currentSection = SECTIONS.find(s => s.id === activeSection);
+
+  // ── Frozen overlay ────────────────────────────────────────
+  if (isFrozen) {
+    return (
+      <div className="glass-card animate-fade-in" style={{ padding: '48px 32px', textAlign: 'center', margin: 'auto', maxWidth: 400 }}>
+        <div style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(255,159,10,0.15)', border: '1px solid rgba(255,159,10,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+          <Lock size={24} style={{ color: '#FF9F0A' }} />
+        </div>
+        <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 700 }}>Mappe eingefroren</h3>
+        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, marginBottom: 20 }}>
+          «{resume.name || 'Bewerbungsmappe'}» überschreitet dein Free-Limit von {limits.resumes} Mappen.
+          Upgrade auf Pro oder lösche andere Mappen um diese wieder zu bearbeiten.
+        </p>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button className="btn-glass" onClick={() => navigate('/')}>← Dashboard</button>
+          <button
+            className="btn-glass"
+            onClick={() => navigate('/account')}
+            style={{ background: 'linear-gradient(135deg, rgba(255,159,10,0.3), rgba(255,55,95,0.2))', border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', fontWeight: 700 }}
+          >
+            Upgrade auf Pro
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // ── Mobile layout: horizontal tab bar ─────────────────────
   if (isMobile) {
