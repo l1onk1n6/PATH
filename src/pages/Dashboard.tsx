@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp, FolderPlus } from 'lucide-react';
+import { Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp, FolderPlus, Pencil } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import { useIsMobile } from '../hooks/useBreakpoint';
 
@@ -203,36 +203,39 @@ export default function Dashboard() {
                   return (
                     <span
                       key={r.id}
-                      className="badge"
-                      title="Klicken zum Aktivieren, Doppelklick zum Umbenennen"
                       style={{
-                        cursor: 'pointer',
-                        background: isActiveResume ? 'rgba(0,122,255,0.2)' : undefined,
-                        borderColor: isActiveResume ? 'rgba(0,122,255,0.5)' : undefined,
+                        display: 'inline-flex', alignItems: 'center', gap: 3,
+                        padding: '3px 7px',
+                        borderRadius: 6,
+                        fontSize: 11,
+                        border: `1px solid ${isActiveResume ? 'rgba(0,122,255,0.5)' : 'rgba(255,255,255,0.15)'}`,
+                        background: isActiveResume ? 'rgba(0,122,255,0.2)' : 'rgba(255,255,255,0.07)',
                         color: isActiveResume ? 'var(--ios-blue)' : undefined,
-                        display: 'flex', alignItems: 'center', gap: 4,
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActivePerson(person.id);
-                        setActiveResume(r.id);
-                      }}
-                      onDoubleClick={(e) => {
-                        e.stopPropagation();
-                        setRenamingResumeId(r.id);
-                        setRenameValue(r.name);
                       }}
                     >
-                      <FileText size={9} />
-                      {r.name || 'Bewerbungsmappe'}
+                      <FileText
+                        size={9}
+                        style={{ cursor: 'pointer', flexShrink: 0 }}
+                        onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); setActiveResume(r.id); }}
+                      />
+                      <span
+                        style={{ cursor: 'pointer' }}
+                        onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); setActiveResume(r.id); }}
+                      >
+                        {r.name || 'Bewerbungsmappe'}
+                      </span>
+                      <span
+                        title="Umbenennen"
+                        style={{ cursor: 'pointer', opacity: 0.5, display: 'flex', alignItems: 'center' }}
+                        onClick={(e) => { e.stopPropagation(); setRenamingResumeId(r.id); setRenameValue(r.name || 'Bewerbungsmappe'); }}
+                      >
+                        <Pencil size={9} />
+                      </span>
                       {personResumes.length > 1 && (
                         <span
                           title="Mappe löschen"
-                          style={{ marginLeft: 2, opacity: 0.5, lineHeight: 1 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (confirm(`"${r.name}" wirklich löschen?`)) deleteResume(r.id);
-                          }}
+                          style={{ cursor: 'pointer', opacity: 0.4, lineHeight: 1, fontSize: 13 }}
+                          onClick={(e) => { e.stopPropagation(); if (confirm(`"${r.name || 'Bewerbungsmappe'}" wirklich löschen?`)) deleteResume(r.id); }}
                         >×</span>
                       )}
                     </span>

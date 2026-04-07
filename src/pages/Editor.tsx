@@ -1,12 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import {
   User, Briefcase, GraduationCap, Zap, FolderOpen,
-  Upload, Palette, AlertCircle,
+  Upload, Palette, AlertCircle, FileEdit,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import type { EditorSection } from '../types/resume';
 import type { LucideProps } from 'lucide-react';
 import PersonalInfoEditor from '../components/editor/PersonalInfoEditor';
+import CoverLetterEditor from '../components/editor/CoverLetterEditor';
 import ExperienceEditor from '../components/editor/ExperienceEditor';
 import EducationEditor from '../components/editor/EducationEditor';
 import SkillsEditor from '../components/editor/SkillsEditor';
@@ -16,13 +17,14 @@ import TemplateSelector from '../components/templates/TemplateSelector';
 import { useIsMobile } from '../hooks/useBreakpoint';
 
 const SECTIONS: { id: EditorSection; label: string; short: string; icon: React.ComponentType<LucideProps> }[] = [
-  { id: 'personal',   label: 'Persönliche Daten',     short: 'Person',    icon: User },
-  { id: 'experience', label: 'Berufserfahrung',        short: 'Erfahrung', icon: Briefcase },
-  { id: 'education',  label: 'Ausbildung',             short: 'Bildung',   icon: GraduationCap },
-  { id: 'skills',     label: 'Fähigkeiten',            short: 'Skills',    icon: Zap },
-  { id: 'projects',   label: 'Projekte & Zertifikate', short: 'Projekte',  icon: FolderOpen },
-  { id: 'documents',  label: 'Dokumente',              short: 'Dokumente', icon: Upload },
-  { id: 'template',   label: 'Design & Template',      short: 'Design',    icon: Palette },
+  { id: 'personal',     label: 'Persönliche Daten',     short: 'Person',    icon: User },
+  { id: 'cover-letter', label: 'Motivationsschreiben',  short: 'Anschreiben', icon: FileEdit },
+  { id: 'experience',   label: 'Berufserfahrung',        short: 'Erfahrung', icon: Briefcase },
+  { id: 'education',    label: 'Ausbildung',             short: 'Bildung',   icon: GraduationCap },
+  { id: 'skills',       label: 'Fähigkeiten',            short: 'Skills',    icon: Zap },
+  { id: 'projects',     label: 'Projekte & Zertifikate', short: 'Projekte',  icon: FolderOpen },
+  { id: 'documents',    label: 'Dokumente',              short: 'Dokumente', icon: Upload },
+  { id: 'template',     label: 'Design & Template',      short: 'Design',    icon: Palette },
 ];
 
 export default function Editor() {
@@ -49,13 +51,14 @@ export default function Editor() {
 
   const renderSection = () => {
     switch (activeSection) {
-      case 'personal':   return <PersonalInfoEditor />;
-      case 'experience': return <ExperienceEditor />;
-      case 'education':  return <EducationEditor />;
-      case 'skills':     return <SkillsEditor />;
-      case 'projects':   return <ProjectsEditor />;
-      case 'documents':  return <DocumentUpload />;
-      case 'template':   return <TemplateSelector />;
+      case 'personal':     return <PersonalInfoEditor />;
+      case 'cover-letter': return <CoverLetterEditor />;
+      case 'experience':   return <ExperienceEditor />;
+      case 'education':    return <EducationEditor />;
+      case 'skills':       return <SkillsEditor />;
+      case 'projects':     return <ProjectsEditor />;
+      case 'documents':    return <DocumentUpload />;
+      case 'template':     return <TemplateSelector />;
       default:           return null;
     }
   };

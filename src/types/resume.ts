@@ -106,6 +106,7 @@ export interface Resume {
   templateId: TemplateId;
   accentColor: string;
   personalInfo: PersonalInfo;
+  coverLetter: CoverLetter;
   workExperience: WorkExperience[];
   education: Education[];
   skills: Skill[];
@@ -126,8 +127,16 @@ export interface Person {
   createdAt: string;
 }
 
+export interface CoverLetter {
+  recipient: string;
+  subject: string;
+  body: string;
+  closing: string;
+}
+
 export type EditorSection =
   | 'personal'
+  | 'cover-letter'
   | 'experience'
   | 'education'
   | 'skills'

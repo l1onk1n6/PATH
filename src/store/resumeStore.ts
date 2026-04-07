@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import type {
-  Person, Resume, PersonalInfo, WorkExperience, Education,
+  Person, Resume, PersonalInfo, CoverLetter, WorkExperience, Education,
   Skill, Language, Project, Certificate, UploadedDocument, TemplateId, EditorSection,
 } from '../types/resume';
 import * as db from '../lib/db';
@@ -44,6 +44,7 @@ interface ResumeStore {
 
   // Section content
   updatePersonalInfo: (resumeId: string, data: Partial<PersonalInfo>) => void;
+  updateCoverLetter: (resumeId: string, data: Partial<CoverLetter>) => void;
   addWorkExperience: (resumeId: string) => void;
   updateWorkExperience: (resumeId: string, id: string, data: Partial<WorkExperience>) => void;
   removeWorkExperience: (resumeId: string, id: string) => void;
@@ -77,6 +78,7 @@ function createDefaultResume(personId: string, name = 'Bewerbungsmappe'): Resume
     name,
     templateId: 'minimal', accentColor: '#007AFF',
     personalInfo: { firstName: '', lastName: '', title: '', email: '', phone: '', location: '', website: '', linkedin: '', github: '', summary: '' },
+    coverLetter: { recipient: '', subject: '', body: '', closing: 'Mit freundlichen Grüssen' },
     workExperience: [], education: [], skills: [], languages: [],
     projects: [], certificates: [], documents: [],
     createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
@@ -211,6 +213,11 @@ export const useResumeStore = create<ResumeStore>()(
       // ── Section mutations (alle sync-fähig via updateResume-Debounce) ──
       updatePersonalInfo: (resumeId, data) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, personalInfo: { ...r.personalInfo, ...data }, updatedAt: new Date().toISOString() } : r) }));
+        debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+      },
+
+      updateCoverLetter: (resumeId, data) => {
+        set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, coverLetter: { ...r.coverLetter, ...data }, updatedAt: new Date().toISOString() } : r) }));
         debounced(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
