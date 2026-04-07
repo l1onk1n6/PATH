@@ -76,8 +76,8 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
         <button
           onClick={() => !isPro && setShowUpgrade(true)}
           style={{
-            display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 20,
-            fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', cursor: isPro ? 'default' : 'pointer',
+            display: 'flex', alignItems: 'center', gap: 5, padding: '7px 14px', borderRadius: 20,
+            fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', cursor: isPro ? 'default' : 'pointer',
             background: isPro
               ? 'linear-gradient(135deg, rgba(255,159,10,0.25), rgba(255,55,95,0.2))'
               : 'rgba(255,255,255,0.08)',
