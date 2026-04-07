@@ -161,7 +161,7 @@ body::before {
   border-radius: var(--radius-sm);
   color: #fff;
   font-family: var(--font-sf);
-  font-size: 14px;
+  font-size: 16px; /* 16px verhindert Auto-Zoom auf iOS */
   transition: all 0.2s ease;
   outline: none;
 }
