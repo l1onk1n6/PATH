@@ -219,6 +219,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
           {persons.map((person) => {
             const isActiveP = person.id === activePersonId;
             const personResumes = resumes.filter((r) => person.resumeIds.includes(r.id));
+            const photo = personResumes[0]?.personalInfo?.photo;
 
             return (
               <div key={person.id} style={{ marginBottom: 6 }}>
@@ -235,12 +236,15 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{
-                      width: 28, height: 28, borderRadius: '50%',
-                      background: `linear-gradient(135deg, hsl(${person.name.charCodeAt(0) * 10 % 360}, 70%, 50%), hsl(${person.name.charCodeAt(0) * 15 % 360}, 60%, 40%))`,
+                      width: 28, height: 28, borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
+                      background: photo ? 'transparent' : `linear-gradient(135deg, hsl(${person.name.charCodeAt(0) * 10 % 360}, 70%, 50%), hsl(${person.name.charCodeAt(0) * 15 % 360}, 60%, 40%))`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 12, fontWeight: 600, color: '#fff', flexShrink: 0,
+                      fontSize: 12, fontWeight: 600, color: '#fff',
                     }}>
-                      {person.name.charAt(0).toUpperCase()}
+                      {photo
+                        ? <img src={photo} alt={person.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        : person.name.charAt(0).toUpperCase()
+                      }
                     </div>
                     <span style={{ fontSize: 13, fontWeight: 500, opacity: isActiveP ? 1 : 0.75, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {person.name}

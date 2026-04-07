@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main, master, claude/resume-editor-app-cv9Op]
+    branches: [main, master, claude/push-local-commits-j8RTh]
   workflow_dispatch:
 
 permissions:

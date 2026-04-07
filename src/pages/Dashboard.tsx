@@ -224,12 +224,15 @@ export default function Dashboard() {
               {/* Avatar + Name */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                 <div style={{
-                  width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-                  background: `linear-gradient(135deg, hsl(${person.name.charCodeAt(0) * 10 % 360}, 70%, 45%), hsl(${person.name.charCodeAt(0) * 15 % 360}, 60%, 35%))`,
+                  width: 44, height: 44, borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
+                  background: personResumes[0]?.personalInfo.photo ? 'transparent' : `linear-gradient(135deg, hsl(${person.name.charCodeAt(0) * 10 % 360}, 70%, 45%), hsl(${person.name.charCodeAt(0) * 15 % 360}, 60%, 35%))`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 17, fontWeight: 700, color: '#fff',
                 }}>
-                  {person.name.charAt(0).toUpperCase()}
+                  {personResumes[0]?.personalInfo.photo
+                    ? <img src={personResumes[0].personalInfo.photo} alt={person.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : person.name.charAt(0).toUpperCase()
+                  }
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 700, fontSize: 15 }}>{person.name}</div>

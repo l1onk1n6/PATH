@@ -1,6 +1,7 @@
-import { Plus, Trash2, Zap, Globe, GripVertical } from 'lucide-react';
+import { Plus, Trash2, Zap, Globe, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { useResumeStore } from '../../store/resumeStore';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import type { Language } from '../../types/resume';
 
 const SKILL_LEVELS = [1, 2, 3, 4, 5];
@@ -17,6 +18,7 @@ export default function SkillsEditor() {
   } = useResumeStore();
   const [dragging, setDragging] = useState<number | null>(null);
   const [dragOver, setDragOver] = useState<number | null>(null);
+  const isMobile = useIsMobile();
   const resume = getActiveResume();
   if (!resume) return null;
 
@@ -47,11 +49,11 @@ export default function SkillsEditor() {
             <div
               key={skill.id}
               className="glass-card"
-              draggable
-              onDragStart={() => setDragging(i)}
-              onDragOver={(e) => { e.preventDefault(); setDragOver(i); }}
-              onDrop={() => { if (dragging !== null && dragging !== i) reorderSkills(resume.id, dragging, i); setDragging(null); setDragOver(null); }}
-              onDragEnd={() => { setDragging(null); setDragOver(null); }}
+              draggable={!isMobile}
+              onDragStart={!isMobile ? () => setDragging(i) : undefined}
+              onDragOver={!isMobile ? (e) => { e.preventDefault(); setDragOver(i); } : undefined}
+              onDrop={!isMobile ? () => { if (dragging !== null && dragging !== i) reorderSkills(resume.id, dragging, i); setDragging(null); setDragOver(null); } : undefined}
+              onDragEnd={!isMobile ? () => { setDragging(null); setDragOver(null); } : undefined}
               style={{
                 padding: '12px 14px',
                 opacity: dragging === i ? 0.5 : 1,
@@ -60,7 +62,20 @@ export default function SkillsEditor() {
               }}
             >
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <GripVertical size={14} style={{ opacity: 0.3, flexShrink: 0, cursor: 'grab' }} />
+                {isMobile ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flexShrink: 0 }}>
+                    <button className="btn-glass btn-icon" disabled={i === 0} onClick={() => reorderSkills(resume.id, i, i - 1)}
+                      style={{ padding: 3, opacity: i === 0 ? 0.2 : 0.6, boxShadow: 'none', background: 'transparent', border: 'none' }}>
+                      <ChevronUp size={13} />
+                    </button>
+                    <button className="btn-glass btn-icon" disabled={i === skills.length - 1} onClick={() => reorderSkills(resume.id, i, i + 1)}
+                      style={{ padding: 3, opacity: i === skills.length - 1 ? 0.2 : 0.6, boxShadow: 'none', background: 'transparent', border: 'none' }}>
+                      <ChevronDown size={13} />
+                    </button>
+                  </div>
+                ) : (
+                  <GripVertical size={14} style={{ opacity: 0.3, flexShrink: 0, cursor: 'grab' }} />
+                )}
                 <input
                   className="input-glass"
                   placeholder="Fähigkeit (z.B. React, Python...)"

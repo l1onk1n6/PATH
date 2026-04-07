@@ -353,7 +353,7 @@ export default function AuthPage() {
         color: 'rgba(255,255,255,0.2)',
         userSelect: 'none',
       }}>
-        by pixmatic · v1.3.0
+        by pixmatic · v{__APP_VERSION__}
       </footer>
     </div>
   );
