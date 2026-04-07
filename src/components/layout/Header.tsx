@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Eye, Edit3, Download, Menu, Cloud, Loader } from 'lucide-react';
+import { Eye, Edit3, Menu, Cloud, Loader } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 
 interface Props {
@@ -89,16 +89,10 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
           </>
         )}
         {location.pathname === '/preview' && (
-          <>
-            <button className="btn-glass btn-sm" onClick={() => navigate('/editor')}>
-              <Edit3 size={14} />
-              {!isMobile && ' Bearbeiten'}
-            </button>
-            <button className="btn-glass btn-primary btn-sm" onClick={() => navigate('/preview')}>
-              <Download size={14} />
-              {!isMobile && ' Exportieren'}
-            </button>
-          </>
+          <button className="btn-glass btn-sm" onClick={() => navigate('/editor')}>
+            <Edit3 size={14} />
+            {!isMobile && ' Bearbeiten'}
+          </button>
         )}
         {location.pathname === '/' && (
           <button className="btn-glass btn-primary btn-sm" onClick={() => navigate('/editor')}>
