@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import {
   User, Briefcase, GraduationCap, Zap, FolderOpen,
-  Upload, Palette, AlertCircle, FileEdit,
+  Upload, Palette, AlertCircle, FileEdit, LayoutList,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import type { EditorSection } from '../types/resume';
@@ -13,6 +13,7 @@ import EducationEditor from '../components/editor/EducationEditor';
 import SkillsEditor from '../components/editor/SkillsEditor';
 import ProjectsEditor from '../components/editor/ProjectsEditor';
 import DocumentUpload from '../components/editor/DocumentUpload';
+import CustomSectionEditor from '../components/editor/CustomSectionEditor';
 import TemplateSelector from '../components/templates/TemplateSelector';
 import { useIsMobile } from '../hooks/useBreakpoint';
 
@@ -24,6 +25,7 @@ const SECTIONS: { id: EditorSection; label: string; short: string; icon: React.C
   { id: 'skills',       label: 'Fähigkeiten',            short: 'Skills',    icon: Zap },
   { id: 'projects',     label: 'Projekte & Zertifikate', short: 'Projekte',  icon: FolderOpen },
   { id: 'documents',    label: 'Dokumente',              short: 'Dokumente', icon: Upload },
+  { id: 'custom',       label: 'Eigene Sektionen',       short: 'Eigene',    icon: LayoutList },
   { id: 'template',     label: 'Design & Template',      short: 'Design',    icon: Palette },
 ];
 
@@ -58,6 +60,7 @@ export default function Editor() {
       case 'skills':       return <SkillsEditor />;
       case 'projects':     return <ProjectsEditor />;
       case 'documents':    return <DocumentUpload />;
+      case 'custom':       return <CustomSectionEditor />;
       case 'template':     return <TemplateSelector />;
       default:           return null;
     }

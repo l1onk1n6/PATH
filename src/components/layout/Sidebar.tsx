@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Users, FileText, Plus, ChevronRight, Trash2,
   LayoutDashboard, Eye, FilePlus, LogOut,
-  PanelLeftClose, PanelLeftOpen,
+  PanelLeftClose, PanelLeftOpen, Mail,
 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useAuthStore } from '../../store/authStore';
@@ -316,12 +316,12 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
       <div className="divider" />
 
       {user && (
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 8, paddingLeft: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 6, paddingLeft: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {user.email}
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: 6 }}>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
         <button
           className="btn-glass btn-sm"
           onClick={() => signOut()}
@@ -330,6 +330,29 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         >
           <LogOut size={13} /> Logout
         </button>
+        <a
+          href="mailto:info@pixmatic.ch"
+          title="Support kontaktieren"
+          className="btn-glass btn-sm btn-icon"
+          style={{ padding: '8px 10px', boxShadow: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', flexShrink: 0 }}
+        >
+          <Mail size={13} />
+        </a>
+      </div>
+
+      {/* Legal links */}
+      <div style={{ display: 'flex', gap: 10, paddingLeft: 4, flexWrap: 'wrap' }}>
+        {[
+          { label: 'Datenschutz', href: 'https://pixmatic.ch/datenschutz' },
+          { label: 'AGB', href: 'https://pixmatic.ch/agb' },
+        ].map(({ label, href }) => (
+          <a key={label} href={href} target="_blank" rel="noopener noreferrer"
+            style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', textDecoration: 'none' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.25)')}>
+            {label}
+          </a>
+        ))}
       </div>
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </aside>

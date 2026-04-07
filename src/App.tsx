@@ -8,12 +8,13 @@ import Editor from './pages/Editor';
 import Preview from './pages/Preview';
 import AuthPage from './pages/AuthPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
+import SharedResumePage from './pages/SharedResumePage';
 import { useAuthStore } from './store/authStore';
 import { useResumeStore } from './store/resumeStore';
 import { isSupabaseConfigured } from './lib/supabase';
 import { useIsMobile } from './hooks/useBreakpoint';
 
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.5.0';
 
 function AppShell() {
   const isMobile = useIsMobile();
@@ -94,6 +95,7 @@ function AppShell() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/editor" element={<Editor />} />
               <Route path="/preview" element={<Preview />} />
+              <Route path="/shared" element={<SharedResumePage />} />
             </Routes>
           </div>
         </div>
@@ -136,6 +138,9 @@ export default function App() {
   const { syncFromCloud } = useResumeStore();
   const [authType] = useState(() => getAuthTypeFromUrl());
 
+  // Public shared CV route — accessible without login
+  const isSharedRoute = window.location.hash.startsWith('#/shared');
+
   useEffect(() => {
     initialize();
   }, [initialize]);
@@ -143,6 +148,10 @@ export default function App() {
   useEffect(() => {
     if (user && !passwordRecovery) syncFromCloud();
   }, [user, passwordRecovery, syncFromCloud]);
+
+  if (isSharedRoute) {
+    return <HashRouter><Routes><Route path="/shared" element={<SharedResumePage />} /></Routes></HashRouter>;
+  }
 
   if (!isSupabaseConfigured()) {
     return (

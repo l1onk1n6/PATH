@@ -78,6 +78,12 @@ export interface UploadedDocument {
   category: 'certificate' | 'reference' | 'portfolio' | 'other';
 }
 
+export interface CustomSection {
+  id: string;
+  title: string;
+  items: string[];
+}
+
 export type TemplateId =
   | 'minimal'
   | 'executive'
@@ -118,6 +124,8 @@ export interface Resume {
   projects: Project[];
   certificates: Certificate[];
   documents: UploadedDocument[];
+  customSections: CustomSection[];
+  shareToken?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -166,4 +174,5 @@ export type EditorSection =
   | 'projects'
   | 'certificates'
   | 'documents'
+  | 'custom'
   | 'template';
