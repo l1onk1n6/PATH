@@ -19,7 +19,7 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
     '/': 'Dashboard',
     '/editor': 'Editor',
     '/preview': 'Vorschau',
-    '/settings': 'Einstellungen',
+    '/account': 'Mein Account',
   };
 
   const title = pageTitle[location.pathname] ?? 'Path';

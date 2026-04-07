@@ -6,6 +6,7 @@ import Header from './components/layout/Header';
 import Dashboard from './pages/Dashboard';
 import Editor from './pages/Editor';
 import Preview from './pages/Preview';
+import AccountPage from './pages/AccountPage';
 import AuthPage from './pages/AuthPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import { useAuthStore } from './store/authStore';
@@ -94,6 +95,7 @@ function AppShell() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/editor" element={<Editor />} />
               <Route path="/preview" element={<Preview />} />
+              <Route path="/account" element={<AccountPage />} />
             </Routes>
           </div>
         </div>

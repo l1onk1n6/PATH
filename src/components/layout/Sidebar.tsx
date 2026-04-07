@@ -315,22 +315,49 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
 
       <div className="divider" />
 
+      {/* Account footer */}
       {user && (
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 8, paddingLeft: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {user.email}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            className="btn-glass"
+            onClick={() => go('/account')}
+            title="Account-Einstellungen"
+            style={{
+              flex: 1, justifyContent: 'flex-start', padding: '8px 10px',
+              boxShadow: 'none', gap: 8, minWidth: 0,
+              background: location.pathname === '/account' ? 'rgba(0,122,255,0.15)' : 'transparent',
+              border: location.pathname === '/account' ? '1px solid rgba(0,122,255,0.3)' : '1px solid transparent',
+            }}
+          >
+            <div style={{
+              width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
+              background: 'linear-gradient(135deg, var(--ios-blue), var(--ios-purple))',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 11, fontWeight: 700, color: '#fff',
+            }}>
+              {((user.user_metadata?.full_name as string) || user.email || '?').charAt(0).toUpperCase()}
+            </div>
+            {!collapsed && (
+              <div style={{ minWidth: 0, textAlign: 'left' }}>
+                <div style={{ fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {(user.user_metadata?.full_name as string) || 'Account'}
+                </div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {user.email}
+                </div>
+              </div>
+            )}
+          </button>
+          <button
+            className="btn-glass btn-icon"
+            onClick={() => signOut()}
+            title="Abmelden"
+            style={{ padding: 8, flexShrink: 0, boxShadow: 'none', opacity: 0.6 }}
+          >
+            <LogOut size={14} />
+          </button>
         </div>
       )}
-
-      <div style={{ display: 'flex', gap: 6 }}>
-        <button
-          className="btn-glass btn-sm"
-          onClick={() => signOut()}
-          title="Abmelden"
-          style={{ flex: 1, justifyContent: 'center', padding: '8px 10px', boxShadow: 'none', fontSize: 12 }}
-        >
-          <LogOut size={13} /> Logout
-        </button>
-      </div>
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </aside>
   );

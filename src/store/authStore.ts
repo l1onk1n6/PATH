@@ -9,7 +9,7 @@ interface AuthStore {
   loading: boolean;
   error: string | null;
   passwordRecovery: boolean;
-  emailUnconfirmed: boolean; // nach Registrierung: warte auf Bestätigung
+  emailUnconfirmed: boolean;
 
   initialize: () => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
@@ -17,6 +17,8 @@ interface AuthStore {
   signOut: () => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
   updatePassword: (newPassword: string) => Promise<void>;
+  updateName: (name: string) => Promise<void>;
+  deleteAccount: () => Promise<void>;
   resendConfirmation: (email: string) => Promise<void>;
   clearError: () => void;
 }
@@ -123,6 +125,31 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
       set({ loading: false, passwordRecovery: false });
+    } catch (e) {
+      set({ error: toGermanError(e), loading: false });
+    }
+  },
+
+  updateName: async (name) => {
+    set({ loading: true, error: null });
+    try {
+      const supabase = getSupabase();
+      const { data, error } = await supabase.auth.updateUser({ data: { full_name: name } });
+      if (error) throw error;
+      set({ user: data.user, loading: false });
+    } catch (e) {
+      set({ error: toGermanError(e), loading: false });
+    }
+  },
+
+  deleteAccount: async () => {
+    set({ loading: true, error: null });
+    try {
+      const supabase = getSupabase();
+      const { error } = await supabase.rpc('delete_user');
+      if (error) throw error;
+      await supabase.auth.signOut();
+      set({ user: null, session: null, loading: false });
     } catch (e) {
       set({ error: toGermanError(e), loading: false });
     }
