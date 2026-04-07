@@ -292,7 +292,7 @@ export default function Dashboard() {
                         onClick={(e) => { e.stopPropagation(); setStatusMenuResumeId(r.id); }}
                       />
                       <FileText
-                        size={9}
+                        size={11}
                         style={{ cursor: 'pointer', flexShrink: 0 }}
                         onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); setActiveResume(r.id); }}
                       />
@@ -305,18 +305,18 @@ export default function Dashboard() {
                       {/* Rename */}
                       <span
                         title="Umbenennen"
-                        style={{ cursor: 'pointer', opacity: 0.45, display: 'flex', alignItems: 'center' }}
+                        style={{ cursor: 'pointer', opacity: 0.5, display: 'flex', alignItems: 'center' }}
                         onClick={(e) => { e.stopPropagation(); setRenamingResumeId(r.id); setRenameValue(r.name || 'Bewerbungsmappe'); }}
                       >
-                        <Pencil size={9} />
+                        <Pencil size={11} />
                       </span>
                       {/* Duplicate */}
                       <span
                         title="Duplizieren"
-                        style={{ cursor: 'pointer', opacity: 0.45, display: 'flex', alignItems: 'center' }}
+                        style={{ cursor: 'pointer', opacity: 0.5, display: 'flex', alignItems: 'center' }}
                         onClick={(e) => { e.stopPropagation(); duplicateResume(r.id); }}
                       >
-                        <Copy size={9} />
+                        <Copy size={11} />
                       </span>
                       {/* Job URL */}
                       {r.jobUrl && (

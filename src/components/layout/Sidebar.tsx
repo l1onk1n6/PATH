@@ -265,9 +265,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
                   <div style={{ paddingLeft: 12, marginTop: 4 }}>
                     {personResumes.map((resume) => {
                       const isActiveR = resume.id === activeResumeId;
-                      const name = resume.personalInfo.firstName
-                        ? `${resume.personalInfo.firstName} ${resume.personalInfo.lastName}`.trim()
-                        : `Lebenslauf ${personResumes.indexOf(resume) + 1}`;
+                      const name = resume.name || `Bewerbungsmappe ${personResumes.indexOf(resume) + 1}`;
 
                       return (
                         <div key={resume.id} style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 3 }}>
@@ -310,7 +308,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
                         boxShadow: 'none',
                       }}
                     >
-                      <FilePlus size={11} /> Lebenslauf hinzufügen
+                      <FilePlus size={11} /> Mappe hinzufügen
                     </button>
                   </div>
                 )}
