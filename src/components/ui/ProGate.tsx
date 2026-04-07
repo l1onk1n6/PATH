@@ -44,7 +44,12 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
     >
       <div
         className="glass-card animate-scale-in"
-        style={{ padding: '28px 24px', width: 380, maxWidth: '92vw', maxHeight: '85vh', overflow: 'auto' }}
+        style={{
+          padding: '28px 24px', width: 380, maxWidth: '92vw', maxHeight: '85vh', overflow: 'auto',
+          background: 'rgba(16, 16, 26, 0.97)',
+          backdropFilter: 'blur(32px) saturate(1.6)',
+          WebkitBackdropFilter: 'blur(32px) saturate(1.6)',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
