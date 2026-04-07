@@ -87,7 +87,17 @@ export type TemplateId =
   | 'elegant'
   | 'bold'
   | 'academic'
-  | 'startup';
+  | 'startup'
+  | 'modern'
+  | 'vibrant'
+  | 'vintage'
+  | 'magazine'
+  | 'timeline'
+  | 'compact'
+  | 'pastel'
+  | 'geometric'
+  | 'freelancer'
+  | 'international';
 
 export interface Resume {
   id: string;
