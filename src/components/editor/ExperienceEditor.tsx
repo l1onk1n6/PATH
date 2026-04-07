@@ -1,15 +1,21 @@
-import { Plus, Trash2, Briefcase, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Trash2, Briefcase, ChevronDown, ChevronUp, GripVertical } from 'lucide-react';
 import { useState } from 'react';
 import { useResumeStore } from '../../store/resumeStore';
 
 export default function ExperienceEditor() {
-  const { getActiveResume, addWorkExperience, updateWorkExperience, removeWorkExperience } = useResumeStore();
+  const { getActiveResume, addWorkExperience, updateWorkExperience, removeWorkExperience, reorderWorkExperience } = useResumeStore();
   const resume = getActiveResume();
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [dragging, setDragging] = useState<number | null>(null);
+  const [dragOver, setDragOver] = useState<number | null>(null);
 
   if (!resume) return null;
-
   const { workExperience: jobs } = resume;
+
+  function handleDrop(to: number) {
+    if (dragging !== null && dragging !== to) reorderWorkExperience(resume!.id, dragging, to);
+    setDragging(null); setDragOver(null);
+  }
 
   return (
     <div className="animate-fade-in">
@@ -31,22 +37,39 @@ export default function ExperienceEditor() {
       )}
 
       {jobs.map((job, i) => (
-        <div key={job.id} className="glass-card animate-fade-in" style={{ padding: 16, marginBottom: 10 }}>
+        <div
+          key={job.id}
+          className="glass-card animate-fade-in"
+          draggable
+          onDragStart={() => setDragging(i)}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(i); }}
+          onDrop={() => handleDrop(i)}
+          onDragEnd={() => { setDragging(null); setDragOver(null); }}
+          style={{
+            padding: 16, marginBottom: 10,
+            opacity: dragging === i ? 0.5 : 1,
+            border: dragOver === i && dragging !== i ? '1px solid rgba(0,122,255,0.6)' : undefined,
+            transition: 'opacity 0.15s, border 0.15s',
+          }}
+        >
           <div
             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
             onClick={() => setExpanded(expanded === job.id ? null : job.id)}
           >
-            <div>
-              <div style={{ fontWeight: 600, fontSize: 14 }}>
-                {job.position || job.company || `Eintrag ${i + 1}`}
-              </div>
-              {job.company && (
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>
-                  {job.company}{job.location ? ` · ${job.location}` : ''}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+              <GripVertical size={14} style={{ opacity: 0.3, flexShrink: 0, cursor: 'grab' }} />
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: 14 }}>
+                  {job.position || job.company || `Eintrag ${i + 1}`}
                 </div>
-              )}
+                {job.company && (
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>
+                    {job.company}{job.location ? ` · ${job.location}` : ''}
+                  </div>
+                )}
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
               <button
                 className="btn-glass btn-danger btn-sm btn-icon"
                 onClick={(e) => { e.stopPropagation(); removeWorkExperience(resume.id, job.id); }}
@@ -78,11 +101,8 @@ export default function ExperienceEditor() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 18 }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 13 }}>
-                    <input
-                      type="checkbox"
-                      checked={job.current}
-                      onChange={(e) => updateWorkExperience(resume.id, job.id, { current: e.target.checked })}
-                    />
+                    <input type="checkbox" checked={job.current}
+                      onChange={(e) => updateWorkExperience(resume.id, job.id, { current: e.target.checked })} />
                     Aktuell tätig
                   </label>
                 </div>
@@ -100,12 +120,10 @@ export default function ExperienceEditor() {
               </div>
               <div>
                 <label className="section-label">Beschreibung / Aufgaben</label>
-                <textarea
-                  className="input-glass"
+                <textarea className="input-glass"
                   placeholder="Beschreiben Sie Ihre Aufgaben und Verantwortlichkeiten..."
                   value={job.description}
-                  onChange={(e) => updateWorkExperience(resume.id, job.id, { description: e.target.value })}
-                />
+                  onChange={(e) => updateWorkExperience(resume.id, job.id, { description: e.target.value })} />
               </div>
             </div>
           )}

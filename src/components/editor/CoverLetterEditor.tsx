@@ -1,7 +1,8 @@
+import { Link, Calendar } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 
 export default function CoverLetterEditor() {
-  const { getActiveResume, updateCoverLetter } = useResumeStore();
+  const { getActiveResume, updateCoverLetter, updateResume } = useResumeStore();
   const resume = getActiveResume();
   if (!resume) return null;
 
@@ -11,8 +12,50 @@ export default function CoverLetterEditor() {
     updateCoverLetter(resume!.id, { [field]: value });
   }
 
+  // Deadline color
+  const deadlineColor = (() => {
+    if (!resume.deadline) return undefined;
+    const diff = (new Date(resume.deadline).getTime() - Date.now()) / 86400000;
+    if (diff < 0) return 'var(--ios-red)';
+    if (diff <= 7) return 'var(--ios-yellow, #FF9F0A)';
+    return 'var(--ios-green)';
+  })();
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+
+      {/* Job details */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
+            <Link size={11} /> Stellenausschreibung URL
+          </label>
+          <input
+            className="input-glass"
+            placeholder="https://jobs.beispiel.ch/stelle-xyz"
+            value={resume.jobUrl ?? ''}
+            onChange={(e) => updateResume(resume.id, { jobUrl: e.target.value })}
+            style={{ width: '100%' }}
+          />
+        </div>
+        <div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
+            <Calendar size={11} /> Bewerbungsfrist
+          </label>
+          <input
+            className="input-glass"
+            type="date"
+            value={resume.deadline ?? ''}
+            onChange={(e) => updateResume(resume.id, { deadline: e.target.value })}
+            style={{ width: '100%', color: deadlineColor ?? undefined }}
+          />
+          {resume.deadline && deadlineColor === 'var(--ios-red)' && (
+            <div style={{ fontSize: 11, color: 'var(--ios-red)', marginTop: 4 }}>Frist abgelaufen</div>
+          )}
+        </div>
+      </div>
+
+      <div className="divider" />
       <div>
         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
           Empfänger / Adresse

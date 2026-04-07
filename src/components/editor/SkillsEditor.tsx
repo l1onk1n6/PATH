@@ -1,4 +1,5 @@
-import { Plus, Trash2, Zap, Globe } from 'lucide-react';
+import { Plus, Trash2, Zap, Globe, GripVertical } from 'lucide-react';
+import { useState } from 'react';
 import { useResumeStore } from '../../store/resumeStore';
 import type { Language } from '../../types/resume';
 
@@ -11,9 +12,11 @@ const LANG_LEVELS: Language['level'][] = ['Grundkenntnisse', 'Fortgeschritten', 
 export default function SkillsEditor() {
   const {
     getActiveResume,
-    addSkill, updateSkill, removeSkill,
+    addSkill, updateSkill, removeSkill, reorderSkills,
     addLanguage, updateLanguage, removeLanguage,
   } = useResumeStore();
+  const [dragging, setDragging] = useState<number | null>(null);
+  const [dragOver, setDragOver] = useState<number | null>(null);
   const resume = getActiveResume();
   if (!resume) return null;
 
@@ -40,9 +43,24 @@ export default function SkillsEditor() {
         )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {skills.map((skill) => (
-            <div key={skill.id} className="glass-card" style={{ padding: '12px 14px' }}>
+          {skills.map((skill, i) => (
+            <div
+              key={skill.id}
+              className="glass-card"
+              draggable
+              onDragStart={() => setDragging(i)}
+              onDragOver={(e) => { e.preventDefault(); setDragOver(i); }}
+              onDrop={() => { if (dragging !== null && dragging !== i) reorderSkills(resume.id, dragging, i); setDragging(null); setDragOver(null); }}
+              onDragEnd={() => { setDragging(null); setDragOver(null); }}
+              style={{
+                padding: '12px 14px',
+                opacity: dragging === i ? 0.5 : 1,
+                border: dragOver === i && dragging !== i ? '1px solid rgba(0,122,255,0.6)' : undefined,
+                transition: 'opacity 0.15s',
+              }}
+            >
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <GripVertical size={14} style={{ opacity: 0.3, flexShrink: 0, cursor: 'grab' }} />
                 <input
                   className="input-glass"
                   placeholder="Fähigkeit (z.B. React, Python...)"
@@ -85,6 +103,7 @@ export default function SkillsEditor() {
               </div>
             </div>
           ))}
+
         </div>
       </div>
 

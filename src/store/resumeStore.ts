@@ -66,12 +66,15 @@ interface ResumeStore {
   addWorkExperience: (resumeId: string) => void;
   updateWorkExperience: (resumeId: string, id: string, data: Partial<WorkExperience>) => void;
   removeWorkExperience: (resumeId: string, id: string) => void;
+  reorderWorkExperience: (resumeId: string, from: number, to: number) => void;
   addEducation: (resumeId: string) => void;
   updateEducation: (resumeId: string, id: string, data: Partial<Education>) => void;
   removeEducation: (resumeId: string, id: string) => void;
+  reorderEducation: (resumeId: string, from: number, to: number) => void;
   addSkill: (resumeId: string) => void;
   updateSkill: (resumeId: string, id: string, data: Partial<Skill>) => void;
   removeSkill: (resumeId: string, id: string) => void;
+  reorderSkills: (resumeId: string, from: number, to: number) => void;
   addLanguage: (resumeId: string) => void;
   updateLanguage: (resumeId: string, id: string, data: Partial<Language>) => void;
   removeLanguage: (resumeId: string, id: string) => void;
@@ -93,7 +96,7 @@ interface ResumeStore {
 function createDefaultResume(personId: string, name = 'Bewerbungsmappe'): Resume {
   return {
     id: uuidv4(), personId,
-    name, status: 'entwurf',
+    name, status: 'entwurf', jobUrl: '', deadline: '',
     templateId: 'minimal', accentColor: '#007AFF',
     personalInfo: { firstName: '', lastName: '', title: '', email: '', phone: '', location: '', website: '', linkedin: '', github: '', summary: '' },
     coverLetter: { recipient: '', subject: '', body: '', closing: 'Mit freundlichen Grüssen' },
@@ -288,6 +291,11 @@ export const useResumeStore = create<ResumeStore>()(
         queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
+      reorderWorkExperience: (resumeId, from, to) => {
+        set((s) => ({ resumes: s.resumes.map(r => { if (r.id !== resumeId) return r; const a = [...r.workExperience]; const [m] = a.splice(from, 1); a.splice(to, 0, m); return { ...r, workExperience: a, updatedAt: new Date().toISOString() }; }) }));
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+      },
+
       addEducation: (resumeId) => {
         const item: Education = { id: uuidv4(), institution: '', degree: '', field: '', location: '', startDate: '', endDate: '', grade: '', description: '' };
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, education: [...r.education, item], updatedAt: new Date().toISOString() } : r) }));
@@ -304,6 +312,11 @@ export const useResumeStore = create<ResumeStore>()(
         queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
+      reorderEducation: (resumeId, from, to) => {
+        set((s) => ({ resumes: s.resumes.map(r => { if (r.id !== resumeId) return r; const a = [...r.education]; const [m] = a.splice(from, 1); a.splice(to, 0, m); return { ...r, education: a, updatedAt: new Date().toISOString() }; }) }));
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+      },
+
       addSkill: (resumeId) => {
         const item: Skill = { id: uuidv4(), name: '', level: 3, category: 'Allgemein' };
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, skills: [...r.skills, item], updatedAt: new Date().toISOString() } : r) }));
@@ -317,6 +330,11 @@ export const useResumeStore = create<ResumeStore>()(
 
       removeSkill: (resumeId, id) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, skills: r.skills.filter(sk => sk.id !== id), updatedAt: new Date().toISOString() } : r) }));
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+      },
+
+      reorderSkills: (resumeId, from, to) => {
+        set((s) => ({ resumes: s.resumes.map(r => { if (r.id !== resumeId) return r; const a = [...r.skills]; const [m] = a.splice(from, 1); a.splice(to, 0, m); return { ...r, skills: a, updatedAt: new Date().toISOString() }; }) }));
         queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 

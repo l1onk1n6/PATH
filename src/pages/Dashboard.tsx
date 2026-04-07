@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp,
-  FolderPlus, Pencil, Copy, Search,
+  FolderPlus, Pencil, Copy, Search, ExternalLink, Clock,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import {
@@ -318,6 +318,31 @@ export default function Dashboard() {
                       >
                         <Copy size={9} />
                       </span>
+                      {/* Job URL */}
+                      {r.jobUrl && (
+                        <a
+                          href={r.jobUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Stellenausschreibung öffnen"
+                          style={{ opacity: 0.5, display: 'flex', alignItems: 'center' }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ExternalLink size={9} />
+                        </a>
+                      )}
+                      {/* Deadline */}
+                      {r.deadline && (() => {
+                        const diff = (new Date(r.deadline).getTime() - Date.now()) / 86400000;
+                        const color = diff < 0 ? 'var(--ios-red)' : diff <= 7 ? '#FF9F0A' : 'rgba(255,255,255,0.4)';
+                        const label = diff < 0 ? 'Abgelaufen' : `${Math.ceil(diff)}T`;
+                        return (
+                          <span title={`Frist: ${new Date(r.deadline).toLocaleDateString('de-CH')}`}
+                            style={{ display: 'flex', alignItems: 'center', gap: 2, color, fontSize: 10 }}>
+                            <Clock size={8} />{label}
+                          </span>
+                        );
+                      })()}
                       {/* Delete (only if more than 1) */}
                       {personResumes.length > 1 && (
                         <span

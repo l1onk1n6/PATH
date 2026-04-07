@@ -104,6 +104,8 @@ export interface Resume {
   personId: string;
   name: string;
   status: ApplicationStatus;
+  jobUrl: string;
+  deadline: string;
   templateId: TemplateId;
   accentColor: string;
   personalInfo: PersonalInfo;
