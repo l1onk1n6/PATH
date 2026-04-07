@@ -253,6 +253,14 @@ export default function Dashboard() {
   const [statusMenuResumeId, setStatusMenuResumeId] = useState<string | null>(null);
   const [shareModalResumeId, setShareModalResumeId] = useState<string | null>(null);
 
+  // Persons beyond the plan limit are frozen (read-only)
+  const frozenPersonIds = new Set(
+    limits.persons < Infinity
+      ? persons.slice(limits.persons).map(p => p.id)
+      : []
+  );
+  const frozenPersonCount = frozenPersonIds.size;
+
   // Resumes beyond the plan limit are frozen (read-only)
   const frozenResumeIds = new Set(
     limits.resumes < Infinity
@@ -377,8 +385,8 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Frozen resumes warning */}
-      {frozenCount > 0 && (
+      {/* Frozen warning */}
+      {(frozenPersonCount > 0 || frozenCount > 0) && (
         <div className="glass-card" style={{
           padding: '12px 16px', marginBottom: 12,
           border: '1px solid rgba(255,159,10,0.35)',
@@ -387,8 +395,14 @@ export default function Dashboard() {
         }}>
           <AlertTriangle size={16} style={{ color: '#FF9F0A', flexShrink: 0 }} />
           <div style={{ flex: 1, fontSize: 13 }}>
-            <span style={{ fontWeight: 600, color: '#FF9F0A' }}>{frozenCount} Mappe{frozenCount > 1 ? 'n' : ''} eingefroren</span>
-            <span style={{ color: 'rgba(255,255,255,0.5)' }}> — dein Free-Plan erlaubt max. {limits.resumes}. Eingefrorene Mappen können nicht bearbeitet werden.</span>
+            {frozenPersonCount > 0 && (
+              <span style={{ fontWeight: 600, color: '#FF9F0A' }}>{frozenPersonCount} Person{frozenPersonCount > 1 ? 'en' : ''} eingefroren</span>
+            )}
+            {frozenPersonCount > 0 && frozenCount > 0 && <span style={{ color: 'rgba(255,255,255,0.3)' }}> · </span>}
+            {frozenCount > 0 && (
+              <span style={{ fontWeight: 600, color: '#FF9F0A' }}>{frozenCount} Mappe{frozenCount > 1 ? 'n' : ''} eingefroren</span>
+            )}
+            <span style={{ color: 'rgba(255,255,255,0.5)' }}> — dein Free-Plan erlaubt max. {limits.persons} Person{limits.persons > 1 ? 'en' : ''}. Eingefroren = nicht bearbeitbar.</span>
           </div>
           <button className="btn-glass btn-sm" style={{ flexShrink: 0, fontSize: 12, color: '#FF9F0A', border: '1px solid rgba(255,159,10,0.4)' }}
             onClick={() => navigate('/account')}>
@@ -511,11 +525,20 @@ export default function Dashboard() {
             {filteredPersons.map((person) => {
               const personResumes = resumes.filter((r) => person.resumeIds.includes(r.id));
               const isActive = person.id === activePersonId;
+              const isPersonFrozen = frozenPersonIds.has(person.id);
 
               return (
                 <div key={person.id} className="glass-card"
-                  style={{ padding: isMobile ? 16 : 20, cursor: 'pointer', border: isActive ? '1px solid rgba(0,122,255,0.4)' : undefined }}
-                  onClick={() => { setActivePerson(person.id); navigate('/editor'); }}>
+                  style={{
+                    padding: isMobile ? 16 : 20,
+                    cursor: isPersonFrozen ? 'default' : 'pointer',
+                    opacity: isPersonFrozen ? 0.72 : 1,
+                    border: isPersonFrozen
+                      ? '1px solid rgba(255,159,10,0.35)'
+                      : isActive ? '1px solid rgba(0,122,255,0.4)' : undefined,
+                    background: isPersonFrozen ? 'rgba(255,159,10,0.04)' : undefined,
+                  }}
+                  onClick={() => { if (!isPersonFrozen) { setActivePerson(person.id); navigate('/editor'); } }}>
 
                   {/* Avatar + Name */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
@@ -531,17 +554,29 @@ export default function Dashboard() {
                       }
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 700, fontSize: 15 }}>{person.name}</div>
-                      {personResumes[0]?.personalInfo.title && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontWeight: 700, fontSize: 15, color: isPersonFrozen ? '#FF9F0A' : undefined }}>{person.name}</span>
+                        {isPersonFrozen && (
+                          <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(255,159,10,0.2)', border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', flexShrink: 0 }}>
+                            EINGEFROREN
+                          </span>
+                        )}
+                      </div>
+                      {isPersonFrozen ? (
+                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>Upgrade auf Pro zum Bearbeiten</div>
+                      ) : personResumes[0]?.personalInfo.title ? (
                         <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {personResumes[0].personalInfo.title}
                         </div>
-                      )}
+                      ) : null}
                     </div>
-                    {isActive && (
+                    {!isPersonFrozen && isActive && (
                       <div className="badge" style={{ background: 'rgba(0,122,255,0.2)', borderColor: 'rgba(0,122,255,0.4)', color: 'var(--ios-blue)', fontSize: 10, flexShrink: 0 }}>
                         Aktiv
                       </div>
+                    )}
+                    {isPersonFrozen && (
+                      <Lock size={16} style={{ color: '#FF9F0A', flexShrink: 0 }} />
                     )}
                   </div>
 
@@ -555,7 +590,7 @@ export default function Dashboard() {
                       const deadlineDiff = r.deadline ? (new Date(r.deadline).getTime() - Date.now()) / 86400000 : null;
                       const deadlineColor = deadlineDiff === null ? undefined : deadlineDiff < 0 ? 'var(--ios-red)' : deadlineDiff <= 7 ? '#FF9F0A' : 'rgba(255,255,255,0.4)';
 
-                      if (renamingResumeId === r.id && !frozen) {
+                      if (renamingResumeId === r.id && !frozen && !isPersonFrozen) {
                         return (
                           <input key={r.id} className="input-glass" value={renameValue} autoFocus
                             onClick={(e) => e.stopPropagation()}
@@ -584,7 +619,7 @@ export default function Dashboard() {
                         }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (!frozen) { setActivePerson(person.id); setActiveResume(r.id); }
+                            if (!frozen && !isPersonFrozen) { setActivePerson(person.id); setActiveResume(r.id); }
                           }}>
 
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -635,7 +670,7 @@ export default function Dashboard() {
 
                             {/* Actions */}
                             <div style={{ display: 'flex', gap: 5, alignItems: 'center', flexShrink: 0 }}>
-                              {!frozen && (
+                              {!frozen && !isPersonFrozen && (
                                 <>
                                   <span title="Teilen" style={{ cursor: 'pointer', opacity: 0.45, display: 'flex' }}
                                     onClick={(e) => { e.stopPropagation(); setShareModalResumeId(r.id); }}>
@@ -670,8 +705,8 @@ export default function Dashboard() {
                       );
                     })}
 
-                    {/* Neue Mappe */}
-                    {addingResumeForPersonId === person.id ? (
+                    {/* Neue Mappe — only for non-frozen persons */}
+                    {!isPersonFrozen && addingResumeForPersonId === person.id ? (
                       <input className="input-glass" placeholder="Name der Mappe…" value={newResumeName} autoFocus
                         onClick={(e) => e.stopPropagation()}
                         onChange={(e) => setNewResumeName(e.target.value)}
@@ -682,27 +717,35 @@ export default function Dashboard() {
                         onBlur={() => { if (newResumeName.trim()) handleAddResume(person.id); else { setAddingResumeForPersonId(null); setNewResumeName(''); } }}
                         style={{ fontSize: 14, padding: '8px 12px', width: '100%' }}
                       />
-                    ) : (
+                    ) : !isPersonFrozen ? (
                       <div title="Neue Bewerbungsmappe"
                         style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, fontSize: 13, border: '1px dashed rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.03)', cursor: 'pointer', opacity: 0.6, color: 'rgba(255,255,255,0.6)' }}
                         onClick={(e) => { e.stopPropagation(); setAddingResumeForPersonId(person.id); setNewResumeName(''); }}>
                         <FolderPlus size={15} /> Neue Bewerbungsmappe
                       </div>
-                    )}
+                    ) : null}
                   </div>
 
                   <div className="divider" style={{ margin: '10px 0' }} />
 
                   {/* Person actions */}
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button className="btn-glass btn-primary btn-sm" style={{ flex: 1 }}
-                      onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); navigate('/editor'); }}>
-                      <Edit3 size={13} /> Bearbeiten
-                    </button>
-                    <button className="btn-glass btn-sm"
-                      onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); navigate('/preview'); }}>
-                      <Eye size={13} /> {!isMobile && 'Vorschau'}
-                    </button>
+                    {isPersonFrozen ? (
+                      <button className="btn-glass btn-sm" style={{ flex: 1, opacity: 0.5, cursor: 'not-allowed', color: '#FF9F0A' }} disabled>
+                        <Lock size={13} /> Eingefroren
+                      </button>
+                    ) : (
+                      <button className="btn-glass btn-primary btn-sm" style={{ flex: 1 }}
+                        onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); navigate('/editor'); }}>
+                        <Edit3 size={13} /> Bearbeiten
+                      </button>
+                    )}
+                    {!isPersonFrozen && (
+                      <button className="btn-glass btn-sm"
+                        onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); navigate('/preview'); }}>
+                        <Eye size={13} /> {!isMobile && 'Vorschau'}
+                      </button>
+                    )}
                     <button className="btn-glass btn-danger btn-icon"
                       onClick={(e) => { e.stopPropagation(); if (confirm(`"${person.name}" wirklich löschen?`)) deletePerson(person.id); }}
                       style={{ width: 34, height: 34, borderRadius: '50%', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
