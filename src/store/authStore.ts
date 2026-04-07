@@ -43,10 +43,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ loading: true, error: null });
     try {
       const supabase = getSupabase();
+      const redirectTo = `${window.location.origin}${window.location.pathname}`;
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: name } },
+        options: {
+          data: { full_name: name },
+          emailRedirectTo: redirectTo,
+        },
       });
       if (error) throw error;
       set({ user: data.user, session: data.session, loading: false });
