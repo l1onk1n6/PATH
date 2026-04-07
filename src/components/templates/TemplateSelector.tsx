@@ -1,0 +1,149 @@
+import { Check, Palette } from 'lucide-react';
+import { useResumeStore } from '../../store/resumeStore';
+import { TEMPLATES } from './templateConfig';
+import type { TemplateId } from '../../types/resume';
+
+const ACCENT_COLORS = [
+  '#007AFF', '#5856D6', '#AF52DE', '#FF2D55', '#FF3B30',
+  '#FF9500', '#FFCC00', '#34C759', '#5AC8FA', '#00C7BE',
+  '#1C1C1E', '#636366',
+];
+
+export default function TemplateSelector() {
+  const { getActiveResume, setTemplate, setAccentColor } = useResumeStore();
+  const resume = getActiveResume();
+
+  if (!resume) return null;
+
+  return (
+    <div className="animate-fade-in">
+      {/* Template Grid */}
+      <div className="section-label" style={{ marginBottom: 12 }}>
+        <Palette size={10} style={{ display: 'inline', marginRight: 4 }} />
+        Template wählen
+      </div>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: 10,
+        marginBottom: 24,
+      }}>
+        {TEMPLATES.map((tmpl) => {
+          const isSelected = resume.templateId === tmpl.id;
+          return (
+            <button
+              key={tmpl.id}
+              onClick={() => setTemplate(resume.id, tmpl.id as TemplateId)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+            >
+              <div
+                className="glass-card"
+                style={{
+                  padding: 12,
+                  border: isSelected
+                    ? `2px solid ${resume.accentColor}`
+                    : '1px solid rgba(255,255,255,0.15)',
+                  boxShadow: isSelected
+                    ? `0 0 0 1px ${resume.accentColor}40, 0 8px 24px rgba(0,0,0,0.2)`
+                    : 'var(--glass-shadow)',
+                  transition: 'all 0.2s',
+                }}
+              >
+                {/* Thumbnail */}
+                <div style={{
+                  height: 70,
+                  borderRadius: 8,
+                  background: tmpl.preview,
+                  marginBottom: 10,
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}>
+                  {/* Simulated resume lines */}
+                  <div style={{ position: 'absolute', inset: 0, padding: '10px 12px' }}>
+                    <div style={{ width: '40%', height: 8, background: 'rgba(255,255,255,0.6)', borderRadius: 4, marginBottom: 5 }} />
+                    <div style={{ width: '60%', height: 5, background: 'rgba(255,255,255,0.35)', borderRadius: 3, marginBottom: 8 }} />
+                    <div style={{ width: '80%', height: 3, background: 'rgba(255,255,255,0.2)', borderRadius: 2, marginBottom: 3 }} />
+                    <div style={{ width: '65%', height: 3, background: 'rgba(255,255,255,0.2)', borderRadius: 2, marginBottom: 3 }} />
+                    <div style={{ width: '70%', height: 3, background: 'rgba(255,255,255,0.15)', borderRadius: 2 }} />
+                  </div>
+                  {isSelected && (
+                    <div style={{
+                      position: 'absolute', top: 6, right: 6,
+                      width: 20, height: 20, borderRadius: '50%',
+                      background: resume.accentColor,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <Check size={11} color="#fff" strokeWidth={3} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 3 }}>{tmpl.name}</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginBottom: 6, lineHeight: 1.3 }}>
+                  {tmpl.description}
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {tmpl.tags.map((tag) => (
+                    <span key={tag} className="badge" style={{ fontSize: 10 }}>{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Accent Color */}
+      <div className="section-label" style={{ marginBottom: 10 }}>Akzentfarbe</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        {ACCENT_COLORS.map((color) => (
+          <button
+            key={color}
+            onClick={() => setAccentColor(resume.id, color)}
+            title={color}
+            style={{
+              width: 28, height: 28, borderRadius: '50%',
+              background: color,
+              border: resume.accentColor === color
+                ? '3px solid #fff'
+                : '2px solid rgba(255,255,255,0.2)',
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+              transform: resume.accentColor === color ? 'scale(1.2)' : 'scale(1)',
+              boxShadow: resume.accentColor === color
+                ? `0 0 12px ${color}80`
+                : 'none',
+            }}
+          />
+        ))}
+
+        {/* Custom color */}
+        <label title="Eigene Farbe" style={{ position: 'relative', cursor: 'pointer' }}>
+          <div style={{
+            width: 28, height: 28, borderRadius: '50%',
+            background: 'conic-gradient(red, yellow, green, blue, red)',
+            border: '2px solid rgba(255,255,255,0.3)',
+            cursor: 'pointer',
+          }} />
+          <input
+            type="color"
+            value={resume.accentColor}
+            onChange={(e) => setAccentColor(resume.id, e.target.value)}
+            style={{
+              position: 'absolute', inset: 0, opacity: 0,
+              width: '100%', height: '100%', cursor: 'pointer',
+            }}
+          />
+        </label>
+      </div>
+    </div>
+  );
+}

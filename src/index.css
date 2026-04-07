@@ -1,0 +1,253 @@
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════════
+   iOS 26 Liquid Glass Design System
+   ══════════════════════════════════════════════ */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.12);
+  --glass-bg-heavy: rgba(255, 255, 255, 0.22);
+  --glass-border: rgba(255, 255, 255, 0.25);
+  --glass-border-strong: rgba(255, 255, 255, 0.45);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.12);
+  --glass-shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.25), 0 4px 16px rgba(0, 0, 0, 0.15);
+
+  --ios-blue: #007AFF;
+  --ios-blue-light: #4DA3FF;
+  --ios-indigo: #5856D6;
+  --ios-purple: #AF52DE;
+  --ios-pink: #FF2D55;
+  --ios-red: #FF3B30;
+  --ios-orange: #FF9500;
+  --ios-green: #34C759;
+  --ios-teal: #5AC8FA;
+
+  --font-sf: -apple-system, "SF Pro Display", "SF Pro Text", BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sf);
+  background: linear-gradient(135deg, #0d1117 0%, #161b2e 30%, #0f2a4a 60%, #1a0533 100%);
+  background-attachment: fixed;
+  color: #fff;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 50%, rgba(88, 86, 214, 0.3) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 15%, rgba(0, 122, 255, 0.25) 0%, transparent 55%),
+    radial-gradient(ellipse at 55% 85%, rgba(175, 82, 222, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Glass Base ─── */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(1.8) brightness(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8) brightness(1.1);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.2);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  z-index: 1;
+}
+
+.glass-card:hover {
+  background: var(--glass-bg-heavy);
+  border-color: var(--glass-border-strong);
+  transform: translateY(-2px);
+  box-shadow: var(--glass-shadow-lg), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+/* ─── Buttons ─── */
+.btn-glass {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  color: #fff;
+  font-family: var(--font-sf);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.2);
+  white-space: nowrap;
+  text-decoration: none;
+  border: none;
+  outline: none;
+}
+
+.btn-glass:hover {
+  background: var(--glass-bg-heavy);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: var(--glass-shadow-lg), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.btn-glass:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo)) !important;
+}
+.btn-primary:hover { filter: brightness(1.15); }
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--ios-red), var(--ios-pink)) !important;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--ios-green), var(--ios-teal)) !important;
+}
+
+.btn-sm { padding: 7px 14px; font-size: 13px; }
+.btn-icon { padding: 9px; border-radius: 50%; }
+
+/* ─── Inputs ─── */
+.input-glass {
+  width: 100%;
+  padding: 11px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-family: var(--font-sf);
+  font-size: 14px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input-glass::placeholder { color: rgba(255,255,255,0.35); }
+
+.input-glass:focus {
+  background: rgba(255,255,255,0.12);
+  border-color: var(--ios-blue);
+  box-shadow: 0 0 0 3px rgba(0,122,255,0.2);
+}
+
+textarea.input-glass { resize: vertical; min-height: 80px; }
+
+select.input-glass option { background: #1a1a2e; color: #fff; }
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.18);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
+/* ─── Animations ─── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+.animate-slide-left { animation: slideInLeft 0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
+.animate-scale-in { animation: scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+/* ─── Misc ─── */
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 8px;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  margin: 12px 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.8);
+}
+
+/* ─── Drag & Drop ─── */
+.dropzone {
+  border: 2px dashed rgba(255,255,255,0.2);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255,255,255,0.04);
+}
+.dropzone:hover, .dropzone.active {
+  border-color: var(--ios-blue);
+  background: rgba(0,122,255,0.08);
+}
