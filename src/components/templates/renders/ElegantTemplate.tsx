@@ -1,44 +1,80 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SkillBar, SafeImg } from './shared';
+import { fullName, formatDate, SafeImg } from './shared';
 
 export default function ElegantTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
+  const SectionHeading = ({ children }: { children: React.ReactNode }) => (
+    <div style={{ marginBottom: 14 }}>
+      <h2 style={{ fontFamily: '"Lora", Georgia, serif', fontSize: 13, fontWeight: 600, letterSpacing: '0.06em', color: '#2c2c2c', margin: '0 0 6px', fontStyle: 'normal' }}>{children}</h2>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ width: 24, height: 1.5, background: color }} />
+        <div style={{ flex: 1, height: 1, background: '#e8e0d5' }} />
+      </div>
+    </div>
+  );
+
   return (
-    <div style={{ fontFamily: '"Palatino Linotype", Palatino, Georgia, serif', background: '#fdfcfb', minHeight: '297mm', padding: '28px 28px', color: '#2c2c2c' }}>
-      {/* Elegant Header */}
-      <div style={{ textAlign: 'center', marginBottom: 24, paddingBottom: 20 }}>
-        {info.photo && <SafeImg src={info.photo} alt="" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${color}`, marginBottom: 12 }} />}
-        <h1 style={{ fontSize: 30, fontWeight: 400, letterSpacing: '0.05em', margin: '0 0 6px', color: '#1a1a1a' }}>{name}</h1>
-        {info.title && <div style={{ fontSize: 13, color, fontStyle: 'italic', marginBottom: 10 }}>{info.title}</div>}
-        <div style={{ width: 60, height: 1, background: color, margin: '0 auto 10px' }} />
-        <div style={{ fontSize: 11, color: '#888', display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
-          {[info.email, info.phone, info.location, info.website].filter(Boolean).map((v, i) => <span key={i}>{v}</span>)}
+    <div style={{
+      fontFamily: '"Lato", "Helvetica Neue", Arial, sans-serif',
+      background: '#fdfcf9',
+      color: '#2c2c2c',
+      minHeight: '297mm',
+      padding: '16mm 18mm',
+      fontSize: 11,
+      lineHeight: 1.6,
+    }}>
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginBottom: 26, paddingBottom: 22, borderBottom: '1px solid #e8e0d5' }}>
+        {info.photo && (
+          <SafeImg src={info.photo} alt="" style={{
+            width: 88, height: 88, borderRadius: '50%', objectFit: 'cover',
+            border: `3px solid ${color}`, marginBottom: 14, display: 'block', margin: '0 auto 14px',
+          }} />
+        )}
+        <h1 style={{
+          fontFamily: '"Lora", Georgia, serif', margin: '0 0 5px',
+          fontSize: 32, fontWeight: 700, letterSpacing: '0.02em', color: '#1a1a1a', lineHeight: 1.1,
+        }}>{name}</h1>
+        {info.title && (
+          <div style={{ fontSize: 13, color, fontWeight: 400, fontStyle: 'italic', marginBottom: 12 }}>{info.title}</div>
+        )}
+        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '4px 20px', fontSize: 10.5, color: '#888' }}>
+          {info.email && <span>{info.email}</span>}
+          {info.phone && <span>{info.phone}</span>}
+          {(info.street || info.location) && <span>{[info.street, info.location].filter(Boolean).join(', ')}</span>}
+          {info.website && <span>{info.website}</span>}
+          {info.linkedin && <span>{info.linkedin}</span>}
         </div>
       </div>
 
       {info.summary && (
-        <div style={{ marginBottom: 22, textAlign: 'center', maxWidth: '75%', margin: '0 auto 22px', fontStyle: 'italic', fontSize: 12, color: '#555', lineHeight: 1.8 }}>
-          <p>{info.summary}</p>
+        <div style={{ textAlign: 'center', maxWidth: '78%', margin: '0 auto 24px' }}>
+          <p style={{ fontStyle: 'italic', fontSize: 12, color: '#555', lineHeight: 1.8, margin: 0 }}>{info.summary}</p>
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 190px', gap: 28 }}>
+        {/* Main */}
         <div>
           {workExperience.length > 0 && (
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ textAlign: 'center', marginBottom: 14 }}>
-                <h2 style={{ fontSize: 12, fontWeight: 400, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#1a1a1a', margin: '0 0 6px' }}>Berufserfahrung</h2>
-                <div style={{ width: 40, height: 1, background: color, margin: '0 auto' }} />
-              </div>
+            <div style={{ marginBottom: 22 }}>
+              <SectionHeading>Berufserfahrung</SectionHeading>
               {workExperience.map(job => (
                 <div key={job.id} style={{ marginBottom: 14 }}>
-                  <div style={{ fontWeight: 700, fontSize: 12, color: '#1a1a1a' }}>{job.position}</div>
-                  <div style={{ fontSize: 11, color, fontStyle: 'italic' }}>{job.company}</div>
-                  <div style={{ fontSize: 10, color: '#999', marginBottom: 4 }}>{formatDate(job.startDate)} – {job.current ? 'Heute' : formatDate(job.endDate)}</div>
-                  {job.description && <p style={{ fontSize: 10, color: '#666', lineHeight: 1.6 }}>{job.description}</p>}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 12.5 }}>{job.position}</div>
+                      <div style={{ fontSize: 11.5, color, fontStyle: 'italic' }}>{job.company}</div>
+                    </div>
+                    <div style={{ fontSize: 10, color: '#999', textAlign: 'right', flexShrink: 0 }}>
+                      {job.location && <div>{job.location}</div>}
+                      <div>{formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? 'heute' : formatDate(job.endDate)}</div>
+                    </div>
+                  </div>
+                  {job.description && <p style={{ fontSize: 11, color: '#555', marginTop: 4, lineHeight: 1.65 }}>{job.description}</p>}
                 </div>
               ))}
             </div>
@@ -46,42 +82,61 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
 
           {education.length > 0 && (
             <div>
-              <div style={{ textAlign: 'center', marginBottom: 14 }}>
-                <h2 style={{ fontSize: 12, fontWeight: 400, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#1a1a1a', margin: '0 0 6px' }}>Ausbildung</h2>
-                <div style={{ width: 40, height: 1, background: color, margin: '0 auto' }} />
-              </div>
+              <SectionHeading>Ausbildung</SectionHeading>
               {education.map(edu => (
                 <div key={edu.id} style={{ marginBottom: 12 }}>
-                  <div style={{ fontWeight: 700, fontSize: 12 }}>{edu.degree}</div>
-                  <div style={{ fontSize: 11, color, fontStyle: 'italic' }}>{edu.institution}</div>
-                  <div style={{ fontSize: 10, color: '#999' }}>{formatDate(edu.startDate)} – {formatDate(edu.endDate)}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 12 }}>{edu.degree}</div>
+                      {edu.field && <div style={{ fontSize: 11, color: '#666' }}>{edu.field}</div>}
+                      <div style={{ fontSize: 11, color, fontStyle: 'italic' }}>{edu.institution}</div>
+                    </div>
+                    <div style={{ fontSize: 10, color: '#999', textAlign: 'right', flexShrink: 0 }}>
+                      <div>{formatDate(edu.startDate)}{edu.startDate ? ' – ' : ''}{formatDate(edu.endDate)}</div>
+                      {edu.grade && <div>Note {edu.grade}</div>}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
 
+        {/* Side */}
         <div>
           {skills.length > 0 && (
             <div style={{ marginBottom: 20 }}>
-              <div style={{ textAlign: 'center', marginBottom: 14 }}>
-                <h2 style={{ fontSize: 12, fontWeight: 400, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#1a1a1a', margin: '0 0 6px' }}>Fähigkeiten</h2>
-                <div style={{ width: 40, height: 1, background: color, margin: '0 auto' }} />
-              </div>
-              {skills.map(sk => <SkillBar key={sk.id} skill={sk} color={color} />)}
+              <SectionHeading>Fähigkeiten</SectionHeading>
+              {skills.map(skill => (
+                <div key={skill.id} style={{ marginBottom: 7 }}>
+                  <div style={{ fontSize: 11, fontWeight: 500, marginBottom: 3 }}>{skill.name}</div>
+                  <div style={{ height: 3, background: '#e8e0d5', borderRadius: 2 }}>
+                    <div style={{ height: '100%', width: `${skill.level * 20}%`, background: color, borderRadius: 2 }} />
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
           {languages.length > 0 && (
-            <div>
-              <div style={{ textAlign: 'center', marginBottom: 14 }}>
-                <h2 style={{ fontSize: 12, fontWeight: 400, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#1a1a1a', margin: '0 0 6px' }}>Sprachen</h2>
-                <div style={{ width: 40, height: 1, background: color, margin: '0 auto' }} />
-              </div>
+            <div style={{ marginBottom: 20 }}>
+              <SectionHeading>Sprachen</SectionHeading>
               {languages.map(lang => (
-                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 6, borderBottom: '1px dotted #ddd', paddingBottom: 4 }}>
+                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 6, borderBottom: '1px dotted #e0d8cc', paddingBottom: 5 }}>
                   <span style={{ fontStyle: 'italic' }}>{lang.name}</span>
-                  <span style={{ color: '#888' }}>{lang.level}</span>
+                  <span style={{ color: '#999', fontSize: 10 }}>{lang.level}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {certificates.length > 0 && (
+            <div>
+              <SectionHeading>Zertifikate</SectionHeading>
+              {certificates.map(cert => (
+                <div key={cert.id} style={{ marginBottom: 7 }}>
+                  <div style={{ fontSize: 11, fontWeight: 600 }}>{cert.name}</div>
+                  <div style={{ fontSize: 10, color: '#999', fontStyle: 'italic' }}>{cert.issuer}{cert.date ? ` · ${formatDate(cert.date)}` : ''}</div>
                 </div>
               ))}
             </div>
