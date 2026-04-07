@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User, Briefcase, GraduationCap, Zap, FolderOpen,
-  Upload, Palette, AlertCircle, FileEdit, LayoutList, Lock,
+  Upload, Palette, AlertCircle, FileEdit, LayoutList, Lock, Languages,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import { usePlan } from '../lib/plan';
@@ -16,6 +17,7 @@ import ProjectsEditor from '../components/editor/ProjectsEditor';
 import DocumentUpload from '../components/editor/DocumentUpload';
 import CustomSectionEditor from '../components/editor/CustomSectionEditor';
 import TemplateSelector from '../components/templates/TemplateSelector';
+import TranslateDialog from '../components/editor/TranslateDialog';
 import { useIsMobile } from '../hooks/useBreakpoint';
 
 const SECTIONS: { id: EditorSection; label: string; short: string; icon: React.ComponentType<LucideProps> }[] = [
@@ -35,6 +37,7 @@ export default function Editor() {
   const isMobile = useIsMobile();
   const { getActiveResume, getActivePerson, activeSection, setActiveSection, resumes } = useResumeStore();
   const { limits } = usePlan();
+  const [showTranslate, setShowTranslate] = useState(false);
   const resume = getActiveResume();
   const person = getActivePerson();
 
@@ -164,6 +167,8 @@ export default function Editor() {
   // ── Desktop layout: vertical sidebar ──────────────────────
   return (
     <div className="animate-fade-in" style={{ display: 'flex', gap: 16, height: '100%', overflow: 'hidden' }}>
+      {showTranslate && <TranslateDialog onClose={() => setShowTranslate(false)} />}
+
       {/* Section nav */}
       <aside style={{ width: 180, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
         {SECTIONS.map(({ id, label, icon: Icon }) => {
@@ -194,6 +199,26 @@ export default function Editor() {
             </button>
           );
         })}
+
+        {/* Translate button */}
+        <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <button
+            className="btn-glass"
+            onClick={() => setShowTranslate(true)}
+            style={{
+              justifyContent: 'flex-start', width: '100%',
+              padding: '10px 12px', borderRadius: 'var(--radius-sm)',
+              boxShadow: 'none', gap: 8,
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            <Languages size={14} style={{ opacity: 0.55, flexShrink: 0 }} />
+            <span style={{ fontSize: 12, fontWeight: 400, opacity: 0.65, textAlign: 'left', lineHeight: 1.2 }}>
+              Übersetzen
+            </span>
+          </button>
+        </div>
       </aside>
 
       {/* Editor content */}

@@ -60,11 +60,11 @@ export const PRO_FEATURES: ProFeature[] = [
   { id: 'pdf',       label: '20 PDF-Exports / Monat',  icon: '📄', description: 'Mehr PDF-Exporte pro Monat (Free: 5)',                                   available: true },
   { id: 'photo',     label: '10 MB Foto-Upload',        icon: '🖼️', description: 'Grössere Profilfotos hochladen (Free: 1 MB)',                           available: true },
   // ── Coming soon ───────────────────────────────────────────
-  { id: 'ai',        label: 'KI-Assistent',             icon: '✦', description: 'Anschreiben generieren & Texte mit Claude KI verbessern',               available: false },
+  { id: 'ai',        label: 'KI-Assistent',             icon: '✦', description: 'Anschreiben generieren & Texte mit Claude KI verbessern',               available: true },
   { id: 'ats',       label: 'ATS-Score',                icon: '📊', description: 'Lebenslauf gegen Stellenbeschreibung prüfen & Keywords optimieren',     available: false },
   { id: 'history',   label: 'CV-Versionshistorie',      icon: '🕓', description: 'Frühere Versionen wiederherstellen',                                     available: false },
   { id: 'analytics', label: 'Link-Analytics',           icon: '📈', description: 'Sehen wer deinen geteilten Lebenslauf aufgerufen hat',                  available: false },
-  { id: 'translate', label: 'Mehrsprachige CVs',        icon: '🌍', description: 'Automatische Übersetzung in jede Sprache',                              available: false },
+  { id: 'translate', label: 'Mehrsprachige CVs',        icon: '🌍', description: 'Automatische Übersetzung in jede Sprache',                              available: true },
   { id: 'password',  label: 'PDF-Passwortschutz',       icon: '🔐', description: 'Bewerbungs-PDFs verschlüsselt versenden',                               available: false },
   { id: 'reminder',  label: 'Deadline-Reminder',        icon: '⏰', description: 'E-Mail-Benachrichtigung vor Bewerbungsschluss',                         available: false },
   { id: 'video',     label: 'Video-Intro',              icon: '🎬', description: 'Kurzes Video-Profil zur Bewerbung hinzufügen',                          available: false },
