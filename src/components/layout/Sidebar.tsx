@@ -23,8 +23,17 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
   const [addingPerson, setAddingPerson] = useState(false);
   const [newName, setNewName] = useState('');
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [expandedPersonIds, setExpandedPersonIds] = useState<Set<string>>(new Set());
   const { user, signOut } = useAuthStore();
   const { isPro } = usePlan();
+
+  function toggleExpand(id: string) {
+    setExpandedPersonIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
 
 
   const {
@@ -38,12 +47,12 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
     onClose?.();
   }
 
-  function handleAddPerson() {
+  async function handleAddPerson() {
     if (!newName.trim()) return;
-    addPerson(newName.trim());
+    const person = await addPerson(newName.trim());
     setNewName('');
     setAddingPerson(false);
-    go('/editor');
+    if (person) go('/editor');
   }
 
   function handleSelectPerson(id: string) {
@@ -51,9 +60,9 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
     go('/editor');
   }
 
-  function handleAddResume(personId: string) {
-    addResume(personId);
-    go('/editor');
+  async function handleAddResume(personId: string) {
+    const resume = await addResume(personId);
+    if (resume) go('/editor');
   }
 
   const isActive = (path: string) => location.pathname === path;
@@ -224,92 +233,112 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
 
           {persons.map((person) => {
             const isActiveP = person.id === activePersonId;
+            const isExpanded = expandedPersonIds.has(person.id) || isActiveP;
             const personResumes = resumes.filter((r) => person.resumeIds.includes(r.id));
             const photo = personResumes[0]?.personalInfo?.photo;
 
             return (
-              <div key={person.id} style={{ marginBottom: 6 }}>
-                <button
-                  className="btn-glass"
-                  onClick={() => handleSelectPerson(person.id)}
-                  style={{
-                    width: '100%', justifyContent: 'space-between', padding: '9px 12px',
-                    borderRadius: 'var(--radius-sm)',
-                    background: isActiveP ? 'rgba(0,122,255,0.15)' : 'transparent',
-                    border: isActiveP ? '1px solid rgba(0,122,255,0.3)' : '1px solid transparent',
-                    boxShadow: 'none',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{
-                      width: 28, height: 28, borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
-                      background: photo ? 'transparent' : `linear-gradient(135deg, hsl(${person.name.charCodeAt(0) * 10 % 360}, 70%, 50%), hsl(${person.name.charCodeAt(0) * 15 % 360}, 60%, 40%))`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 12, fontWeight: 600, color: '#fff',
-                    }}>
-                      {photo
-                        ? <img src={photo} alt={person.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        : person.name.charAt(0).toUpperCase()
-                      }
-                    </div>
-                    <span style={{ fontSize: 13, fontWeight: 500, opacity: isActiveP ? 1 : 0.75, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {person.name}
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-                    <span className="badge" style={{ fontSize: 10 }}>{personResumes.length}</span>
-                    <ChevronRight size={12} style={{ opacity: 0.5, transform: isActiveP ? 'rotate(90deg)' : 'none', transition: '0.2s' }} />
-                  </div>
-                </button>
+              <div key={person.id} style={{ marginBottom: 4 }}>
+                {/* Person row */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                  {/* Expand/collapse toggle */}
+                  <button
+                    onClick={() => toggleExpand(person.id)}
+                    style={{
+                      background: 'none', border: 'none', padding: '4px 2px', cursor: 'pointer',
+                      color: 'rgba(255,255,255,0.4)', flexShrink: 0, display: 'flex', alignItems: 'center',
+                    }}
+                  >
+                    <ChevronRight
+                      size={13}
+                      style={{ transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.18s' }}
+                    />
+                  </button>
 
-                {isActiveP && (
-                  <div style={{ paddingLeft: 12, marginTop: 4 }}>
+                  {/* Avatar + name — click to activate */}
+                  <button
+                    className="btn-glass"
+                    onClick={() => { handleSelectPerson(person.id); if (!isExpanded) toggleExpand(person.id); }}
+                    style={{
+                      flex: 1, justifyContent: 'space-between', padding: '7px 10px',
+                      borderRadius: 'var(--radius-sm)',
+                      background: isActiveP ? 'rgba(0,122,255,0.15)' : 'rgba(255,255,255,0.04)',
+                      border: isActiveP ? '1px solid rgba(0,122,255,0.3)' : '1px solid rgba(255,255,255,0.07)',
+                      boxShadow: 'none', minWidth: 0,
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+                      <div style={{
+                        width: 24, height: 24, borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
+                        background: photo ? 'transparent' : `linear-gradient(135deg, hsl(${person.name.charCodeAt(0) * 10 % 360}, 65%, 48%), hsl(${person.name.charCodeAt(0) * 15 % 360}, 55%, 38%))`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 11, fontWeight: 700, color: '#fff',
+                      }}>
+                        {photo
+                          ? <img src={photo} alt={person.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          : person.name.charAt(0).toUpperCase()
+                        }
+                      </div>
+                      <span style={{
+                        fontSize: 12, fontWeight: isActiveP ? 600 : 400,
+                        opacity: isActiveP ? 1 : 0.8,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}>
+                        {person.name}
+                      </span>
+                    </div>
+                    <span className="badge" style={{ fontSize: 10, flexShrink: 0 }}>{personResumes.length}</span>
+                  </button>
+                </div>
+
+                {/* Resumes — shown when expanded */}
+                {isExpanded && (
+                  <div style={{ marginLeft: 18, marginTop: 3, paddingLeft: 8, borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
                     {personResumes.map((resume) => {
                       const isActiveR = resume.id === activeResumeId;
                       const name = resume.name || `Bewerbungsmappe ${personResumes.indexOf(resume) + 1}`;
-
                       return (
-                        <div key={resume.id} style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 3 }}>
+                        <div key={resume.id} style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 2 }}>
                           <button
                             className="btn-glass"
                             onClick={() => { setActiveResume(resume.id); go('/editor'); }}
                             style={{
-                              flex: 1, justifyContent: 'flex-start', padding: '7px 10px',
-                              borderRadius: 'var(--radius-xs)',
-                              background: isActiveR ? 'rgba(0,122,255,0.2)' : 'rgba(255,255,255,0.04)',
-                              border: isActiveR ? '1px solid rgba(0,122,255,0.35)' : '1px solid rgba(255,255,255,0.08)',
-                              boxShadow: 'none', gap: 6,
+                              flex: 1, justifyContent: 'flex-start', padding: '6px 8px',
+                              borderRadius: 6,
+                              background: isActiveR ? 'rgba(0,122,255,0.2)' : 'transparent',
+                              border: isActiveR ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
+                              boxShadow: 'none', gap: 5, minWidth: 0,
                             }}
                           >
-                            <FileText size={11} style={{ opacity: 0.6, flexShrink: 0 }} />
-                            <span style={{ fontSize: 12, opacity: isActiveR ? 1 : 0.65, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <FileText size={10} style={{ opacity: 0.5, flexShrink: 0 }} />
+                            <span style={{
+                              fontSize: 11, opacity: isActiveR ? 1 : 0.65,
+                              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                            }}>
                               {name}
                             </span>
                           </button>
                           {personResumes.length > 1 && (
                             <button
-                              className="btn-glass btn-icon"
                               onClick={() => deleteResume(resume.id)}
-                              style={{ padding: 5, opacity: 0.5, boxShadow: 'none', background: 'transparent', border: 'none' }}
+                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, opacity: 0.35, color: 'inherit', flexShrink: 0, display: 'flex' }}
                             >
-                              <Trash2 size={11} />
+                              <Trash2 size={10} />
                             </button>
                           )}
                         </div>
                       );
                     })}
-
                     <button
-                      className="btn-glass btn-sm"
                       onClick={() => handleAddResume(person.id)}
                       style={{
-                        width: '100%', justifyContent: 'center', padding: '6px 10px',
-                        borderRadius: 'var(--radius-xs)', fontSize: 11, marginTop: 2,
-                        background: 'rgba(255,255,255,0.04)', border: '1px dashed rgba(255,255,255,0.15)',
-                        boxShadow: 'none',
+                        display: 'flex', alignItems: 'center', gap: 5, width: '100%',
+                        background: 'none', border: 'none', borderTop: '1px dashed rgba(255,255,255,0.1)',
+                        cursor: 'pointer', color: 'rgba(255,255,255,0.4)', fontSize: 11,
+                        padding: '5px 6px', marginTop: 2,
                       }}
                     >
-                      <FilePlus size={11} /> Mappe hinzufügen
+                      <FilePlus size={10} /> Mappe hinzufügen
                     </button>
                   </div>
                 )}

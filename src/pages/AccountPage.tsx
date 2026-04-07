@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useResumeStore } from '../store/resumeStore';
-import { usePlan, PRO_FEATURES } from '../lib/plan';
+import { usePlan, PRO_FEATURES, LIMITS } from '../lib/plan';
 import { UpgradeModal } from '../components/ui/ProGate';
 import { useIsMobile } from '../hooks/useBreakpoint';
 
@@ -20,7 +20,8 @@ const NAV: { id: Section; label: string; icon: React.ComponentType<{ size: numbe
 
 // ── Section: Plan ──────────────────────────────────────────
 function PlanSection() {
-  const { isPro } = usePlan();
+  const { isPro, plan } = usePlan();
+  const { persons, resumes } = useResumeStore();
   const [showUpgrade, setShowUpgrade] = useState(false);
 
   return (
@@ -62,6 +63,36 @@ function PlanSection() {
             </button>
           )}
         </div>
+
+        <div className="divider" style={{ margin: '12px 0' }} />
+
+        {/* Usage limits */}
+        {[
+          { label: 'Personen', used: persons.length, max: LIMITS[plan].persons },
+          { label: 'Bewerbungsmappen', used: resumes.length, max: LIMITS[plan].resumes },
+          { label: 'Eigene Sektionen / Mappe', used: null, max: LIMITS[plan].customSections },
+          { label: 'Templates', used: null, max: LIMITS[plan].templates },
+          { label: 'Dokumente gesamt', used: null, max: LIMITS[plan].documentsMb, unit: 'MB' },
+        ].map(({ label, used, max, unit }) => {
+          const pct = used !== null ? used / max : 0;
+          const color = pct >= 1 ? 'var(--ios-red)' : pct >= 0.8 ? '#FF9F0A' : 'var(--ios-green)';
+          const maxDisplay = max === Infinity ? '∞' : `${max}${unit ? ' ' + unit : ''}`;
+          return (
+            <div key={label} style={{ marginBottom: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+                <span style={{ color: 'rgba(255,255,255,0.6)' }}>{label}</span>
+                <span style={{ fontWeight: 600, color: used !== null ? color : 'rgba(255,255,255,0.5)' }}>
+                  {used !== null ? `${used} / ${maxDisplay}` : maxDisplay}
+                </span>
+              </div>
+              {used !== null && max !== Infinity && (
+                <div style={{ height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.1)' }}>
+                  <div style={{ height: '100%', width: `${Math.min(100, pct * 100)}%`, borderRadius: 2, background: color, transition: 'width 0.3s' }} />
+                </div>
+              )}
+            </div>
+          );
+        })}
 
         <div className="divider" style={{ margin: '12px 0' }} />
 

@@ -2,6 +2,34 @@ import { useAuthStore } from '../store/authStore';
 
 export type PlanType = 'free' | 'pro';
 
+export interface PlanLimits {
+  persons: number;
+  resumes: number;
+  customSections: number;    // per resume
+  templates: number;         // how many templates accessible
+  shareLinks: number;        // active share links total
+  documentsMb: number;       // total upload MB
+}
+
+export const LIMITS: Record<PlanType, PlanLimits> = {
+  free: {
+    persons:        1,
+    resumes:        10,
+    customSections: 2,
+    templates:      6,
+    shareLinks:     1,
+    documentsMb:    20,
+  },
+  pro: {
+    persons:        5,
+    resumes:        60,
+    customSections: Infinity,
+    templates:      Infinity,
+    shareLinks:     Infinity,
+    documentsMb:    200,
+  },
+};
+
 export interface ProFeature {
   id: string;
   label: string;
@@ -19,8 +47,13 @@ export const PRO_FEATURES: ProFeature[] = [
   { id: 'video',      label: 'Video-Intro',              icon: '🎬', description: 'Kurzes Video-Profil zur Bewerbung hinzufügen' },
 ];
 
-export function usePlan(): { plan: PlanType; isPro: boolean } {
+export function usePlan(): { plan: PlanType; isPro: boolean; limits: PlanLimits } {
   const { user } = useAuthStore();
   const plan: PlanType = (user?.user_metadata?.plan as PlanType) ?? 'free';
-  return { plan, isPro: plan === 'pro' };
+  return { plan, isPro: plan === 'pro', limits: LIMITS[plan] };
+}
+
+/** Standalone helper for use outside React (e.g. in the store) */
+export function getPlanFromMetadata(userMetadata: Record<string, unknown> | undefined): PlanType {
+  return (userMetadata?.plan as PlanType) ?? 'free';
 }

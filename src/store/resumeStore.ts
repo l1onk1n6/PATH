@@ -7,6 +7,16 @@ import type {
   ApplicationStatus, CustomSection,
 } from '../types/resume';
 import * as db from '../lib/db';
+import { LIMITS, getPlanFromMetadata } from '../lib/plan';
+import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
+
+async function getCurrentPlan() {
+  if (!isSupabaseConfigured()) return 'free' as const;
+  try {
+    const { data } = await getSupabase().auth.getUser();
+    return getPlanFromMetadata(data.user?.user_metadata as Record<string, unknown> | undefined);
+  } catch { return 'free' as const; }
+}
 
 // ── Debounce helper with savePending tracking ─────────────
 const debounceMap = new Map<string, ReturnType<typeof setTimeout>>();
@@ -39,18 +49,19 @@ interface ResumeStore {
   activeSection: EditorSection;
   syncing: boolean;
   savePending: boolean;
+  limitError: string | null;   // shown when a plan limit is hit
 
   // Cloud sync
   syncFromCloud: () => Promise<void>;
 
   // Person actions
-  addPerson: (name: string) => Person;
+  addPerson: (name: string) => Promise<Person | null>;
   updatePerson: (id: string, data: Partial<Person>) => void;
   deletePerson: (id: string) => void;
   setActivePerson: (id: string) => void;
 
   // Resume actions
-  addResume: (personId: string, name?: string) => Resume;
+  addResume: (personId: string, name?: string) => Promise<Resume | null>;
   duplicateResume: (id: string) => Resume;
   updateResume: (id: string, data: Partial<Resume>) => void;
   deleteResume: (id: string) => void;
@@ -97,6 +108,7 @@ interface ResumeStore {
 
   // Share token
   setShareToken: (resumeId: string, token: string | null) => void;
+  clearLimitError: () => void;
 
   // GDPR export
   exportGdprData: () => void;
@@ -125,7 +137,7 @@ export const useResumeStore = create<ResumeStore>()(
   persist(
     (set, get) => ({
       persons: [], resumes: [], activePersonId: null, activeResumeId: null,
-      activeSection: 'personal', syncing: false, savePending: false,
+      activeSection: 'personal', syncing: false, savePending: false, limitError: null,
 
       // ── Cloud sync ──────────────────────────────────────
       syncFromCloud: async () => {
@@ -163,7 +175,13 @@ export const useResumeStore = create<ResumeStore>()(
       },
 
       // ── Persons ─────────────────────────────────────────
-      addPerson: (name) => {
+      addPerson: async (name) => {
+        const plan = await getCurrentPlan();
+        const limit = LIMITS[plan].persons;
+        if (get().persons.length >= limit) {
+          set({ limitError: `Maximale Anzahl Personen (${limit}) für deinen Plan erreicht.` });
+          return null;
+        }
         const resume = createDefaultResume('', 'Bewerbungsmappe 1');
         const person: Person = { id: uuidv4(), name, resumeIds: [resume.id], activeResumeId: resume.id, createdAt: new Date().toISOString() };
         resume.personId = person.id;
@@ -199,11 +217,16 @@ export const useResumeStore = create<ResumeStore>()(
       },
 
       // ── Resumes ─────────────────────────────────────────
-      addResume: (personId, name) => {
+      addResume: async (personId, name) => {
+        const plan = await getCurrentPlan();
+        const limit = LIMITS[plan].resumes;
+        if (get().resumes.length >= limit) {
+          set({ limitError: `Maximale Anzahl Bewerbungsmappen (${limit}) für deinen Plan erreicht.` });
+          return null;
+        }
         const existing = get().resumes.filter(r => r.personId === personId);
         const resumeName = name || `Bewerbungsmappe ${existing.length + 1}`;
         const resume = createDefaultResume(personId, resumeName);
-        // Inherit personalInfo from an existing resume of this person
         if (existing.length > 0) {
           resume.personalInfo = { ...existing[0].personalInfo };
         }
@@ -483,6 +506,7 @@ export const useResumeStore = create<ResumeStore>()(
         URL.revokeObjectURL(url);
       },
 
+      clearLimitError: () => set({ limitError: null }),
       setActiveSection: (section) => set({ activeSection: section }),
       getActiveResume: () => { const { resumes, activeResumeId } = get(); return resumes.find(r => r.id === activeResumeId) ?? null; },
       getActivePerson: () => { const { persons, activePersonId } = get(); return persons.find(p => p.id === activePersonId) ?? null; },

@@ -14,6 +14,7 @@ import { calcCompleteness, completenessColor } from '../lib/completeness';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { v4 as uuidv4 } from 'uuid';
 import ProGate from '../components/ui/ProGate';
+import { usePlan } from '../lib/plan';
 
 const ALL_STATUSES: ApplicationStatus[] = ['entwurf', 'gesendet', 'interview', 'abgelehnt', 'angenommen'];
 
@@ -184,10 +185,11 @@ function TrackerView() {
 export default function Dashboard() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { limits } = usePlan();
   const {
     persons, resumes, addPerson, deletePerson, setActivePerson, activePersonId,
     addResume, deleteResume, setActiveResume, renameResume, duplicateResume, setResumeStatus,
-    exportGdprData,
+    exportGdprData, limitError, clearLimitError,
   } = useResumeStore();
 
   const [newName, setNewName] = useState('');
@@ -204,20 +206,20 @@ export default function Dashboard() {
   const [statusMenuResumeId, setStatusMenuResumeId] = useState<string | null>(null);
   const [shareModalResumeId, setShareModalResumeId] = useState<string | null>(null);
 
-  function handleAdd() {
+  async function handleAdd() {
     if (!newName.trim()) return;
-    addPerson(newName.trim());
+    const person = await addPerson(newName.trim());
     setNewName('');
     setShowAdd(false);
-    navigate('/editor');
+    if (person) navigate('/editor');
   }
 
-  function handleAddResume(personId: string) {
+  async function handleAddResume(personId: string) {
     if (!newResumeName.trim()) return;
-    addResume(personId, newResumeName.trim());
+    const resume = await addResume(personId, newResumeName.trim());
     setAddingResumeForPersonId(null);
     setNewResumeName('');
-    navigate('/editor');
+    if (resume) navigate('/editor');
   }
 
   function handleRenameCommit(resumeId: string) {
@@ -245,6 +247,23 @@ export default function Dashboard() {
 
   return (
     <div className="animate-fade-in" style={{ height: '100%', overflow: 'auto', padding: isMobile ? '0 0 16px' : undefined }}>
+
+      {/* Limit error toast */}
+      {limitError && (
+        <div style={{
+          position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 300, padding: '12px 20px', borderRadius: 12,
+          background: 'rgba(255,59,48,0.95)', backdropFilter: 'blur(12px)',
+          color: '#fff', fontSize: 13, fontWeight: 500,
+          display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+          maxWidth: '90vw',
+        }}>
+          <span>{limitError}</span>
+          <button onClick={clearLimitError} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', opacity: 0.7, padding: 2 }}>
+            <X size={14} />
+          </button>
+        </div>
+      )}
 
       {/* Status menu overlay */}
       {statusMenuResumeId && (
@@ -334,12 +353,30 @@ export default function Dashboard() {
           >
             <LayoutGrid size={13} /> Tracker
           </button>
+          {/* Limit counters */}
+          {[
+            { used: persons.length, max: limits.persons, label: 'P' },
+            { used: resumes.length, max: limits.resumes, label: 'M' },
+          ].map(({ used, max, label }) => {
+            const pct = used / max;
+            const color = pct >= 1 ? 'var(--ios-red)' : pct >= 0.8 ? '#FF9F0A' : 'rgba(255,255,255,0.3)';
+            return (
+              <span key={label} style={{ fontSize: 11, color, fontWeight: 500, whiteSpace: 'nowrap' }}>
+                {used}/{max} {label}
+              </span>
+            );
+          })}
         </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           <button className="btn-glass btn-sm" onClick={exportGdprData} title="Alle Daten exportieren (DSGVO Art. 20)">
             <Download size={13} /> {!isMobile && 'Export'}
           </button>
-          <button className="btn-glass btn-primary btn-sm" style={{ flexShrink: 0 }} onClick={() => setShowAdd(true)}>
+          <button
+            className="btn-glass btn-primary btn-sm"
+            style={{ flexShrink: 0, opacity: persons.length >= limits.persons ? 0.5 : 1 }}
+            onClick={() => { if (persons.length >= limits.persons) { clearLimitError(); } else { setShowAdd(true); } }}
+            title={persons.length >= limits.persons ? `Limit erreicht (${limits.persons} Personen)` : undefined}
+          >
             <Plus size={14} /> {!isMobile && 'Neue '}Person
           </button>
         </div>

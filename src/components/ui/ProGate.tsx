@@ -93,14 +93,19 @@ export default function ProGate({ featureId, children, badge = false }: ProGateP
     return (
       <>
         {showModal && <UpgradeModal onClose={() => setShowModal(false)} highlightId={featureId} />}
-        <div style={{ position: 'relative', display: 'inline-flex' }} onClick={() => setShowModal(true)}>
+        <div
+          style={{ position: 'relative', display: 'inline-flex', marginRight: 6 }}
+          onClick={() => setShowModal(true)}
+          title="Pro-Feature"
+        >
           <div style={{ opacity: 0.4, pointerEvents: 'none', filter: 'grayscale(0.5)' }}>{children}</div>
           <span style={{
-            position: 'absolute', top: -6, right: -8,
-            fontSize: 9, fontWeight: 800, letterSpacing: '0.05em',
-            padding: '2px 5px', borderRadius: 4,
+            position: 'absolute', top: -5, right: -14,
+            fontSize: 9, fontWeight: 800, letterSpacing: '0.04em',
+            padding: '2px 4px', borderRadius: 3,
             background: 'linear-gradient(135deg, #FF9F0A, #FF375F)',
-            color: '#fff', pointerEvents: 'none',
+            color: '#fff', pointerEvents: 'none', whiteSpace: 'nowrap',
+            zIndex: 1,
           }}>PRO</span>
         </div>
       </>
