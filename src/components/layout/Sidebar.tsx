@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Users, FileText, Plus, ChevronRight, Trash2,
   LayoutDashboard, Eye, FilePlus, LogOut,
-  PanelLeftClose, PanelLeftOpen, Mail, Sparkles, UserCircle,
+  PanelLeftClose, PanelLeftOpen, Sparkles, UserCircle,
 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useAuthStore } from '../../store/authStore';
@@ -24,7 +24,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
   const [newName, setNewName] = useState('');
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [expandedPersonIds, setExpandedPersonIds] = useState<Set<string>>(new Set());
-  const { user, signOut } = useAuthStore();
+  const { signOut } = useAuthStore();
   const { isPro } = usePlan();
 
   function toggleExpand(id: string) {
@@ -352,69 +352,35 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
 
       {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
 
-      {/* Plan badge */}
-      {!isPro && (
-        <button
-          onClick={() => setShowUpgrade(true)}
-          className="btn-glass"
-          style={{
-            width: '100%', justifyContent: 'flex-start', padding: '9px 12px', marginBottom: 8,
-            background: 'linear-gradient(135deg, rgba(255,159,10,0.12), rgba(255,55,95,0.1))',
-            border: '1px solid rgba(255,159,10,0.25)', boxShadow: 'none', fontSize: 12, gap: 8,
-          }}
-        >
-          <Sparkles size={13} style={{ color: '#FF9F0A' }} />
-          <div style={{ textAlign: 'left' }}>
-            <div style={{ fontWeight: 600, color: '#FF9F0A', fontSize: 11 }}>Auf Pro upgraden</div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>KI, Analytics & mehr</div>
+      {/* Plan badge + Logout */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+        {!isPro ? (
+          <button
+            onClick={() => setShowUpgrade(true)}
+            className="btn-glass"
+            style={{
+              width: '100%', justifyContent: 'center', padding: '8px 12px',
+              background: 'linear-gradient(135deg, rgba(255,159,10,0.12), rgba(255,55,95,0.1))',
+              border: '1px solid rgba(255,159,10,0.25)', boxShadow: 'none', fontSize: 12, gap: 7,
+            }}
+          >
+            <Sparkles size={13} style={{ color: '#FF9F0A' }} />
+            <span style={{ fontWeight: 600, color: '#FF9F0A' }}>Auf Pro upgraden</span>
+          </button>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#FF9F0A', padding: '4px 0' }}>
+            <Sparkles size={12} />
+            <span style={{ fontWeight: 700 }}>PATH Pro</span>
           </div>
-        </button>
-      )}
-      {isPro && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 8px', marginBottom: 6, fontSize: 11, color: '#FF9F0A' }}>
-          <Sparkles size={12} />
-          <span style={{ fontWeight: 700 }}>PATH Pro</span>
-        </div>
-      )}
+        )}
 
-      {user && (
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 6, paddingLeft: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {user.email}
-        </div>
-      )}
-
-      <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
         <button
           className="btn-glass btn-sm"
           onClick={() => signOut()}
-          title="Abmelden"
-          style={{ flex: 1, justifyContent: 'center', padding: '8px 10px', boxShadow: 'none', fontSize: 12 }}
+          style={{ width: '100%', justifyContent: 'center', padding: '8px 10px', boxShadow: 'none', fontSize: 12 }}
         >
           <LogOut size={13} /> Logout
         </button>
-        <a
-          href="mailto:info@pixmatic.ch"
-          title="Support kontaktieren"
-          className="btn-glass btn-sm btn-icon"
-          style={{ padding: '8px 10px', boxShadow: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', flexShrink: 0 }}
-        >
-          <Mail size={13} />
-        </a>
-      </div>
-
-      {/* Legal links */}
-      <div style={{ display: 'flex', gap: 10, paddingLeft: 4, flexWrap: 'wrap' }}>
-        {[
-          { label: 'Datenschutz', href: 'https://pixmatic.ch/datenschutz' },
-          { label: 'AGB', href: 'https://pixmatic.ch/agb' },
-        ].map(({ label, href }) => (
-          <a key={label} href={href} target="_blank" rel="noopener noreferrer"
-            style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', textDecoration: 'none' }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.25)')}>
-            {label}
-          </a>
-        ))}
       </div>
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </aside>
