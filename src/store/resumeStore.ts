@@ -98,7 +98,7 @@ function createDefaultResume(personId: string, name = 'Bewerbungsmappe'): Resume
     id: uuidv4(), personId,
     name, status: 'entwurf', jobUrl: '', deadline: '',
     templateId: 'minimal', accentColor: '#007AFF',
-    personalInfo: { firstName: '', lastName: '', title: '', email: '', phone: '', location: '', website: '', linkedin: '', github: '', summary: '' },
+    personalInfo: { firstName: '', lastName: '', title: '', email: '', phone: '', street: '', location: '', website: '', linkedin: '', github: '', summary: '' },
     coverLetter: { recipient: '', subject: '', body: '', closing: 'Mit freundlichen Grüssen' },
     workExperience: [], education: [], skills: [], languages: [],
     projects: [], certificates: [], documents: [],

@@ -114,11 +114,18 @@ export default function PersonalInfoEditor() {
           <input className="input-glass" type="tel" placeholder="+49 123 456789" value={info.phone}
             onChange={(e) => update('phone', e.target.value)} />
         </div>
+        <div style={{ gridColumn: 'span 2' }}>
+          <label className="section-label">
+            <MapPin size={9} style={{ display: 'inline', marginRight: 3 }} />Strasse und Hausnummer
+          </label>
+          <input className="input-glass" placeholder="Musterstrasse 12" value={info.street ?? ''}
+            onChange={(e) => update('street', e.target.value)} />
+        </div>
         <div>
           <label className="section-label">
-            <MapPin size={9} style={{ display: 'inline', marginRight: 3 }} />Standort
+            <MapPin size={9} style={{ display: 'inline', marginRight: 3 }} />Ort / PLZ
           </label>
-          <input className="input-glass" placeholder="Berlin, Deutschland" value={info.location}
+          <input className="input-glass" placeholder="8000 Zürich" value={info.location}
             onChange={(e) => update('location', e.target.value)} />
         </div>
         <div>
