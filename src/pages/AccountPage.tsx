@@ -35,12 +35,11 @@ function PlanSection() {
   const activeShareLinks = resumes.filter(r => r.shareToken).length;
   const isGift = user?.user_metadata?.gift_pro === true;
 
-  // Detect Stripe success redirect
+  // Detect Stripe success redirect + always refresh metadata on mount
   useEffect(() => {
+    refreshUser();
     if (location.search.includes('success=1') || location.hash.includes('success=1')) {
       setShowSuccess(true);
-      refreshUser();
-      // Clean up the URL param
       window.history.replaceState(null, '', window.location.pathname + window.location.hash.replace('?success=1', ''));
     }
   }, []);
