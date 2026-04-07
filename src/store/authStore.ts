@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { User, Session } from '@supabase/supabase-js';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
+import { toGermanError } from '../lib/authErrors';
 
 interface AuthStore {
   user: User | null;
@@ -8,6 +9,7 @@ interface AuthStore {
   loading: boolean;
   error: string | null;
   passwordRecovery: boolean;
+  emailUnconfirmed: boolean; // nach Registrierung: warte auf Bestätigung
 
   initialize: () => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
@@ -15,6 +17,7 @@ interface AuthStore {
   signOut: () => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
   updatePassword: (newPassword: string) => Promise<void>;
+  resendConfirmation: (email: string) => Promise<void>;
   clearError: () => void;
 }
 
@@ -24,6 +27,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   loading: true,
   error: null,
   passwordRecovery: false,
+  emailUnconfirmed: false,
 
   initialize: async () => {
     if (!isSupabaseConfigured()) {
@@ -36,6 +40,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
       supabase.auth.onAuthStateChange((event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
           set({ session, user: session?.user ?? null, loading: false, passwordRecovery: true });
+        } else if (event === 'SIGNED_OUT') {
+          set({ user: null, session: null, loading: false, passwordRecovery: false, emailUnconfirmed: false });
+        } else if (event === 'TOKEN_REFRESHED') {
+          set({ session, user: session?.user ?? null });
         } else {
           set({ session, user: session?.user ?? null, loading: false, passwordRecovery: false });
         }
@@ -48,7 +56,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   signUp: async (email, password, name) => {
-    set({ loading: true, error: null });
+    set({ loading: true, error: null, emailUnconfirmed: false });
     try {
       const supabase = getSupabase();
       const redirectTo = `${window.location.origin}${window.location.pathname}`;
@@ -58,9 +66,17 @@ export const useAuthStore = create<AuthStore>((set) => ({
         options: { data: { full_name: name }, emailRedirectTo: redirectTo },
       });
       if (error) throw error;
-      set({ user: data.user, session: data.session, loading: false });
-    } catch (e: unknown) {
-      set({ error: (e as Error).message, loading: false });
+
+      // Supabase gibt user zurück, aber session=null wenn E-Mail-Bestätigung nötig
+      const needsConfirmation = data.user && !data.session;
+      set({
+        user: needsConfirmation ? null : data.user,
+        session: data.session,
+        loading: false,
+        emailUnconfirmed: !!needsConfirmation,
+      });
+    } catch (e) {
+      set({ error: toGermanError(e), loading: false });
     }
   },
 
@@ -70,9 +86,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const supabase = getSupabase();
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      set({ user: data.user, session: data.session, loading: false });
-    } catch (e: unknown) {
-      set({ error: (e as Error).message, loading: false });
+      set({ user: data.user, session: data.session, loading: false, emailUnconfirmed: false });
+    } catch (e) {
+      set({ error: toGermanError(e), loading: false });
     }
   },
 
@@ -80,8 +96,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
     try {
       const supabase = getSupabase();
       await supabase.auth.signOut();
+    } catch {
+      // ignore
     } finally {
-      set({ user: null, session: null, passwordRecovery: false });
+      set({ user: null, session: null, passwordRecovery: false, emailUnconfirmed: false });
     }
   },
 
@@ -93,8 +111,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
       if (error) throw error;
       set({ loading: false });
-    } catch (e: unknown) {
-      set({ error: (e as Error).message, loading: false });
+    } catch (e) {
+      set({ error: toGermanError(e), loading: false });
     }
   },
 
@@ -105,8 +123,25 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
       set({ loading: false, passwordRecovery: false });
-    } catch (e: unknown) {
-      set({ error: (e as Error).message, loading: false });
+    } catch (e) {
+      set({ error: toGermanError(e), loading: false });
+    }
+  },
+
+  resendConfirmation: async (email) => {
+    set({ loading: true, error: null });
+    try {
+      const supabase = getSupabase();
+      const redirectTo = `${window.location.origin}${window.location.pathname}`;
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: { emailRedirectTo: redirectTo },
+      });
+      if (error) throw error;
+      set({ loading: false });
+    } catch (e) {
+      set({ error: toGermanError(e), loading: false });
     }
   },
 

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Mail, Lock, User, Eye, EyeOff, ShieldAlert, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, ShieldAlert, ArrowLeft, CheckCircle, RefreshCw } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { LogoIcon } from '../components/layout/Logo';
 import { passwordStrength, STRENGTH_LABEL, STRENGTH_COLOR, RateLimiter } from '../lib/security';
@@ -21,7 +21,8 @@ export default function AuthPage() {
   const [pwMismatch, setPwMismatch] = useState(false);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const { signIn, signUp, sendPasswordReset, updatePassword, loading, error, clearError, passwordRecovery } = useAuthStore();
+  const { signIn, signUp, sendPasswordReset, updatePassword, resendConfirmation, loading, error, clearError, passwordRecovery, emailUnconfirmed } = useAuthStore();
+  const [resendSent, setResendSent] = useState(false);
 
   // Switch to reset mode when coming from password recovery email
   useEffect(() => {
@@ -94,8 +95,46 @@ export default function AuthPage() {
           <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, margin: 0 }}>by pixmatic</p>
         </div>
 
+        {/* ── E-Mail bestätigen (nach Registrierung) ── */}
+        {emailUnconfirmed && (
+          <div style={{ textAlign: 'center', padding: '8px 0' }}>
+            <div style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(0,122,255,0.12)', border: '1px solid rgba(0,122,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <Mail size={26} style={{ color: 'var(--ios-blue)' }} />
+            </div>
+            <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>E-Mail bestätigen</h2>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, margin: '0 0 20px' }}>
+              Wir haben dir eine Bestätigungs-E-Mail geschickt.<br />Bitte klicke auf den Link in der E-Mail.
+            </p>
+            {resendSent ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 13, color: '#34c759', marginBottom: 16 }}>
+                <CheckCircle size={14} /> E-Mail erneut gesendet!
+              </div>
+            ) : (
+              <button
+                className="btn-glass"
+                disabled={loading}
+                onClick={async () => {
+                  await resendConfirmation(email);
+                  if (!useAuthStore.getState().error) setResendSent(true);
+                }}
+                style={{ width: '100%', justifyContent: 'center', padding: '11px 20px', marginBottom: 12, gap: 6, opacity: loading ? 0.7 : 1 }}
+              >
+                <RefreshCw size={13} /> E-Mail erneut senden
+              </button>
+            )}
+            {error && (
+              <div style={{ background: 'rgba(255,59,48,0.15)', border: '1px solid rgba(255,59,48,0.3)', borderRadius: 'var(--radius-sm)', padding: '10px 14px', fontSize: 13, color: '#ff6b6b', marginBottom: 12 }}>
+                {error}
+              </div>
+            )}
+            <button onClick={() => { clearError(); switchMode('login'); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
+              Zurück zur Anmeldung
+            </button>
+          </div>
+        )}
+
         {/* ── Login / Register tabs ── */}
-        {(mode === 'login' || mode === 'register') && (
+        {!emailUnconfirmed && (mode === 'login' || mode === 'register') && (
           <>
             <div style={{ display: 'flex', background: 'rgba(255,255,255,0.06)', borderRadius: 'var(--radius-full)', padding: 3, marginBottom: 16 }}>
               {(['login', 'register'] as const).map((m) => (
@@ -190,7 +229,7 @@ export default function AuthPage() {
         )}
 
         {/* ── Passwort vergessen ── */}
-        {mode === 'forgot' && (
+        {!emailUnconfirmed && mode === 'forgot' && (
           <>
             <button onClick={() => switchMode('login')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.45)', fontSize: 13, padding: '0 0 16px', display: 'flex', alignItems: 'center', gap: 6 }}>
               <ArrowLeft size={14} /> Zurück zur Anmeldung
@@ -236,7 +275,7 @@ export default function AuthPage() {
         )}
 
         {/* ── Neues Passwort setzen (nach Klick auf Reset-Link) ── */}
-        {mode === 'reset' && (
+        {!emailUnconfirmed && mode === 'reset' && (
           <form onSubmit={handleSubmit}>
             <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 6px' }}>Neues Passwort</h2>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: '0 0 18px', lineHeight: 1.5 }}>
