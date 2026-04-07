@@ -101,12 +101,13 @@ export default function CoverLetterEditor() {
         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
           Grussformel
         </label>
-        <input
+        <textarea
           className="input-glass"
-          placeholder="Mit freundlichen Grüssen"
+          placeholder={"Mit freundlichen Grüssen\n\nMax Mustermann"}
           value={cl.closing}
           onChange={(e) => update('closing', e.target.value)}
-          style={{ width: '100%' }}
+          rows={3}
+          style={{ width: '100%', resize: 'vertical', fontFamily: 'inherit' }}
         />
       </div>
     </div>
