@@ -1,73 +1,86 @@
-# React + TypeScript + Vite
+# PATH – Bewerbungsmappe leicht gemacht
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**PATH** ist eine moderne Web-App, mit der du professionelle Bewerbungsunterlagen erstellen, verwalten und als PDF exportieren kannst – übersichtlich, schnell und von überall erreichbar.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Was kann PATH?
 
-## React Compiler
+### Personen & Bewerbungsmappen
+- Lege beliebig viele **Personen** an (z. B. für dich selbst oder Familienmitglieder)
+- Jede Person kann mehrere **Bewerbungsmappen** haben – zum Beispiel eine für eine Stelle als Softwareentwickler und eine andere für eine Führungsposition
+- Die persönlichen Daten (Name, Kontakt, Foto) sind pro Person automatisch in allen Mappen gleich
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Lebenslauf
+- Erfasse alle relevanten Informationen: persönliche Daten, Berufserfahrung, Ausbildung, Fähigkeiten, Sprachen, Projekte und Zertifikate
+- Einträge lassen sich per **Drag & Drop** (Desktop) oder mit den **Pfeiltasten** (Mobilgerät) beliebig sortieren
+- Profilbild hochladen
 
-## Expanding the ESLint configuration
+### Anschreiben
+- Integrierter Editor für das Anschreiben direkt in der App
+- Empfänger, Betreff, Text und Grussformel
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Vorschau & Templates
+- **15+ professionelle Vorlagen** (Minimal, Modern, Elegant, Corporate, Nordic, …) – einfach per Klick wechseln
+- Akzentfarbe frei wählbar
+- Zoom-Funktion für die Vorschau
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### PDF-Export
+- **Einzelexport:** aktueller Lebenslauf oder Anschreiben als PDF
+- **Ganze Mappe:** Anschreiben + Lebenslauf + alle Dokumente in einer einzigen PDF-Datei
+- Automatische Qualitätsanpassung – das exportierte PDF ist nie grösser als **5 MB**
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Dokumente
+- Lade zusätzliche Dokumente hoch (Zeugnisse, Zertifikate etc.), die beim Mappe-Export automatisch angehängt werden
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Cloud-Sync
+- Daten werden automatisch in der Cloud gespeichert – du kannst von jedem Gerät weiterarbeiten
+
+---
+
+## Anmeldung
+
+PATH erfordert ein kostenloses Konto:
+
+| Funktion | Beschreibung |
+|---|---|
+| **Registrieren** | E-Mail + Passwort, Bestätigungs-Mail wird versendet |
+| **Anmelden** | E-Mail + Passwort |
+| **Passwort vergessen** | Reset-Link per E-Mail |
+| **Magic Link** | Einmaliger Login-Link per E-Mail (kein Passwort nötig) |
+
+---
+
+## Bedienung auf einen Blick
+
+```
+Dashboard  →  Übersicht aller Personen und Mappen
+Editor     →  Inhalte bearbeiten (Lebenslauf & Anschreiben)
+Vorschau   →  Template auswählen, PDF exportieren
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+**Sidebar (links):**
+- Person auswählen oder neu anlegen
+- Zwischen den Bewerbungsmappen einer Person wechseln
+- Neue Mappe hinzufügen
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Unterstützte Geräte
+
+PATH funktioniert auf **Desktop, Tablet und Smartphone** – der Editor und alle Funktionen sind vollständig mobil optimiert.
+
+---
+
+## Datenschutz
+
+- Deine Daten werden ausschliesslich in deinem persönlichen Account gespeichert
+- Kein Zugriff durch Dritte
+- Passwörter werden verschlüsselt gespeichert (Supabase Auth)
+
+---
+
+## Version
+
+Aktuelle Version: **v1.4.0**  
+Entwickelt von **pixmatic**
