@@ -8,6 +8,7 @@ import { useResumeStore } from '../store/resumeStore';
 import { usePlan, PRO_FEATURES, LIMITS } from '../lib/plan';
 import { UpgradeModal } from '../components/ui/ProGate';
 import { useIsMobile } from '../hooks/useBreakpoint';
+import { getPdfExportCount } from '../lib/pdfExports';
 
 type Section = 'plan' | 'account' | 'security' | 'privacy';
 
@@ -20,9 +21,11 @@ const NAV: { id: Section; label: string; icon: React.ComponentType<{ size: numbe
 
 // ── Section: Plan ──────────────────────────────────────────
 function PlanSection() {
-  const { isPro, plan } = usePlan();
+  const { isPro, plan, limits } = usePlan();
   const { persons, resumes } = useResumeStore();
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const pdfCount = getPdfExportCount();
+  const activeShareLinks = resumes.filter(r => r.shareToken).length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -70,13 +73,32 @@ function PlanSection() {
         {[
           { label: 'Personen', used: persons.length, max: LIMITS[plan].persons },
           { label: 'Bewerbungsmappen', used: resumes.length, max: LIMITS[plan].resumes },
+          { label: 'PDF-Exporte diesen Monat', used: pdfCount, max: LIMITS[plan].pdfExportsPerMonth },
+          { label: 'Aktive Share-Links', used: activeShareLinks, max: LIMITS[plan].shareLinks },
+          { label: 'Foto-Upload-Grösse', used: null, max: LIMITS[plan].photoMb, unit: 'MB' },
           { label: 'Eigene Sektionen / Mappe', used: null, max: LIMITS[plan].customSections },
           { label: 'Templates', used: null, max: LIMITS[plan].templates },
           { label: 'Dokumente gesamt', used: null, max: LIMITS[plan].documentsMb, unit: 'MB' },
-        ].map(({ label, used, max, unit }) => {
+          { label: 'CV-Versionshistorie', used: null, max: limits.versionHistory ? 1 : 0, isBoolean: true },
+        ].map(({ label, used, max, unit, isBoolean }) => {
           const pct = used !== null ? used / max : 0;
           const color = pct >= 1 ? 'var(--ios-red)' : pct >= 0.8 ? '#FF9F0A' : 'var(--ios-green)';
           const maxDisplay = max === Infinity ? '∞' : `${max}${unit ? ' ' + unit : ''}`;
+
+          if (isBoolean) {
+            const enabled = limits.versionHistory;
+            return (
+              <div key={label} style={{ marginBottom: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                  <span style={{ color: 'rgba(255,255,255,0.6)' }}>{label}</span>
+                  <span style={{ fontWeight: 600, color: enabled ? 'var(--ios-green)' : 'rgba(255,255,255,0.3)' }}>
+                    {enabled ? '✓ Aktiv' : '—'}
+                  </span>
+                </div>
+              </div>
+            );
+          }
+
           return (
             <div key={label} style={{ marginBottom: 10 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>

@@ -20,12 +20,16 @@ const ALL_STATUSES: ApplicationStatus[] = ['entwurf', 'gesendet', 'interview', '
 
 // ── Share modal ────────────────────────────────────────────
 function ShareModal({ resumeId, token, onClose }: { resumeId: string; token?: string; onClose: () => void }) {
-  const { setShareToken } = useResumeStore();
+  const { setShareToken, resumes } = useResumeStore();
+  const { limits } = usePlan();
   const [copied, setCopied] = useState(false);
 
   const shareUrl = token ? `${window.location.origin}${window.location.pathname}#/shared?t=${token}` : null;
+  const activeShareCount = resumes.filter(r => r.shareToken && r.id !== resumeId).length;
+  const atShareLimit = !token && activeShareCount >= limits.shareLinks;
 
   function generate() {
+    if (atShareLimit) return;
     setShareToken(resumeId, uuidv4());
   }
 
@@ -58,9 +62,15 @@ function ShareModal({ resumeId, token, onClose }: { resumeId: string; token?: st
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 14 }}>
               Erstelle einen öffentlichen Link — der Lebenslauf ist ohne Login einsehbar.
             </p>
-            <button className="btn-glass btn-primary" style={{ width: '100%' }} onClick={generate}>
-              <Share2 size={14} /> Link generieren
-            </button>
+            {atShareLimit ? (
+              <div style={{ fontSize: 12, color: '#FF9F0A', background: 'rgba(255,159,10,0.1)', border: '1px solid rgba(255,159,10,0.25)', borderRadius: 8, padding: '10px 12px' }}>
+                Share-Link-Limit erreicht ({limits.shareLinks}/{limits.shareLinks}). Deaktiviere einen anderen Link oder upgrade auf Pro.
+              </div>
+            ) : (
+              <button className="btn-glass btn-primary" style={{ width: '100%' }} onClick={generate}>
+                <Share2 size={14} /> Link generieren
+              </button>
+            )}
           </>
         ) : (
           <>

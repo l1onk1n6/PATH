@@ -2,9 +2,11 @@ import { useCallback, useState } from 'react';
 import { User, Mail, Phone, MapPin, Globe, Link2, FileText, Camera, AlertCircle } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { validatePhotoFile, sanitizePhotoUrl } from '../../lib/security';
+import { usePlan } from '../../lib/plan';
 
 export default function PersonalInfoEditor() {
   const { getActiveResume, updatePersonalInfo } = useResumeStore();
+  const { limits } = usePlan();
   const resume = getActiveResume();
   const [photoError, setPhotoError] = useState('');
 
@@ -20,7 +22,7 @@ export default function PersonalInfoEditor() {
   function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !resume) return;
-    const { valid, error } = validatePhotoFile(file);
+    const { valid, error } = validatePhotoFile(file, limits.photoMb);
     if (!valid) {
       setPhotoError(error ?? 'Ungültige Datei.');
       e.target.value = '';

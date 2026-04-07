@@ -1,15 +1,16 @@
 // ── Photo validation ────────────────────────────────────────
 
-export const MAX_PHOTO_SIZE_BYTES = 2 * 1024 * 1024; // 2 MB
+export const MAX_PHOTO_SIZE_BYTES = 2 * 1024 * 1024; // 2 MB (default fallback)
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
-export function validatePhotoFile(file: File): { valid: boolean; error?: string } {
+export function validatePhotoFile(file: File, maxMb = 2): { valid: boolean; error?: string } {
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
     return { valid: false, error: 'Nur JPG, PNG, WEBP oder GIF erlaubt.' };
   }
-  if (file.size > MAX_PHOTO_SIZE_BYTES) {
-    return { valid: false, error: 'Bild zu groß. Maximal 2 MB erlaubt.' };
+  const maxBytes = maxMb * 1024 * 1024;
+  if (file.size > maxBytes) {
+    return { valid: false, error: `Bild zu groß. Maximal ${maxMb} MB erlaubt.` };
   }
   return { valid: true };
 }
