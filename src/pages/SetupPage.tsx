@@ -1,0 +1,107 @@
+import { useState } from 'react';
+import { Database, ExternalLink, CheckCircle } from 'lucide-react';
+import { saveSupabaseConfig, resetSupabaseClient, isSupabaseConfigured } from '../lib/supabase';
+import { useAuthStore } from '../store/authStore';
+
+export default function SetupPage() {
+  const [url, setUrl] = useState(localStorage.getItem('aicv-supabase-url') || '');
+  const [key, setKey] = useState(localStorage.getItem('aicv-supabase-key') || '');
+  const [saved, setSaved] = useState(false);
+  const { initialize } = useAuthStore();
+
+  async function handleSave() {
+    if (!url.trim() || !key.trim()) return;
+    saveSupabaseConfig(url, key);
+    resetSupabaseClient();
+    await initialize();
+    setSaved(true);
+    setTimeout(() => window.location.reload(), 800);
+  }
+
+  return (
+    <div style={{
+      height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+    }}>
+      <div className="glass-card animate-scale-in" style={{ width: '100%', maxWidth: 500, padding: 36 }}>
+        {/* Icon */}
+        <div style={{
+          width: 56, height: 56, borderRadius: 16, margin: '0 auto 20px',
+          background: 'linear-gradient(135deg, var(--ios-blue), var(--ios-indigo))',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 8px 24px rgba(0,122,255,0.4)',
+        }}>
+          <Database size={26} color="#fff" />
+        </div>
+
+        <h1 style={{ textAlign: 'center', fontSize: 22, fontWeight: 700, margin: '0 0 8px', letterSpacing: '-0.4px' }}>
+          Supabase konfigurieren
+        </h1>
+        <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.5)', fontSize: 14, marginBottom: 28, lineHeight: 1.5 }}>
+          Verbinden Sie Ihr eigenes Supabase-Projekt für sichere Cloud-Synchronisation.
+        </p>
+
+        {/* Instructions */}
+        <div className="glass-card" style={{ padding: '12px 16px', marginBottom: 24, borderRadius: 'var(--radius-sm)' }}>
+          <div className="section-label" style={{ marginBottom: 8 }}>So richten Sie Supabase ein</div>
+          <ol style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 2 }}>
+            <li>Kostenloses Konto auf <a href="https://supabase.com" target="_blank" rel="noreferrer" style={{ color: 'var(--ios-blue)' }}>supabase.com</a> erstellen</li>
+            <li>Neues Projekt anlegen</li>
+            <li>SQL Editor → <code style={{ background: 'rgba(255,255,255,0.1)', padding: '1px 5px', borderRadius: 4 }}>supabase/schema.sql</code> ausführen</li>
+            <li>Settings → API → URL & anon key kopieren</li>
+          </ol>
+          <a
+            href="https://supabase.com/dashboard"
+            target="_blank" rel="noreferrer"
+            className="btn-glass btn-sm"
+            style={{ marginTop: 10, display: 'inline-flex', fontSize: 12 }}
+          >
+            <ExternalLink size={12} /> Supabase Dashboard öffnen
+          </a>
+        </div>
+
+        {/* Form */}
+        <div style={{ marginBottom: 12 }}>
+          <label className="section-label">Project URL</label>
+          <input
+            className="input-glass"
+            placeholder="https://xxxxxxxxxxxx.supabase.co"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+          />
+        </div>
+        <div style={{ marginBottom: 24 }}>
+          <label className="section-label">anon / public Key</label>
+          <input
+            className="input-glass"
+            placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            value={key}
+            onChange={(e) => setKey(e.target.value)}
+            type="password"
+          />
+        </div>
+
+        <button
+          className={`btn-glass btn-primary ${saved ? 'btn-success' : ''}`}
+          onClick={handleSave}
+          disabled={!url.trim() || !key.trim() || saved}
+          style={{ width: '100%', justifyContent: 'center', padding: '13px 20px' }}
+        >
+          {saved
+            ? <><CheckCircle size={16} /> Gespeichert – Seite wird neu geladen…</>
+            : 'Verbindung herstellen'
+          }
+        </button>
+
+        {isSupabaseConfigured() && (
+          <button
+            className="btn-glass btn-sm"
+            onClick={() => window.location.reload()}
+            style={{ width: '100%', justifyContent: 'center', marginTop: 10 }}
+          >
+            Überspringen (bereits konfiguriert)
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}

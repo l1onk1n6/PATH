@@ -2,15 +2,18 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Users, FileText, Plus, ChevronRight, Trash2,
-  LayoutDashboard, Eye, Settings, FilePlus,
+  LayoutDashboard, Eye, FilePlus, LogOut, Cloud,
 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
+import { useAuthStore } from '../../store/authStore';
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [addingPerson, setAddingPerson] = useState(false);
   const [newName, setNewName] = useState('');
+  const { user, signOut } = useAuthStore();
+  const { syncing, syncFromCloud } = useResumeStore();
 
   const {
     persons, resumes, activePersonId, activeResumeId,
@@ -247,18 +250,33 @@ export default function Sidebar() {
       <div className="divider" />
 
       {/* Footer */}
-      <button
-        className="btn-glass"
-        onClick={() => navigate('/settings')}
-        style={{
-          width: '100%', justifyContent: 'flex-start', padding: '9px 12px',
-          borderRadius: 'var(--radius-sm)', boxShadow: 'none',
-          background: 'transparent', border: '1px solid transparent',
-        }}
-      >
-        <Settings size={14} style={{ opacity: 0.5 }} />
-        <span style={{ fontSize: 13, opacity: 0.5 }}>Einstellungen</span>
-      </button>
+      {user && (
+        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 8, paddingLeft: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {user.email}
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: 6 }}>
+        <button
+          className="btn-glass btn-sm"
+          onClick={() => syncFromCloud()}
+          disabled={syncing}
+          title="Mit Cloud synchronisieren"
+          style={{ flex: 1, justifyContent: 'center', padding: '8px 10px', boxShadow: 'none', fontSize: 12 }}
+        >
+          <Cloud size={13} style={{ animation: syncing ? 'spin 1s linear infinite' : 'none' }} />
+          {syncing ? 'Sync…' : 'Sync'}
+        </button>
+        <button
+          className="btn-glass btn-sm"
+          onClick={() => signOut()}
+          title="Abmelden"
+          style={{ flex: 1, justifyContent: 'center', padding: '8px 10px', boxShadow: 'none', fontSize: 12 }}
+        >
+          <LogOut size={13} /> Logout
+        </button>
+      </div>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </aside>
   );
 }
