@@ -386,7 +386,7 @@ export default function Dashboard() {
 
         const itemStyle: React.CSSProperties = {
           display: 'flex', alignItems: 'center', gap: 10, width: '100%',
-          padding: '9px 12px', fontSize: 13, background: 'none', border: 'none',
+          padding: '10px 13px', fontSize: 13, background: 'none', border: 'none',
           color: 'rgba(255,255,255,0.85)', cursor: 'pointer', borderRadius: 8,
           fontFamily: 'var(--font-sf)', textDecoration: 'none', textAlign: 'left',
           transition: 'background 0.12s',
@@ -399,12 +399,12 @@ export default function Dashboard() {
               onClick={e => e.stopPropagation()}
               style={{
                 position: 'fixed', top: menuPos.top, left: menuPos.left,
-                zIndex: 9001, minWidth: 200,
-                background: 'rgba(30,30,46,0.96)',
-                backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-                borderRadius: 13, padding: '5px',
-                border: '1px solid rgba(255,255,255,0.1)',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
+                zIndex: 9001, minWidth: 210,
+                background: 'rgba(14,22,48,0.97)',
+                backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
+                borderRadius: 14, padding: '6px',
+                border: '1px solid rgba(99,140,255,0.18)',
+                boxShadow: '0 12px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)',
                 animation: 'scaleIn 0.15s cubic-bezier(0.34,1.56,0.64,1) both',
               }}>
               <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', padding: '6px 12px 4px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
