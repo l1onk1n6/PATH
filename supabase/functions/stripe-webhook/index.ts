@@ -35,17 +35,16 @@ Deno.serve(async (req) => {
     return data?.user_id ?? null
   }
 
-  /** Update user_metadata.plan without overwriting other metadata */
-  async function setPlan(userId: string, plan: 'free' | 'pro') {
-    // Fetch current metadata first to preserve other fields
+  /** Update user_metadata.plan (and optional extra fields) without overwriting other metadata */
+  async function setPlan(userId: string, plan: 'free' | 'pro', extra: Record<string, unknown> = {}) {
     const { data: u } = await admin.auth.admin.getUserById(userId)
     const existing = u?.user?.user_metadata ?? {}
 
     const { error } = await admin.auth.admin.updateUserById(userId, {
-      user_metadata: { ...existing, plan },
+      user_metadata: { ...existing, plan, ...extra },
     })
     if (error) console.error(`setPlan error for ${userId}:`, error)
-    else       console.log(`✓ ${userId} → ${plan}`)
+    else       console.log(`✓ ${userId} → ${plan}`, extra)
   }
 
   switch (event.type) {
@@ -53,14 +52,19 @@ Deno.serve(async (req) => {
       const session = event.data.object as Stripe.CheckoutSession
       const userId  = session.metadata?.user_id
       if (userId) {
-        // Ensure customer mapping exists (belt-and-suspenders)
         if (session.customer) {
           await admin.from('stripe_customers').upsert({
             user_id:            userId,
             stripe_customer_id: session.customer as string,
           })
         }
-        await setPlan(userId, 'pro')
+        // Fetch subscription to get period end
+        let periodEnd: number | null = null
+        if (session.subscription) {
+          const sub = await stripe.subscriptions.retrieve(session.subscription as string)
+          periodEnd = sub.current_period_end ?? null
+        }
+        await setPlan(userId, 'pro', periodEnd ? { subscription_period_end: periodEnd } : {})
       }
       break
     }
@@ -72,7 +76,7 @@ Deno.serve(async (req) => {
       if (userId) {
         const plan: 'pro' | 'free' =
           ['active', 'trialing'].includes(sub.status) ? 'pro' : 'free'
-        await setPlan(userId, plan)
+        await setPlan(userId, plan, { subscription_period_end: sub.current_period_end ?? null })
       }
       break
     }
@@ -80,7 +84,7 @@ Deno.serve(async (req) => {
     case 'customer.subscription.deleted': {
       const sub    = event.data.object as Stripe.Subscription
       const userId = await getUserId(sub.customer as string)
-      if (userId) await setPlan(userId, 'free')
+      if (userId) await setPlan(userId, 'free', { subscription_period_end: null })
       break
     }
   }

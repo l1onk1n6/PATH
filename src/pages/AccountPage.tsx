@@ -156,6 +156,16 @@ function PlanSection() {
             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
               {isPro ? 'Alle Features freigeschaltet' : 'Grundfunktionen — kostenlos'}
             </div>
+            {isPro && !isGift && (() => {
+              const ts = user?.user_metadata?.subscription_period_end as number | undefined;
+              if (!ts) return null;
+              const date = new Date(ts * 1000).toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
+              return (
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>
+                  Verlängert am {date}
+                </div>
+              );
+            })()}
           </div>
           {isPro && !isGift ? (
             <button
