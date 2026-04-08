@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useIsMobile } from '../../hooks/useBreakpoint';
 import {
   Users, FileText, Plus, ChevronRight, ChevronDown, Trash2,
   LayoutDashboard, Eye, FilePlus, LogOut,
@@ -45,6 +46,15 @@ const ACCOUNT_SECTIONS: { id: AccountSection; label: string; icon: React.Compone
 export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
+  const navPad   = isMobile ? '7px 10px' : '10px 12px';
+  const navStyle = (active: boolean): React.CSSProperties => ({
+    width: '100%', justifyContent: 'flex-start',
+    borderRadius: 'var(--radius-sm)', padding: navPad, marginBottom: 1,
+    background: active ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent',
+    border: active ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent',
+    boxShadow: 'none',
+  });
   const [addingPerson, setAddingPerson] = useState(false);
   const [newName, setNewName] = useState('');
   const [showUpgrade, setShowUpgrade] = useState(false);
@@ -145,9 +155,9 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
 
   // ── Full sidebar ────────────────────────────────────────────
   return (
-    <aside style={{ display: 'flex', flexDirection: 'column', height: '100%', width: 240, flexShrink: 0, padding: '16px 12px' }}>
+    <aside style={{ display: 'flex', flexDirection: 'column', height: '100%', width: isMobile ? 260 : 240, flexShrink: 0, padding: isMobile ? '12px 10px' : '16px 12px' }}>
       {/* Logo + collapse */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, paddingLeft: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? 12 : 20, paddingLeft: 4 }}>
         <LogoFull size={32} />
         {onToggleCollapse && (
           <button className="btn-glass btn-icon btn-sm" onClick={onToggleCollapse} title="Seitenleiste einklappen"
@@ -165,8 +175,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         <div className="section-label" style={{ paddingLeft: 8 }}>Navigation</div>
 
         {/* Dashboard */}
-        <button onClick={() => go('/')} className="btn-glass"
-          style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isActive('/') ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isActive('/') ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
+        <button onClick={() => go('/')} className="btn-glass" style={navStyle(isActive('/'))}>
           <LayoutDashboard size={16} style={{ opacity: isActive('/') ? 1 : 0.6 }} />
           <span style={{ opacity: isActive('/') ? 1 : 0.7 }}>Dashboard</span>
         </button>
@@ -177,8 +186,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
             if (isEditorActive) { setEditorOpen(v => !v); }
             else { setActiveSection('personal'); setEditorOpen(true); go('/editor'); }
           }}
-          className="btn-glass"
-          style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isEditorActive ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isEditorActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
+          className="btn-glass" style={navStyle(isEditorActive)}>
           <FileText size={16} style={{ opacity: isEditorActive ? 1 : 0.6 }} />
           <span style={{ opacity: isEditorActive ? 1 : 0.7 }}>Editor</span>
           <ChevronDown size={12} style={{ opacity: 0.4, marginLeft: 'auto', transform: editorOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
@@ -221,15 +229,13 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         )}
 
         {/* Vorschau */}
-        <button onClick={() => go('/preview')} className="btn-glass"
-          style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isActive('/preview') ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isActive('/preview') ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
+        <button onClick={() => go('/preview')} className="btn-glass" style={navStyle(isActive('/preview'))}>
           <Eye size={16} style={{ opacity: isActive('/preview') ? 1 : 0.6 }} />
           <span style={{ opacity: isActive('/preview') ? 1 : 0.7 }}>Vorschau</span>
         </button>
 
         {/* Bewerbungs-Tracker */}
-        <button onClick={() => go('/tracker')} className="btn-glass"
-          style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isActive('/tracker') ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isActive('/tracker') ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
+        <button onClick={() => go('/tracker')} className="btn-glass" style={navStyle(isActive('/tracker'))}>
           <ClipboardList size={16} style={{ opacity: isActive('/tracker') ? 1 : 0.6 }} />
           <span style={{ opacity: isActive('/tracker') ? 1 : 0.7 }}>Tracker</span>
         </button>
@@ -240,8 +246,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
             if (isAccountActive) { setAccountOpen(v => !v); }
             else { setAccountSection('account'); setAccountOpen(true); go('/account'); }
           }}
-          className="btn-glass"
-          style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isAccountActive ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isAccountActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
+          className="btn-glass" style={navStyle(isAccountActive)}>
           <UserCircle size={16} style={{ opacity: isAccountActive ? 1 : 0.6 }} />
           <span style={{ opacity: isAccountActive ? 1 : 0.7 }}>Konto</span>
           <ChevronDown size={12} style={{ opacity: 0.4, marginLeft: 'auto', transform: accountOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
@@ -260,8 +265,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         )}
 
         {/* Personen nav item */}
-        <button onClick={() => setPersonsOpen(v => !v)} className="btn-glass"
-          style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: 'transparent', border: '1px solid transparent', boxShadow: 'none' }}>
+        <button onClick={() => setPersonsOpen(v => !v)} className="btn-glass" style={navStyle(false)}>
           <Users size={16} style={{ opacity: 0.6 }} />
           <span style={{ opacity: 0.7 }}>Personen</span>
           <ChevronDown size={12} style={{ opacity: 0.4, marginLeft: 'auto', transform: personsOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
