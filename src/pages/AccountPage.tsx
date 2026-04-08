@@ -30,6 +30,7 @@ function PlanSection() {
   const location = useLocation();
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [portalError, setPortalError] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const [webhookPending, setWebhookPending] = useState(false);
   const [webhookFailed, setWebhookFailed] = useState(false);
@@ -68,6 +69,7 @@ function PlanSection() {
   async function handlePortal() {
     if (!isSupabaseConfigured()) return;
     setPortalLoading(true);
+    setPortalError('');
     try {
       const supabase = getSupabase();
       const { data: { session } } = await supabase.auth.getSession();
@@ -75,7 +77,13 @@ function PlanSection() {
       const { data, error } = await supabase.functions.invoke('create-portal-session', {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
-      if (!error && data?.url) window.location.href = data.url;
+      if (error || !data?.url) {
+        setPortalError(data?.error ?? 'Portal konnte nicht geöffnet werden. Bitte support@pixmatic.ch kontaktieren.');
+      } else {
+        window.location.href = data.url;
+      }
+    } catch {
+      setPortalError('Portal konnte nicht geöffnet werden. Bitte support@pixmatic.ch kontaktieren.');
     } finally {
       setPortalLoading(false);
     }
@@ -160,6 +168,7 @@ function PlanSection() {
               Abo verwalten
             </button>
           ) : !isPro ? (
+
             <button
               className="btn-glass"
               onClick={() => setShowUpgrade(true)}
@@ -173,6 +182,11 @@ function PlanSection() {
             </button>
           ) : null}
         </div>
+        {portalError && (
+          <div style={{ marginTop: 10, fontSize: 12, color: 'var(--ios-red)', display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+            <AlertTriangle size={13} style={{ flexShrink: 0, marginTop: 1 }} /> {portalError}
+          </div>
+        )}
 
         <div className="divider" style={{ margin: '12px 0' }} />
 
