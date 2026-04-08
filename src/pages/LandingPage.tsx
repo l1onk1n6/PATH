@@ -54,7 +54,7 @@ const STEPS = [
 ];
 
 const FREE_FEATURES = [
-  '1 Person, 10 Mappen',
+  '1 Person, 3 Mappen',
   '6 Templates',
   '5 PDF-Exporte / Monat',
   '1 Share-Link',
@@ -64,7 +64,7 @@ const FREE_FEATURES = [
 const PRO_FEATURES = [
   '5 Personen, 60 Mappen',
   'Alle 15+ Templates',
-  '20 PDF-Exporte / Monat',
+  'Unbegrenzte PDF-Exporte',
   '10 Share-Links',
   'KI-Assistent (Claude AI)',
   'Versionshistorie',

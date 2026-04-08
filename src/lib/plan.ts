@@ -21,7 +21,7 @@ export const FREE_TEMPLATE_IDS = [
 export const LIMITS: Record<PlanType, PlanLimits> = {
   free: {
     persons:             1,
-    resumes:             10,
+    resumes:             3,
     customSections:      0,
     templates:           6,
     shareLinks:          1,
@@ -37,7 +37,7 @@ export const LIMITS: Record<PlanType, PlanLimits> = {
     templates:           Infinity,
     shareLinks:          10,
     documentsMb:         50,
-    pdfExportsPerMonth:  20,
+    pdfExportsPerMonth:  Infinity,
     photoMb:             2,
     versionHistory:      true,
   },
@@ -53,11 +53,11 @@ export interface ProFeature {
 
 export const PRO_FEATURES: ProFeature[] = [
   // ── Already live ──────────────────────────────────────────
-  { id: 'persons',   label: '5 Personen & 60 Mappen',  icon: '👥', description: 'Bis zu 5 Profile mit je 60 Bewerbungsmappen (Free: 1 / 10)',          available: true },
+  { id: 'persons',   label: '5 Personen & 60 Mappen',  icon: '👥', description: 'Bis zu 5 Profile mit je 60 Bewerbungsmappen (Free: 1 / 3)',           available: true },
   { id: 'templates', label: 'Alle Templates',           icon: '🎨', description: 'Zugriff auf alle Premium-Designs (Free: 6 Templates)',                  available: true },
   { id: 'sections',  label: 'Eigene Sektionen',         icon: '📋', description: 'Beliebig viele eigene Sektionen im Lebenslauf (Free: keine)',           available: true },
   { id: 'share',     label: '10 Share-Links',           icon: '🔗', description: 'Bis zu 10 aktive öffentliche Links gleichzeitig (Free: 1)',             available: true },
-  { id: 'pdf',       label: '20 PDF-Exports / Monat',  icon: '📄', description: 'Mehr PDF-Exporte pro Monat (Free: 5)',                                   available: true },
+  { id: 'pdf',       label: 'Unbegrenzte PDF-Exports',  icon: '📄', description: 'Exportiere so oft du willst – ohne Limit (Free: 5 / Monat)',       available: true },
   { id: 'photo',     label: '2 MB Foto-Upload',         icon: '🖼️', description: 'Grössere Profilfotos hochladen (Free: 1 MB)',                           available: true },
   // ── Coming soon ───────────────────────────────────────────
   { id: 'ai',        label: 'KI-Assistent',             icon: '✦', description: 'Anschreiben generieren & Texte mit Claude KI verbessern',               available: true },
