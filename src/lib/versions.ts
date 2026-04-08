@@ -11,18 +11,20 @@ export interface ResumeVersion {
 
 const MAX_VERSIONS = 20;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const table = () => getSupabase().from('resume_versions') as any;
+
 export async function saveVersion(resume: Resume, label?: string): Promise<boolean> {
   if (!isSupabaseConfigured()) return false;
   const sb = getSupabase();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return false;
 
-  // Snapshot without documents (large blobs, stored separately)
+  // Version without documents (large blobs, stored separately)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { documents: _docs, ...snapshot } = resume;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (sb.from('resume_versions') as any).insert({
+  const { error } = await table().insert({
     resume_id: resume.id,
     user_id:   user.id,
     snapshot,
@@ -35,35 +37,36 @@ export async function saveVersion(resume: Resume, label?: string): Promise<boole
   }
 
   // Prune old versions beyond the limit
-  const { data: versions } = await sb
-    .from('resume_versions')
+  const { data: versions } = await table()
     .select('id')
     .eq('resume_id', resume.id)
     .order('created_at', { ascending: false });
 
   if (versions && versions.length > MAX_VERSIONS) {
     const toDelete = versions.slice(MAX_VERSIONS).map((v: { id: string }) => v.id);
-    await sb.from('resume_versions').delete().in('id', toDelete);
+    await table().delete().in('id', toDelete);
   }
 
   return true;
 }
 
-export async function listVersions(resumeId: string): Promise<ResumeVersion[]> {
-  if (!isSupabaseConfigured()) return [];
-  const { data, error } = await getSupabase()
-    .from('resume_versions')
+export async function listVersions(resumeId: string): Promise<{ data: ResumeVersion[]; error: string | null }> {
+  if (!isSupabaseConfigured()) return { data: [], error: null };
+  const { data, error } = await table()
     .select('id, resume_id, snapshot, label, created_at')
     .eq('resume_id', resumeId)
     .order('created_at', { ascending: false })
     .limit(MAX_VERSIONS);
-  if (error) return [];
-  return (data ?? []) as ResumeVersion[];
+  if (error) {
+    console.error('listVersions error:', error);
+    return { data: [], error: error.message ?? 'Unbekannter Fehler' };
+  }
+  return { data: (data ?? []) as ResumeVersion[], error: null };
 }
 
 export async function deleteVersion(versionId: string): Promise<void> {
   if (!isSupabaseConfigured()) return;
-  await getSupabase().from('resume_versions').delete().eq('id', versionId);
+  await table().delete().eq('id', versionId);
 }
 
 export function relativeTime(dateStr: string): string {

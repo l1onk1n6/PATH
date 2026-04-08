@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { History, Plus, RotateCcw, Trash2, Loader2, Clock } from 'lucide-react';
+import { History, Plus, RotateCcw, Trash2, Loader2, Clock, AlertCircle } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import {
   saveVersion, listVersions, deleteVersion,
@@ -21,10 +21,17 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
   const [confirmId, setConfirmId]   = useState<string | null>(null);
   const [labelInput, setLabelInput] = useState('');
   const [showLabel, setShowLabel]   = useState(false);
+  const [error, setError]           = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
-    setVersions(await listVersions(resumeId));
+    setError(null);
+    const result = await listVersions(resumeId);
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setVersions(result.data);
+    }
     setLoading(false);
   }
 
@@ -33,10 +40,15 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
   async function handleSave() {
     if (!resume) return;
     setSaving(true);
-    await saveVersion(resume, labelInput.trim() || undefined);
-    setLabelInput('');
-    setShowLabel(false);
-    await load();
+    setError(null);
+    const ok = await saveVersion(resume, labelInput.trim() || undefined);
+    if (!ok) {
+      setError('Version konnte nicht gespeichert werden. Bitte prüfe ob die Datenbanktabelle angelegt ist.');
+    } else {
+      setLabelInput('');
+      setShowLabel(false);
+      await load();
+    }
     setSaving(false);
   }
 
@@ -66,11 +78,23 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
           <div>
             <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>Versionshistorie</h2>
             <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
-              Bis zu 20 Snapshots pro Mappe
+              Bis zu 20 gespeicherte Versionen pro Mappe
             </p>
           </div>
         </div>
       </div>
+
+      {/* Error banner */}
+      {error && (
+        <div style={{
+          display: 'flex', alignItems: 'flex-start', gap: 8, padding: '10px 12px',
+          background: 'rgba(255,59,48,0.12)', border: '1px solid rgba(255,59,48,0.3)',
+          borderRadius: 10, marginBottom: 16, fontSize: 12, color: 'rgba(255,255,255,0.75)',
+        }}>
+          <AlertCircle size={14} style={{ color: '#FF3B30', flexShrink: 0, marginTop: 1 }} />
+          <span>{error}</span>
+        </div>
+      )}
 
       {/* Save controls */}
       <div style={{ marginBottom: 20 }}>
@@ -78,7 +102,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
           <div style={{ display: 'flex', gap: 8 }}>
             <input
               className="input-glass"
-              placeholder="Bezeichnung (optional)"
+              placeholder="Bezeichnung (optional, z.B. «vor Überarbeitung»)"
               value={labelInput}
               onChange={e => setLabelInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSave()}
@@ -99,7 +123,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
             onClick={() => setShowLabel(true)}
             style={{ gap: 8, width: '100%', justifyContent: 'center', padding: '10px 16px' }}
           >
-            <Plus size={14} /> Snapshot jetzt speichern
+            <Plus size={14} /> Aktuelle Version speichern
           </button>
         )}
       </div>
@@ -109,11 +133,11 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: 8, color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>
           <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Lädt…
         </div>
-      ) : versions.length === 0 ? (
+      ) : versions.length === 0 && !error ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: 'rgba(255,255,255,0.3)' }}>
           <Clock size={32} style={{ margin: '0 auto 12px', opacity: 0.4 }} />
-          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Noch keine Snapshots</div>
-          <div style={{ fontSize: 12 }}>Speichere manuell einen Snapshot um Änderungen festzuhalten.</div>
+          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Noch keine Versionen gespeichert</div>
+          <div style={{ fontSize: 12 }}>Speichere manuell eine Version um Änderungen festzuhalten.</div>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto' }}>
@@ -138,7 +162,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
               {/* Info */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: v.label ? 600 : 400, color: v.label ? '#fff' : 'rgba(255,255,255,0.65)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {v.label ?? 'Snapshot'}
+                  {v.label ?? 'Version'}
                 </div>
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
                   {relativeTime(v.created_at)} · {new Date(v.created_at).toLocaleString('de-CH', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
