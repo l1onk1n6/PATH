@@ -4,7 +4,7 @@ import AuthPage from './AuthPage';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import {
   FileText, Sparkles, Globe, Clock, Share2, Download,
-  Check, ChevronRight, ArrowRight, Star, ClipboardList, Mail, Linkedin,
+  Check, ChevronRight, ArrowRight, Star, ClipboardList, Mail, Import,
 } from 'lucide-react';
 
 const FEATURES = [
@@ -57,7 +57,7 @@ const FEATURES = [
     desc: '4 professionelle Anschreiben-Strukturen als Startpunkt – individuell anpassbar, mit KI-Unterstützung.',
   },
   {
-    icon: Linkedin,
+    icon: Import,
     color: '#0A66C2',
     title: 'LinkedIn-Import',
     desc: 'LinkedIn-Profil einfügen und automatisch in einen strukturierten Lebenslauf umwandeln.',
