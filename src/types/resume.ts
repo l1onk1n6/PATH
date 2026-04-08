@@ -176,4 +176,6 @@ export type EditorSection =
   | 'certificates'
   | 'documents'
   | 'custom'
-  | 'template';
+  | 'template'
+  | 'translate'
+  | 'history';

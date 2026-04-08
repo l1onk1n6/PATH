@@ -1,11 +1,11 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User, Briefcase, GraduationCap, Zap, FolderOpen,
-  Upload, Palette, AlertCircle, FileEdit, LayoutList, Lock, Languages, History,
+  Upload, Palette, AlertCircle, FileEdit, LayoutList, Lock,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import { usePlan } from '../lib/plan';
+import { useUIStore } from '../store/uiStore';
 import type { EditorSection } from '../types/resume';
 import type { LucideProps } from 'lucide-react';
 import PersonalInfoEditor from '../components/editor/PersonalInfoEditor';
@@ -38,8 +38,7 @@ export default function Editor() {
   const isMobile = useIsMobile();
   const { getActiveResume, getActivePerson, activeSection, setActiveSection, resumes } = useResumeStore();
   const { limits } = usePlan();
-  const [showTranslate, setShowTranslate] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
+  const { showTranslate, setShowTranslate } = useUIStore();
   const resume = getActiveResume();
   const person = getActivePerson();
 
@@ -166,128 +165,29 @@ export default function Editor() {
     );
   }
 
-  // ── Desktop layout: vertical sidebar ──────────────────────
+  // ── Desktop layout: full-width content ───────────────────
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', gap: 16, height: '100%', overflow: 'hidden' }}>
+    <div className="animate-fade-in glass" style={{ height: '100%', overflow: 'auto', borderRadius: 'var(--radius-lg)', padding: '20px 22px', scrollbarGutter: 'stable' }}>
       {showTranslate && <TranslateDialog onClose={() => setShowTranslate(false)} />}
 
-      {/* Section nav */}
-      <aside style={{ width: 180, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-        {SECTIONS.map(({ id, label, icon: Icon }) => {
-          const isActive = activeSection === id;
-          return (
-            <button
-              key={id}
-              className="btn-glass"
-              onClick={() => setActiveSection(id)}
-              style={{
-                justifyContent: 'flex-start',
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-sm)',
-                boxShadow: 'none',
-                background: isActive
-                  ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))'
-                  : 'rgba(255,255,255,0.05)',
-                border: isActive
-                  ? '1px solid rgba(0,122,255,0.4)'
-                  : '1px solid rgba(255,255,255,0.08)',
-                gap: 8,
-              }}
-            >
-              <Icon size={14} style={{ opacity: isActive ? 1 : 0.55, flexShrink: 0 }} />
-              <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, opacity: isActive ? 1 : 0.65, textAlign: 'left', lineHeight: 1.2 }}>
-                {label}
-              </span>
-            </button>
-          );
-        })}
-
-        {/* Translate + History buttons */}
-        <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <button
-            className="btn-glass"
-            onClick={() => { setShowTranslate(true); setShowHistory(false); }}
-            style={{
-              justifyContent: 'flex-start', width: '100%',
-              padding: '10px 12px', borderRadius: 'var(--radius-sm)',
-              boxShadow: 'none', gap: 8,
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
-            <Languages size={14} style={{ opacity: 0.55, flexShrink: 0 }} />
-            <span style={{ fontSize: 12, fontWeight: 400, opacity: 0.65, textAlign: 'left', lineHeight: 1.2 }}>
-              Übersetzen
-            </span>
-          </button>
-
-          {limits.versionHistory ? (
-            <button
-              className="btn-glass"
-              onClick={() => setShowHistory(v => !v)}
-              style={{
-                justifyContent: 'flex-start', width: '100%',
-                padding: '10px 12px', borderRadius: 'var(--radius-sm)',
-                boxShadow: 'none', gap: 8,
-                background: showHistory ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'rgba(255,255,255,0.05)',
-                border: showHistory ? '1px solid rgba(0,122,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
-              }}
-            >
-              <History size={14} style={{ opacity: showHistory ? 1 : 0.55, flexShrink: 0 }} />
-              <span style={{ fontSize: 12, fontWeight: showHistory ? 600 : 400, opacity: showHistory ? 1 : 0.65, textAlign: 'left', lineHeight: 1.2 }}>
-                Versionen
-              </span>
-            </button>
-          ) : (
-            <button
-              className="btn-glass"
-              disabled
-              title="Pro-Feature"
-              style={{
-                justifyContent: 'flex-start', width: '100%',
-                padding: '10px 12px', borderRadius: 'var(--radius-sm)',
-                boxShadow: 'none', gap: 8, opacity: 0.4, cursor: 'not-allowed',
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.06)',
-              }}
-            >
-              <History size={14} style={{ flexShrink: 0 }} />
-              <span style={{ fontSize: 12, textAlign: 'left', lineHeight: 1.2, flex: 1 }}>Versionen</span>
-              <Lock size={11} style={{ opacity: 0.5 }} />
-            </button>
-          )}
-        </div>
-      </aside>
-
-      {/* Editor content */}
-      <div
-        className="glass"
-        style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: '20px 22px' }}
-      >
-        {showHistory ? (
-          <VersionHistoryPanel resumeId={resume.id} />
-        ) : (
+      {activeSection === 'history' ? (
+        <VersionHistoryPanel resumeId={resume.id} />
+      ) : (
         <>
-        {/* Section header */}
-        <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {currentSection?.icon && (
-              <div style={{
-                width: 32, height: 32, borderRadius: 8,
-                background: 'rgba(0,122,255,0.2)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <currentSection.icon size={15} />
-              </div>
-            )}
-            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{currentSection?.label}</h2>
+          {/* Section header */}
+          <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              {currentSection?.icon && (
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <currentSection.icon size={15} />
+                </div>
+              )}
+              <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{currentSection?.label}</h2>
+            </div>
           </div>
-        </div>
-
-        {renderSection()}
+          {renderSection()}
         </>
-        )}
-      </div>
+      )}
     </div>
   );
 }

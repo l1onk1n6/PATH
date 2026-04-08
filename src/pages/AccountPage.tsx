@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   User, Shield, Lock, Sparkles, Mail, ExternalLink,
-  ChevronRight, AlertTriangle, Download, Trash2, KeyRound,
+  AlertTriangle, Download, Trash2, KeyRound,
   CreditCard, Loader2, CheckCircle, PlayCircle, LogOut,
   Copy, Check, Gift,
 } from 'lucide-react';
@@ -15,6 +15,7 @@ import { getPdfExportCount } from '../lib/pdfExports';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 import { resetOnboarding } from '../components/ui/OnboardingModal';
 import { useNavigate } from 'react-router-dom';
+import { useUIStore } from '../store/uiStore';
 
 type Section = 'plan' | 'account' | 'security' | 'referral' | 'privacy';
 
@@ -566,7 +567,7 @@ function PrivacySection() {
 
 // ── Main Account Page ──────────────────────────────────────
 export default function AccountPage() {
-  const [section, setSection] = useState<Section>('account');
+  const { accountSection: section, setAccountSection: setSection } = useUIStore();
   const isMobile = useIsMobile();
 
   const renderSection = () => {
@@ -608,41 +609,18 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', gap: 16, height: '100%', overflow: 'hidden' }}>
-      {/* Sidebar nav */}
-      <aside style={{ width: 180, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-        {NAV.map(({ id, label, icon: Icon }) => {
-          const isActive = section === id;
-          return (
-            <button key={id} className="btn-glass btn-nav" onClick={() => setSection(id)}
-              style={{ justifyContent: 'space-between', padding: '10px 12px', borderRadius: 'var(--radius-sm)', boxShadow: 'none',
-                background: isActive ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'rgba(255,255,255,0.05)',
-                border: isActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
-              }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Icon size={14} />
-                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400 }}>{label}</span>
-              </div>
-              {isActive && <ChevronRight size={12} style={{ opacity: 0.5 }} />}
-            </button>
-          );
-        })}
-      </aside>
-
-      {/* Content */}
-      <div className="glass" style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: '20px 22px' }}>
-        <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {current && (
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <current.icon size={15} />
-              </div>
-            )}
-            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{current?.label}</h2>
-          </div>
+    <div className="animate-fade-in glass" style={{ height: '100%', overflow: 'auto', borderRadius: 'var(--radius-lg)', padding: '20px 22px' }}>
+      <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {current && (
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <current.icon size={15} />
+            </div>
+          )}
+          <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{current?.label}</h2>
         </div>
-        {renderSection()}
       </div>
+      {renderSection()}
     </div>
   );
 }
