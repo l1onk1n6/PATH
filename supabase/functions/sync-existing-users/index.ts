@@ -1,15 +1,26 @@
 // One-time sync: pushes all existing Supabase users to Listmonk + InvoiceNinja
-// Run once via: Supabase Dashboard → Edge Functions → sync-existing-users → Invoke
-// Same Secrets as on-user-signup are required.
+// Run via: Supabase Dashboard → Edge Functions → sync-existing-users → Test (service role)
 
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
+// Find InvoiceNinja client ID by contact email
+async function findNinjaClientId(url: string, token: string, email: string): Promise<string | null> {
+  const res = await fetch(`${url}/api/v1/clients?filter=${encodeURIComponent(email)}&per_page=10`, {
+    headers: { 'X-Api-Token': token, Accept: 'application/json' },
+  })
+  if (!res.ok) return null
+  const data = await res.json()
+  const client = (data?.data ?? []).find((c: Record<string, unknown>) =>
+    (c.contacts as Array<{ email: string }>)?.some(
+      (ct) => ct.email?.toLowerCase() === email.toLowerCase()
+    )
+  )
+  return (client?.id as string) ?? null
+}
+
 Deno.serve(async (req) => {
-  // Simple auth check — only allow with service role key
   const auth = req.headers.get('Authorization') ?? ''
-  if (!auth.startsWith('Bearer ')) {
-    return new Response('Unauthorized', { status: 401 })
-  }
+  if (!auth.startsWith('Bearer ')) return new Response('Unauthorized', { status: 401 })
 
   const admin = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -23,10 +34,8 @@ Deno.serve(async (req) => {
   const ninjaUrl     = Deno.env.get('INVOICE_NINJA_URL')
   const ninjaToken   = Deno.env.get('INVOICE_NINJA_TOKEN')
 
-  // Fetch all users (max 1000 per page)
   const results: Array<{ email: string; listmonk?: string; ninja?: string }> = []
-  let page = 1
-  let hasMore = true
+  let page = 1, hasMore = true
 
   while (hasMore) {
     const { data: { users }, error } = await admin.auth.admin.listUsers({ page, perPage: 100 })
@@ -38,18 +47,18 @@ Deno.serve(async (req) => {
       const { id: userId, email } = user
       if (!email) continue
 
-      const name = (user.user_metadata?.full_name as string) || (user.user_metadata?.name as string) || ''
+      const name      = (user.user_metadata?.full_name as string) || (user.user_metadata?.name as string) || ''
       const firstName = name.split(' ')[0] ?? ''
       const lastName  = name.split(' ').slice(1).join(' ') || firstName
       const row: { email: string; listmonk?: string; ninja?: string } = { email }
 
-      // ── Listmonk ────────────────────────────────────────────
+      // ── Listmonk: create subscriber (409 = already exists, skip) ──
       if (listmonkUrl && listmonkUser && listmonkPass) {
         try {
           const creds = btoa(`${listmonkUser}:${listmonkPass}`)
-          const res = await fetch(`${listmonkUrl}/api/subscribers`, {
+          const res   = await fetch(`${listmonkUrl}/api/subscribers`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Basic ${creds}` },
+            headers: { 'Content-Type': 'application/json', Authorization: `Basic ${creds}` },
             body: JSON.stringify({
               email, name: name || email, status: 'enabled',
               lists: [listmonkList],
@@ -58,36 +67,39 @@ Deno.serve(async (req) => {
             }),
           })
           row.listmonk = res.status === 409 ? 'already_exists' : res.ok ? 'created' : `error_${res.status}`
-        } catch (e) {
-          row.listmonk = `exception: ${e}`
-        }
+        } catch (e) { row.listmonk = `exception: ${e}` }
       }
 
-      // ── InvoiceNinja ─────────────────────────────────────────
+      // ── InvoiceNinja: find by email, update or create ──
       if (ninjaUrl && ninjaToken) {
         try {
-          const res = await fetch(`${ninjaUrl}/api/v1/clients`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Api-Token': ninjaToken,
-              'X-Requested-With': 'XMLHttpRequest',
-            },
-            body: JSON.stringify({
-              name: name || email,
-              contacts: [{ email, first_name: firstName, last_name: lastName || firstName, send_email: false }],
-              custom_value1: userId,
-              public_notes: `PATH App user (bulk sync). Supabase signup: ${user.created_at}`,
-            }),
-          })
-          row.ninja = res.ok ? 'created' : `error_${res.status}`
-        } catch (e) {
-          row.ninja = `exception: ${e}`
-        }
+          const headers = { 'X-Api-Token': ninjaToken, 'Content-Type': 'application/json', Accept: 'application/json' }
+          const clientId = await findNinjaClientId(ninjaUrl, ninjaToken, email)
+
+          if (clientId) {
+            // Already exists — update name/custom_value1 only
+            const res = await fetch(`${ninjaUrl}/api/v1/clients/${clientId}`, {
+              method: 'PUT', headers,
+              body: JSON.stringify({ name: name || email, custom_value1: userId }),
+            })
+            row.ninja = res.ok ? 'updated' : `error_${res.status}`
+          } else {
+            // Create new
+            const res = await fetch(`${ninjaUrl}/api/v1/clients`, {
+              method: 'POST', headers,
+              body: JSON.stringify({
+                name: name || email,
+                contacts: [{ email, first_name: firstName, last_name: lastName || firstName, send_email: false }],
+                custom_value1: userId,
+                public_notes: `PATH App user. Supabase signup: ${user.created_at}`,
+              }),
+            })
+            row.ninja = res.ok ? 'created' : `error_${res.status}`
+          }
+        } catch (e) { row.ninja = `exception: ${e}` }
       }
 
       results.push(row)
-      // Small delay to avoid rate limiting
       await new Promise(r => setTimeout(r, 120))
     }
   }

@@ -1,144 +1,134 @@
 // Called from the AccountPage when user saves their profile.
 // Updates public.profiles, then syncs to Listmonk and InvoiceNinja.
 //
-// Required Secrets (same as on-user-signup):
+// Required Secrets:
 //   LISTMONK_URL, LISTMONK_USERNAME, LISTMONK_PASSWORD
 //   INVOICE_NINJA_URL, INVOICE_NINJA_TOKEN
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const SUPABASE_URL          = Deno.env.get('SUPABASE_URL')!
-const SUPABASE_SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+const SUPABASE_URL         = Deno.env.get('SUPABASE_URL')!
+const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
-// Country name → ISO 3166-1 numeric (for InvoiceNinja)
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
 const COUNTRY_IDS: Record<string, string> = {
-  'Schweiz': '756',
-  'Deutschland': '276',
-  'Österreich': '40',
-  'Liechtenstein': '438',
+  'Schweiz': '756', 'Deutschland': '276', 'Österreich': '40', 'Liechtenstein': '438',
+}
+
+// Find InvoiceNinja client ID by contact email (more reliable than custom_value1 filter)
+async function findNinjaClientId(url: string, token: string, email: string): Promise<string | null> {
+  const res = await fetch(`${url}/api/v1/clients?filter=${encodeURIComponent(email)}&per_page=10`, {
+    headers: { 'X-Api-Token': token, Accept: 'application/json' },
+  })
+  if (!res.ok) return null
+  const data = await res.json()
+  const client = (data?.data ?? []).find((c: Record<string, unknown>) =>
+    (c.contacts as Array<{ email: string }>)?.some(
+      (ct) => ct.email?.toLowerCase() === email.toLowerCase()
+    )
+  )
+  return (client?.id as string) ?? null
 }
 
 Deno.serve(async (req) => {
-  if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405 })
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
+  if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers: CORS })
 
-  const auth = req.headers.get('Authorization') ?? ''
-  if (!auth.startsWith('Bearer ')) return new Response('Unauthorized', { status: 401 })
-  const jwt = auth.slice(7)
+  const authHeader = req.headers.get('Authorization') ?? ''
+  if (!authHeader.startsWith('Bearer ')) return new Response('Unauthorized', { status: 401, headers: CORS })
 
-  // Verify JWT and get user
   const adminClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-  const { data: { user }, error: userError } = await adminClient.auth.getUser(jwt)
-  if (userError || !user) return new Response('Unauthorized', { status: 401 })
+  const { data: { user }, error: userError } = await adminClient.auth.getUser(authHeader.slice(7))
+  if (userError || !user) return new Response('Unauthorized', { status: 401, headers: CORS })
 
   const body = await req.json().catch(() => ({}))
   const { phone = '', street = '', zip = '', city = '', country = 'Schweiz' } = body
 
-  // 1. Upsert profile to public.profiles
+  // 1. Upsert to public.profiles
   const { error: dbError } = await adminClient.from('profiles').upsert({
     id: user.id, phone, street, zip, city, country,
     updated_at: new Date().toISOString(),
   })
-  if (dbError) console.error('[update-user-profile] DB upsert error:', dbError)
+  if (dbError) console.error('[update-user-profile] DB error:', dbError)
 
   const email = user.email!
-  const name = (user.user_metadata?.full_name as string) || email
+  const name  = (user.user_metadata?.full_name as string) || email
   const results: Record<string, string> = {}
 
-  // 2. Listmonk — find subscriber by email, then update attribs
-  const listmonkUrl  = Deno.env.get('LISTMONK_URL')
-  const listmonkUser = Deno.env.get('LISTMONK_USERNAME')
-  const listmonkPass = Deno.env.get('LISTMONK_PASSWORD')
+  // 2. Listmonk
+  const lmUrl  = Deno.env.get('LISTMONK_URL')
+  const lmUser = Deno.env.get('LISTMONK_USERNAME')
+  const lmPass = Deno.env.get('LISTMONK_PASSWORD')
 
-  if (listmonkUrl && listmonkUser && listmonkPass) {
+  if (lmUrl && lmUser && lmPass) {
     try {
-      const auth = `Basic ${btoa(`${listmonkUser}:${listmonkPass}`)}`
-
-      // Find subscriber
-      const query = encodeURIComponent(`subscribers.email = '${email}'`)
-      const searchRes = await fetch(`${listmonkUrl}/api/subscribers?query=${query}&page=1&per_page=1`, {
-        headers: { Authorization: auth },
+      const lmAuth = `Basic ${btoa(`${lmUser}:${lmPass}`)}`
+      const query  = encodeURIComponent(`subscribers.email = '${email}'`)
+      const searchRes = await fetch(`${lmUrl}/api/subscribers?query=${query}&page=1&per_page=1`, {
+        headers: { Authorization: lmAuth },
       })
       if (!searchRes.ok) {
         results.listmonk = `search_error_${searchRes.status}`
       } else {
-        const searchData = await searchRes.json()
-        const sub = searchData?.data?.results?.[0]
+        const sub = (await searchRes.json())?.data?.results?.[0]
         if (!sub) {
           results.listmonk = 'not_found'
         } else {
-          const putRes = await fetch(`${listmonkUrl}/api/subscribers/${sub.id}`, {
+          const putRes = await fetch(`${lmUrl}/api/subscribers/${sub.id}`, {
             method: 'PUT',
-            headers: { Authorization: auth, 'Content-Type': 'application/json' },
+            headers: { Authorization: lmAuth, 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              email: sub.email,
-              name,
-              status: 'enabled',
+              email: sub.email, name, status: 'enabled',
               lists: (sub.lists ?? []).map((l: { id: number }) => l.id),
-              attribs: {
-                ...(sub.attribs ?? {}),
-                phone, street, zip, city, country,
-              },
+              attribs: { ...(sub.attribs ?? {}), phone, street, zip, city, country },
             }),
           })
           results.listmonk = putRes.ok ? 'updated' : `error_${putRes.status}`
         }
       }
-    } catch (e) {
-      results.listmonk = `exception: ${e}`
-    }
-  } else {
-    results.listmonk = 'not_configured'
-  }
+    } catch (e) { results.listmonk = `exception: ${e}` }
+  } else { results.listmonk = 'not_configured' }
 
-  // 3. InvoiceNinja — find client by custom_value1 (=user_id), then update
+  // 3. InvoiceNinja — find by email, update or create
   const ninjaUrl   = Deno.env.get('INVOICE_NINJA_URL')
   const ninjaToken = Deno.env.get('INVOICE_NINJA_TOKEN')
 
   if (ninjaUrl && ninjaToken) {
     try {
-      const headers = {
-        'X-Api-Token': ninjaToken,
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
+      const clientId = await findNinjaClientId(ninjaUrl, ninjaToken, email)
+      const payload  = {
+        name, phone, address1: street, postal_code: zip, city,
+        country_id: COUNTRY_IDS[country] ?? '',
       }
+      const headers  = { 'X-Api-Token': ninjaToken, 'Content-Type': 'application/json', Accept: 'application/json' }
 
-      // Find client by custom_value1 = user_id
-      const searchRes = await fetch(
-        `${ninjaUrl}/api/v1/clients?custom_value1=${encodeURIComponent(user.id)}&per_page=1`,
-        { headers },
-      )
-      if (!searchRes.ok) {
-        results.ninja = `search_error_${searchRes.status}`
+      if (clientId) {
+        const res = await fetch(`${ninjaUrl}/api/v1/clients/${clientId}`, {
+          method: 'PUT', headers, body: JSON.stringify(payload),
+        })
+        results.ninja = res.ok ? 'updated' : `error_${res.status}`
       } else {
-        const searchData = await searchRes.json()
-        const client = searchData?.data?.[0]
-        if (!client) {
-          results.ninja = 'not_found'
-        } else {
-          const putRes = await fetch(`${ninjaUrl}/api/v1/clients/${client.id}`, {
-            method: 'PUT',
-            headers,
-            body: JSON.stringify({
-              name,
-              phone,
-              address1: street,
-              postal_code: zip,
-              city,
-              country_id: COUNTRY_IDS[country] ?? '',
-            }),
-          })
-          results.ninja = putRes.ok ? 'updated' : `error_${putRes.status}`
-        }
+        // Client not found — create
+        const firstName = name.split(' ')[0]
+        const res = await fetch(`${ninjaUrl}/api/v1/clients`, {
+          method: 'POST', headers,
+          body: JSON.stringify({
+            ...payload,
+            contacts: [{ email, first_name: firstName, last_name: name.split(' ').slice(1).join(' ') || firstName }],
+            custom_value1: user.id,
+          }),
+        })
+        results.ninja = res.ok ? 'created' : `error_${res.status}`
       }
-    } catch (e) {
-      results.ninja = `exception: ${e}`
-    }
-  } else {
-    results.ninja = 'not_configured'
-  }
+    } catch (e) { results.ninja = `exception: ${e}` }
+  } else { results.ninja = 'not_configured' }
 
   console.log(`[update-user-profile] ${email}:`, results)
   return new Response(JSON.stringify({ ok: true, results }), {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { ...CORS, 'Content-Type': 'application/json' },
   })
 })
