@@ -52,7 +52,15 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
   const { signOut } = useAuthStore();
   const { isPro, limits } = usePlan();
   const { activeSection, setActiveSection } = useResumeStore();
-  const { accountSection, setAccountSection, setShowTranslate } = useUIStore();
+  const { accountSection, setAccountSection, setShowTranslate, theme } = useUIStore();
+
+  // Theme-aware colour tokens
+  const c = {
+    muted:  theme === 'light' ? 'rgba(0,0,0,0.50)' : 'rgba(255,255,255,0.55)',
+    faint:  theme === 'light' ? 'rgba(0,0,0,0.32)' : 'rgba(255,255,255,0.35)',
+    line:   theme === 'light' ? 'rgba(0,0,0,0.09)'  : 'rgba(255,255,255,0.10)',
+    lineDash: theme === 'light' ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.12)',
+  };
 
   const isEditorActive  = location.pathname === '/editor';
   const isAccountActive = location.pathname === '/account';
@@ -100,7 +108,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
     padding: '7px 10px', borderRadius: 6, fontSize: 12,
     background: active ? 'rgba(0,122,255,0.15)' : 'transparent',
     border: active ? '1px solid rgba(0,122,255,0.25)' : '1px solid transparent',
-    color: active ? '#fff' : 'rgba(255,255,255,0.6)',
+    color: active ? (theme === 'light' ? '#007AFF' : '#fff') : c.muted,
     cursor: 'pointer', marginBottom: 2, fontFamily: 'var(--font-sf)',
     textAlign: 'left',
   });
@@ -116,7 +124,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
           style={{ padding: 8, marginBottom: 8, boxShadow: 'none', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
           <PanelLeftOpen size={15} />
         </button>
-        <div style={{ width: '70%', height: 1, background: 'rgba(255,255,255,0.1)', margin: '4px 0 8px' }} />
+        <div style={{ width: '70%', height: 1, background: c.line, margin: '4px 0 8px' }} />
         {[
           { path: '/',        icon: LayoutDashboard, label: 'Dashboard' },
           { path: '/editor',  icon: FileText,        label: 'Editor' },
@@ -171,7 +179,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         </button>
 
         {isEditorActive && (
-          <div style={{ marginLeft: 14, paddingLeft: 10, borderLeft: '1px solid rgba(255,255,255,0.1)', marginBottom: 4 }}>
+          <div style={{ marginLeft: 14, paddingLeft: 10, borderLeft: `1px solid ${c.line}`, marginBottom: 4 }}>
             {EDITOR_SECTIONS.map(({ id, label, icon: Icon }) => (
               <button key={id} style={subItem(activeSection === id && activeSection !== 'translate' && activeSection !== 'history')}
                 onClick={() => { setActiveSection(id); onClose?.(); }}>
@@ -181,7 +189,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
             ))}
 
             {/* Divider */}
-            <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '4px 0 6px' }} />
+            <div style={{ height: 1, background: c.line, margin: '4px 0 6px' }} />
 
             {/* Übersetzen */}
             <button style={subItem(false)} onClick={() => { setShowTranslate(true); onClose?.(); }}>
@@ -228,7 +236,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         </button>
 
         {isAccountActive && (
-          <div style={{ marginLeft: 14, paddingLeft: 10, borderLeft: '1px solid rgba(255,255,255,0.1)', marginBottom: 4 }}>
+          <div style={{ marginLeft: 14, paddingLeft: 10, borderLeft: `1px solid ${c.line}`, marginBottom: 4 }}>
             {ACCOUNT_SECTIONS.map(({ id, label, icon: Icon }) => (
               <button key={id} style={subItem(accountSection === id)}
                 onClick={() => { setAccountSection(id); onClose?.(); }}>
@@ -269,7 +277,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
 
         <div style={{ overflow: 'auto', flex: 1 }}>
           {persons.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '20px 8px', color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>
+            <div style={{ textAlign: 'center', padding: '20px 8px', color: c.faint, fontSize: 13 }}>
               Noch keine Personen.<br />
               <button className="btn-glass btn-sm" onClick={() => setAddingPerson(true)} style={{ marginTop: 10, fontSize: 12 }}>
                 <Plus size={12} /> Person anlegen
@@ -288,7 +296,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
               <div key={person.id} style={{ marginBottom: 4, opacity: isPersonFrozen ? 0.55 : 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                   <button onClick={() => toggleExpand(person.id)}
-                    style={{ background: 'none', border: 'none', padding: '4px 2px', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                    style={{ background: 'none', border: 'none', padding: '4px 2px', cursor: 'pointer', color: c.faint, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
                     <ChevronRight size={13} style={{ transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.18s' }} />
                   </button>
 
@@ -314,7 +322,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
                 </div>
 
                 {isExpanded && (
-                  <div style={{ marginLeft: 18, marginTop: 3, paddingLeft: 8, borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
+                  <div style={{ marginLeft: 18, marginTop: 3, paddingLeft: 8, borderLeft: `1px solid ${c.line}` }}>
                     {personResumes.map((resume) => {
                       const isActiveR = resume.id === activeResumeId;
                       const isResumeFrozen = isPersonFrozen || frozenResumeIds.has(resume.id);
@@ -338,7 +346,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
                     })}
                     {!isPersonFrozen && (
                       <button onClick={() => handleAddResume(person.id)}
-                        style={{ display: 'flex', alignItems: 'center', gap: 5, width: '100%', background: 'none', border: 'none', borderTop: '1px dashed rgba(255,255,255,0.1)', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', fontSize: 11, padding: '5px 6px', marginTop: 2 }}>
+                        style={{ display: 'flex', alignItems: 'center', gap: 5, width: '100%', background: 'none', border: 'none', borderTop: `1px dashed ${c.lineDash}`, cursor: 'pointer', color: c.faint, fontSize: 11, padding: '5px 6px', marginTop: 2 }}>
                         <FilePlus size={10} /> Mappe hinzufügen
                       </button>
                     )}

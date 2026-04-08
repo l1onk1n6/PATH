@@ -218,7 +218,7 @@ export default function CoverLetterEditor() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} highlightId="ai" />}
 
       {/* Overwrite confirmation modal */}
@@ -324,14 +324,15 @@ export default function CoverLetterEditor() {
 
       {/* Template picker */}
       <div>
-        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.7 }}>
+        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
           Strukturvorlage wählen
         </label>
-        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'none' }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {CL_TEMPLATES.map(tpl => (
             <button
               key={tpl.id}
-              className="btn-glass"
+              className="btn-glass btn-sm"
+              title={tpl.desc}
               onClick={() => {
                 if (cl.body.trim()) {
                   setConfirmOverwrite('template' as any);
@@ -340,17 +341,10 @@ export default function CoverLetterEditor() {
                   update('body', tpl.body);
                 }
               }}
-              style={{
-                flexShrink: 0, flexDirection: 'column', alignItems: 'flex-start',
-                padding: '10px 14px', borderRadius: 12, textAlign: 'left',
-                width: 140, gap: 4, boxShadow: 'none',
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.12)',
-              }}
+              style={{ gap: 5, boxShadow: 'none', borderRadius: 8 }}
             >
-              <span style={{ fontSize: 18 }}>{tpl.emoji}</span>
-              <span style={{ fontSize: 13, fontWeight: 600 }}>{tpl.label}</span>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', lineHeight: 1.3, whiteSpace: 'normal' }}>{tpl.desc}</span>
+              <span style={{ fontSize: 13 }}>{tpl.emoji}</span>
+              <span style={{ fontSize: 12, fontWeight: 600 }}>{tpl.label}</span>
             </button>
           ))}
         </div>
