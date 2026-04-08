@@ -426,19 +426,6 @@ export default function Dashboard() {
             <LayoutGrid size={13} /> Tracker
           </button>
           <AtsButton />
-          {[
-            { used: persons.length, max: limits.persons, label: 'P' },
-            { used: resumes.length, max: limits.resumes, label: 'M' },
-          ].map(({ used, max, label }) => {
-            const pct = used / max;
-            if (pct < 0.8) return null;
-            const color = pct >= 1 ? 'var(--ios-red)' : '#FF9F0A';
-            return (
-              <span key={label} style={{ fontSize: 11, color, fontWeight: 500, whiteSpace: 'nowrap' }}>
-                {used}/{max} {label}
-              </span>
-            );
-          })}
         </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           <button className="btn-glass btn-sm" onClick={exportGdprData} title="Alle Daten exportieren (DSGVO Art. 20)">
