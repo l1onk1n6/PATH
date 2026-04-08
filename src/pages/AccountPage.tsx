@@ -299,7 +299,7 @@ function PlanSection() {
 const COUNTRIES = ['Schweiz', 'Deutschland', 'Österreich', 'Liechtenstein']
 
 function ProfileCard() {
-  const { user, session } = useAuthStore()
+  const { user } = useAuthStore()
   const supabase = isSupabaseConfigured() ? getSupabase() : null
 
   const [phone,   setPhone]   = useState('')
@@ -342,7 +342,6 @@ function ProfileCard() {
       setTimeout(() => setSaved(false), 2500)
 
       // Sync to Listmonk/InvoiceNinja in background (best-effort)
-      const supabase = getSupabase()
       if (supabase) {
         supabase.functions.invoke('update-user-profile', {
           body: { phone, street, zip, city, country },
