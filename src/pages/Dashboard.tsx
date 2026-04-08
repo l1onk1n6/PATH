@@ -155,7 +155,15 @@ function CompletenessBar({ score }: { score: number }) {
 // ── Tracker (Kanban) view ──────────────────────────────────
 function TrackerView() {
   const { resumes, persons, setResumeStatus, setActiveResume, setActivePerson } = useResumeStore();
+  const { limits } = usePlan();
   const navigate = useNavigate();
+
+  const frozenPersonIds = new Set(
+    limits.persons < Infinity ? persons.slice(limits.persons).map(p => p.id) : []
+  );
+  const frozenResumeIds = new Set(
+    limits.resumes < Infinity ? resumes.slice(limits.resumes).map(r => r.id) : []
+  );
 
   return (
     <div style={{
@@ -180,19 +188,30 @@ function TrackerView() {
               )}
               {statusResumes.map((r) => {
                 const person = persons.find(p => p.resumeIds.includes(r.id));
+                const isFrozen = frozenResumeIds.has(r.id) || (person ? frozenPersonIds.has(person.id) : false);
                 return (
                   <div
                     key={r.id}
                     className="glass-card"
-                    style={{ padding: '12px 14px', cursor: 'pointer', borderRadius: 10 }}
+                    style={{
+                      padding: '12px 14px', borderRadius: 10,
+                      cursor: isFrozen ? 'default' : 'pointer',
+                      opacity: isFrozen ? 0.65 : 1,
+                      border: isFrozen ? '1px solid rgba(255,159,10,0.3)' : undefined,
+                      background: isFrozen ? 'rgba(255,159,10,0.05)' : undefined,
+                    }}
                     onClick={() => {
+                      if (isFrozen) return;
                       if (person) setActivePerson(person.id);
                       setActiveResume(r.id);
                       navigate('/editor');
                     }}
                   >
-                    <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {r.name || 'Bewerbungsmappe'}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                      {isFrozen && <Lock size={11} style={{ color: '#FF9F0A', flexShrink: 0 }} />}
+                      <div style={{ fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: isFrozen ? '#FF9F0A' : undefined }}>
+                        {r.name || 'Bewerbungsmappe'}
+                      </div>
                     </div>
                     {person && (
                       <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>
@@ -205,19 +224,25 @@ function TrackerView() {
                         {new Date(r.deadline).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: '2-digit' })}
                       </div>
                     )}
-                    <div style={{ display: 'flex', gap: 5, marginTop: 10, flexWrap: 'wrap' }}>
-                      {ALL_STATUSES.filter(s => s !== status).map(s => (
-                        <button
-                          key={s}
-                          title={APPLICATION_STATUS_LABELS[s]}
-                          className="btn-glass"
-                          style={{ padding: '4px 9px', fontSize: 11, borderRadius: 6 }}
-                          onClick={(e) => { e.stopPropagation(); setResumeStatus(r.id, s); }}
-                        >
-                          → {APPLICATION_STATUS_LABELS[s]}
-                        </button>
-                      ))}
-                    </div>
+                    {isFrozen ? (
+                      <div style={{ marginTop: 8, fontSize: 11, color: 'rgba(255,159,10,0.7)' }}>
+                        Upgrade auf Pro zum Bearbeiten
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', gap: 5, marginTop: 10, flexWrap: 'wrap' }}>
+                        {ALL_STATUSES.filter(s => s !== status).map(s => (
+                          <button
+                            key={s}
+                            title={APPLICATION_STATUS_LABELS[s]}
+                            className="btn-glass"
+                            style={{ padding: '4px 9px', fontSize: 11, borderRadius: 6 }}
+                            onClick={(e) => { e.stopPropagation(); setResumeStatus(r.id, s); }}
+                          >
+                            → {APPLICATION_STATUS_LABELS[s]}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })}
