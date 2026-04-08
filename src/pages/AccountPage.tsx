@@ -19,11 +19,11 @@ import { useNavigate } from 'react-router-dom';
 type Section = 'plan' | 'account' | 'security' | 'referral' | 'privacy';
 
 const NAV: { id: Section; label: string; icon: React.ComponentType<{ size: number }> }[] = [
-  { id: 'plan',     label: 'Plan & Features',    icon: Sparkles },
   { id: 'account',  label: 'Konto',               icon: User },
   { id: 'security', label: 'Sicherheit',           icon: Lock },
   { id: 'referral', label: 'Freunde einladen',     icon: Gift },
   { id: 'privacy',  label: 'Datenschutz',          icon: Shield },
+  { id: 'plan',     label: 'Plan & Features',      icon: Sparkles },
 ];
 
 // ── Section: Plan ──────────────────────────────────────────
@@ -566,7 +566,7 @@ function PrivacySection() {
 
 // ── Main Account Page ──────────────────────────────────────
 export default function AccountPage() {
-  const [section, setSection] = useState<Section>('plan');
+  const [section, setSection] = useState<Section>('account');
   const isMobile = useIsMobile();
 
   const renderSection = () => {
