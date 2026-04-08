@@ -65,10 +65,10 @@
     <!-- ── Content Security Policy ───────────────────────── -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline';
+      script-src 'self' 'unsafe-inline' https://www.googletagmanager.com;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       img-src 'self' data: https: blob:;
-      connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+      connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com;
       font-src 'self' data: https://fonts.gstatic.com;
       object-src 'none';
       base-uri 'self';
@@ -76,6 +76,15 @@
       frame-ancestors 'none';
     " />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+    <!-- ── Google Analytics ─────────────────────────────── -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-T5SJLKKZJQ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-T5SJLKKZJQ');
+    </script>
 
     <!-- ── Fonts ──────────────────────────────────────────── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
