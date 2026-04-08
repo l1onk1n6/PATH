@@ -328,16 +328,6 @@ function AccountSection() {
       </div>
 
       <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>DATEN-EXPORT (DSGVO Art. 20)</div>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
-          Lade alle deine Daten als JSON-Datei herunter. Dokumentenanhänge (Base64) werden aus Datenschutzgründen nicht mitexportiert.
-        </p>
-        <button className="btn-glass btn-sm" onClick={exportGdprData} style={{ gap: 6 }}>
-          <Download size={13} /> Daten herunterladen
-        </button>
-      </div>
-
-      <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>APP-TOUR</div>
         <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
           Zeige die Einführungstour erneut an.
@@ -515,6 +505,7 @@ function ReferralSection() {
 
 // ── Section: Privacy ───────────────────────────────────────
 function PrivacySection() {
+  const { exportGdprData } = useResumeStore();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -544,6 +535,16 @@ function PrivacySection() {
           <li>Passwörter werden gehasht gespeichert (bcrypt)</li>
           <li>Datenexport jederzeit möglich (DSGVO Art. 20)</li>
         </ul>
+      </div>
+
+      <div className="glass-card" style={{ padding: 20 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>DATEN-EXPORT (DSGVO Art. 20)</div>
+        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
+          Lade alle deine Daten als JSON-Datei herunter. Dokumentenanhänge (Base64) werden aus Datenschutzgründen nicht mitexportiert.
+        </p>
+        <button className="btn-glass btn-sm" onClick={exportGdprData} style={{ gap: 6 }}>
+          <Download size={13} /> Daten herunterladen
+        </button>
       </div>
 
       <div className="glass-card" style={{ padding: 20, border: '1px solid rgba(255,59,48,0.2)' }}>
