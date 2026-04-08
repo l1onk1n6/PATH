@@ -167,7 +167,7 @@ export default function Editor() {
 
   // ── Desktop layout: full-width content ───────────────────
   return (
-    <div className="animate-fade-in glass" style={{ height: '100%', overflow: 'auto', borderRadius: 'var(--radius-lg)', padding: '20px 22px', scrollbarGutter: 'stable' }}>
+    <div className="animate-fade-in glass" style={{ height: '100%', overflow: 'auto', borderRadius: 'var(--radius-lg)', padding: '20px 28px 20px 22px' }}>
       {showTranslate && <TranslateDialog onClose={() => setShowTranslate(false)} />}
 
       {activeSection === 'history' ? (

@@ -6,7 +6,7 @@ import {
   PanelLeftClose, PanelLeftOpen, Sparkles, UserCircle, Lock,
   User, Briefcase, GraduationCap, Zap, FolderOpen,
   Upload, Palette, LayoutList, FileEdit, Languages, History,
-  Shield, Gift, Sparkles as SparklesIcon,
+  Shield, Gift,
 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useAuthStore } from '../../store/authStore';
@@ -39,7 +39,7 @@ const ACCOUNT_SECTIONS: { id: AccountSection; label: string; icon: React.Compone
   { id: 'security', label: 'Sicherheit',          icon: Lock },
   { id: 'referral', label: 'Freunde einladen',    icon: Gift },
   { id: 'privacy',  label: 'Datenschutz',         icon: Shield },
-  { id: 'plan',     label: 'Plan & Features',     icon: SparklesIcon },
+  { id: 'plan',     label: 'Plan & Features',     icon: Sparkles },
 ];
 
 export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }: SidebarProps) {
