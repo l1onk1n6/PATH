@@ -218,7 +218,7 @@ export default function CoverLetterEditor() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 26 }}>
       {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} highlightId="ai" />}
 
       {/* Overwrite confirmation modal */}

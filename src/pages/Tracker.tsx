@@ -32,19 +32,6 @@ const SORT_OPTIONS = [
   { value: 'status',      label: 'Status' },
 ];
 
-function StatusBadge({ status }: { status: ApplicationStatus }) {
-  const cfg = STATUS_CONFIG[status];
-  return (
-    <span style={{
-      display: 'inline-block', padding: '3px 9px', borderRadius: 20,
-      fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap',
-      color: cfg.color, background: cfg.bg,
-      border: `1px solid ${cfg.color}33`,
-    }}>
-      {cfg.label}
-    </span>
-  );
-}
 
 function TypeBadge({ type }: { type: ApplicationType }) {
   const cfg = TYPE_CONFIG[type];
@@ -220,47 +207,69 @@ export default function Tracker() {
           return (
             <div key={app.id} className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
               {/* Summary row */}
-              <div
-                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', cursor: 'pointer' }}
-                onClick={() => setExpanded(isOpen ? null : app.id)}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 600, fontSize: 14 }}>
-                      {app.company || <span style={{ opacity: 0.4 }}>Firma</span>}
-                    </span>
-                    {app.position && (
-                      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>· {app.position}</span>
-                    )}
-                  </div>
-                  {!isMobile && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3 }}>
-                      {app.appliedDate && (
-                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
-                          Beworben: {formatDate(app.appliedDate)}
-                        </span>
-                      )}
-                      {app.deadline && (
-                        <span style={{ fontSize: 11, color: 'rgba(255,159,10,0.7)' }}>
-                          Deadline: {formatDate(app.deadline)}
-                        </span>
+              <div style={{ padding: '12px 14px' }}>
+                <div
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', marginBottom: 8 }}
+                  onClick={() => setExpanded(isOpen ? null : app.id)}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <span style={{ fontWeight: 600, fontSize: 14 }}>
+                        {app.company || <span style={{ opacity: 0.4 }}>Firma</span>}
+                      </span>
+                      {app.position && (
+                        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>· {app.position}</span>
                       )}
                     </div>
-                  )}
+                    {(app.appliedDate || app.deadline) && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 2 }}>
+                        {app.appliedDate && (
+                          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                            {formatDate(app.appliedDate)}
+                          </span>
+                        )}
+                        {app.deadline && (
+                          <span style={{ fontSize: 11, color: 'rgba(255,159,10,0.7)' }}>
+                            Deadline: {formatDate(app.deadline)}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                    <TypeBadge type={appType} />
+                    <button
+                      className="btn-glass btn-danger btn-icon"
+                      onClick={(e) => { e.stopPropagation(); if (confirm('Bewerbung löschen?')) removeApplication(app.id); }}
+                      style={{ padding: 6 }}
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                    {isOpen ? <ChevronUp size={14} style={{ opacity: 0.4 }} /> : <ChevronDown size={14} style={{ opacity: 0.4 }} />}
+                  </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, flexWrap: 'wrap' }}>
-                  <StatusBadge status={app.status} />
-                  <TypeBadge type={appType} />
-                </div>
-                <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-                  <button
-                    className="btn-glass btn-danger btn-icon"
-                    onClick={(e) => { e.stopPropagation(); if (confirm('Bewerbung löschen?')) removeApplication(app.id); }}
-                    style={{ padding: 6 }}
-                  >
-                    <Trash2 size={12} />
-                  </button>
-                  {isOpen ? <ChevronUp size={14} style={{ opacity: 0.4 }} /> : <ChevronDown size={14} style={{ opacity: 0.4 }} />}
+
+                {/* Clickable status steps */}
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                  {ALL_STATUSES.map((s) => {
+                    const cfg = STATUS_CONFIG[s];
+                    const isActive = app.status === s;
+                    return (
+                      <button
+                        key={s}
+                        onClick={(e) => { e.stopPropagation(); updateApplication(app.id, { status: s }); }}
+                        style={{
+                          padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600,
+                          cursor: 'pointer', border: 'none', transition: 'all 0.15s',
+                          background: isActive ? cfg.bg : 'rgba(255,255,255,0.05)',
+                          color: isActive ? cfg.color : 'rgba(255,255,255,0.3)',
+                          outline: isActive ? `1px solid ${cfg.color}30` : '1px solid rgba(255,255,255,0.08)',
+                        }}
+                      >
+                        {cfg.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
