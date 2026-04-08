@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Link, Calendar, Sparkles, Bell, BellOff, Loader2, Wand2, ChevronDown, ChevronUp, AlertTriangle, Check } from 'lucide-react';
+import { Link, Calendar, Sparkles, Bell, BellOff, Loader2, Wand2, ChevronDown, ChevronUp, AlertTriangle, Check, ClipboardList } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { generateCoverLetter, improveText } from '../../lib/ai';
@@ -7,6 +7,16 @@ import ProGate from '../ui/ProGate';
 import { UpgradeModal } from '../ui/ProGate';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
+import { useTrackerStore } from '../../store/trackerStore';
+
+// Parse multiline recipient string into structured address fields
+function parseRecipient(s: string) {
+  const [company = '', dept = '', street = '', city = ''] = s.split('\n').map(l => l.trim());
+  return { company, dept, street, city };
+}
+function assembleRecipient(company: string, dept: string, street: string, city: string) {
+  return [company, dept, street, city].filter(Boolean).join('\n');
+}
 
 const CL_TEMPLATES = [
   {
@@ -111,7 +121,9 @@ export default function CoverLetterEditor() {
   const { isPro } = usePlan();
   const resume = getActiveResume();
 
+  const { addApplication, updateApplication } = useTrackerStore();
   const [showAiPanel, setShowAiPanel] = useState(false);
+  const [trackerAdded, setTrackerAdded] = useState(false);
   const [aiJobTitle, setAiJobTitle] = useState('');
   const [aiCompany, setAiCompany] = useState('');
   const [aiJobDesc, setAiJobDesc] = useState('');
@@ -126,6 +138,32 @@ export default function CoverLetterEditor() {
 
   const cl = resume.coverLetter ?? { recipient: '', subject: '', body: '', closing: 'Mit freundlichen Grüssen' };
   const hasExistingBody = cl.body.trim().length > 0;
+  const addr = parseRecipient(cl.recipient);
+
+  function updateAddr(field: 'company' | 'dept' | 'street' | 'city', value: string) {
+    const next = { ...addr, [field]: value };
+    update('recipient', assembleRecipient(next.company, next.dept, next.street, next.city));
+  }
+
+  function addToTracker() {
+    if (!resume) return;
+    addApplication();
+    const apps = useTrackerStore.getState().applications;
+    const newApp = apps[0];
+    if (newApp) {
+      updateApplication(newApp.id, {
+        company:     addr.company,
+        position:    resume.personalInfo.title || '',
+        deadline:    resume.deadline || '',
+        url:         resume.jobUrl || '',
+        resumeId:    resume.id,
+        status:      'offen',
+        type:        'online',
+      });
+    }
+    setTrackerAdded(true);
+    setTimeout(() => setTrackerAdded(false), 2000);
+  }
 
   function update(field: keyof typeof cl, value: string) {
     updateCoverLetter(resume!.id, { [field]: value });
@@ -284,76 +322,6 @@ export default function CoverLetterEditor() {
 
       <div className="divider" />
 
-      {/* AI panel */}
-      <div className="glass-card" style={{
-        padding: 0, overflow: 'hidden',
-        border: showAiPanel ? '1px solid rgba(255,159,10,0.35)' : '1px solid rgba(255,255,255,0.1)',
-        background: showAiPanel ? 'rgba(255,159,10,0.04)' : 'rgba(255,255,255,0.04)',
-      }}>
-        <button
-          style={{
-            display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 14px',
-            background: 'none', border: 'none', cursor: 'pointer', color: 'inherit',
-          }}
-          onClick={() => isPro ? setShowAiPanel(v => !v) : setShowUpgrade(true)}
-        >
-          <Sparkles size={14} style={{ color: isPro ? '#FF9F0A' : 'rgba(255,255,255,0.4)' }} />
-          <span style={{ fontSize: 13, fontWeight: 600, flex: 1, textAlign: 'left', color: isPro ? '#FF9F0A' : 'rgba(255,255,255,0.5)' }}>
-            KI-Assistent — Anschreiben generieren
-          </span>
-          {!isPro && (
-            <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 5px', borderRadius: 4, background: 'linear-gradient(135deg, #FF9F0A, #FF375F)', color: '#fff' }}>PRO</span>
-          )}
-          {isPro && (showAiPanel ? <ChevronUp size={14} style={{ opacity: 0.5 }} /> : <ChevronDown size={14} style={{ opacity: 0.5 }} />)}
-        </button>
-
-        {showAiPanel && (
-          <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {hasExistingBody && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, background: 'rgba(255,159,10,0.08)', border: '1px solid rgba(255,159,10,0.2)', fontSize: 12, color: '#FF9F0A' }}>
-                <AlertTriangle size={12} style={{ flexShrink: 0 }} />
-                Der bestehende Anschreiben-Text wird überschrieben.
-              </div>
-            )}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              <div>
-                <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Stelle</label>
-                <input className="input-glass" placeholder={resume.personalInfo.title || 'z.B. Software Engineer'} value={aiJobTitle}
-                  onChange={e => setAiJobTitle(e.target.value)} style={{ width: '100%', fontSize: 13 }} />
-              </div>
-              <div>
-                <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Unternehmen</label>
-                <input className="input-glass" placeholder="z.B. Acme AG" value={aiCompany}
-                  onChange={e => setAiCompany(e.target.value)} style={{ width: '100%', fontSize: 13 }} />
-              </div>
-            </div>
-            <div>
-              <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>
-                Stellenbeschreibung (optional, für bessere Ergebnisse)
-              </label>
-              <textarea className="input-glass" placeholder="Stellenbeschreibung hier einfügen…" value={aiJobDesc}
-                onChange={e => setAiJobDesc(e.target.value)} rows={4}
-                style={{ width: '100%', resize: 'vertical', fontSize: 13 }} />
-            </div>
-            <button
-              className="btn-glass"
-              onClick={handleGenerateCL}
-              disabled={generatingCL}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                padding: '10px 16px',
-                background: generatingCL ? 'rgba(255,159,10,0.1)' : 'linear-gradient(135deg, rgba(255,159,10,0.3), rgba(255,55,95,0.2))',
-                border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', fontWeight: 700, fontSize: 13,
-              }}
-            >
-              {generatingCL
-                ? <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> Wird generiert…</>
-                : <><Sparkles size={14} /> Anschreiben generieren</>}
-            </button>
-          </div>
-        )}
-      </div>
-
       {/* Template picker */}
       <div>
         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.7 }}>
@@ -388,18 +356,54 @@ export default function CoverLetterEditor() {
         </div>
       </div>
 
+      {/* Structured address */}
       <div>
-        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
-          Empfänger / Adresse
-        </label>
-        <textarea
-          className="input-glass"
-          placeholder={"Muster AG\nHR-Abteilung\nMusterstrasse 1\n8000 Zürich"}
-          value={cl.recipient}
-          onChange={(e) => update('recipient', e.target.value)}
-          rows={4}
-          style={{ width: '100%', resize: 'vertical', fontFamily: 'inherit' }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+          <label style={{ fontSize: 12, fontWeight: 600, opacity: 0.7 }}>Empfänger / Adresse</label>
+          {addr.company && (
+            <button
+              className="btn-glass btn-sm"
+              onClick={addToTracker}
+              style={{ fontSize: 11, gap: 5, background: trackerAdded ? 'rgba(52,199,89,0.15)' : undefined, border: trackerAdded ? '1px solid rgba(52,199,89,0.3)' : undefined, color: trackerAdded ? '#34C759' : undefined }}
+            >
+              {trackerAdded
+                ? <><Check size={11} /> Hinzugefügt</>
+                : <><ClipboardList size={11} /> Zu Tracker</>}
+            </button>
+          )}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <input
+            className="input-glass"
+            placeholder="Firmenname (z.B. Muster AG)"
+            value={addr.company} maxLength={150}
+            onChange={e => updateAddr('company', e.target.value)}
+            style={{ fontSize: 13 }}
+          />
+          <input
+            className="input-glass"
+            placeholder="Abteilung / Ansprechperson (optional)"
+            value={addr.dept} maxLength={150}
+            onChange={e => updateAddr('dept', e.target.value)}
+            style={{ fontSize: 13 }}
+          />
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 6 }}>
+            <input
+              className="input-glass"
+              placeholder="Strasse und Nr."
+              value={addr.street} maxLength={150}
+              onChange={e => updateAddr('street', e.target.value)}
+              style={{ fontSize: 13 }}
+            />
+            <input
+              className="input-glass"
+              placeholder="PLZ / Ort"
+              value={addr.city} maxLength={100}
+              onChange={e => updateAddr('city', e.target.value)}
+              style={{ fontSize: 13 }}
+            />
+          </div>
+        </div>
       </div>
 
       <div>
@@ -413,6 +417,77 @@ export default function CoverLetterEditor() {
           onChange={(e) => update('subject', e.target.value)}
           style={{ width: '100%' }}
         />
+      </div>
+
+      {/* AI panel — directly above body */}
+      <div className="glass-card" style={{
+        padding: 0, overflow: 'hidden',
+        border: showAiPanel ? '1px solid rgba(255,159,10,0.35)' : '1px solid rgba(255,255,255,0.1)',
+        background: showAiPanel ? 'rgba(255,159,10,0.04)' : 'rgba(255,255,255,0.04)',
+        marginBottom: -10,
+      }}>
+        <button
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 14px',
+            background: 'none', border: 'none', cursor: 'pointer', color: 'inherit',
+          }}
+          onClick={() => isPro ? setShowAiPanel(v => !v) : setShowUpgrade(true)}
+        >
+          <Sparkles size={14} style={{ color: isPro ? '#FF9F0A' : 'rgba(255,255,255,0.4)' }} />
+          <span style={{ fontSize: 13, fontWeight: 600, flex: 1, textAlign: 'left', color: isPro ? '#FF9F0A' : 'rgba(255,255,255,0.5)' }}>
+            KI-Assistent — Anschreiben generieren
+          </span>
+          {!isPro && (
+            <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 5px', borderRadius: 4, background: 'linear-gradient(135deg, #FF9F0A, #FF375F)', color: '#fff' }}>PRO</span>
+          )}
+          {isPro && (showAiPanel ? <ChevronUp size={14} style={{ opacity: 0.5 }} /> : <ChevronDown size={14} style={{ opacity: 0.5 }} />)}
+        </button>
+
+        {showAiPanel && (
+          <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {hasExistingBody && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, background: 'rgba(255,159,10,0.08)', border: '1px solid rgba(255,159,10,0.2)', fontSize: 12, color: '#FF9F0A' }}>
+                <AlertTriangle size={12} style={{ flexShrink: 0 }} />
+                Der bestehende Anschreiben-Text wird überschrieben.
+              </div>
+            )}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <div>
+                <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Stelle</label>
+                <input className="input-glass" placeholder={resume.personalInfo.title || 'z.B. Software Engineer'} value={aiJobTitle}
+                  onChange={e => setAiJobTitle(e.target.value)} style={{ width: '100%', fontSize: 13 }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Unternehmen</label>
+                <input className="input-glass" placeholder={addr.company || 'z.B. Acme AG'} value={aiCompany}
+                  onChange={e => setAiCompany(e.target.value)} style={{ width: '100%', fontSize: 13 }} />
+              </div>
+            </div>
+            <div>
+              <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>
+                Stellenbeschreibung (optional, für bessere Ergebnisse)
+              </label>
+              <textarea className="input-glass" placeholder="Stellenbeschreibung hier einfügen…" value={aiJobDesc}
+                onChange={e => setAiJobDesc(e.target.value)} rows={4}
+                style={{ width: '100%', resize: 'vertical', fontSize: 13 }} />
+            </div>
+            <button
+              className="btn-glass"
+              onClick={handleGenerateCL}
+              disabled={generatingCL}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '10px 16px',
+                background: generatingCL ? 'rgba(255,159,10,0.1)' : 'linear-gradient(135deg, rgba(255,159,10,0.3), rgba(255,55,95,0.2))',
+                border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', fontWeight: 700, fontSize: 13,
+              }}
+            >
+              {generatingCL
+                ? <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> Wird generiert…</>
+                : <><Sparkles size={14} /> Anschreiben generieren</>}
+            </button>
+          </div>
+        )}
       </div>
 
       <div>
