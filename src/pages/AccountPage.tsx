@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import {
   User, Shield, Lock, Sparkles, Mail, ExternalLink,
   ChevronRight, AlertTriangle, Download, Trash2, KeyRound,
-  CreditCard, Loader2, CheckCircle,
+  CreditCard, Loader2, CheckCircle, PlayCircle,
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useResumeStore } from '../store/resumeStore';
@@ -12,6 +12,8 @@ import { UpgradeModal } from '../components/ui/ProGate';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { getPdfExportCount } from '../lib/pdfExports';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
+import { resetOnboarding } from '../components/ui/OnboardingModal';
+import { useNavigate } from 'react-router-dom';
 
 type Section = 'plan' | 'account' | 'security' | 'privacy';
 
@@ -291,6 +293,7 @@ function PlanSection() {
 function AccountSection() {
   const { user } = useAuthStore();
   const { exportGdprData, persons, resumes } = useResumeStore();
+  const navigate = useNavigate();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -325,6 +328,20 @@ function AccountSection() {
         </p>
         <button className="btn-glass btn-sm" onClick={exportGdprData} style={{ gap: 6 }}>
           <Download size={13} /> Daten herunterladen
+        </button>
+      </div>
+
+      <div className="glass-card" style={{ padding: 20 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>APP-TOUR</div>
+        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
+          Zeige die Einführungstour erneut an.
+        </p>
+        <button
+          className="btn-glass btn-sm"
+          onClick={() => { resetOnboarding(); navigate('/'); }}
+          style={{ gap: 6 }}
+        >
+          <PlayCircle size={13} /> Tour neu starten
         </button>
       </div>
 

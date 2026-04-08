@@ -30,6 +30,13 @@ function AppShell() {
     if (!isMobile) setDrawerOpen(false);
   }, [isMobile]);
 
+  // Allow triggering onboarding from anywhere via custom event
+  useEffect(() => {
+    const handler = () => setShowOnboarding(true);
+    window.addEventListener('start-onboarding', handler);
+    return () => window.removeEventListener('start-onboarding', handler);
+  }, []);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', overflow: 'hidden' }}>
 

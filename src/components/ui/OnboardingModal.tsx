@@ -10,6 +10,11 @@ export function isOnboardingDone(): boolean {
   return localStorage.getItem(ONBOARDING_KEY) === '1';
 }
 
+export function resetOnboarding(): void {
+  localStorage.removeItem(ONBOARDING_KEY);
+  window.dispatchEvent(new CustomEvent('start-onboarding'));
+}
+
 export function markOnboardingDone() {
   localStorage.setItem(ONBOARDING_KEY, '1');
 }
