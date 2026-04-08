@@ -4,8 +4,12 @@ async function call(action: string, params: Record<string, unknown>): Promise<st
   if (!isSupabaseConfigured()) return null;
   try {
     const supabase = getSupabase();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return null;
+
     const { data, error } = await supabase.functions.invoke('ai-assist', {
       body: { action, ...params },
+      headers: { Authorization: `Bearer ${session.access_token}` },
     });
     if (error) { console.error('[ai]', error); return null; }
     return (data?.result as string) ?? null;
