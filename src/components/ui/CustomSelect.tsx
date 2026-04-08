@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, type CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
 import { Check, ChevronDown } from 'lucide-react';
 
 interface SelectOption {
@@ -18,16 +19,40 @@ interface CustomSelectProps {
 export function CustomSelect({ value, onChange, options, style, placeholder = 'Auswählen…', className }: CustomSelectProps) {
   const [open, setOpen] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [dropdownStyle, setDropdownStyle] = useState<CSSProperties>({});
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const selectedOption = options.find((o) => o.value === value);
   const displayLabel = selectedOption ? selectedOption.label : placeholder;
   const hasValue = !!selectedOption;
 
+  // Position dropdown via getBoundingClientRect to escape overflow clipping
+  useEffect(() => {
+    if (!open || !triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const dropdownH = Math.min(options.length * 41 + 8, 260);
+    const openUp = spaceBelow < dropdownH + 8 && rect.top > dropdownH;
+
+    setDropdownStyle({
+      position: 'fixed',
+      left: rect.left,
+      width: rect.width,
+      zIndex: 9999,
+      ...(openUp
+        ? { bottom: window.innerHeight - rect.top + 4 }
+        : { top: rect.bottom + 4 }),
+    });
+  }, [open, options.length]);
+
   useEffect(() => {
     if (!open) return;
     function handleOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current && !containerRef.current.contains(e.target as Node) &&
+        !(e.target as Element).closest?.('[data-custom-select-dropdown]')
+      ) {
         setOpen(false);
       }
     }
@@ -53,9 +78,67 @@ export function CustomSelect({ value, onChange, options, style, placeholder = 'A
     ...style,
   };
 
+  const dropdown = open && (
+    <div
+      data-custom-select-dropdown
+      role="listbox"
+      style={{
+        ...dropdownStyle,
+        background: 'rgba(16,16,30,0.97)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255,255,255,0.15)',
+        borderRadius: 10,
+        overflow: 'auto',
+        maxHeight: 260,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+      }}
+    >
+      {options.map((opt) => {
+        const isSelected = opt.value === value;
+        return (
+          <div
+            key={opt.value}
+            role="option"
+            aria-selected={isSelected}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              onChange(opt.value);
+              setOpen(false);
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '9px 12px',
+              cursor: 'pointer',
+              fontSize: 13,
+              background: isSelected ? 'rgba(0,122,255,0.2)' : 'transparent',
+              border: isSelected ? '1px solid rgba(0,122,255,0.3)' : '1px solid transparent',
+              margin: '2px 4px',
+              borderRadius: 7,
+              transition: 'background 0.1s',
+              color: isSelected ? '#fff' : 'rgba(255,255,255,0.85)',
+            }}
+            onMouseEnter={(e) => {
+              if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.08)';
+            }}
+            onMouseLeave={(e) => {
+              if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'transparent';
+            }}
+          >
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{opt.label}</span>
+            {isSelected && <Check size={13} style={{ flexShrink: 0, color: '#007AFF' }} />}
+          </div>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div ref={containerRef} style={{ position: 'relative', width: '100%' }} className={className}>
       <button
+        ref={triggerRef}
         type="button"
         className="input-glass"
         style={triggerStyle}
@@ -79,63 +162,7 @@ export function CustomSelect({ value, onChange, options, style, placeholder = 'A
         />
       </button>
 
-      {open && (
-        <div
-          role="listbox"
-          style={{
-            position: 'absolute',
-            top: 'calc(100% + 4px)',
-            left: 0,
-            right: 0,
-            zIndex: 999,
-            background: 'rgba(16,16,30,0.97)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.15)',
-            borderRadius: 10,
-            overflow: 'hidden',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-          }}
-        >
-          {options.map((opt) => {
-            const isSelected = opt.value === value;
-            return (
-              <div
-                key={opt.value}
-                role="option"
-                aria-selected={isSelected}
-                onClick={() => {
-                  onChange(opt.value);
-                  setOpen(false);
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '9px 12px',
-                  cursor: 'pointer',
-                  fontSize: 13,
-                  background: isSelected ? 'rgba(0,122,255,0.2)' : 'transparent',
-                  border: isSelected ? '1px solid rgba(0,122,255,0.3)' : '1px solid transparent',
-                  margin: '2px 4px',
-                  borderRadius: 7,
-                  transition: 'background 0.1s',
-                  color: isSelected ? '#fff' : 'rgba(255,255,255,0.85)',
-                }}
-                onMouseEnter={(e) => {
-                  if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.08)';
-                }}
-                onMouseLeave={(e) => {
-                  if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'transparent';
-                }}
-              >
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{opt.label}</span>
-                {isSelected && <Check size={13} style={{ flexShrink: 0, color: '#007AFF' }} />}
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {createPortal(dropdown, document.body)}
     </div>
   );
 }
