@@ -28,6 +28,11 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
   async function handleUpgrade() {
     setLoading(true);
     setCheckoutError('');
+    // GA4 event
+    (window as any).gtag?.('event', 'begin_checkout', {
+      event_category: 'upgrade',
+      event_label: highlightId ?? 'modal',
+    });
     const url = await startCheckout();
     if (url) {
       window.location.href = url;
