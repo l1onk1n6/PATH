@@ -4,7 +4,7 @@ import AuthPage from './AuthPage';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import {
   FileText, Sparkles, Globe, Clock, Share2, Download,
-  Check, ChevronRight, ArrowRight, Star, ClipboardList,
+  Check, ChevronRight, ArrowRight, Star, ClipboardList, Mail, Linkedin,
 } from 'lucide-react';
 
 const FEATURES = [
@@ -50,6 +50,18 @@ const FEATURES = [
     title: 'Bewerbungs-Tracker',
     desc: 'Behalte den Überblick über alle Bewerbungen — Status, Deadline, Notizen und verknüpfte Unterlagen.',
   },
+  {
+    icon: Mail,
+    color: '#FF6B6B',
+    title: 'Anschreiben & Vorlagen',
+    desc: '4 professionelle Anschreiben-Strukturen als Startpunkt – individuell anpassbar, mit KI-Unterstützung.',
+  },
+  {
+    icon: Linkedin,
+    color: '#0A66C2',
+    title: 'LinkedIn-Import',
+    desc: 'LinkedIn-Profil einfügen und automatisch in einen strukturierten Lebenslauf umwandeln.',
+  },
 ];
 
 const STEPS = [
@@ -66,6 +78,8 @@ const FREE_FEATURES = [
   '1 Share-Link',
   'Basis-Editor',
   'Bewerbungs-Tracker',
+  'Anschreiben-Vorlagen',
+  'LinkedIn-Import',
 ];
 
 const PRO_FEATURES = [
