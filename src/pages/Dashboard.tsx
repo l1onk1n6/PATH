@@ -4,7 +4,7 @@ import {
   Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp,
   FolderPlus, Pencil, Copy, Search, ExternalLink, Clock,
   Download, Share2, CheckCircle, LayoutGrid, List, X, BarChart2,
-  Lock, AlertTriangle,
+  Lock,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import {
@@ -284,15 +284,12 @@ export default function Dashboard() {
       ? persons.slice(limits.persons).map(p => p.id)
       : []
   );
-  const frozenPersonCount = frozenPersonIds.size;
-
   // Resumes beyond the plan limit are frozen (read-only)
   const frozenResumeIds = new Set(
     limits.resumes < Infinity
       ? resumes.slice(limits.resumes).map(r => r.id)
       : []
   );
-  const frozenCount = frozenResumeIds.size;
 
   async function handleAdd() {
     if (!newName.trim()) return;
@@ -410,31 +407,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Frozen warning */}
-      {(frozenPersonCount > 0 || frozenCount > 0) && (
-        <div className="glass-card" style={{
-          padding: '12px 16px', marginBottom: 12,
-          border: '1px solid rgba(255,159,10,0.35)',
-          background: 'rgba(255,159,10,0.08)',
-          display: 'flex', alignItems: 'center', gap: 12,
-        }}>
-          <AlertTriangle size={16} style={{ color: '#FF9F0A', flexShrink: 0 }} />
-          <div style={{ flex: 1, fontSize: 13 }}>
-            {frozenPersonCount > 0 && (
-              <span style={{ fontWeight: 600, color: '#FF9F0A' }}>{frozenPersonCount} Person{frozenPersonCount > 1 ? 'en' : ''} eingefroren</span>
-            )}
-            {frozenPersonCount > 0 && frozenCount > 0 && <span style={{ color: 'rgba(255,255,255,0.3)' }}> · </span>}
-            {frozenCount > 0 && (
-              <span style={{ fontWeight: 600, color: '#FF9F0A' }}>{frozenCount} Mappe{frozenCount > 1 ? 'n' : ''} eingefroren</span>
-            )}
-            <span style={{ color: 'rgba(255,255,255,0.5)' }}> — dein Free-Plan erlaubt max. {limits.persons} Person{limits.persons > 1 ? 'en' : ''}. Eingefroren = nicht bearbeitbar.</span>
-          </div>
-          <button className="btn-glass btn-sm" style={{ flexShrink: 0, fontSize: 12, color: '#FF9F0A', border: '1px solid rgba(255,159,10,0.4)' }}
-            onClick={() => navigate('/account')}>
-            Upgrade →
-          </button>
-        </div>
-      )}
 
       {/* Section header + controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 8, flexWrap: 'wrap' }}>
@@ -454,13 +426,13 @@ export default function Dashboard() {
             <LayoutGrid size={13} /> Tracker
           </button>
           <AtsButton />
-          {/* Limit counters */}
           {[
             { used: persons.length, max: limits.persons, label: 'P' },
             { used: resumes.length, max: limits.resumes, label: 'M' },
           ].map(({ used, max, label }) => {
             const pct = used / max;
-            const color = pct >= 1 ? 'var(--ios-red)' : pct >= 0.8 ? '#FF9F0A' : 'rgba(255,255,255,0.3)';
+            if (pct < 0.8) return null;
+            const color = pct >= 1 ? 'var(--ios-red)' : '#FF9F0A';
             return (
               <span key={label} style={{ fontSize: 11, color, fontWeight: 500, whiteSpace: 'nowrap' }}>
                 {used}/{max} {label}
