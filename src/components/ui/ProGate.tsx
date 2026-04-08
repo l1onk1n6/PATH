@@ -45,7 +45,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
       <div
         className="glass-card animate-scale-in"
         style={{
-          padding: '28px 24px', width: 380, maxWidth: '92vw', maxHeight: '85vh', overflow: 'auto',
+          padding: '28px 24px', width: 660, maxWidth: '92vw', maxHeight: '88vh', overflow: 'auto',
           background: 'rgba(16, 16, 26, 0.97)',
           backdropFilter: 'blur(32px) saturate(1.6)',
           WebkitBackdropFilter: 'blur(32px) saturate(1.6)',
@@ -71,43 +71,47 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
         </div>
 
         {/* Feature list */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 24 }}>
+        <div style={{ marginBottom: 24 }}>
           {/* Available now */}
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(52,199,89,0.8)', textTransform: 'uppercase', padding: '2px 4px', marginBottom: 2 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(52,199,89,0.8)', textTransform: 'uppercase', padding: '2px 4px', marginBottom: 8 }}>
             ✓ Jetzt verfügbar
           </div>
-          {PRO_FEATURES.filter(f => f.available).map((f) => (
-            <div key={f.id} style={{
-              display: 'flex', alignItems: 'flex-start', gap: 12, padding: '9px 12px', borderRadius: 10,
-              background: f.id === highlightId ? 'rgba(255,159,10,0.12)' : 'rgba(52,199,89,0.07)',
-              border: `1px solid ${f.id === highlightId ? 'rgba(255,159,10,0.3)' : 'rgba(52,199,89,0.2)'}`,
-            }}>
-              <span style={{ fontSize: 16, flexShrink: 0, lineHeight: 1.3 }}>{f.icon}</span>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 1 }}>{f.label}</div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>{f.description}</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 6, marginBottom: 14 }}>
+            {PRO_FEATURES.filter(f => f.available).map((f) => (
+              <div key={f.id} style={{
+                display: 'flex', alignItems: 'flex-start', gap: 10, padding: '9px 12px', borderRadius: 10,
+                background: f.id === highlightId ? 'rgba(255,159,10,0.12)' : 'rgba(52,199,89,0.07)',
+                border: `1px solid ${f.id === highlightId ? 'rgba(255,159,10,0.3)' : 'rgba(52,199,89,0.2)'}`,
+              }}>
+                <span style={{ fontSize: 15, flexShrink: 0, lineHeight: 1.4 }}>{f.icon}</span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 1 }}>{f.label}</div>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>{f.description}</div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
 
           {/* Coming soon */}
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', padding: '2px 4px', marginTop: 6, marginBottom: 2 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', padding: '2px 4px', marginBottom: 8 }}>
             ⏳ In Entwicklung
           </div>
-          {PRO_FEATURES.filter(f => !f.available).map((f) => (
-            <div key={f.id} style={{
-              display: 'flex', alignItems: 'flex-start', gap: 12, padding: '9px 12px', borderRadius: 10,
-              background: f.id === highlightId ? 'rgba(255,159,10,0.12)' : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${f.id === highlightId ? 'rgba(255,159,10,0.3)' : 'rgba(255,255,255,0.07)'}`,
-              opacity: 0.7,
-            }}>
-              <span style={{ fontSize: 16, flexShrink: 0, lineHeight: 1.3 }}>{f.icon}</span>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 1 }}>{f.label}</div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{f.description}</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 6 }}>
+            {PRO_FEATURES.filter(f => !f.available).map((f) => (
+              <div key={f.id} style={{
+                display: 'flex', alignItems: 'flex-start', gap: 10, padding: '9px 12px', borderRadius: 10,
+                background: f.id === highlightId ? 'rgba(255,159,10,0.12)' : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${f.id === highlightId ? 'rgba(255,159,10,0.3)' : 'rgba(255,255,255,0.07)'}`,
+                opacity: 0.7,
+              }}>
+                <span style={{ fontSize: 15, flexShrink: 0, lineHeight: 1.4 }}>{f.icon}</span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 1 }}>{f.label}</div>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{f.description}</div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* CTA */}
