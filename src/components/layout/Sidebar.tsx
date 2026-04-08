@@ -180,8 +180,8 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
           className="btn-glass"
           style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isEditorActive ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isEditorActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
           <FileText size={16} style={{ opacity: isEditorActive ? 1 : 0.6 }} />
-          <span style={{ opacity: isEditorActive ? 1 : 0.7, flex: 1 }}>Editor</span>
-          <ChevronDown size={12} style={{ opacity: 0.4, transform: editorOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+          <span style={{ opacity: isEditorActive ? 1 : 0.7 }}>Editor</span>
+          <ChevronDown size={12} style={{ opacity: 0.4, marginLeft: 'auto', transform: editorOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
         </button>
 
         {isEditorActive && editorOpen && (
@@ -243,8 +243,8 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
           className="btn-glass"
           style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isAccountActive ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isAccountActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
           <UserCircle size={16} style={{ opacity: isAccountActive ? 1 : 0.6 }} />
-          <span style={{ opacity: isAccountActive ? 1 : 0.7, flex: 1 }}>Konto</span>
-          <ChevronDown size={12} style={{ opacity: 0.4, transform: accountOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+          <span style={{ opacity: isAccountActive ? 1 : 0.7 }}>Konto</span>
+          <ChevronDown size={12} style={{ opacity: 0.4, marginLeft: 'auto', transform: accountOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
         </button>
 
         {isAccountActive && accountOpen && (
@@ -263,17 +263,22 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         <button onClick={() => setPersonsOpen(v => !v)} className="btn-glass"
           style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: 'transparent', border: '1px solid transparent', boxShadow: 'none' }}>
           <Users size={16} style={{ opacity: 0.6 }} />
-          <span style={{ opacity: 0.7, flex: 1 }}>Personen</span>
-          <button className="btn-glass btn-icon btn-sm" onClick={(e) => { e.stopPropagation(); setAddingPerson(true); }} title="Person hinzufügen"
-            style={{ padding: 4, boxShadow: 'none', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', marginRight: 4 }}>
-            <Plus size={12} />
-          </button>
-          <ChevronDown size={12} style={{ opacity: 0.4, transform: personsOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+          <span style={{ opacity: 0.7 }}>Personen</span>
+          <ChevronDown size={12} style={{ opacity: 0.4, marginLeft: 'auto', transform: personsOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
         </button>
       </nav>
 
       {/* Persons list (collapsible) */}
       <div style={{ display: personsOpen ? 'flex' : 'none', flexDirection: 'column', minHeight: 0, marginLeft: 14, paddingLeft: 10, borderLeft: '1px solid rgba(255,255,255,0.1)', marginBottom: 4 }}>
+
+        {/* Sub-header with + button */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '2px 0 6px' }}>
+          <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase' }}>Personen</span>
+          <button className="btn-glass btn-icon btn-sm" onClick={() => setAddingPerson(true)} title="Person hinzufügen"
+            style={{ padding: 4, boxShadow: 'none', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <Plus size={12} />
+          </button>
+        </div>
 
         {addingPerson && (
           <div className="glass-card animate-scale-in" style={{ padding: 12, marginBottom: 8, borderRadius: 'var(--radius-sm)' }}>
