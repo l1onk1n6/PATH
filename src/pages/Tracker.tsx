@@ -131,7 +131,7 @@ export default function Tracker() {
   }
 
   return (
-    <div className="animate-fade-in glass" style={{ height: '100%', overflow: 'auto', borderRadius: 'var(--radius-lg)', padding: isMobile ? '14px 14px' : '20px 28px' }}>
+    <div className="animate-fade-in" style={{ height: '100%', overflow: 'auto', padding: isMobile ? '14px 14px' : '20px 28px' }}>
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
         <div>

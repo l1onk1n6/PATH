@@ -130,7 +130,7 @@ export default function Editor() {
         </div>
 
         {/* Editor content — also handles 'history' on mobile */}
-        <div className="glass" style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: '16px 16px' }}>
+        <div style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: '16px 16px' }}>
           {showTranslate && <TranslateDialog onClose={() => setShowTranslate(false)} />}
           {activeSection === 'history'
             ? <VersionHistoryPanel resumeId={resume.id} />
@@ -143,7 +143,7 @@ export default function Editor() {
 
   // ── Desktop layout: full-width content ───────────────────
   return (
-    <div className="animate-fade-in glass" style={{ height: '100%', overflow: 'auto', borderRadius: 'var(--radius-lg)', padding: '20px 28px 20px 22px' }}>
+    <div className="animate-fade-in" style={{ height: '100%', overflow: 'auto', padding: '20px 28px 20px 22px' }}>
       {showTranslate && <TranslateDialog onClose={() => setShowTranslate(false)} />}
 
       {activeSection === 'history' ? (
