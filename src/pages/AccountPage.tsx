@@ -37,10 +37,24 @@ function PlanSection() {
 
   // Detect Stripe success redirect + always refresh metadata on mount
   useEffect(() => {
-    refreshUser();
-    if (location.search.includes('success=1') || location.hash.includes('success=1')) {
+    const isSuccess = location.search.includes('success=1') || location.hash.includes('success=1');
+    if (isSuccess) {
       setShowSuccess(true);
       window.history.replaceState(null, '', window.location.pathname + window.location.hash.replace('?success=1', ''));
+      // Webhook is async — poll until plan is updated (max 5 attempts, 2s apart)
+      let attempts = 0;
+      const poll = async () => {
+        await refreshUser();
+        attempts++;
+        // useAuthStore state is updated by refreshUser; check via getState
+        const { user: u } = useAuthStore.getState();
+        if (u?.user_metadata?.plan !== 'pro' && attempts < 5) {
+          setTimeout(poll, 2000);
+        }
+      };
+      setTimeout(poll, 1500); // first check after 1.5s
+    } else {
+      refreshUser();
     }
   }, []);
 
