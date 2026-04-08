@@ -40,7 +40,7 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: isMobile ? '6px 4px 10px' : '4px 4px 14px',
+        padding: isMobile ? '8px 4px 14px' : '14px 4px 26px',
         marginBottom: 0,
         flexShrink: 0,
         gap: 10,
