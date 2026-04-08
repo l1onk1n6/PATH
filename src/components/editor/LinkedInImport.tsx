@@ -124,7 +124,10 @@ export default function LinkedInImportDialog({ onClose }: Props) {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(10,102,194,0.2)', border: '1px solid rgba(10,102,194,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14, color: '#0A66C2' }}>in</div>
+            <svg width="32" height="32" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+              <rect width="72" height="72" rx="10" fill="#0A66C2"/>
+              <path d="M20.4 28.8h8.1v23.4h-8.1V28.8zm4.05-12.96c2.59 0 4.69 2.1 4.69 4.69s-2.1 4.69-4.69 4.69-4.69-2.1-4.69-4.69 2.1-4.69 4.69-4.69zM33.3 28.8h7.76v3.2h.11c1.08-2.05 3.72-4.21 7.66-4.21 8.2 0 9.71 5.39 9.71 12.4v14h-8.1V41.7c0-3.02-.05-6.91-4.21-6.91-4.21 0-4.86 3.29-4.86 6.69v10.76H33.3V28.8z" fill="white"/>
+            </svg>
             <div>
               <div style={{ fontWeight: 700, fontSize: 15 }}>LinkedIn importieren</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>Schritt {step} von 2 · KI-gestützt</div>
