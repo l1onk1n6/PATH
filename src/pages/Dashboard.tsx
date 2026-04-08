@@ -4,8 +4,13 @@ import {
   Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp,
   FolderPlus, Pencil, Copy, Search, ExternalLink, Clock,
   Download, Share2, CheckCircle, LayoutGrid, List, X, BarChart2,
-  Lock,
+  Lock, MoreHorizontal,
 } from 'lucide-react';
+
+function safeUrl(url: string) {
+  if (!url) return url;
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}
 import { useResumeStore } from '../store/resumeStore';
 import {
   APPLICATION_STATUS_LABELS, APPLICATION_STATUS_COLORS,
@@ -277,6 +282,7 @@ export default function Dashboard() {
 
   const [statusMenuResumeId, setStatusMenuResumeId] = useState<string | null>(null);
   const [shareModalResumeId, setShareModalResumeId] = useState<string | null>(null);
+  const [menuOpenResumeId, setMenuOpenResumeId] = useState<string | null>(null);
 
   // Persons beyond the plan limit are frozen (read-only)
   const frozenPersonIds = new Set(
@@ -367,6 +373,56 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Resume action menu */}
+      {menuOpenResumeId && (() => {
+        const mr = resumes.find(r => r.id === menuOpenResumeId);
+        const mp = mr ? persons.find(p => p.resumeIds.includes(mr.id)) : null;
+        const mpResumes = mp ? mp.resumeIds.length : 0;
+        if (!mr) return null;
+        return (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)' }}
+            onClick={() => setMenuOpenResumeId(null)}>
+            <div className="glass-card animate-scale-in"
+              onClick={e => e.stopPropagation()}
+              style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', zIndex: 201, padding: 8, minWidth: 200, background: 'rgba(14,14,22,0.97)' }}>
+              <div style={{ fontSize: 11, fontWeight: 600, opacity: 0.4, padding: '6px 10px 4px', textTransform: 'uppercase' }}>
+                {mr.name || 'Bewerbungsmappe'}
+              </div>
+              {[
+                { icon: Share2, label: mr.shareToken ? 'Link teilen (aktiv)' : 'Link teilen', color: mr.shareToken ? 'var(--ios-blue)' : undefined,
+                  action: () => { setShareModalResumeId(mr.id); setMenuOpenResumeId(null); } },
+                { icon: Pencil, label: 'Umbenennen', action: () => { setRenamingResumeId(mr.id); setRenameValue(mr.name || 'Bewerbungsmappe'); setMenuOpenResumeId(null); } },
+                { icon: Copy, label: 'Duplizieren', action: () => { duplicateResume(mr.id); setMenuOpenResumeId(null); } },
+              ].map(({ icon: Icon, label, color, action }) => (
+                <button key={label} className="btn-glass"
+                  style={{ width: '100%', justifyContent: 'flex-start', gap: 10, fontSize: 13, padding: '9px 10px', color, boxShadow: 'none' }}
+                  onClick={action}>
+                  <Icon size={14} /> {label}
+                </button>
+              ))}
+              {mr.jobUrl && (
+                <a href={safeUrl(mr.jobUrl)} target="_blank" rel="noopener noreferrer"
+                  className="btn-glass"
+                  style={{ display: 'flex', width: '100%', justifyContent: 'flex-start', gap: 10, fontSize: 13, padding: '9px 10px', textDecoration: 'none', color: 'inherit', boxShadow: 'none' }}
+                  onClick={() => setMenuOpenResumeId(null)}>
+                  <ExternalLink size={14} /> Stelle öffnen
+                </a>
+              )}
+              {mpResumes > 1 && (
+                <>
+                  <div className="divider" style={{ margin: '6px 0' }} />
+                  <button className="btn-glass"
+                    style={{ width: '100%', justifyContent: 'flex-start', gap: 10, fontSize: 13, padding: '9px 10px', color: 'var(--ios-red)', borderColor: 'transparent', boxShadow: 'none' }}
+                    onClick={() => { if (confirm(`"${mr.name || 'Bewerbungsmappe'}" löschen?`)) { deleteResume(mr.id); } setMenuOpenResumeId(null); }}>
+                    <Trash2 size={14} /> Löschen
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Share modal */}
       {shareModalResumeId && shareResume && (
@@ -652,40 +708,15 @@ export default function Dashboard() {
                               )}
                             </div>
 
-                            {/* Actions */}
-                            <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0 }}>
+                            {/* Actions — single ⋯ menu */}
+                            <div style={{ flexShrink: 0 }}>
                               {!frozen && !isPersonFrozen && (
-                                <>
-                                  <button
-                                    className="btn-glass btn-sm"
-                                    title="Link teilen"
-                                    style={{ gap: 4, padding: '4px 8px', fontSize: 11, color: r.shareToken ? 'var(--ios-blue)' : undefined }}
-                                    onClick={(e) => { e.stopPropagation(); setShareModalResumeId(r.id); }}>
-                                    <Share2 size={12} /> Teilen
-                                  </button>
-                                  <button
-                                    className="btn-glass btn-icon"
-                                    title="Umbenennen"
-                                    style={{ padding: 6 }}
-                                    onClick={(e) => { e.stopPropagation(); setRenamingResumeId(r.id); setRenameValue(r.name || 'Bewerbungsmappe'); }}>
-                                    <Pencil size={13} />
-                                  </button>
-                                  <button
-                                    className="btn-glass btn-icon"
-                                    title="Duplizieren"
-                                    style={{ padding: 6 }}
-                                    onClick={(e) => { e.stopPropagation(); duplicateResume(r.id); }}>
-                                    <Copy size={13} />
-                                  </button>
-                                </>
-                              )}
-                              {personResumes.length > 1 && (
                                 <button
                                   className="btn-glass btn-icon"
-                                  title="Löschen"
-                                  style={{ padding: 6, color: 'var(--ios-red)', borderColor: 'rgba(255,59,48,0.3)' }}
-                                  onClick={(e) => { e.stopPropagation(); if (confirm(`"${r.name || 'Bewerbungsmappe'}" löschen?`)) deleteResume(r.id); }}>
-                                  <Trash2 size={13} />
+                                  title="Aktionen"
+                                  style={{ padding: 6, color: r.shareToken ? 'var(--ios-blue)' : undefined }}
+                                  onClick={(e) => { e.stopPropagation(); setMenuOpenResumeId(r.id); }}>
+                                  <MoreHorizontal size={15} />
                                 </button>
                               )}
                             </div>
