@@ -95,6 +95,7 @@ export async function upsertResume(resume: Resume): Promise<void> {
       certificates: resume.certificates,
       custom_sections: resume.customSections ?? [],
       share_token: resume.shareToken ?? null,
+      reminder_days: resume.reminderDays ?? [],
     });
   } catch (e) {
     console.warn('[db] upsertResume', e);
@@ -188,6 +189,7 @@ function rowToResume(row: Record<string, unknown>): Resume {
     documents: [],
     customSections: (row.custom_sections as Resume['customSections']) ?? [],
     shareToken: (row.share_token as string) ?? undefined,
+    reminderDays: (row.reminder_days as number[]) ?? [],
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };

@@ -66,7 +66,7 @@ export const PRO_FEATURES: ProFeature[] = [
   { id: 'analytics', label: 'Link-Analytics',           icon: '📈', description: 'Sehen wer deinen geteilten Lebenslauf aufgerufen hat',                  available: false },
   { id: 'translate', label: 'Mehrsprachige CVs',        icon: '🌍', description: 'Automatische Übersetzung in jede Sprache',                              available: true },
   { id: 'password',  label: 'PDF-Passwortschutz',       icon: '🔐', description: 'Bewerbungs-PDFs verschlüsselt versenden',                               available: false },
-  { id: 'reminder',  label: 'Deadline-Reminder',        icon: '⏰', description: 'E-Mail-Benachrichtigung vor Bewerbungsschluss',                         available: false },
+  { id: 'reminder',  label: 'Deadline-Reminder',        icon: '⏰', description: 'E-Mail-Benachrichtigung vor Bewerbungsschluss',                         available: true  },
   { id: 'video',     label: 'Video-Intro',              icon: '🎬', description: 'Kurzes Video-Profil zur Bewerbung hinzufügen',                          available: false },
 ];
 

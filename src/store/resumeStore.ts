@@ -122,7 +122,7 @@ interface ResumeStore {
 function createDefaultResume(personId: string, name = 'Bewerbungsmappe'): Resume {
   return {
     id: uuidv4(), personId,
-    name, status: 'entwurf', jobUrl: '', deadline: '',
+    name, status: 'entwurf', jobUrl: '', deadline: '', reminderDays: [],
     templateId: 'minimal', accentColor: '#007AFF',
     personalInfo: { firstName: '', lastName: '', title: '', email: '', phone: '', street: '', location: '', website: '', linkedin: '', github: '', summary: '' },
     coverLetter: { recipient: '', subject: '', body: '', closing: 'Mit freundlichen Grüssen' },

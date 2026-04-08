@@ -126,6 +126,7 @@ export interface Resume {
   documents: UploadedDocument[];
   customSections: CustomSection[];
   shareToken?: string;
+  reminderDays?: number[];   // e.g. [1, 3, 7] — days before deadline to send reminder
   createdAt: string;
   updatedAt: string;
 }

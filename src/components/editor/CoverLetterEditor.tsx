@@ -1,10 +1,87 @@
-import { useState } from 'react';
-import { Link, Calendar, Sparkles, Bell, Loader2, Wand2, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { Link, Calendar, Sparkles, Bell, BellOff, Loader2, Wand2, ChevronDown, ChevronUp, AlertTriangle, Check } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { generateCoverLetter, improveText } from '../../lib/ai';
 import ProGate from '../ui/ProGate';
 import { UpgradeModal } from '../ui/ProGate';
+import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
+import { useAuthStore } from '../../store/authStore';
+
+const REMINDER_OPTIONS = [
+  { days: 1, label: '1 Tag vorher' },
+  { days: 3, label: '3 Tage vorher' },
+  { days: 7, label: '7 Tage vorher' },
+];
+
+function ReminderPanel({ resumeId, deadline, reminderDays, onClose }: {
+  resumeId: string; deadline: string; reminderDays: number[]; onClose: () => void;
+}) {
+  const { updateResume } = useResumeStore();
+  const { session } = useAuthStore();
+  const [selected, setSelected] = useState<number[]>(reminderDays ?? []);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
+
+  const toggle = useCallback((days: number) => {
+    setSelected(prev => prev.includes(days) ? prev.filter(d => d !== days) : [...prev, days]);
+    setSaved(false);
+  }, []);
+
+  async function save() {
+    setSaving(true); setError('');
+    // Save to store
+    updateResume(resumeId, { reminderDays: selected });
+    // Sync to Supabase if configured
+    if (isSupabaseConfigured() && session?.access_token) {
+      try {
+        const resume = useResumeStore.getState().resumes.find(r => r.id === resumeId);
+        const supabase = getSupabase();
+        const { error: fnErr } = await supabase.functions.invoke('upsert-deadline-reminders', {
+          body: { resume_id: resumeId, deadline, reminder_days: selected, resume_name: resume?.name ?? '' },
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        });
+        if (fnErr) setError('Gespeichert, aber Sync fehlgeschlagen.');
+      } catch { setError('Gespeichert, aber Sync fehlgeschlagen.'); }
+    }
+    setSaving(false); setSaved(true);
+    setTimeout(onClose, 900);
+  }
+
+  return (
+    <div className="glass-card animate-scale-in" style={{ marginTop: 8, padding: 14, border: '1px solid rgba(0,122,255,0.25)', background: 'rgba(0,122,255,0.06)' }}>
+      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+        <Bell size={12} style={{ color: 'var(--ios-blue)' }} />
+        E-Mail-Reminder vor Frist
+      </div>
+      {!deadline && (
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 10 }}>
+          Zuerst eine Bewerbungsfrist setzen.
+        </div>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
+        {REMINDER_OPTIONS.map(({ days, label }) => (
+          <label key={days} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: deadline ? 'pointer' : 'default', opacity: deadline ? 1 : 0.4 }}>
+            <input type="checkbox" checked={selected.includes(days)} disabled={!deadline}
+              onChange={() => toggle(days)}
+              style={{ width: 15, height: 15, accentColor: 'var(--ios-blue)', cursor: 'pointer' }} />
+            <span style={{ fontSize: 13 }}>{label}</span>
+          </label>
+        ))}
+      </div>
+      {error && <div style={{ fontSize: 11, color: 'var(--ios-red)', marginBottom: 8 }}>{error}</div>}
+      <div style={{ display: 'flex', gap: 6 }}>
+        <button className="btn-glass btn-sm" onClick={onClose} style={{ fontSize: 12 }}>Abbrechen</button>
+        <button className="btn-glass btn-primary btn-sm" onClick={save} disabled={saving || !deadline}
+          style={{ fontSize: 12, gap: 5 }}>
+          {saved ? <><Check size={12} /> Gespeichert</> : saving ? <><Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> Speichern…</> : 'Speichern'}
+        </button>
+      </div>
+      <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
+    </div>
+  );
+}
 
 export default function CoverLetterEditor() {
   const { getActiveResume, updateCoverLetter, updateResume } = useResumeStore();
@@ -19,6 +96,7 @@ export default function CoverLetterEditor() {
   const [improvingBody, setImprovingBody] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [confirmOverwrite, setConfirmOverwrite] = useState<'generate' | 'improve' | null>(null);
+  const [showReminder, setShowReminder] = useState(false);
 
   if (!resume) return null;
 
@@ -150,13 +228,26 @@ export default function CoverLetterEditor() {
               style={{ flex: 1, color: deadlineColor ?? undefined }}
             />
             <ProGate featureId="reminder" badge>
-              <button className="btn-glass btn-icon" style={{ padding: 8 }} title="Deadline-Reminder">
-                <Bell size={13} />
+              <button
+                className="btn-glass btn-icon"
+                style={{ padding: 8, color: (resume.reminderDays?.length ?? 0) > 0 ? 'var(--ios-blue)' : undefined }}
+                title="Deadline-Reminder"
+                onClick={() => isPro ? setShowReminder(v => !v) : setShowUpgrade(true)}
+              >
+                {(resume.reminderDays?.length ?? 0) > 0 ? <Bell size={13} /> : <BellOff size={13} />}
               </button>
             </ProGate>
           </div>
           {resume.deadline && deadlineColor === 'var(--ios-red)' && (
             <div style={{ fontSize: 11, color: 'var(--ios-red)', marginTop: 4 }}>Frist abgelaufen</div>
+          )}
+          {showReminder && (
+            <ReminderPanel
+              resumeId={resume.id}
+              deadline={resume.deadline ?? ''}
+              reminderDays={resume.reminderDays ?? []}
+              onClose={() => setShowReminder(false)}
+            />
           )}
         </div>
       </div>

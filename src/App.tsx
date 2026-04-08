@@ -14,6 +14,7 @@ import { useAuthStore } from './store/authStore';
 import { useResumeStore } from './store/resumeStore';
 import { isSupabaseConfigured } from './lib/supabase';
 import { useIsMobile } from './hooks/useBreakpoint';
+import OnboardingModal, { isOnboardingDone } from './components/ui/OnboardingModal';
 
 const APP_VERSION = '1.6.0';
 
@@ -21,6 +22,7 @@ function AppShell() {
   const isMobile = useIsMobile();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => !isOnboardingDone());
   const { savePending, syncing } = useResumeStore();
 
   // Close drawer on resize to desktop
@@ -103,6 +105,11 @@ function AppShell() {
           </div>
         </div>
       </div>
+
+      {/* ── Onboarding ────────────────────────────────────── */}
+      {showOnboarding && (
+        <OnboardingModal onClose={() => setShowOnboarding(false)} />
+      )}
 
       {/* ── Footer ────────────────────────────────────────── */}
       <footer style={{
