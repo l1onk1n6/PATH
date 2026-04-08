@@ -19,12 +19,15 @@ const COUNTRY_IDS: Record<string, string> = {
   'Schweiz': '756', 'Deutschland': '276', 'Österreich': '40', 'Liechtenstein': '438',
 }
 
-// Find InvoiceNinja client ID by contact email (more reliable than custom_value1 filter)
+// Find InvoiceNinja client ID by contact email
 async function findNinjaClientId(url: string, token: string, email: string): Promise<string | null> {
   const res = await fetch(`${url}/api/v1/clients?filter=${encodeURIComponent(email)}&per_page=10`, {
     headers: { 'X-Api-Token': token, Accept: 'application/json' },
   })
-  if (!res.ok) return null
+  if (!res.ok) {
+    console.error('[update-user-profile] ninja search failed:', res.status, await res.text())
+    return null
+  }
   const data = await res.json()
   const client = (data?.data ?? []).find((c: Record<string, unknown>) =>
     (c.contacts as Array<{ email: string }>)?.some(
@@ -60,7 +63,7 @@ Deno.serve(async (req) => {
   const results: Record<string, string> = {}
 
   // 2. Listmonk
-  const lmUrl  = Deno.env.get('LISTMONK_URL')
+  const lmUrl  = Deno.env.get('LISTMONK_URL')?.replace(/\/$/, '')  // strip trailing slash
   const lmUser = Deno.env.get('LISTMONK_USERNAME')
   const lmPass = Deno.env.get('LISTMONK_PASSWORD')
 
@@ -68,10 +71,14 @@ Deno.serve(async (req) => {
     try {
       const lmAuth = `Basic ${btoa(`${lmUser}:${lmPass}`)}`
       const query  = encodeURIComponent(`subscribers.email = '${email}'`)
-      const searchRes = await fetch(`${lmUrl}/api/subscribers?query=${query}&page=1&per_page=1`, {
+      const searchUrl = `${lmUrl}/api/subscribers?query=${query}&page=1&per_page=1`
+      console.log('[update-user-profile] listmonk search:', searchUrl)
+      const searchRes = await fetch(searchUrl, {
         headers: { Authorization: lmAuth },
       })
       if (!searchRes.ok) {
+        const body = await searchRes.text()
+        console.error('[update-user-profile] listmonk search error:', searchRes.status, body)
         results.listmonk = `search_error_${searchRes.status}`
       } else {
         const sub = (await searchRes.json())?.data?.results?.[0]
@@ -88,6 +95,7 @@ Deno.serve(async (req) => {
               preconfirm_subscriptions: true,
             }),
           })
+          if (!createRes.ok) console.error('[update-user-profile] listmonk create error:', createRes.status, await createRes.text())
           results.listmonk = createRes.ok ? 'created' : createRes.status === 409 ? 'already_exists' : `create_error_${createRes.status}`
         } else {
           const putRes = await fetch(`${lmUrl}/api/subscribers/${sub.id}`, {
@@ -99,29 +107,39 @@ Deno.serve(async (req) => {
               attribs: { ...(sub.attribs ?? {}), phone, street, zip, city, country },
             }),
           })
+          if (!putRes.ok) console.error('[update-user-profile] listmonk update error:', putRes.status, await putRes.text())
           results.listmonk = putRes.ok ? 'updated' : `error_${putRes.status}`
         }
       }
     } catch (e) { results.listmonk = `exception: ${e}` }
-  } else { results.listmonk = 'not_configured' }
+  } else {
+    results.listmonk = 'not_configured'
+    console.warn('[update-user-profile] Listmonk secrets missing:', { lmUrl: !!lmUrl, lmUser: !!lmUser, lmPass: !!lmPass })
+  }
 
   // 3. InvoiceNinja — find by email, update or create
-  const ninjaUrl   = Deno.env.get('INVOICE_NINJA_URL')
+  const ninjaUrl   = Deno.env.get('INVOICE_NINJA_URL')?.replace(/\/$/, '')
   const ninjaToken = Deno.env.get('INVOICE_NINJA_TOKEN')
 
   if (ninjaUrl && ninjaToken) {
     try {
       const clientId = await findNinjaClientId(ninjaUrl, ninjaToken, email)
-      const payload  = {
-        name, phone, address1: street, postal_code: zip, city,
-        country_id: COUNTRY_IDS[country] ?? '',
-      }
       const headers  = { 'X-Api-Token': ninjaToken, 'Content-Type': 'application/json', Accept: 'application/json' }
+
+      // Build payload — omit empty/invalid fields
+      const countryId = COUNTRY_IDS[country]
+      const payload: Record<string, string> = { name }
+      if (phone)     payload.phone       = phone
+      if (street)    payload.address1    = street
+      if (zip)       payload.postal_code = zip
+      if (city)      payload.city        = city
+      if (countryId) payload.country_id  = countryId
 
       if (clientId) {
         const res = await fetch(`${ninjaUrl}/api/v1/clients/${clientId}`, {
           method: 'PUT', headers, body: JSON.stringify(payload),
         })
+        if (!res.ok) console.error('[update-user-profile] ninja update error:', res.status, await res.text())
         results.ninja = res.ok ? 'updated' : `error_${res.status}`
       } else {
         // Client not found — create
@@ -134,10 +152,14 @@ Deno.serve(async (req) => {
             custom_value1: user.id,
           }),
         })
+        if (!res.ok) console.error('[update-user-profile] ninja create error:', res.status, await res.text())
         results.ninja = res.ok ? 'created' : `error_${res.status}`
       }
     } catch (e) { results.ninja = `exception: ${e}` }
-  } else { results.ninja = 'not_configured' }
+  } else {
+    results.ninja = 'not_configured'
+    console.warn('[update-user-profile] InvoiceNinja secrets missing')
+  }
 
   console.log(`[update-user-profile] ${email}:`, results)
   return new Response(JSON.stringify({ ok: true, results }), {
