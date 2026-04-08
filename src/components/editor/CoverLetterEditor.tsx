@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, Calendar, Sparkles, Bell, Loader2, Wand2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Link, Calendar, Sparkles, Bell, Loader2, Wand2, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { generateCoverLetter, improveText } from '../../lib/ai';
@@ -18,10 +18,12 @@ export default function CoverLetterEditor() {
   const [generatingCL, setGeneratingCL] = useState(false);
   const [improvingBody, setImprovingBody] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [confirmOverwrite, setConfirmOverwrite] = useState<'generate' | 'improve' | null>(null);
 
   if (!resume) return null;
 
   const cl = resume.coverLetter ?? { recipient: '', subject: '', body: '', closing: 'Mit freundlichen Grüssen' };
+  const hasExistingBody = cl.body.trim().length > 0;
 
   function update(field: keyof typeof cl, value: string) {
     updateCoverLetter(resume!.id, { [field]: value });
@@ -35,15 +37,14 @@ export default function CoverLetterEditor() {
     return 'var(--ios-green)';
   })();
 
-  async function handleGenerateCL() {
-    if (!isPro) { setShowUpgrade(true); return; }
+  async function doGenerateCL() {
+    setConfirmOverwrite(null);
     setGeneratingCL(true);
     const summary = resume!.personalInfo.summary ?? '';
     const experience = resume!.workExperience
       .slice(0, 3)
       .map(j => `${j.position} bei ${j.company}${j.description ? ': ' + j.description : ''}`)
       .join('\n');
-
     const result = await generateCoverLetter({
       jobTitle:       aiJobTitle || resume!.personalInfo.title,
       company:        aiCompany,
@@ -56,18 +57,71 @@ export default function CoverLetterEditor() {
     setShowAiPanel(false);
   }
 
-  async function handleImproveBody() {
-    if (!isPro) { setShowUpgrade(true); return; }
-    if (!cl.body.trim()) return;
+  async function doImproveBody() {
+    setConfirmOverwrite(null);
     setImprovingBody(true);
     const result = await improveText(cl.body, `Bewerbung als ${resume!.personalInfo.title || 'Fachkraft'}`);
     if (result) update('body', result);
     setImprovingBody(false);
   }
 
+  function handleGenerateCL() {
+    if (!isPro) { setShowUpgrade(true); return; }
+    if (hasExistingBody) { setConfirmOverwrite('generate'); return; }
+    doGenerateCL();
+  }
+
+  function handleImproveBody() {
+    if (!isPro) { setShowUpgrade(true); return; }
+    if (!cl.body.trim()) return;
+    setConfirmOverwrite('improve');
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
       {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} highlightId="ai" />}
+
+      {/* Overwrite confirmation modal */}
+      {confirmOverwrite && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 200,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)',
+        }} onClick={() => setConfirmOverwrite(null)}>
+          <div className="glass-card animate-scale-in"
+            style={{ padding: '28px 24px', width: 360, maxWidth: '92vw', background: 'rgba(16,16,26,0.97)' }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(255,159,10,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <AlertTriangle size={18} style={{ color: '#FF9F0A' }} />
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 15 }}>Bestehenden Text überschreiben?</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
+                  {confirmOverwrite === 'generate'
+                    ? 'Der KI-Assistent ersetzt deinen aktuellen Anschreiben-Text.'
+                    : 'Der verbesserte Text ersetzt deinen aktuellen Anschreiben-Text.'}
+                </div>
+              </div>
+            </div>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: '0 0 20px', lineHeight: 1.55 }}>
+              Dein bestehender Text wird unwiderruflich ersetzt. Möchtest du fortfahren?
+            </p>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn-glass" style={{ flex: 1 }} onClick={() => setConfirmOverwrite(null)}>
+                Abbrechen
+              </button>
+              <button
+                className="btn-glass"
+                style={{ flex: 1, background: 'rgba(255,159,10,0.2)', border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', fontWeight: 700 }}
+                onClick={() => confirmOverwrite === 'generate' ? doGenerateCL() : doImproveBody()}
+              >
+                Ja, überschreiben
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Job details */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -134,6 +188,12 @@ export default function CoverLetterEditor() {
 
         {showAiPanel && (
           <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {hasExistingBody && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, background: 'rgba(255,159,10,0.08)', border: '1px solid rgba(255,159,10,0.2)', fontSize: 12, color: '#FF9F0A' }}>
+                <AlertTriangle size={12} style={{ flexShrink: 0 }} />
+                Der bestehende Anschreiben-Text wird überschrieben.
+              </div>
+            )}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <div>
                 <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Stelle</label>
@@ -148,7 +208,7 @@ export default function CoverLetterEditor() {
             </div>
             <div>
               <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>
-                Stellenbeschreibung (optional einfügen für bessere Ergebnisse)
+                Stellenbeschreibung (optional, für bessere Ergebnisse)
               </label>
               <textarea className="input-glass" placeholder="Stellenbeschreibung hier einfügen…" value={aiJobDesc}
                 onChange={e => setAiJobDesc(e.target.value)} rows={4}
@@ -160,7 +220,8 @@ export default function CoverLetterEditor() {
               disabled={generatingCL}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                padding: '10px 16px', background: generatingCL ? 'rgba(255,159,10,0.1)' : 'linear-gradient(135deg, rgba(255,159,10,0.3), rgba(255,55,95,0.2))',
+                padding: '10px 16px',
+                background: generatingCL ? 'rgba(255,159,10,0.1)' : 'linear-gradient(135deg, rgba(255,159,10,0.3), rgba(255,55,95,0.2))',
                 border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', fontWeight: 700, fontSize: 13,
               }}
             >
