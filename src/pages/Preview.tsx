@@ -222,8 +222,19 @@ export default function Preview() {
       width: 794, minHeight: 1123, background: '#fff', color: '#111',
       fontFamily: 'Georgia, "Times New Roman", serif',
       fontSize: 13, lineHeight: 1.7, padding: '80px 80px 60px',
-      boxSizing: 'border-box',
+      boxSizing: 'border-box', position: 'relative',
     }}>
+      {/* Page break indicator — visible in preview, not in PDF (it's at exact 1123px) */}
+      <div style={{
+        position: 'absolute', top: 1123, left: 0, right: 0, pointerEvents: 'none',
+        borderTop: '1.5px dashed rgba(180,180,220,0.7)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <span style={{
+          fontSize: 9, color: 'rgba(100,100,180,0.7)', background: '#fff',
+          padding: '0 8px', letterSpacing: '0.05em', fontFamily: 'sans-serif',
+        }}>— Seite 2 —</span>
+      </div>
       {/* Sender info top right */}
       <div style={{ textAlign: 'right', marginBottom: 40, fontSize: 12, color: '#555' }}>
         {senderName && <div style={{ fontWeight: 700, fontSize: 14, color: '#111' }}>{senderName}</div>}
@@ -259,7 +270,7 @@ export default function Preview() {
 
       {/* Closing */}
       <div>
-        <div style={{ marginBottom: 48 }}>{cl.closing || 'Mit freundlichen Grüssen'}</div>
+        <div style={{ marginBottom: 48, whiteSpace: 'pre-wrap' }}>{cl.closing || 'Mit freundlichen Grüssen'}</div>
         {senderName && <div style={{ fontWeight: 700 }}>{senderName}</div>}
       </div>
     </div>
