@@ -180,20 +180,35 @@ function PlanSection() {
         <div className="divider" style={{ margin: '12px 0' }} />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {PRO_FEATURES.map((f) => (
-            <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 15 }}>{f.icon}</span>
-              <span style={{ fontSize: 13, flex: 1 }}>{f.label}</span>
-              <span style={{
-                fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4,
-                background: isPro ? 'rgba(52,199,89,0.15)' : 'rgba(255,159,10,0.12)',
-                border: isPro ? '1px solid rgba(52,199,89,0.3)' : '1px solid rgba(255,159,10,0.25)',
-                color: isPro ? 'var(--ios-green)' : '#FF9F0A',
-              }}>
-                {isPro ? '✓ Aktiv' : 'PRO'}
-              </span>
-            </div>
-          ))}
+          {PRO_FEATURES.map((f) => {
+            const status = !isPro ? 'locked' : f.available ? 'active' : 'soon';
+            return (
+              <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 15, opacity: status === 'soon' ? 0.4 : 1 }}>{f.icon}</span>
+                <span style={{ fontSize: 13, flex: 1, opacity: status === 'soon' ? 0.4 : 1 }}>{f.label}</span>
+                <span style={{
+                  fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4,
+                  background: status === 'active'
+                    ? 'rgba(52,199,89,0.15)'
+                    : status === 'soon'
+                    ? 'rgba(255,255,255,0.05)'
+                    : 'rgba(255,159,10,0.12)',
+                  border: status === 'active'
+                    ? '1px solid rgba(52,199,89,0.3)'
+                    : status === 'soon'
+                    ? '1px solid rgba(255,255,255,0.08)'
+                    : '1px solid rgba(255,159,10,0.25)',
+                  color: status === 'active'
+                    ? 'var(--ios-green)'
+                    : status === 'soon'
+                    ? 'rgba(255,255,255,0.22)'
+                    : '#FF9F0A',
+                }}>
+                  {status === 'active' ? '✓ Aktiv' : status === 'soon' ? 'Bald' : 'PRO'}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
