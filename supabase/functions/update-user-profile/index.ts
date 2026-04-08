@@ -71,10 +71,8 @@ Deno.serve(async (req) => {
   if (lmUrl && lmUser && lmPass) {
     try {
       const lmAuth = `Basic ${btoa(unescape(encodeURIComponent(`${lmUser}:${lmPass}`)))}`
-      console.log('[update-user-profile] listmonk user:', lmUser, 'pass length:', lmPass.length)
       const query  = encodeURIComponent(`subscribers.email = '${email}'`)
       const searchUrl = `${lmUrl}/api/subscribers?query=${query}&page=1&per_page=1`
-      console.log('[update-user-profile] listmonk search:', searchUrl)
       const searchRes = await fetch(searchUrl, {
         headers: { Authorization: lmAuth },
       })
