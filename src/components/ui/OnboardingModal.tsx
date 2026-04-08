@@ -34,8 +34,9 @@ export default function OnboardingModal({ onClose }: Props) {
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
   const [creating, setCreating] = useState(false);
-  const { addPerson } = useResumeStore();
+  const { addPerson, persons } = useResumeStore();
   const navigate = useNavigate();
+  const hasPersons = persons.length > 0;
 
   async function handleCreate() {
     if (!name.trim()) return;
@@ -43,6 +44,11 @@ export default function OnboardingModal({ onClose }: Props) {
     await addPerson(name.trim());
     setCreating(false);
     setStep(2);
+  }
+
+  function goNext() {
+    // Skip name step if user already has a person
+    setStep(hasPersons ? 2 : 1);
   }
 
   function finish() {
@@ -82,7 +88,7 @@ export default function OnboardingModal({ onClose }: Props) {
               Lass uns in 2 Minuten alles einrichten.
             </p>
             <button className="btn-glass btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '14px', fontWeight: 700, fontSize: 15, gap: 8 }}
-              onClick={() => setStep(1)}>
+              onClick={goNext}>
               Loslegen <ArrowRight size={16} />
             </button>
             <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 12, fontFamily: 'var(--font-sf)' }}>
@@ -114,6 +120,9 @@ export default function OnboardingModal({ onClose }: Props) {
               disabled={!name.trim() || creating}
               onClick={handleCreate}>
               {creating ? 'Erstelle…' : <>Profil anlegen <ArrowRight size={15} /></>}
+            </button>
+            <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 12, fontFamily: 'var(--font-sf)', width: '100%' }}>
+              Überspringen
             </button>
           </div>
         )}
@@ -150,6 +159,9 @@ export default function OnboardingModal({ onClose }: Props) {
             <button className="btn-glass btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '14px', fontWeight: 700, fontSize: 15, gap: 8 }}
               onClick={finish}>
               <Check size={16} /> Zum Editor
+            </button>
+            <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 12, fontFamily: 'var(--font-sf)', width: '100%' }}>
+              Schliessen
             </button>
           </div>
         )}
