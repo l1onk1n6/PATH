@@ -78,12 +78,12 @@ function PlanSection() {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (error || !data?.url) {
-        setPortalError(data?.error ?? 'Portal konnte nicht geöffnet werden. Bitte support@pixmatic.ch kontaktieren.');
+        setPortalError(data?.error ?? 'Portal konnte nicht geöffnet werden. Bitte info@pixmatic.ch kontaktieren.');
       } else {
         window.location.href = data.url;
       }
     } catch {
-      setPortalError('Portal konnte nicht geöffnet werden. Bitte support@pixmatic.ch kontaktieren.');
+      setPortalError('Portal konnte nicht geöffnet werden. Bitte info@pixmatic.ch kontaktieren.');
     } finally {
       setPortalLoading(false);
     }

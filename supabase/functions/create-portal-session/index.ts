@@ -11,10 +11,14 @@ const cors = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
-/** Decode JWT payload without re-verifying (gateway already verified) */
+/** Decode JWT payload (with base64url padding fix) */
 function jwtPayload(token: string): Record<string, unknown> {
-  const part = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
-  return JSON.parse(atob(part))
+  try {
+    let part = token.split('.')[1] ?? ''
+    part = part.replace(/-/g, '+').replace(/_/g, '/')
+    while (part.length % 4 !== 0) part += '='
+    return JSON.parse(atob(part))
+  } catch { return {} }
 }
 
 Deno.serve(async (req) => {
