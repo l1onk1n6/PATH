@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User, Briefcase, GraduationCap, Zap, FolderOpen,
-  Upload, Palette, AlertCircle, FileEdit, LayoutList, Lock, Languages,
+  Upload, Palette, AlertCircle, FileEdit, LayoutList, Lock, Languages, History,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import { usePlan } from '../lib/plan';
@@ -18,6 +18,7 @@ import DocumentUpload from '../components/editor/DocumentUpload';
 import CustomSectionEditor from '../components/editor/CustomSectionEditor';
 import TemplateSelector from '../components/templates/TemplateSelector';
 import TranslateDialog from '../components/editor/TranslateDialog';
+import VersionHistoryPanel from '../components/editor/VersionHistoryPanel';
 import { useIsMobile } from '../hooks/useBreakpoint';
 
 const SECTIONS: { id: EditorSection; label: string; short: string; icon: React.ComponentType<LucideProps> }[] = [
@@ -38,6 +39,7 @@ export default function Editor() {
   const { getActiveResume, getActivePerson, activeSection, setActiveSection, resumes } = useResumeStore();
   const { limits } = usePlan();
   const [showTranslate, setShowTranslate] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const resume = getActiveResume();
   const person = getActivePerson();
 
@@ -200,11 +202,11 @@ export default function Editor() {
           );
         })}
 
-        {/* Translate button */}
-        <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        {/* Translate + History buttons */}
+        <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: 4 }}>
           <button
             className="btn-glass"
-            onClick={() => setShowTranslate(true)}
+            onClick={() => { setShowTranslate(true); setShowHistory(false); }}
             style={{
               justifyContent: 'flex-start', width: '100%',
               padding: '10px 12px', borderRadius: 'var(--radius-sm)',
@@ -218,6 +220,42 @@ export default function Editor() {
               Übersetzen
             </span>
           </button>
+
+          {limits.versionHistory ? (
+            <button
+              className="btn-glass"
+              onClick={() => setShowHistory(v => !v)}
+              style={{
+                justifyContent: 'flex-start', width: '100%',
+                padding: '10px 12px', borderRadius: 'var(--radius-sm)',
+                boxShadow: 'none', gap: 8,
+                background: showHistory ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'rgba(255,255,255,0.05)',
+                border: showHistory ? '1px solid rgba(0,122,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
+              }}
+            >
+              <History size={14} style={{ opacity: showHistory ? 1 : 0.55, flexShrink: 0 }} />
+              <span style={{ fontSize: 12, fontWeight: showHistory ? 600 : 400, opacity: showHistory ? 1 : 0.65, textAlign: 'left', lineHeight: 1.2 }}>
+                Versionen
+              </span>
+            </button>
+          ) : (
+            <button
+              className="btn-glass"
+              disabled
+              title="Pro-Feature"
+              style={{
+                justifyContent: 'flex-start', width: '100%',
+                padding: '10px 12px', borderRadius: 'var(--radius-sm)',
+                boxShadow: 'none', gap: 8, opacity: 0.4, cursor: 'not-allowed',
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.06)',
+              }}
+            >
+              <History size={14} style={{ flexShrink: 0 }} />
+              <span style={{ fontSize: 12, textAlign: 'left', lineHeight: 1.2, flex: 1 }}>Versionen</span>
+              <Lock size={11} style={{ opacity: 0.5 }} />
+            </button>
+          )}
         </div>
       </aside>
 
@@ -226,6 +264,10 @@ export default function Editor() {
         className="glass"
         style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: '20px 22px' }}
       >
+        {showHistory ? (
+          <VersionHistoryPanel resumeId={resume.id} />
+        ) : (
+        <>
         {/* Section header */}
         <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -243,6 +285,8 @@ export default function Editor() {
         </div>
 
         {renderSection()}
+        </>
+        )}
       </div>
     </div>
   );
