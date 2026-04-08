@@ -3,7 +3,8 @@ import { useLocation } from 'react-router-dom';
 import {
   User, Shield, Lock, Sparkles, Mail, ExternalLink,
   ChevronRight, AlertTriangle, Download, Trash2, KeyRound,
-  CreditCard, Loader2, CheckCircle, PlayCircle,
+  CreditCard, Loader2, CheckCircle, PlayCircle, LogOut,
+  Copy, Check, Gift,
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useResumeStore } from '../store/resumeStore';
@@ -15,12 +16,13 @@ import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 import { resetOnboarding } from '../components/ui/OnboardingModal';
 import { useNavigate } from 'react-router-dom';
 
-type Section = 'plan' | 'account' | 'security' | 'privacy';
+type Section = 'plan' | 'account' | 'security' | 'referral' | 'privacy';
 
 const NAV: { id: Section; label: string; icon: React.ComponentType<{ size: number }> }[] = [
   { id: 'plan',     label: 'Plan & Features',    icon: Sparkles },
   { id: 'account',  label: 'Konto',               icon: User },
   { id: 'security', label: 'Sicherheit',           icon: Lock },
+  { id: 'referral', label: 'Freunde einladen',     icon: Gift },
   { id: 'privacy',  label: 'Datenschutz',          icon: Shield },
 ];
 
@@ -28,6 +30,9 @@ const NAV: { id: Section; label: string; icon: React.ComponentType<{ size: numbe
 function PlanSection() {
   const { isPro, plan, limits } = usePlan();
   const { persons, resumes } = useResumeStore();
+  const totalDocMb = Math.round(
+    resumes.flatMap(r => r.documents ?? []).reduce((s, d) => s + d.size, 0) / (1024 * 1024) * 10
+  ) / 10;
   const { refreshUser, user } = useAuthStore();
   const location = useLocation();
   const [showUpgrade, setShowUpgrade] = useState(false);
@@ -211,7 +216,7 @@ function PlanSection() {
           { label: 'Foto-Upload-Grösse', used: null, max: LIMITS[plan].photoMb, unit: 'MB' },
           { label: 'Eigene Sektionen / Mappe', used: null, max: LIMITS[plan].customSections },
           { label: 'Templates', used: null, max: LIMITS[plan].templates },
-          { label: 'Dokumente gesamt', used: null, max: LIMITS[plan].documentsMb, unit: 'MB' },
+          { label: 'Dokumente gesamt', used: totalDocMb, max: LIMITS[plan].documentsMb, unit: 'MB' },
           { label: 'CV-Versionshistorie', used: null, max: limits.versionHistory ? 1 : 0, isBoolean: true },
         ].map(({ label, used, max, unit, isBoolean }) => {
           const pct = used !== null ? used / max : 0;
@@ -291,7 +296,7 @@ function PlanSection() {
 
 // ── Section: Account ───────────────────────────────────────
 function AccountSection() {
-  const { user } = useAuthStore();
+  const { user, signOut } = useAuthStore();
   const { exportGdprData, persons, resumes } = useResumeStore();
   const navigate = useNavigate();
 
@@ -351,6 +356,17 @@ function AccountSection() {
           <Mail size={13} /> info@pixmatic.ch
         </a>
       </div>
+
+      <div className="glass-card" style={{ padding: 20 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>SITZUNG</div>
+        <button
+          className="btn-glass btn-sm btn-danger"
+          onClick={() => signOut()}
+          style={{ gap: 6 }}
+        >
+          <LogOut size={13} /> Abmelden
+        </button>
+      </div>
     </div>
   );
 }
@@ -385,10 +401,112 @@ function SecuritySection() {
       </div>
 
       <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>AKTIVE SITZUNG</div>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>
-          Du bist aktuell mit <strong>{user?.email}</strong> angemeldet. Alle Daten sind verschlüsselt in der Schweizer Supabase-Region gespeichert.
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 10, opacity: 0.6 }}>AKTIVE SITZUNG</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: 'rgba(255,255,255,0.5)' }}>Angemeldet als</span>
+            <span style={{ fontWeight: 500 }}>{user?.email ?? '—'}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: 'rgba(255,255,255,0.5)' }}>Letzte Anmeldung</span>
+            <span style={{ fontWeight: 500 }}>
+              {user?.last_sign_in_at
+                ? new Date(user.last_sign_in_at).toLocaleString('de-CH', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                : '—'}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Section: Referral ──────────────────────────────────────
+function ReferralSection() {
+  const { user } = useAuthStore();
+  const [copied, setCopied] = useState(false);
+  const [stats, setStats] = useState<{ total: number; subscribed: number; rewarded: number } | null>(null);
+
+  const refLink = user
+    ? `${window.location.origin}${window.location.pathname}#/?ref=${user.id}`
+    : '';
+
+  useEffect(() => {
+    if (!user || !isSupabaseConfigured()) return;
+    getSupabase()
+      .from('referrals')
+      .select('subscribed, rewarded')
+      .eq('referrer_id', user.id)
+      .then(({ data }) => {
+        if (data) {
+          const rows = data as { subscribed: boolean; rewarded: boolean }[];
+          setStats({
+            total:      rows.length,
+            subscribed: rows.filter(r => r.subscribed).length,
+            rewarded:   rows.filter(r => r.rewarded).length,
+          });
+        }
+      });
+  }, [user]);
+
+  function copyLink() {
+    navigator.clipboard.writeText(refLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div className="glass-card" style={{ padding: 20, background: 'rgba(0,122,255,0.06)', border: '1px solid rgba(0,122,255,0.2)' }}>
+        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>Freunde einladen, 1 Monat gratis</div>
+        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', lineHeight: 1.65, margin: 0 }}>
+          Teile deinen persönlichen Link. Wenn sich jemand über deinen Link registriert und ein Pro-Abo abschliesst, bekommst du automatisch einen Gratismonat gutgeschrieben.
         </p>
+      </div>
+
+      <div className="glass-card" style={{ padding: 20 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>DEIN EINLADUNGSLINK</div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div style={{
+            flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 8, padding: '9px 12px', fontSize: 12, fontFamily: 'monospace',
+            color: 'rgba(255,255,255,0.55)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
+            {refLink}
+          </div>
+          <button className="btn-glass btn-sm" onClick={copyLink} style={{ gap: 6, flexShrink: 0 }}>
+            {copied
+              ? <Check size={13} style={{ color: 'var(--ios-green)' }} />
+              : <Copy size={13} />}
+            {copied ? 'Kopiert!' : 'Kopieren'}
+          </button>
+        </div>
+      </div>
+
+      <div className="glass-card" style={{ padding: 20 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>DEINE STATISTIK</div>
+        {stats === null ? (
+          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>Lädt…</div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+            {[
+              { label: 'Eingeladen', value: stats.total },
+              { label: 'Pro-Abos',   value: stats.subscribed },
+              { label: 'Gratismonate', value: stats.rewarded },
+            ].map(({ label, value }) => (
+              <div key={label} style={{
+                textAlign: 'center', padding: '14px 8px',
+                background: 'rgba(255,255,255,0.04)', borderRadius: 10,
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}>
+                <div style={{ fontSize: 26, fontWeight: 700, color: value > 0 ? 'var(--ios-green)' : 'rgba(255,255,255,0.45)' }}>
+                  {value}
+                </div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>{label}</div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -456,6 +574,7 @@ export default function AccountPage() {
       case 'plan':     return <PlanSection />;
       case 'account':  return <AccountSection />;
       case 'security': return <SecuritySection />;
+      case 'referral': return <ReferralSection />;
       case 'privacy':  return <PrivacySection />;
     }
   };

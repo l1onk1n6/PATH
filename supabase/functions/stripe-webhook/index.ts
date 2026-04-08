@@ -65,6 +65,41 @@ Deno.serve(async (req) => {
           periodEnd = sub.current_period_end ?? null
         }
         await setPlan(userId, 'pro', periodEnd ? { subscription_period_end: periodEnd } : {})
+
+        // ── Referral reward ──────────────────────────────────
+        // If this user was referred and hasn't been rewarded yet, credit the referrer 1 month
+        if (session.mode === 'subscription') {
+          try {
+            const { data: referral } = await admin
+              .from('referrals')
+              .select('id, referrer_id')
+              .eq('referee_id', userId)
+              .eq('subscribed', false)
+              .maybeSingle()
+
+            if (referral) {
+              await admin.from('referrals')
+                .update({ subscribed: true, rewarded: true })
+                .eq('id', referral.id)
+
+              const { data: referrerStripe } = await admin
+                .from('stripe_customers')
+                .select('stripe_customer_id')
+                .eq('user_id', referral.referrer_id)
+                .maybeSingle()
+
+              if (referrerStripe?.stripe_customer_id) {
+                await stripe.customers.createBalanceTransaction(
+                  referrerStripe.stripe_customer_id,
+                  { amount: -990, currency: 'chf', description: 'Referral reward: 1 free month' },
+                )
+                console.log(`✓ Referral reward (−CHF 9.90) credited to ${referral.referrer_id}`)
+              }
+            }
+          } catch (e) {
+            console.error('Referral reward error:', e)
+          }
+        }
       }
       break
     }

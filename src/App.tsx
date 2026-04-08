@@ -12,7 +12,7 @@ import SharedResumePage from './pages/SharedResumePage';
 import AccountPage from './pages/AccountPage';
 import { useAuthStore } from './store/authStore';
 import { useResumeStore } from './store/resumeStore';
-import { isSupabaseConfigured } from './lib/supabase';
+import { isSupabaseConfigured, getSupabase } from './lib/supabase';
 import { useIsMobile } from './hooks/useBreakpoint';
 import OnboardingModal, { isOnboardingDone } from './components/ui/OnboardingModal';
 
@@ -176,6 +176,22 @@ export default function App() {
   useEffect(() => {
     if (user && !passwordRecovery) syncFromCloud();
   }, [user, passwordRecovery, syncFromCloud]);
+
+  // Process pending referral after login/signup
+  useEffect(() => {
+    if (!user || !isSupabaseConfigured()) return;
+    const ref = localStorage.getItem('path_ref');
+    if (!ref) return;
+    localStorage.removeItem('path_ref');
+    getSupabase().auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        getSupabase().functions.invoke('record-referral', {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+          body: { referrer_id: ref },
+        }).catch(() => {});
+      }
+    });
+  }, [user]);
 
   if (isSharedRoute) {
     return <HashRouter><Routes><Route path="/shared" element={<SharedResumePage />} /></Routes></HashRouter>;
