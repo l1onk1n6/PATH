@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Vorschau – PATH</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "SF Pro Display", BlinkMacSystemFont, "Segoe UI", sans-serif;
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  /* ── DARK MODE ── */
+  body.dark {
+    background: linear-gradient(135deg, #0d1117 0%, #161b2e 30%, #0f2a4a 60%, #1a0533 100%);
+    background-attachment: fixed;
+    color: #fff;
+  }
+  body.dark::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at 15% 50%, rgba(88,86,214,0.3) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 15%, rgba(0,122,255,0.25) 0%, transparent 55%),
+      radial-gradient(ellipse at 55% 85%, rgba(175,82,222,0.2) 0%, transparent 50%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── LIGHT MODE ── */
+  body.light {
+    background: #f2f4f8;
+    color: #1a1a2e;
+  }
+
+  .app-layout {
+    display: flex; height: 100vh; position: relative; z-index: 1;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 240px; flex-shrink: 0;
+    padding: 16px 10px;
+    display: flex; flex-direction: column; gap: 2px;
+    border-right: 1px solid;
+    transition: all 0.3s;
+  }
+  body.dark .sidebar {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border-color: rgba(255,255,255,0.12);
+  }
+  body.light .sidebar {
+    background: #fff;
+    border-color: #e2e6ef;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.06);
+  }
+
+  .logo {
+    font-size: 20px; font-weight: 800;
+    padding: 4px 10px 16px;
+    letter-spacing: -0.5px;
+  }
+  body.dark .logo { color: #fff; }
+  body.light .logo { color: #1a1a2e; }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 12px;
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  body.dark .nav-item { color: rgba(255,255,255,0.7); }
+  body.light .nav-item { color: #555; }
+
+  .nav-item.active {
+    font-weight: 600;
+  }
+  body.dark .nav-item.active {
+    background: linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2));
+    border-color: rgba(0,122,255,0.4);
+    color: #fff;
+  }
+  body.light .nav-item.active {
+    background: rgba(0,122,255,0.1);
+    border-color: rgba(0,122,255,0.25);
+    color: #007AFF;
+  }
+
+  .nav-icon { opacity: 0.7; font-size: 16px; }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1; overflow-y: auto; padding: 20px 24px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .page-title { font-size: 22px; font-weight: 700; }
+  body.light .page-title { color: #1a1a2e; }
+
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+
+  /* ── THEME TOGGLE ── */
+  .toggle-btn {
+    padding: 7px 14px; border-radius: 20px; border: 1px solid;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  body.dark .toggle-btn {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+  body.light .toggle-btn {
+    background: #fff;
+    border-color: #d1d9e6;
+    color: #333;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  /* ── STAT CARDS ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .stat-card {
+    padding: 16px 18px; border-radius: 16px;
+    border: 1px solid; position: relative; overflow: hidden;
+    transition: all 0.3s;
+  }
+  body.dark .stat-card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+    border-color: rgba(255,255,255,0.15);
+  }
+  body.light .stat-card {
+    background: #fff;
+    border-color: #e2e6ef;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  .stat-accent {
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    border-radius: 16px 16px 0 0;
+  }
+  .stat-label {
+    font-size: 12px; font-weight: 500; margin-bottom: 6px; margin-top: 4px;
+  }
+  body.dark .stat-label { color: rgba(255,255,255,0.5); }
+  body.light .stat-label { color: #8896a7; }
+
+  .stat-value { font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+  body.light .stat-value { color: #1a1a2e; }
+
+  .stat-sub { font-size: 11px; }
+  body.dark .stat-sub { color: rgba(255,255,255,0.35); }
+  body.light .stat-sub { color: #aab4c0; }
+
+  /* ── 3-COL LAYOUT ── */
+  .three-col {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+
+  /* ── CARD ── */
+  .card {
+    border-radius: 18px; border: 1px solid;
+    overflow: hidden; transition: all 0.3s;
+  }
+  body.dark .card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  }
+  body.light .card {
+    background: #fff;
+    border-color: #e2e6ef;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  }
+
+  .card-header {
+    padding: 14px 16px 10px;
+    font-size: 13px; font-weight: 600;
+    border-bottom: 1px solid;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  body.dark .card-header {
+    color: rgba(255,255,255,0.9);
+    border-color: rgba(255,255,255,0.1);
+  }
+  body.light .card-header {
+    color: #333;
+    border-color: #edf0f5;
+  }
+
+  .card-body { padding: 14px 16px; }
+
+  /* ── PERSON CARD ── */
+  .person-avatar {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg, #007AFF, #5856D6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .person-name { font-size: 16px; font-weight: 700; }
+  body.light .person-name { color: #1a1a2e; }
+  .person-title { font-size: 12px; margin-top: 2px; }
+  body.dark .person-title { color: rgba(255,255,255,0.5); }
+  body.light .person-title { color: #8896a7; }
+
+  .badge-active {
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 6px;
+    background: rgba(0,122,255,0.15); border: 1px solid rgba(0,122,255,0.35);
+    color: #007AFF;
+  }
+
+  /* ── RESUME ITEM ── */
+  .resume-item {
+    padding: 10px 12px; border-radius: 10px; border: 1px solid;
+    margin-bottom: 6px; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .resume-item.active-r {
+    border-color: rgba(0,122,255,0.5) !important;
+  }
+  body.dark .resume-item {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.1);
+  }
+  body.dark .resume-item.active-r {
+    background: rgba(0,122,255,0.12);
+  }
+  body.light .resume-item {
+    background: #f8faff;
+    border-color: #e5eaf4;
+  }
+  body.light .resume-item.active-r {
+    background: rgba(0,122,255,0.07);
+  }
+
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  .resume-name { font-size: 13px; font-weight: 600; flex: 1; }
+  body.dark .resume-name { color: rgba(255,255,255,0.9); }
+  body.light .resume-name { color: #2d3748; }
+
+  .progress-bar-wrap {
+    height: 4px; border-radius: 2px; overflow: hidden; margin-top: 6px;
+  }
+  body.dark .progress-bar-wrap { background: rgba(255,255,255,0.1); }
+  body.light .progress-bar-wrap { background: #e5eaf4; }
+
+  .progress-bar-fill { height: 100%; border-radius: 2px; }
+
+  /* ── QUICK ACTIONS ── */
+  .quick-actions-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .action-btn {
+    padding: 14px 12px; border-radius: 14px; border: 1px solid;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+    cursor: pointer; transition: all 0.2s; text-align: left;
+  }
+  body.dark .action-btn {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.85);
+  }
+  body.dark .action-btn:hover {
+    background: rgba(255,255,255,0.12);
+  }
+  body.light .action-btn {
+    background: #f8faff;
+    border-color: #dde3f0;
+    color: #333;
+  }
+  body.light .action-btn:hover {
+    background: #eef1fb;
+    border-color: rgba(0,122,255,0.3);
+  }
+  .action-icon {
+    width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .action-label { font-size: 13px; font-weight: 600; line-height: 1.2; }
+  .action-sub { font-size: 11px; }
+  body.dark .action-sub { color: rgba(255,255,255,0.4); }
+  body.light .action-sub { color: #9ba8bb; }
+
+  /* ── ACTIVITY / RECENT ── */
+  .activity-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid;
+  }
+  body.dark .activity-item { border-color: rgba(255,255,255,0.07); }
+  body.light .activity-item { border-color: #edf0f5; }
+  .activity-item:last-child { border-bottom: none; }
+
+  .activity-dot {
+    width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0;
+  }
+  .activity-text { font-size: 13px; flex: 1; }
+  body.dark .activity-text { color: rgba(255,255,255,0.75); }
+  body.light .activity-text { color: #444; }
+  .activity-time { font-size: 11px; }
+  body.dark .activity-time { color: rgba(255,255,255,0.3); }
+  body.light .activity-time { color: #b0bac8; }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.7px;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  body.dark .section-header { color: rgba(255,255,255,0.35); }
+  body.light .section-header { color: #a0aec0; }
+
+  /* ── ALL PERSONS (bottom) ── */
+  .persons-row {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  }
+  .person-mini-card {
+    padding: 14px 16px; border-radius: 16px; border: 1px solid;
+    display: flex; align-items: center; gap: 12px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  body.dark .person-mini-card {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.12);
+  }
+  body.light .person-mini-card {
+    background: #fff;
+    border-color: #e2e6ef;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .person-mini-card:hover { transform: translateY(-1px); }
+
+  .mini-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .mini-name { font-size: 14px; font-weight: 600; }
+  body.light .mini-name { color: #1a1a2e; }
+  .mini-sub { font-size: 11px; margin-top: 1px; }
+  body.dark .mini-sub { color: rgba(255,255,255,0.4); }
+  body.light .mini-sub { color: #9ba8bb; }
+
+  /* ── UTILITY ── */
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px;
+  }
+
+  .add-btn {
+    width: 28px; height: 28px; border-radius: 50%; border: 1px dashed;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; cursor: pointer; flex-shrink: 0; transition: all 0.2s;
+  }
+  body.dark .add-btn { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.5); }
+  body.light .add-btn { border-color: #c5cde0; color: #9ba8bb; }
+</style>
+</head>
+<body class="dark">
+
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo">✦ PATH</div>
+
+    <div class="nav-item active">
+      <span class="nav-icon">⊞</span> Dashboard
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">✎</span> Editor
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">◈</span> Vorschau
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⊙</span> Personen
+    </div>
+    <div style="flex:1"></div>
+    <div class="nav-item">
+      <span class="nav-icon">⚙</span> Konto
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div style="font-size:13px; margin-top:3px; opacity:0.45">Mittwoch, 8. April 2026</div>
+      </div>
+      <div class="header-actions">
+        <button class="toggle-btn" onclick="toggleTheme()" id="themeBtn">☾ Dark Mode</button>
+        <button style="padding:8px 16px; border-radius:20px; border:none; background:linear-gradient(135deg,#007AFF,#5856D6); color:#fff; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
+          + Neue Person
+        </button>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-accent" style="background:#007AFF"></div>
+        <div class="stat-label">Personen</div>
+        <div class="stat-value">3</div>
+        <div class="stat-sub">Profile angelegt</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-accent" style="background:#34C759"></div>
+        <div class="stat-label">Mappen</div>
+        <div class="stat-value">7</div>
+        <div class="stat-sub">Bewerbungsunterlagen</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-accent" style="background:#FF9F0A"></div>
+        <div class="stat-label">Sektionen</div>
+        <div class="stat-value">24</div>
+        <div class="stat-sub">Inhaltsblöcke gesamt</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-accent" style="background:#AF52DE"></div>
+        <div class="stat-label">Vollständigkeit</div>
+        <div class="stat-value">73%</div>
+        <div class="stat-sub">Ø aller Mappen</div>
+      </div>
+    </div>
+
+    <!-- 3-COL LAYOUT -->
+    <div class="three-col">
+
+      <!-- LEFT: Aktive Person -->
+      <div>
+        <div class="section-header">Aktive Person</div>
+        <div class="card">
+          <div class="card-header">
+            <span>Max Mustermann</span>
+            <span class="badge-active">Aktiv</span>
+          </div>
+          <div class="card-body">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+              <div class="person-avatar">M</div>
+              <div>
+                <div class="person-name">Max Mustermann</div>
+                <div class="person-title">Senior Product Designer</div>
+              </div>
+            </div>
+
+            <div class="section-header" style="margin-bottom:8px;">Bewerbungsmappen</div>
+
+            <div class="resume-item active-r">
+              <span class="status-dot" style="background:#34C759"></span>
+              <div style="flex:1">
+                <div class="resume-name" style="color:#007AFF;">Google – UX Lead</div>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar-fill" style="width:85%; background:linear-gradient(90deg,#007AFF,#5856D6)"></div>
+                </div>
+              </div>
+              <span style="font-size:11px; color:#007AFF; font-weight:600;">85%</span>
+            </div>
+
+            <div class="resume-item">
+              <span class="status-dot" style="background:#FF9F0A"></span>
+              <div style="flex:1">
+                <div class="resume-name">Apple – Product Designer</div>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar-fill" style="width:62%; background:linear-gradient(90deg,#FF9F0A,#FF6B35)"></div>
+                </div>
+              </div>
+              <span style="font-size:11px; opacity:0.5; font-weight:600;">62%</span>
+            </div>
+
+            <div class="resume-item">
+              <span class="status-dot" style="background:#5856D6"></span>
+              <div style="flex:1">
+                <div class="resume-name">Meta – Design System</div>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar-fill" style="width:40%; background:linear-gradient(90deg,#5856D6,#AF52DE)"></div>
+                </div>
+              </div>
+              <span style="font-size:11px; opacity:0.5; font-weight:600;">40%</span>
+            </div>
+
+            <div style="margin-top:12px; display:flex; gap:8px;">
+              <button style="flex:1; padding:9px; border-radius:10px; border:none; background:linear-gradient(135deg,#007AFF,#5856D6); color:#fff; font-size:13px; font-weight:600; cursor:pointer;">
+                ✎ Bearbeiten
+              </button>
+              <button style="padding:9px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.15); background:transparent; color:rgba(255,255,255,0.7); font-size:13px; cursor:pointer;">
+                👁 Vorschau
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MIDDLE: Quick Actions + Aktivität -->
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div>
+          <div class="section-header">Schnellaktionen</div>
+          <div class="card" style="padding:16px;">
+            <div class="quick-actions-grid">
+              <div class="action-btn">
+                <div class="action-icon" style="background:rgba(0,122,255,0.15);">✎</div>
+                <div>
+                  <div class="action-label">Lebenslauf bearbeiten</div>
+                  <div class="action-sub">Aktive Mappe öffnen</div>
+                </div>
+              </div>
+              <div class="action-btn">
+                <div class="action-icon" style="background:rgba(175,82,222,0.15);">✦</div>
+                <div>
+                  <div class="action-label">KI Assistent</div>
+                  <div class="action-sub">Anschreiben generieren</div>
+                </div>
+              </div>
+              <div class="action-btn">
+                <div class="action-icon" style="background:rgba(52,199,89,0.15);">⊕</div>
+                <div>
+                  <div class="action-label">Neue Mappe</div>
+                  <div class="action-sub">Bewerbung anlegen</div>
+                </div>
+              </div>
+              <div class="action-btn">
+                <div class="action-icon" style="background:rgba(255,159,10,0.15);">↓</div>
+                <div>
+                  <div class="action-label">LinkedIn Import</div>
+                  <div class="action-sub">Profil importieren</div>
+                </div>
+              </div>
+              <div class="action-btn">
+                <div class="action-icon" style="background:rgba(90,200,250,0.15);">👁</div>
+                <div>
+                  <div class="action-label">PDF Vorschau</div>
+                  <div class="action-sub">Lebenslauf ansehen</div>
+                </div>
+              </div>
+              <div class="action-btn">
+                <div class="action-icon" style="background:rgba(255,45,85,0.15);">↗</div>
+                <div>
+                  <div class="action-label">Link teilen</div>
+                  <div class="action-sub">Öffentlicher Link</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-header">Zuletzt aktiv</div>
+          <div class="card">
+            <div class="card-body" style="padding:12px 16px;">
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#34C759"></div>
+                <div style="flex:1">
+                  <div class="activity-text">Google – UX Lead aktualisiert</div>
+                  <div class="activity-time">Heute, 14:32 Uhr</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#007AFF"></div>
+                <div style="flex:1">
+                  <div class="activity-text">Neue Mappe „Apple" erstellt</div>
+                  <div class="activity-time">Gestern, 10:15 Uhr</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#AF52DE"></div>
+                <div style="flex:1">
+                  <div class="activity-text">LinkedIn Profil importiert</div>
+                  <div class="activity-time">Di, 6. Apr</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#FF9F0A"></div>
+                <div style="flex:1">
+                  <div class="activity-text">Person „Lena M." angelegt</div>
+                  <div class="activity-time">Mo, 5. Apr</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Bewerbungsstatus -->
+      <div>
+        <div class="section-header">Bewerbungsstatus</div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header">
+            <span>Status Übersicht</span>
+          </div>
+          <div class="card-body">
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:8px; font-size:13px;">
+                  <span class="status-dot" style="background:rgba(255,255,255,0.35)"></span>
+                  Entwurf
+                </div>
+                <span class="chip" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);">3</span>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:8px; font-size:13px;">
+                  <span class="status-dot" style="background:#007AFF"></span>
+                  Gesendet
+                </div>
+                <span class="chip" style="background:rgba(0,122,255,0.12); border:1px solid rgba(0,122,255,0.25); color:#007AFF;">2</span>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:8px; font-size:13px;">
+                  <span class="status-dot" style="background:#FF9F0A"></span>
+                  Interview
+                </div>
+                <span class="chip" style="background:rgba(255,159,10,0.12); border:1px solid rgba(255,159,10,0.25); color:#FF9F0A;">1</span>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:8px; font-size:13px;">
+                  <span class="status-dot" style="background:#34C759"></span>
+                  Angenommen
+                </div>
+                <span class="chip" style="background:rgba(52,199,89,0.12); border:1px solid rgba(52,199,89,0.25); color:#34C759;">1</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header">Anstehende Deadlines</div>
+        <div class="card">
+          <div class="card-body">
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#FF3B30"></div>
+              <div style="flex:1">
+                <div class="activity-text" style="font-weight:600;">Google – UX Lead</div>
+                <div class="activity-time" style="color:#FF3B30;">Morgen!</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#FF9F0A"></div>
+              <div style="flex:1">
+                <div class="activity-text">Apple – Product Designer</div>
+                <div class="activity-time" style="color:#FF9F0A;">in 5 Tagen</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:rgba(255,255,255,0.35)"></div>
+              <div style="flex:1">
+                <div class="activity-text">Meta – Design System</div>
+                <div class="activity-time">in 14 Tagen</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL PERSONS row -->
+    <div>
+      <div class="section-header">Alle Personen</div>
+      <div class="persons-row">
+        <div class="person-mini-card" style="border-color:rgba(0,122,255,0.4); background:rgba(0,122,255,0.07);">
+          <div class="mini-avatar" style="background:linear-gradient(135deg,#007AFF,#5856D6);">M</div>
+          <div style="flex:1">
+            <div class="mini-name">Max Mustermann</div>
+            <div class="mini-sub">3 Mappen · Aktiv</div>
+          </div>
+          <span class="badge-active" style="font-size:9px;">●</span>
+        </div>
+        <div class="person-mini-card">
+          <div class="mini-avatar" style="background:linear-gradient(135deg,#FF9F0A,#FF6B35);">L</div>
+          <div style="flex:1">
+            <div class="mini-name">Lena Müller</div>
+            <div class="mini-sub">2 Mappen</div>
+          </div>
+        </div>
+        <div class="person-mini-card">
+          <div class="mini-avatar" style="background:linear-gradient(135deg,#34C759,#5AC8FA);">T</div>
+          <div style="flex:1">
+            <div class="mini-name">Tim Schmidt</div>
+            <div class="mini-sub">2 Mappen</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function toggleTheme() {
+  const body = document.body;
+  const btn = document.getElementById('themeBtn');
+  if (body.classList.contains('dark')) {
+    body.classList.remove('dark');
+    body.classList.add('light');
+    btn.textContent = '☀ Light Mode';
+  } else {
+    body.classList.remove('light');
+    body.classList.add('dark');
+    btn.textContent = '☾ Dark Mode';
+  }
+}
+</script>
+</body>
+</html>
