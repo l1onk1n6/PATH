@@ -369,12 +369,11 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         </div>
       </div>
 
-      <div className="divider" />
+      </div>{/* end scrollable */}
 
-      {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
-
-      {/* Plan badge + Logout */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+      {/* Fixed bottom: plan badge + logout */}
+      <div style={{ paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
         {!isPro ? (
           <button onClick={() => setShowUpgrade(true)} className="btn-glass"
             style={{ width: '100%', justifyContent: 'center', padding: '8px 12px', background: 'linear-gradient(135deg, rgba(255,159,10,0.12), rgba(255,55,95,0.1))', border: '1px solid rgba(255,159,10,0.25)', boxShadow: 'none', fontSize: 12, gap: 7 }}>
@@ -382,17 +381,15 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
             <span style={{ fontWeight: 600, color: '#FF9F0A' }}>Auf Pro upgraden</span>
           </button>
         ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#FF9F0A', padding: '4px 0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 11, color: '#FF9F0A', padding: '4px 0' }}>
             <Sparkles size={12} /><span style={{ fontWeight: 700 }}>PATH Pro</span>
           </div>
         )}
         <button className="btn-glass btn-sm" onClick={() => signOut()}
           style={{ width: '100%', justifyContent: 'center', padding: '8px 10px', boxShadow: 'none', fontSize: 12 }}>
-          <LogOut size={13} /> Logout
+          <LogOut size={13} /> Abmelden
         </button>
       </div>
-
-      </div>{/* end scrollable */}
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </aside>
   );
