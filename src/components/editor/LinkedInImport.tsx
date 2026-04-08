@@ -362,7 +362,7 @@ export default function LinkedInImportDialog({ onClose }: Props) {
         className="glass-card animate-scale-in"
         style={{
           padding: '28px 24px', width: 500, maxWidth: '95vw', maxHeight: '90vh',
-          overflowY: 'auto', background: 'rgba(14,14,24,0.98)',
+          overflowY: 'auto',
         }}
         onClick={e => e.stopPropagation()}
       >

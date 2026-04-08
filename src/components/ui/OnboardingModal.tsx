@@ -140,7 +140,7 @@ export default function OnboardingModal({ onClose }: Props) {
     }}>
       <div className="glass-card animate-scale-in" style={{
         width: '100%', maxWidth: 440, padding: '32px 28px',
-        background: 'rgba(16,16,28,0.98)',
+        background: 'var(--modal-bg)',
         border: '1px solid rgba(255,255,255,0.1)',
         boxShadow: '0 24px 60px rgba(0,0,0,0.6)',
       }}>

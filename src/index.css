@@ -14,6 +14,7 @@
   --text-primary:   #ffffff;
   --text-secondary: rgba(255,255,255,0.55);
   --text-muted:     rgba(255,255,255,0.38);
+  --modal-bg:       rgba(14,14,22,0.97);
 
   --ios-blue: #007AFF;
   --ios-blue-light: #4DA3FF;
@@ -319,6 +320,7 @@ input[type="month"].input-glass::-webkit-calendar-picker-indicator:hover {
   --text-primary:   #1a1a2e;
   --text-secondary: rgba(0,0,0,0.50);
   --text-muted:     rgba(0,0,0,0.38);
+  --modal-bg:       #ffffff;
 }
 
 [data-theme="light"] body {

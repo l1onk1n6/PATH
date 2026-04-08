@@ -36,7 +36,7 @@ function AtsButton() {
       {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} highlightId="ats" />}
       {showSoon && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }} onClick={() => setShowSoon(false)}>
-          <div className="glass-card animate-scale-in" style={{ padding: '24px 28px', maxWidth: 320, textAlign: 'center', background: 'rgba(14,14,22,0.97)' }} onClick={e => e.stopPropagation()}>
+          <div className="glass-card animate-scale-in" style={{ padding: '24px 28px', maxWidth: 320, textAlign: 'center', background: 'var(--modal-bg)' }} onClick={e => e.stopPropagation()}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>📊</div>
             <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>ATS-Score — bald verfügbar</div>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 16 }}>
@@ -91,7 +91,7 @@ function ShareModal({ resumeId, token, onClose }: { resumeId: string; token?: st
     <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }}
       onClick={onClose}>
       <div className="glass-card animate-scale-in"
-        style={{ padding: 20, width: 340, maxWidth: '90vw', zIndex: 101, background: 'rgba(14,14,22,0.97)' }}
+        style={{ padding: 20, width: 340, maxWidth: '90vw', zIndex: 101, background: 'var(--modal-bg)' }}
         onClick={(e) => e.stopPropagation()}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
           <div style={{ fontWeight: 700, fontSize: 15 }}>Lebenslauf teilen</div>
@@ -353,7 +353,7 @@ export default function Dashboard() {
       {statusMenuResumeId && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }} onClick={() => setStatusMenuResumeId(null)}>
           <div onClick={(e) => e.stopPropagation()} className="glass-card animate-scale-in"
-            style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 101, padding: 16, minWidth: 200, background: 'rgba(14,14,22,0.97)' }}>
+            style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 101, padding: 16, minWidth: 200, background: 'var(--modal-bg)' }}>
             <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, opacity: 0.7 }}>Status setzen</div>
             {ALL_STATUSES.map(s => (
               <button key={s} className="btn-glass"
@@ -390,7 +390,7 @@ export default function Dashboard() {
               style={{
                 position: 'fixed', top: menuPos.top, left: menuPos.left,
                 zIndex: 9001, minWidth: 210,
-                background: 'rgba(14,22,48,0.97)',
+                background: 'var(--modal-bg)',
                 backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
                 borderRadius: 14, padding: '6px',
                 border: '1px solid rgba(99,140,255,0.18)',

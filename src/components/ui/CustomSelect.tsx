@@ -88,7 +88,7 @@ export function CustomSelect({ value, onChange, options, style, placeholder = 'A
             left: 0,
             right: 0,
             zIndex: 999,
-            background: 'rgba(16,16,30,0.97)',
+            background: 'var(--modal-bg)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             border: '1px solid rgba(255,255,255,0.15)',
