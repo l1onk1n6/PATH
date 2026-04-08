@@ -6,7 +6,7 @@ import {
   PanelLeftClose, PanelLeftOpen, Sparkles, UserCircle, Lock,
   User, Briefcase, GraduationCap, Zap, FolderOpen,
   Upload, Palette, LayoutList, FileEdit, Languages, History,
-  Shield, Gift,
+  Shield, Gift, ClipboardList,
 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useAuthStore } from '../../store/authStore';
@@ -121,6 +121,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
           { path: '/',        icon: LayoutDashboard, label: 'Dashboard' },
           { path: '/editor',  icon: FileText,        label: 'Editor' },
           { path: '/preview', icon: Eye,             label: 'Vorschau' },
+          { path: '/tracker', icon: ClipboardList,   label: 'Tracker' },
           { path: '/account', icon: UserCircle,      label: 'Konto' },
         ].map(({ path, icon: Icon, label }) => (
           <button key={path} onClick={() => go(path)} className="btn-glass btn-icon" title={label}
@@ -210,6 +211,13 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
           style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isActive('/preview') ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isActive('/preview') ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
           <Eye size={16} style={{ opacity: isActive('/preview') ? 1 : 0.6 }} />
           <span style={{ opacity: isActive('/preview') ? 1 : 0.7 }}>Vorschau</span>
+        </button>
+
+        {/* Bewerbungs-Tracker */}
+        <button onClick={() => go('/tracker')} className="btn-glass"
+          style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isActive('/tracker') ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isActive('/tracker') ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
+          <ClipboardList size={16} style={{ opacity: isActive('/tracker') ? 1 : 0.6 }} />
+          <span style={{ opacity: isActive('/tracker') ? 1 : 0.7 }}>Tracker</span>
         </button>
 
         {/* Konto + sub-nav */}

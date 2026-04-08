@@ -3,12 +3,14 @@ import { User, Mail, Phone, MapPin, Globe, Link2, FileText, Camera, AlertCircle 
 import { useResumeStore } from '../../store/resumeStore';
 import { validatePhotoFile, sanitizePhotoUrl } from '../../lib/security';
 import { usePlan } from '../../lib/plan';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 export default function PersonalInfoEditor() {
   const { getActiveResume, updatePersonalInfo } = useResumeStore();
   const { limits } = usePlan();
   const resume = getActiveResume();
   const [photoError, setPhotoError] = useState('');
+  const isMobile = useIsMobile();
 
   const update = useCallback((field: string, value: string) => {
     if (!resume) return;
@@ -76,7 +78,7 @@ export default function PersonalInfoEditor() {
         )}
 
         {/* Name fields */}
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
           <div>
             <label className="section-label">Vorname</label>
             <input className="input-glass" placeholder="Max" value={info.firstName} maxLength={50}
@@ -87,7 +89,7 @@ export default function PersonalInfoEditor() {
             <input className="input-glass" placeholder="Mustermann" value={info.lastName} maxLength={50}
               onChange={(e) => update('lastName', e.target.value)} />
           </div>
-          <div style={{ gridColumn: 'span 2' }}>
+          <div style={{ gridColumn: isMobile ? 'auto' : 'span 2' }}>
             <label className="section-label">
               <FileText size={10} style={{ display: 'inline', marginRight: 4 }} />Berufsbezeichnung
             </label>
@@ -101,7 +103,7 @@ export default function PersonalInfoEditor() {
       <div className="section-label">
         <User size={10} style={{ display: 'inline', marginRight: 4 }} />Kontaktdaten
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10, marginBottom: 16 }}>
         <div>
           <label className="section-label">
             <Mail size={9} style={{ display: 'inline', marginRight: 3 }} />E-Mail
@@ -116,7 +118,7 @@ export default function PersonalInfoEditor() {
           <input className="input-glass" type="tel" placeholder="+49 123 456789" value={info.phone} maxLength={30}
             onChange={(e) => update('phone', e.target.value)} />
         </div>
-        <div style={{ gridColumn: 'span 2' }}>
+        <div style={{ gridColumn: isMobile ? 'auto' : 'span 2' }}>
           <label className="section-label">
             <MapPin size={9} style={{ display: 'inline', marginRight: 3 }} />Strasse und Hausnummer
           </label>

@@ -110,56 +110,32 @@ export default function Editor() {
       <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
         {/* Horizontal scrollable tab bar */}
         <div style={{
-          display: 'flex',
-          overflowX: 'auto',
-          gap: 6,
-          paddingBottom: 8,
-          flexShrink: 0,
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
+          display: 'flex', overflowX: 'auto', gap: 6, paddingBottom: 8,
+          flexShrink: 0, scrollbarWidth: 'none', msOverflowStyle: 'none',
         }}>
           {SECTIONS.map(({ id, short, icon: Icon }) => {
             const isActive = activeSection === id;
             return (
-              <button
-                key={id}
-                className="btn-glass"
-                onClick={() => setActiveSection(id)}
-                style={{
-                  flexShrink: 0,
-                  padding: '8px 12px',
-                  borderRadius: 'var(--radius-sm)',
-                  boxShadow: 'none',
-                  background: isActive
-                    ? 'linear-gradient(135deg, rgba(0,122,255,0.3), rgba(88,86,214,0.25))'
-                    : 'rgba(255,255,255,0.07)',
-                  border: isActive
-                    ? '1px solid rgba(0,122,255,0.45)'
-                    : '1px solid rgba(255,255,255,0.1)',
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  whiteSpace: 'nowrap',
-                }}
-              >
+              <button key={id} className="btn-glass" onClick={() => setActiveSection(id)} style={{
+                flexShrink: 0, padding: '8px 12px', borderRadius: 'var(--radius-sm)', boxShadow: 'none',
+                background: isActive ? 'linear-gradient(135deg, rgba(0,122,255,0.3), rgba(88,86,214,0.25))' : 'rgba(255,255,255,0.07)',
+                border: isActive ? '1px solid rgba(0,122,255,0.45)' : '1px solid rgba(255,255,255,0.1)',
+                display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
+              }}>
                 <Icon size={13} style={{ opacity: isActive ? 1 : 0.55 }} />
-                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, opacity: isActive ? 1 : 0.65 }}>
-                  {short}
-                </span>
+                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, opacity: isActive ? 1 : 0.65 }}>{short}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Editor content */}
-        <div
-          className="glass"
-          style={{
-            flex: 1,
-            borderRadius: 'var(--radius-lg)',
-            overflow: 'auto',
-            padding: '16px 16px',
-          }}
-        >
-          {renderSection()}
+        {/* Editor content — also handles 'history' on mobile */}
+        <div className="glass" style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: '16px 16px' }}>
+          {showTranslate && <TranslateDialog onClose={() => setShowTranslate(false)} />}
+          {activeSection === 'history'
+            ? <VersionHistoryPanel resumeId={resume.id} />
+            : renderSection()
+          }
         </div>
       </div>
     );

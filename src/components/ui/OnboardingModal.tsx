@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Check, FileText, Sparkles, Share2, Bell } from 'lucide-react';
+import { ArrowRight, Check, FileText, Sparkles, Share2, Bell, Wand2 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { LogoIcon } from '../layout/Logo';
 
@@ -26,6 +26,63 @@ const FEATURES = [
   { icon: <Bell size={18} />, color: 'var(--ios-green)', title: 'Deadline-Reminder', desc: 'Verpasse keine Bewerbungsfrist — erhalte Erinnerungen per E-Mail.' },
 ];
 
+function buildSampleData(firstName: string, lastName: string) {
+  const fn = firstName || 'Max';
+  const ln = lastName || 'Mustermann';
+  return {
+    personalInfo: {
+      firstName: fn, lastName: ln,
+      title: 'Senior Softwareentwickler',
+      email: `${fn.toLowerCase()}.${ln.toLowerCase()}@beispiel.ch`,
+      phone: '+41 79 123 45 67',
+      street: 'Musterstrasse 12',
+      location: '8001 Zürich',
+      website: `www.${ln.toLowerCase()}.ch`,
+      linkedin: `linkedin.com/in/${fn.toLowerCase()}${ln.toLowerCase()}`,
+      github: `github.com/${fn.toLowerCase()}${ln.toLowerCase()}`,
+      summary: 'Erfahrener Softwareentwickler mit über 5 Jahren Erfahrung in der Entwicklung moderner Webanwendungen. Leidenschaft für sauberen Code, nutzerzentriertes Design und agile Teamarbeit. Spezialisiert auf React, TypeScript und Node.js.',
+    },
+    workExperience: [
+      {
+        id: 'sample-job-1',
+        company: 'Tech Solutions AG', position: 'Senior Frontend Entwickler',
+        location: 'Zürich', startDate: '2022-03', endDate: '', current: true,
+        description: 'Entwicklung und Wartung einer Enterprise SaaS-Plattform mit React und TypeScript. Leitung eines 4-köpfigen Frontend-Teams, Code Reviews und technisches Mentoring. Einführung von automatisierten Tests und Reduktion der Bug-Rate um 60 %.',
+        highlights: [],
+      },
+      {
+        id: 'sample-job-2',
+        company: 'Digital Agency GmbH', position: 'Frontend Entwickler',
+        location: 'Basel', startDate: '2019-06', endDate: '2022-02', current: false,
+        description: 'Umsetzung von Kundenprojekten in React und Vue.js. Enge Zusammenarbeit mit UI/UX-Designern. Optimierung der Core Web Vitals und Verbesserung der PageSpeed-Scores um durchschnittlich 40 %.',
+        highlights: [],
+      },
+    ],
+    education: [
+      {
+        id: 'sample-edu-1',
+        degree: 'Bachelor of Science', field: 'Informatik',
+        institution: 'ETH Zürich', location: 'Zürich',
+        startDate: '2015-09', endDate: '2019-06', grade: '5.4',
+        description: 'Schwerpunkte: Software Engineering, verteilte Systeme und Mensch-Computer-Interaktion.',
+      },
+    ],
+    skills: [
+      { id: 's1', name: 'React', level: 5 as const, category: 'Frontend' },
+      { id: 's2', name: 'TypeScript', level: 5 as const, category: 'Frontend' },
+      { id: 's3', name: 'Node.js', level: 4 as const, category: 'Backend' },
+      { id: 's4', name: 'PostgreSQL', level: 3 as const, category: 'Backend' },
+      { id: 's5', name: 'Docker', level: 3 as const, category: 'DevOps' },
+      { id: 's6', name: 'Git', level: 5 as const, category: 'Tools' },
+    ],
+    languages: [
+      { id: 'l1', name: 'Deutsch', level: 'Muttersprache' as const },
+      { id: 'l2', name: 'Englisch', level: 'Fließend' as const },
+      { id: 'l3', name: 'Französisch', level: 'Grundkenntnisse' as const },
+    ],
+  };
+}
+
 interface Props {
   onClose: () => void;
 }
@@ -34,7 +91,7 @@ export default function OnboardingModal({ onClose }: Props) {
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
   const [creating, setCreating] = useState(false);
-  const { addPerson, persons } = useResumeStore();
+  const { addPerson, persons, updateResume } = useResumeStore();
   const navigate = useNavigate();
   const hasPersons = persons.length > 0;
 
@@ -47,12 +104,24 @@ export default function OnboardingModal({ onClose }: Props) {
   }
 
   function goNext() {
-    // Skip name step if user already has a person
     setStep(hasPersons ? 2 : 1);
   }
 
-  function finish() {
+  function finish(withSampleData: boolean) {
     markOnboardingDone();
+    if (withSampleData) {
+      const { persons: currentPersons, resumes: currentResumes } = useResumeStore.getState();
+      const activePerson = currentPersons[0];
+      if (activePerson) {
+        const resume = currentResumes.find(r => r.personId === activePerson.id);
+        if (resume) {
+          const nameParts = (name.trim() || activePerson.name).split(' ');
+          const firstName = nameParts[0] ?? '';
+          const lastName = nameParts.slice(1).join(' ') || firstName;
+          updateResume(resume.id, buildSampleData(firstName, lastName));
+        }
+      }
+    }
     onClose();
     navigate('/editor');
   }
@@ -103,9 +172,7 @@ export default function OnboardingModal({ onClose }: Props) {
             <div style={{ marginBottom: 20 }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ios-blue)', marginBottom: 6 }}>SCHRITT 1 VON 2</div>
               <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 6px', letterSpacing: '-0.4px' }}>Wie heisst du?</h2>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
-                Wir legen dein erstes Profil an.
-              </p>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: 0 }}>Wir legen dein erstes Profil an.</p>
             </div>
             <input
               className="input-glass"
@@ -113,7 +180,7 @@ export default function OnboardingModal({ onClose }: Props) {
               value={name}
               onChange={e => setName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && name.trim() && handleCreate()}
-              autoFocus
+              autoFocus maxLength={100}
               style={{ marginBottom: 16, fontSize: 15 }}
             />
             <button className="btn-glass btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '13px', fontWeight: 700, gap: 8 }}
@@ -127,7 +194,7 @@ export default function OnboardingModal({ onClose }: Props) {
           </div>
         )}
 
-        {/* Step 2: Feature overview */}
+        {/* Step 2: Features + sample data choice */}
         {step === 2 && (
           <div>
             <div style={{ marginBottom: 20 }}>
@@ -138,14 +205,10 @@ export default function OnboardingModal({ onClose }: Props) {
               </p>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
               {FEATURES.map(f => (
                 <div key={f.title} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                    background: `${f.color}22`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: f.color,
-                  }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: `${f.color}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: f.color }}>
                     {f.icon}
                   </div>
                   <div>
@@ -156,25 +219,36 @@ export default function OnboardingModal({ onClose }: Props) {
               ))}
             </div>
 
-            <button className="btn-glass btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '14px', fontWeight: 700, fontSize: 15, gap: 8 }}
-              onClick={finish}>
-              <Check size={16} /> Zum Editor
+            {/* Sample data card */}
+            <div style={{ background: 'rgba(0,122,255,0.08)', border: '1px solid rgba(0,122,255,0.2)', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <Wand2 size={13} style={{ color: 'var(--ios-blue)', flexShrink: 0 }} />
+                <span style={{ fontSize: 13, fontWeight: 600 }}>Mit Beispieldaten starten</span>
+              </div>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: '0 0 12px', lineHeight: 1.5 }}>
+                Sieh sofort wie dein Lebenslauf aussehen könnte — wir füllen ihn mit realistischen Musterdaten vor.
+              </p>
+              <button className="btn-glass btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '11px', fontWeight: 700, fontSize: 13, gap: 7 }}
+                onClick={() => finish(true)}>
+                <Wand2 size={13} /> Beispieldaten laden & starten
+              </button>
+            </div>
+
+            <button className="btn-glass" style={{ width: '100%', justifyContent: 'center', padding: '11px', gap: 7, fontSize: 13 }}
+              onClick={() => finish(false)}>
+              <Check size={13} /> Ohne Beispieldaten starten
             </button>
+
             <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 12, fontFamily: 'var(--font-sf)', width: '100%' }}>
               Schliessen
             </button>
           </div>
         )}
 
-        {/* Progress dots */}
         {step > 0 && (
           <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 20 }}>
             {[1, 2].map(s => (
-              <div key={s} style={{
-                width: s === step ? 20 : 6, height: 6, borderRadius: 3,
-                background: s === step ? 'var(--ios-blue)' : 'rgba(255,255,255,0.15)',
-                transition: 'all 0.3s',
-              }} />
+              <div key={s} style={{ width: s === step ? 20 : 6, height: 6, borderRadius: 3, background: s === step ? 'var(--ios-blue)' : 'rgba(255,255,255,0.15)', transition: 'all 0.3s' }} />
             ))}
           </div>
         )}

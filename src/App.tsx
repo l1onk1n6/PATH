@@ -12,6 +12,7 @@ import LandingPage from './pages/LandingPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import SharedResumePage from './pages/SharedResumePage';
 import AccountPage from './pages/AccountPage';
+import Tracker from './pages/Tracker';
 import { useAuthStore } from './store/authStore';
 import { useResumeStore } from './store/resumeStore';
 import { isSupabaseConfigured, getSupabase } from './lib/supabase';
@@ -111,6 +112,7 @@ function AppShell() {
               <Route path="/editor" element={<Editor />} />
               <Route path="/preview" element={<Preview />} />
               <Route path="/account" element={<AccountPage />} />
+              <Route path="/tracker" element={<Tracker />} />
               <Route path="/shared" element={<SharedResumePage />} />
             </Routes>
           </div>

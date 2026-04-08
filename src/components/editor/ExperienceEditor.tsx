@@ -99,7 +99,7 @@ export default function ExperienceEditor() {
 
           {expanded === job.id && (
             <div style={{ marginTop: 14 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10, marginBottom: 10 }}>
                 <div>
                   <label className="section-label">Position</label>
                   <input className="input-glass" placeholder="z.B. Senior Developer" value={job.position} maxLength={150}

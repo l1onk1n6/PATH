@@ -105,7 +105,7 @@ export default function ProjectsEditor() {
 
             {expandedProject === project.id && (
               <div style={{ marginTop: 12 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10, marginBottom: 10 }}>
                   <div>
                     <label className="section-label">Projektname</label>
                     <input className="input-glass" placeholder="z.B. E-Commerce App" value={project.name} maxLength={150}
@@ -124,7 +124,7 @@ export default function ProjectsEditor() {
                     <label className="section-label">Bis</label>
                     <MonthYearPicker value={project.endDate} onChange={(v) => updateProject(resume.id, project.id, { endDate: v })} />
                   </div>
-                  <div style={{ gridColumn: 'span 2' }}>
+                  <div style={{ gridColumn: isMobile ? 'auto' : 'span 2' }}>
                     <label className="section-label">Technologien (Komma-getrennt)</label>
                     <input className="input-glass"
                       placeholder="z.B. React, TypeScript, Node.js"
@@ -203,7 +203,7 @@ export default function ProjectsEditor() {
               )}
               {!isMobile && <GripVertical size={14} style={{ opacity: 0.3, flexShrink: 0, cursor: 'grab', marginTop: 4 }} />}
               <div style={{ flex: 1 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
                   <div>
                     <label className="section-label">Zertifikat</label>
                     <input className="input-glass" placeholder="z.B. AWS Certified" value={cert.name} maxLength={150}
