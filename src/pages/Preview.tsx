@@ -26,22 +26,55 @@ async function renderElementToPdfDoc(
   });
 
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-  const pdfW = pdf.internal.pageSize.getWidth();
-  const pdfH = pdf.internal.pageSize.getHeight();
-  const ratio = pdfW / (canvas.width / 2);
-  const contentH = (canvas.height / 2) * ratio;
+  const pdfW = pdf.internal.pageSize.getWidth();   // 210 mm
+  const pdfH = pdf.internal.pageSize.getHeight();  // 297 mm
 
-  let yOffset = 0;
+  // canvas pixels per mm (canvas is 2x scaled)
+  const pxPerMm = canvas.width / pdfW;
+  const pageHeightPx = pdfH * pxPerMm; // canvas pixels per A4 page
+
+  /**
+   * Scan upward from targetY to find a nearly-blank row (whitespace between
+   * paragraphs). Cuts there instead of mid-line. Falls back to targetY if no
+   * good break is found within the search window (8% of page height).
+   */
+  function findBreakPoint(targetY: number): number {
+    const ctx = canvas.getContext('2d')!;
+    const searchPx = Math.round(pageHeightPx * 0.08);
+    const start = Math.min(Math.round(targetY), canvas.height - 1);
+    for (let y = start; y > start - searchPx; y--) {
+      if (y <= 0) break;
+      const { data } = ctx.getImageData(0, y, canvas.width, 1);
+      let dark = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        if (data[i] < 240 || data[i + 1] < 240 || data[i + 2] < 240) dark++;
+      }
+      if (dark < canvas.width * 0.03) return y; // >97% white → good break
+    }
+    return start; // no whitespace found, cut at original boundary
+  }
+
+  let srcY = 0;
   let pageCount = 0;
-  while (yOffset < contentH) {
+
+  while (srcY < canvas.height) {
     if (pageCount > 0) pdf.addPage();
-    const srcY = (yOffset / ratio) * 2;
-    const srcH = Math.min((pdfH / ratio) * 2, canvas.height - srcY);
+
+    const isLastPage = srcY + pageHeightPx >= canvas.height;
+    const breakY = isLastPage
+      ? canvas.height
+      : findBreakPoint(srcY + pageHeightPx);
+
+    const srcH = Math.round(breakY - srcY);
     const pg = document.createElement('canvas');
-    pg.width = canvas.width; pg.height = srcH;
+    pg.width = canvas.width;
+    pg.height = srcH;
     pg.getContext('2d')!.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
-    pdf.addImage(pg.toDataURL('image/jpeg', quality), 'JPEG', 0, 0, pdfW, srcH * ratio / 2);
-    yOffset += pdfH;
+
+    const imgH = srcH / pxPerMm; // mm height for this chunk
+    pdf.addImage(pg.toDataURL('image/jpeg', quality), 'JPEG', 0, 0, pdfW, imgH);
+
+    srcY = Math.round(breakY);
     pageCount++;
   }
 
@@ -224,8 +257,8 @@ export default function Preview() {
       fontSize: 13, lineHeight: 1.7, padding: '80px 80px 60px',
       boxSizing: 'border-box', position: 'relative',
     }}>
-      {/* Page break indicator — visible in preview, not in PDF (it's at exact 1123px) */}
-      <div style={{
+      {/* Page break indicator — visible in preview only, ignored by html2canvas */}
+      <div data-html2canvas-ignore="true" style={{
         position: 'absolute', top: 1123, left: 0, right: 0, pointerEvents: 'none',
         borderTop: '1.5px dashed rgba(180,180,220,0.7)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
