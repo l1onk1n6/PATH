@@ -527,8 +527,9 @@ function ReferralSection() {
 
   useEffect(() => {
     if (!user || !isSupabaseConfigured()) return;
-    getSupabase()
-      .from('referrals')
+    const sb = getSupabase();
+    if (!sb) return;
+    sb.from('referrals')
       .select('subscribed, rewarded')
       .eq('referrer_id', user.id)
       .then(({ data }) => {
