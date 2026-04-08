@@ -165,7 +165,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
 
         {/* Dashboard */}
         <button onClick={() => go('/')} className="btn-glass"
-          style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isActive('/') ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isActive('/') ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
+          style={{ width: '100%', justifyContent: 'center', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isActive('/') ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isActive('/') ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
           <LayoutDashboard size={16} style={{ opacity: isActive('/') ? 1 : 0.6 }} />
           <span style={{ opacity: isActive('/') ? 1 : 0.7 }}>Dashboard</span>
         </button>
@@ -177,10 +177,10 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
             else { setActiveSection('personal'); setEditorOpen(true); go('/editor'); }
           }}
           className="btn-glass"
-          style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isEditorActive ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isEditorActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
+          style={{ width: '100%', justifyContent: 'center', position: 'relative', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isEditorActive ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isEditorActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
           <FileText size={16} style={{ opacity: isEditorActive ? 1 : 0.6 }} />
-          <span style={{ opacity: isEditorActive ? 1 : 0.7, flex: 1 }}>Editor</span>
-          <ChevronDown size={12} style={{ opacity: 0.4, transform: editorOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+          <span style={{ opacity: isEditorActive ? 1 : 0.7 }}>Editor</span>
+          <ChevronDown size={12} style={{ opacity: 0.4, transform: editorOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', position: 'absolute', right: 10 }} />
         </button>
 
         {isEditorActive && editorOpen && (
@@ -221,14 +221,14 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
 
         {/* Vorschau */}
         <button onClick={() => go('/preview')} className="btn-glass"
-          style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isActive('/preview') ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isActive('/preview') ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
+          style={{ width: '100%', justifyContent: 'center', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isActive('/preview') ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isActive('/preview') ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
           <Eye size={16} style={{ opacity: isActive('/preview') ? 1 : 0.6 }} />
           <span style={{ opacity: isActive('/preview') ? 1 : 0.7 }}>Vorschau</span>
         </button>
 
         {/* Bewerbungs-Tracker */}
         <button onClick={() => go('/tracker')} className="btn-glass"
-          style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isActive('/tracker') ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isActive('/tracker') ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
+          style={{ width: '100%', justifyContent: 'center', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isActive('/tracker') ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isActive('/tracker') ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
           <ClipboardList size={16} style={{ opacity: isActive('/tracker') ? 1 : 0.6 }} />
           <span style={{ opacity: isActive('/tracker') ? 1 : 0.7 }}>Tracker</span>
         </button>
@@ -240,10 +240,10 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
             else { setAccountSection('account'); setAccountOpen(true); go('/account'); }
           }}
           className="btn-glass"
-          style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isAccountActive ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isAccountActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
+          style={{ width: '100%', justifyContent: 'center', position: 'relative', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isAccountActive ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isAccountActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
           <UserCircle size={16} style={{ opacity: isAccountActive ? 1 : 0.6 }} />
-          <span style={{ opacity: isAccountActive ? 1 : 0.7, flex: 1 }}>Konto</span>
-          <ChevronDown size={12} style={{ opacity: 0.4, transform: accountOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+          <span style={{ opacity: isAccountActive ? 1 : 0.7 }}>Konto</span>
+          <ChevronDown size={12} style={{ opacity: 0.4, transform: accountOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', position: 'absolute', right: 10 }} />
         </button>
 
         {isAccountActive && accountOpen && (
