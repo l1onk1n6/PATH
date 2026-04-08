@@ -75,7 +75,7 @@ const PRO_FEATURES = [
 ];
 
 export default function LandingPage() {
-  const [showAuth, setShowAuth] = useState(false);
+  const [showAuth, setShowAuth] = useState<false | 'login' | 'register'>(false);
   const [scrolled, setScrolled] = useState(false);
   const isMobile = useIsMobile();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -102,7 +102,7 @@ export default function LandingPage() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  if (showAuth) return <AuthPage onBack={() => setShowAuth(false)} />;
+  if (showAuth) return <AuthPage onBack={() => setShowAuth(false)} initialMode={showAuth} />;
 
   return (
     <div
@@ -149,7 +149,7 @@ export default function LandingPage() {
 
         {/* Auth buttons */}
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <button onClick={() => setShowAuth(true)} style={{
+          <button onClick={() => setShowAuth('login')} style={{
             background: 'none', border: 'none', cursor: 'pointer',
             color: 'rgba(255,255,255,0.65)', fontSize: 14, padding: '8px 14px',
             borderRadius: 10, transition: 'color 0.2s',
@@ -158,7 +158,7 @@ export default function LandingPage() {
             onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.65)')}>
             Anmelden
           </button>
-          <button onClick={() => setShowAuth(true)} style={{
+          <button onClick={() => setShowAuth('register')} style={{
             background: 'rgba(0,122,255,0.9)', border: 'none', cursor: 'pointer',
             color: '#fff', fontSize: 14, fontWeight: 600,
             padding: '9px 18px', borderRadius: 10,
@@ -222,7 +222,7 @@ export default function LandingPage() {
           </p>
 
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <button onClick={() => setShowAuth(true)} style={{
+            <button onClick={() => setShowAuth('register')} style={{
               display: 'flex', alignItems: 'center', gap: 8,
               background: 'linear-gradient(135deg, #007AFF, #5856D6)',
               border: 'none', borderRadius: 14, cursor: 'pointer',
@@ -413,7 +413,7 @@ export default function LandingPage() {
               ))}
             </div>
 
-            <button onClick={() => setShowAuth(true)} style={{
+            <button onClick={() => setShowAuth('register')} style={{
               width: '100%', padding: '13px 20px', borderRadius: 12,
               background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
               color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer',
@@ -469,7 +469,7 @@ export default function LandingPage() {
               ))}
             </div>
 
-            <button onClick={() => setShowAuth(true)} style={{
+            <button onClick={() => setShowAuth('register')} style={{
               width: '100%', padding: '14px 20px', borderRadius: 12,
               background: 'linear-gradient(135deg, #007AFF, #5856D6)',
               border: 'none',
@@ -525,7 +525,7 @@ export default function LandingPage() {
           <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.55)', margin: '0 0 36px', lineHeight: 1.6 }}>
             Erstelle in wenigen Minuten einen Lebenslauf, der überzeugt. Kostenlos, ohne Kreditkarte.
           </p>
-          <button onClick={() => setShowAuth(true)} style={{
+          <button onClick={() => setShowAuth('register')} style={{
             display: 'inline-flex', alignItems: 'center', gap: 10,
             background: 'linear-gradient(135deg, #007AFF, #5856D6)',
             border: 'none', borderRadius: 16, cursor: 'pointer',

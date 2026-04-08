@@ -8,8 +8,8 @@ const limiter = new RateLimiter(5, 30_000);
 
 type Mode = 'login' | 'register' | 'forgot' | 'reset';
 
-export default function AuthPage({ onBack }: { onBack?: () => void } = {}) {
-  const [mode, setMode] = useState<Mode>('login');
+export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: () => void; initialMode?: Mode } = {}) {
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
