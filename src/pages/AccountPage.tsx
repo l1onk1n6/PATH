@@ -343,10 +343,15 @@ function ProfileCard() {
 
       // Sync to Listmonk/InvoiceNinja in background (best-effort)
       if (session?.access_token) {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
+        const supabaseUrl  = import.meta.env.VITE_SUPABASE_URL as string
+        const supabaseAnon = import.meta.env.VITE_SUPABASE_ANON_KEY as string
         fetch(`${supabaseUrl}/functions/v1/update-user-profile`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': supabaseAnon,
+          },
           body: JSON.stringify({ phone, street, zip, city, country }),
         }).catch(() => {/* ignore sync errors */})
       }
