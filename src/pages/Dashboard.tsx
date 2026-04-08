@@ -383,11 +383,11 @@ export default function Dashboard() {
         if (!mr) return null;
         // Smart positioning: flip left if near right edge, flip up if near bottom
         const menuW = 210;
-        const menuH = 220;
+        const menuH = mpResumes > 1 ? 230 : 185;
         const vw = window.innerWidth;
         const vh = window.innerHeight;
         const left = menuPos.x + menuW > vw ? menuPos.x - menuW : menuPos.x;
-        const top  = menuPos.y + menuH > vh ? menuPos.y - menuH - 8 : menuPos.y + 4;
+        const top  = menuPos.y + menuH > vh ? menuPos.y - menuH : menuPos.y + 8;
         return (
           <div style={{ position: 'fixed', inset: 0, zIndex: 200 }}
             onClick={() => setMenuOpenResumeId(null)}>
@@ -725,8 +725,7 @@ export default function Dashboard() {
                                   style={{ padding: 6, color: r.shareToken ? 'var(--ios-blue)' : undefined }}
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    const rect = e.currentTarget.getBoundingClientRect();
-                                    setMenuPos({ x: rect.left, y: rect.bottom });
+                                    setMenuPos({ x: e.clientX, y: e.clientY });
                                     setMenuOpenResumeId(r.id);
                                   }}>
                                   <MoreHorizontal size={15} />

@@ -1,4 +1,5 @@
 import { Plus, Trash2, GraduationCap, ChevronDown, ChevronUp, GripVertical } from 'lucide-react';
+import MonthYearPicker from '../ui/MonthYearPicker';
 import { useState } from 'react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -121,13 +122,11 @@ export default function EducationEditor() {
                 </div>
                 <div>
                   <label className="section-label">Von</label>
-                  <input className="input-glass" type="month" value={edu.startDate}
-                    onChange={(e) => updateEducation(resume.id, edu.id, { startDate: e.target.value })} />
+                  <MonthYearPicker value={edu.startDate} onChange={(v) => updateEducation(resume.id, edu.id, { startDate: v })} />
                 </div>
                 <div>
                   <label className="section-label">Bis</label>
-                  <input className="input-glass" type="month" value={edu.endDate}
-                    onChange={(e) => updateEducation(resume.id, edu.id, { endDate: e.target.value })} />
+                  <MonthYearPicker value={edu.endDate} onChange={(v) => updateEducation(resume.id, edu.id, { endDate: v })} />
                 </div>
                 <div>
                   <label className="section-label">Note / GPA</label>

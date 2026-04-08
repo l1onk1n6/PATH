@@ -1,4 +1,5 @@
 import { Plus, Trash2, Briefcase, ChevronDown, ChevronUp, GripVertical } from 'lucide-react';
+import MonthYearPicker from '../ui/MonthYearPicker';
 import { useState } from 'react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -123,14 +124,11 @@ export default function ExperienceEditor() {
                 </div>
                 <div>
                   <label className="section-label">Von</label>
-                  <input className="input-glass" type="month" value={job.startDate}
-                    onChange={(e) => updateWorkExperience(resume.id, job.id, { startDate: e.target.value })} />
+                  <MonthYearPicker value={job.startDate} onChange={(v) => updateWorkExperience(resume.id, job.id, { startDate: v })} />
                 </div>
                 <div>
                   <label className="section-label">Bis</label>
-                  <input className="input-glass" type="month" value={job.endDate} disabled={job.current}
-                    onChange={(e) => updateWorkExperience(resume.id, job.id, { endDate: e.target.value })}
-                    style={{ opacity: job.current ? 0.4 : 1 }} />
+                  <MonthYearPicker value={job.endDate} disabled={job.current} onChange={(v) => updateWorkExperience(resume.id, job.id, { endDate: v })} />
                 </div>
               </div>
               <div>

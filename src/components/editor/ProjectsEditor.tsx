@@ -1,4 +1,5 @@
 import { Plus, Trash2, FolderOpen, Award, ChevronDown, ChevronUp, GripVertical } from 'lucide-react';
+import MonthYearPicker from '../ui/MonthYearPicker';
 import { useState } from 'react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -117,13 +118,11 @@ export default function ProjectsEditor() {
                   </div>
                   <div>
                     <label className="section-label">Von</label>
-                    <input className="input-glass" type="month" value={project.startDate}
-                      onChange={(e) => updateProject(resume.id, project.id, { startDate: e.target.value })} />
+                    <MonthYearPicker value={project.startDate} onChange={(v) => updateProject(resume.id, project.id, { startDate: v })} />
                   </div>
                   <div>
                     <label className="section-label">Bis</label>
-                    <input className="input-glass" type="month" value={project.endDate}
-                      onChange={(e) => updateProject(resume.id, project.id, { endDate: e.target.value })} />
+                    <MonthYearPicker value={project.endDate} onChange={(v) => updateProject(resume.id, project.id, { endDate: v })} />
                   </div>
                   <div style={{ gridColumn: 'span 2' }}>
                     <label className="section-label">Technologien (Komma-getrennt)</label>
@@ -217,8 +216,7 @@ export default function ProjectsEditor() {
                   </div>
                   <div>
                     <label className="section-label">Datum</label>
-                    <input className="input-glass" type="month" value={cert.date}
-                      onChange={(e) => updateCertificate(resume.id, cert.id, { date: e.target.value })} />
+                    <MonthYearPicker value={cert.date} onChange={(v) => updateCertificate(resume.id, cert.id, { date: v })} placeholder="Monat / Jahr" />
                   </div>
                   <div>
                     <label className="section-label">URL</label>
