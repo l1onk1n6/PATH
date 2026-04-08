@@ -3,7 +3,7 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
-// Find InvoiceNinja client ID by contact email
+// Find active (non-deleted) InvoiceNinja client ID by contact email
 async function findNinjaClientId(url: string, token: string, email: string): Promise<string | null> {
   const res = await fetch(`${url}/api/v1/clients?filter=${encodeURIComponent(email)}&per_page=10`, {
     headers: { 'X-Api-Token': token, Accept: 'application/json' },
@@ -11,6 +11,7 @@ async function findNinjaClientId(url: string, token: string, email: string): Pro
   if (!res.ok) return null
   const data = await res.json()
   const client = (data?.data ?? []).find((c: Record<string, unknown>) =>
+    !c.is_deleted &&
     (c.contacts as Array<{ email: string }>)?.some(
       (ct) => ct.email?.toLowerCase() === email.toLowerCase()
     )
@@ -55,7 +56,7 @@ Deno.serve(async (req) => {
       // ── Listmonk: create subscriber (409 = already exists, skip) ──
       if (listmonkUrl && listmonkUser && listmonkPass) {
         try {
-          const creds = btoa(`${listmonkUser}:${listmonkPass}`)
+          const creds = btoa(unescape(encodeURIComponent(`${listmonkUser.trim()}:${listmonkPass.trim()}`)))
           const res   = await fetch(`${listmonkUrl}/api/subscribers`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Basic ${creds}` },
