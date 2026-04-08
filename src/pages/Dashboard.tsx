@@ -29,8 +29,8 @@ function AtsButton() {
     <>
       {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} highlightId="ats" />}
       {showSoon && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowSoon(false)}>
-          <div className="glass-card animate-scale-in" style={{ padding: '24px 28px', maxWidth: 320, textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }} onClick={() => setShowSoon(false)}>
+          <div className="glass-card animate-scale-in" style={{ padding: '24px 28px', maxWidth: 320, textAlign: 'center', background: 'rgba(14,14,22,0.97)' }} onClick={e => e.stopPropagation()}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>📊</div>
             <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>ATS-Score — bald verfügbar</div>
             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 16 }}>
@@ -82,10 +82,10 @@ function ShareModal({ resumeId, token, onClose }: { resumeId: string; token?: st
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+    <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }}
       onClick={onClose}>
       <div className="glass-card animate-scale-in"
-        style={{ padding: 20, width: 340, maxWidth: '90vw', zIndex: 101 }}
+        style={{ padding: 20, width: 340, maxWidth: '90vw', zIndex: 101, background: 'rgba(14,14,22,0.97)' }}
         onClick={(e) => e.stopPropagation()}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
           <div style={{ fontWeight: 700, fontSize: 15 }}>Lebenslauf teilen</div>
@@ -330,9 +330,9 @@ export default function Dashboard() {
 
       {/* Status menu overlay */}
       {statusMenuResumeId && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 100 }} onClick={() => setStatusMenuResumeId(null)}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }} onClick={() => setStatusMenuResumeId(null)}>
           <div onClick={(e) => e.stopPropagation()} className="glass-card animate-scale-in"
-            style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 101, padding: 16, minWidth: 200 }}>
+            style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 101, padding: 16, minWidth: 200, background: 'rgba(14,14,22,0.97)' }}>
             <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, opacity: 0.7 }}>Status setzen</div>
             {ALL_STATUSES.map(s => (
               <button key={s} className="btn-glass"
@@ -669,28 +669,40 @@ export default function Dashboard() {
                             </div>
 
                             {/* Actions */}
-                            <div style={{ display: 'flex', gap: 5, alignItems: 'center', flexShrink: 0 }}>
+                            <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0 }}>
                               {!frozen && !isPersonFrozen && (
                                 <>
-                                  <span title="Teilen" style={{ cursor: 'pointer', opacity: 0.45, display: 'flex' }}
+                                  <button
+                                    className="btn-glass btn-sm"
+                                    title="Link teilen"
+                                    style={{ gap: 4, padding: '4px 8px', fontSize: 11, color: r.shareToken ? 'var(--ios-blue)' : undefined }}
                                     onClick={(e) => { e.stopPropagation(); setShareModalResumeId(r.id); }}>
-                                    <Share2 size={14} />
-                                  </span>
-                                  <span title="Umbenennen" style={{ cursor: 'pointer', opacity: 0.45, display: 'flex' }}
+                                    <Share2 size={12} /> Teilen
+                                  </button>
+                                  <button
+                                    className="btn-glass btn-icon"
+                                    title="Umbenennen"
+                                    style={{ padding: 6 }}
                                     onClick={(e) => { e.stopPropagation(); setRenamingResumeId(r.id); setRenameValue(r.name || 'Bewerbungsmappe'); }}>
-                                    <Pencil size={14} />
-                                  </span>
-                                  <span title="Duplizieren" style={{ cursor: 'pointer', opacity: 0.45, display: 'flex' }}
+                                    <Pencil size={13} />
+                                  </button>
+                                  <button
+                                    className="btn-glass btn-icon"
+                                    title="Duplizieren"
+                                    style={{ padding: 6 }}
                                     onClick={(e) => { e.stopPropagation(); duplicateResume(r.id); }}>
-                                    <Copy size={14} />
-                                  </span>
+                                    <Copy size={13} />
+                                  </button>
                                 </>
                               )}
                               {personResumes.length > 1 && (
-                                <span title="Löschen" style={{ cursor: 'pointer', opacity: 0.4, display: 'flex' }}
+                                <button
+                                  className="btn-glass btn-icon"
+                                  title="Löschen"
+                                  style={{ padding: 6, color: 'var(--ios-red)', borderColor: 'rgba(255,59,48,0.3)' }}
                                   onClick={(e) => { e.stopPropagation(); if (confirm(`"${r.name || 'Bewerbungsmappe'}" löschen?`)) deleteResume(r.id); }}>
-                                  <Trash2 size={14} />
-                                </span>
+                                  <Trash2 size={13} />
+                                </button>
                               )}
                             </div>
                           </div>
