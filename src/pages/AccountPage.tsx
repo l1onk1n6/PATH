@@ -309,12 +309,13 @@ function ProfileCard() {
   const [country, setCountry] = useState('Schweiz')
   const [saving,  setSaving]  = useState(false)
   const [saved,   setSaved]   = useState(false)
-  const [loadErr, setLoadErr] = useState('')
+  const [saveErr, setSaveErr] = useState('')
 
   // Load profile on mount
   useEffect(() => {
     if (!supabase || !user) return
-    ;(supabase.from('profiles' as never) as ReturnType<typeof supabase.from>)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(supabase.from('profiles' as any) as any)
       .select('*').eq('id', user.id).maybeSingle()
       .then(({ data }: { data: Record<string, string> | null }) => {
         if (!data) return
@@ -324,25 +325,30 @@ function ProfileCard() {
         if (data.city)    setCity(data.city)
         if (data.country) setCountry(data.country)
       })
-      .catch(() => setLoadErr('Profil konnte nicht geladen werden.'))
   }, [user?.id])
 
   async function handleSave() {
-    if (!session) return
-    setSaving(true)
+    if (!supabase || !user) return
+    setSaving(true); setSaveErr('')
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
-      const res = await fetch(`${supabaseUrl}/functions/v1/update-user-profile`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ phone, street, zip, city, country }),
+      // Save directly to DB (reliable)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from('profiles' as any) as any).upsert({
+        id: user.id, phone, street, zip, city, country,
+        updated_at: new Date().toISOString(),
       })
-      if (res.ok) {
-        setSaved(true)
-        setTimeout(() => setSaved(false), 2500)
+      if (error) { setSaveErr('Speichern fehlgeschlagen.'); return }
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2500)
+
+      // Sync to Listmonk/InvoiceNinja in background (best-effort)
+      if (session?.access_token) {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
+        fetch(`${supabaseUrl}/functions/v1/update-user-profile`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+          body: JSON.stringify({ phone, street, zip, city, country }),
+        }).catch(() => {/* ignore sync errors */})
       }
     } finally {
       setSaving(false)
@@ -352,7 +358,7 @@ function ProfileCard() {
   return (
     <div className="glass-card" style={{ padding: 20 }}>
       <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 14, opacity: 0.6 }}>PROFIL</div>
-      {loadErr && <div style={{ fontSize: 12, color: '#ff6b6b', marginBottom: 10 }}>{loadErr}</div>}
+      {saveErr && <div style={{ fontSize: 12, color: '#ff6b6b', marginBottom: 10 }}>{saveErr}</div>}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <div>
           <label className="section-label">Telefon</label>
@@ -387,7 +393,7 @@ function ProfileCard() {
           disabled={saving} style={{ alignSelf: 'flex-end', gap: 6, marginTop: 4 }}>
           {saving ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> :
            saved  ? <CheckCircle size={13} style={{ color: '#34c759' }} /> : null}
-          {saved ? 'Gespeichert' : 'Speichern & synchronisieren'}
+          {saved ? 'Gespeichert' : 'Speichern'}
         </button>
       </div>
     </div>
