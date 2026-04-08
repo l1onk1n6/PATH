@@ -103,16 +103,18 @@ Gib NUR den verbesserten Text zurück, keine Erklärungen oder Kommentare.`
       const { fields, targetLanguage } = body
       if (!fields || !targetLanguage) return new Response(JSON.stringify({ error: 'Missing fields or targetLanguage' }), { status: 400, headers: cors })
 
-      const prompt = `Übersetze folgende Bewerbungsfelder ins ${targetLanguage}. Behalte den professionellen Ton bei. Übersetze nur den Text, keine Keys. Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Objekt mit denselben Keys.
+      const prompt = `Translate the following resume fields to ${targetLanguage}. Keep a professional tone. Translate only the values, not the keys. Reply ONLY with a valid JSON object using the same keys — no markdown, no code blocks, no explanations.
 
-${JSON.stringify(fields, null, 2)}
+${JSON.stringify(fields, null, 2)}`
 
-Wichtig: Gib nur das JSON zurück, kein Markdown, keine Erklärungen.`
+      const raw = await callClaude(prompt, 4096)
 
-      const result = await callClaude(prompt, 4096)
-      // Validate it's parseable JSON
-      JSON.parse(result)
-      return new Response(JSON.stringify({ result }), { headers: { ...cors, 'Content-Type': 'application/json' } })
+      // Strip markdown code fences if Claude wrapped the JSON (e.g. ```json ... ```)
+      const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
+
+      // Validate parseable JSON before returning
+      JSON.parse(cleaned)
+      return new Response(JSON.stringify({ result: cleaned }), { headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 
     return new Response(JSON.stringify({ error: 'Unknown action' }), { status: 400, headers: cors })
