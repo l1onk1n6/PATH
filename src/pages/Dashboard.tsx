@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp,
   FolderPlus, Pencil, Copy, Search, ExternalLink, Clock,
-  Download, Share2, CheckCircle, LayoutGrid, List, X, BarChart2,
-  Lock, MoreHorizontal,
+  Download, Share2, CheckCircle, List, X, BarChart2,
+  Lock, MoreHorizontal, ClipboardList,
 } from 'lucide-react';
 
 function safeUrl(url: string) {
@@ -158,107 +158,6 @@ function CompletenessBar({ score }: { score: number }) {
   );
 }
 
-// ── Tracker (Kanban) view ──────────────────────────────────
-function TrackerView() {
-  const { resumes, persons, setResumeStatus, setActiveResume, setActivePerson } = useResumeStore();
-  const { limits } = usePlan();
-  const navigate = useNavigate();
-
-  const frozenPersonIds = new Set(
-    limits.persons < Infinity ? persons.slice(limits.persons).map(p => p.id) : []
-  );
-  const frozenResumeIds = new Set(
-    limits.resumes < Infinity ? resumes.slice(limits.resumes).map(r => r.id) : []
-  );
-
-  return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-      gap: 16,
-      alignItems: 'start',
-    }}>
-      {ALL_STATUSES.map((status) => {
-        const statusResumes = resumes.filter(r => (r.status ?? 'entwurf') === status);
-        const color = APPLICATION_STATUS_COLORS[status];
-        return (
-          <div key={status} className="glass-card" style={{ padding: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-              <span style={{ width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0 }} />
-              <span style={{ fontSize: 14, fontWeight: 700 }}>{APPLICATION_STATUS_LABELS[status]}</span>
-              <span className="badge" style={{ marginLeft: 'auto', fontSize: 11, padding: '2px 8px' }}>{statusResumes.length}</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {statusResumes.length === 0 && (
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '16px 0' }}>Keine Einträge</div>
-              )}
-              {statusResumes.map((r) => {
-                const person = persons.find(p => p.resumeIds.includes(r.id));
-                const isFrozen = frozenResumeIds.has(r.id) || (person ? frozenPersonIds.has(person.id) : false);
-                return (
-                  <div
-                    key={r.id}
-                    className="glass-card"
-                    style={{
-                      padding: '12px 14px', borderRadius: 10,
-                      cursor: isFrozen ? 'default' : 'pointer',
-                      opacity: isFrozen ? 0.65 : 1,
-                      border: isFrozen ? '1px solid rgba(255,159,10,0.3)' : undefined,
-                      background: isFrozen ? 'rgba(255,159,10,0.05)' : undefined,
-                    }}
-                    onClick={() => {
-                      if (isFrozen) return;
-                      if (person) setActivePerson(person.id);
-                      setActiveResume(r.id);
-                      navigate('/editor');
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                      {isFrozen && <Lock size={11} style={{ color: '#FF9F0A', flexShrink: 0 }} />}
-                      <div style={{ fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: isFrozen ? '#FF9F0A' : undefined }}>
-                        {r.name || 'Bewerbungsmappe'}
-                      </div>
-                    </div>
-                    {person && (
-                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>
-                        {person.name}
-                      </div>
-                    )}
-                    {r.deadline && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6, fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
-                        <Clock size={11} />
-                        {new Date(r.deadline).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: '2-digit' })}
-                      </div>
-                    )}
-                    {isFrozen ? (
-                      <div style={{ marginTop: 8, fontSize: 11, color: 'rgba(255,159,10,0.7)' }}>
-                        Upgrade auf Pro zum Bearbeiten
-                      </div>
-                    ) : (
-                      <div style={{ display: 'flex', gap: 5, marginTop: 10, flexWrap: 'wrap' }}>
-                        {ALL_STATUSES.filter(s => s !== status).map(s => (
-                          <button
-                            key={s}
-                            title={APPLICATION_STATUS_LABELS[s]}
-                            className="btn-glass"
-                            style={{ padding: '4px 9px', fontSize: 11, borderRadius: 6 }}
-                            onClick={(e) => { e.stopPropagation(); setResumeStatus(r.id, s); }}
-                          >
-                            → {APPLICATION_STATUS_LABELS[s]}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -273,8 +172,6 @@ export default function Dashboard() {
   const [newName, setNewName] = useState('');
   const [showAdd, setShowAdd] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [view, setView] = useState<'list' | 'tracker'>('list');
-
   const [addingResumeForPersonId, setAddingResumeForPersonId] = useState<string | null>(null);
   const [newResumeName, setNewResumeName] = useState('');
 
@@ -495,19 +392,11 @@ export default function Dashboard() {
       {/* Section header + controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 8, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <button
-            className="btn-glass btn-sm"
-            onClick={() => setView('list')}
-            style={{ background: view === 'list' ? 'rgba(0,122,255,0.2)' : undefined, border: view === 'list' ? '1px solid rgba(0,122,255,0.4)' : undefined }}
-          >
+          <button className="btn-glass btn-sm" style={{ background: 'rgba(0,122,255,0.2)', border: '1px solid rgba(0,122,255,0.4)' }}>
             <List size={13} /> Liste
           </button>
-          <button
-            className="btn-glass btn-sm"
-            onClick={() => setView('tracker')}
-            style={{ background: view === 'tracker' ? 'rgba(0,122,255,0.2)' : undefined, border: view === 'tracker' ? '1px solid rgba(0,122,255,0.4)' : undefined }}
-          >
-            <LayoutGrid size={13} /> Tracker
+          <button className="btn-glass btn-sm" onClick={() => navigate('/tracker')}>
+            <ClipboardList size={13} /> Tracker
           </button>
           <AtsButton />
         </div>
@@ -526,12 +415,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Tracker view */}
-      {view === 'tracker' && <TrackerView />}
-
       {/* List view */}
-      {view === 'list' && (
-        <>
+      <>
           {/* Search bar */}
           {persons.length > 1 && (
             <div style={{ position: 'relative', marginBottom: 12 }}>
@@ -828,8 +713,7 @@ export default function Dashboard() {
               Keine Ergebnisse für „{searchQuery}"
             </div>
           )}
-        </>
-      )}
+      </>
     </div>
   );
 }
