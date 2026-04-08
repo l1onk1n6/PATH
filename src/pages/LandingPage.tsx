@@ -131,7 +131,7 @@ export default function LandingPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} onClick={() => containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}>
           <LogoIcon size={30} />
           <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: '-0.3px' }}>PATH</span>
-          <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 99, background: 'rgba(0,122,255,0.2)', border: '1px solid rgba(0,122,255,0.35)', color: 'var(--ios-blue)', marginLeft: 2 }}>by pixmatic</span>
+          <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 99, background: 'rgba(0,122,255,0.2)', border: '1px solid rgba(0,122,255,0.35)', color: 'var(--ios-blue)', marginLeft: 2, whiteSpace: 'nowrap' }}>by pixmatic</span>
         </div>
 
         {/* Nav links – desktop only */}
