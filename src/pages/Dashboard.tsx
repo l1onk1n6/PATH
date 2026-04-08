@@ -597,21 +597,12 @@ export default function Dashboard() {
                                   </span>
                                 )}
                               </div>
-                              {!frozen && (r.deadline || r.jobUrl) && (
+                              {!frozen && r.deadline && (
                                 <div style={{ display: 'flex', gap: 8, marginTop: 3, alignItems: 'center' }}>
-                                  {r.deadline && (
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, color: deadlineColor }}>
-                                      <Clock size={11} />
-                                      {deadlineDiff! < 0 ? 'Abgelaufen' : `${Math.ceil(deadlineDiff!)} Tage`}
-                                    </span>
-                                  )}
-                                  {r.jobUrl && (
-                                    <a href={r.jobUrl} target="_blank" rel="noopener noreferrer"
-                                      style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}
-                                      onClick={(e) => e.stopPropagation()}>
-                                      <ExternalLink size={11} /> Stelle
-                                    </a>
-                                  )}
+                                  <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, color: deadlineColor }}>
+                                    <Clock size={11} />
+                                    {deadlineDiff! < 0 ? 'Abgelaufen' : `${Math.ceil(deadlineDiff!)} Tage`}
+                                  </span>
                                 </div>
                               )}
                               {frozen && (
