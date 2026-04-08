@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Identität bestätigen – PATH</title>
+</head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0a0a0a;padding:48px 16px;">
+    <tr>
+      <td align="center">
+        <table width="540" cellpadding="0" cellspacing="0" border="0" style="max-width:540px;width:100%;">
+
+          <!-- Logo -->
+          <tr>
+            <td align="center" style="padding-bottom:28px;">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding-right:10px;vertical-align:middle;">
+                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <linearGradient id="em-bg" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+                          <stop offset="0%" stop-color="#34C759"/>
+                          <stop offset="100%" stop-color="#00C7BE"/>
+                        </linearGradient>
+                        <linearGradient id="em-shine" x1="18" y1="0" x2="18" y2="20" gradientUnits="userSpaceOnUse">
+                          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+                          <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+                        </linearGradient>
+                        <clipPath id="em-clip">
+                          <rect width="36" height="36" rx="9"/>
+                        </clipPath>
+                      </defs>
+                      <rect width="36" height="36" rx="9" fill="url(#em-bg)"/>
+                      <rect width="36" height="36" rx="9" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="0.8"/>
+                      <rect width="36" height="22" rx="9" fill="url(#em-shine)" clip-path="url(#em-clip)"/>
+                      <path d="M10.5 26L25.5 11" stroke="white" stroke-width="2.8" stroke-linecap="round"/>
+                      <path d="M16 11H25.5V20.5" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </td>
+                  <td style="vertical-align:middle;">
+                    <div style="font-size:17px;font-weight:800;color:#ffffff;letter-spacing:-0.4px;line-height:1;">Path</div>
+                    <div style="font-size:10px;color:rgba(255,255,255,0.38);margin-top:2px;letter-spacing:0.02em;">by pixmatic</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Card -->
+          <tr>
+            <td style="background:#161616;border:1px solid #2a2a2a;border-radius:16px;padding:40px 44px 36px;">
+
+              <!-- Icon -->
+              <div align="center" style="margin-bottom:24px;">
+                <div style="display:inline-block;width:60px;height:60px;border-radius:50%;background:#1a2a1a;border:1px solid #2d4a2d;text-align:center;line-height:58px;font-size:26px;">🛡️</div>
+              </div>
+
+              <!-- Title -->
+              <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#ffffff;text-align:center;letter-spacing:-0.3px;">
+                Identität bestätigen
+              </h1>
+              <p style="margin:0 0 28px;font-size:14px;color:#666;text-align:center;">
+                Sicherheitsbestätigung für eine sensible Aktion
+              </p>
+
+              <!-- Divider -->
+              <div style="border-top:1px solid #222;margin-bottom:28px;"></div>
+
+              <!-- Body -->
+              <p style="margin:0 0 16px;font-size:15px;color:#aaa;line-height:1.65;">
+                Du hast eine sicherheitsrelevante Aktion in deinem PATH-Konto angefordert.
+              </p>
+              <p style="margin:0 0 16px;font-size:15px;color:#aaa;line-height:1.65;">
+                Gib den folgenden Code in der App ein, um deine Identität zu bestätigen:
+              </p>
+
+              <!-- OTP Code -->
+              <div align="center" style="margin:24px 0;">
+                <div style="display:inline-block;background:#1e1e1e;border:1px solid #3a3a3a;border-radius:12px;padding:18px 40px;">
+                  <span style="font-size:32px;font-weight:800;color:#ffffff;letter-spacing:8px;font-family:monospace;">{{ .Token }}</span>
+                </div>
+              </div>
+
+              <p style="margin:0 0 24px;font-size:14px;color:#555;text-align:center;line-height:1.5;">
+                Der Code ist <strong style="color:#777;">10 Minuten</strong> gültig.
+              </p>
+
+              <!-- Security notice -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="background:#1f1800;border:1px solid #3d2f00;border-radius:10px;padding:14px 18px;">
+                    <p style="margin:0;font-size:13px;color:#cc8800;line-height:1.5;">
+                      ⚠️ &nbsp;Falls du diese Aktion nicht angefordert hast, ignoriere diese E-Mail und wende dich an
+                      <a href="mailto:info@pixmatic.ch" style="color:#FF9F0A;font-weight:600;text-decoration:none;">info@pixmatic.ch</a>.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 0 0;text-align:center;">
+              <p style="margin:0 0 4px;font-size:12px;color:#444;">
+                PATH &mdash; Dein professioneller Bewerbungsmanager
+              </p>
+              <p style="margin:0;font-size:12px;color:#333;">
+                <a href="https://path.pixmatic.ch" style="color:#444;text-decoration:none;">path.pixmatic.ch</a>
+                &nbsp;&middot;&nbsp;
+                <a href="mailto:info@pixmatic.ch" style="color:#444;text-decoration:none;">info@pixmatic.ch</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
