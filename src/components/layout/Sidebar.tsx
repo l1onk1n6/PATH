@@ -60,6 +60,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
   // Collapsible sub-navs — open by default when route is active
   const [editorOpen,  setEditorOpen]  = useState(isEditorActive);
   const [accountOpen, setAccountOpen] = useState(isAccountActive);
+  const [personsOpen, setPersonsOpen] = useState(true);
 
   function toggleExpand(id: string) {
     setExpandedPersonIds(prev => {
@@ -257,21 +258,22 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
             ))}
           </div>
         )}
+
+        {/* Personen nav item */}
+        <button onClick={() => setPersonsOpen(v => !v)} className="btn-glass"
+          style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: 'transparent', border: '1px solid transparent', boxShadow: 'none' }}>
+          <Users size={16} style={{ opacity: 0.6 }} />
+          <span style={{ opacity: 0.7, flex: 1 }}>Personen</span>
+          <button className="btn-glass btn-icon btn-sm" onClick={(e) => { e.stopPropagation(); setAddingPerson(true); }} title="Person hinzufügen"
+            style={{ padding: 4, boxShadow: 'none', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', marginRight: 4 }}>
+            <Plus size={12} />
+          </button>
+          <ChevronDown size={12} style={{ opacity: 0.4, transform: personsOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+        </button>
       </nav>
 
-      <div className="divider" />
-
-      {/* Persons */}
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, paddingLeft: 8 }}>
-          <div className="section-label" style={{ marginBottom: 0 }}>
-            <Users size={10} style={{ display: 'inline', marginRight: 5 }} />
-            Personen
-          </div>
-          <button className="btn-glass btn-icon btn-sm" onClick={() => setAddingPerson(true)} title="Person hinzufügen" style={{ padding: 5 }}>
-            <Plus size={13} />
-          </button>
-        </div>
+      {/* Persons list (collapsible) */}
+      <div style={{ display: personsOpen ? 'flex' : 'none', flexDirection: 'column', minHeight: 0, marginLeft: 14, paddingLeft: 10, borderLeft: '1px solid rgba(255,255,255,0.1)', marginBottom: 4 }}>
 
         {addingPerson && (
           <div className="glass-card animate-scale-in" style={{ padding: 12, marginBottom: 8, borderRadius: 'var(--radius-sm)' }}>
