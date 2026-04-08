@@ -314,14 +314,17 @@ function ProfileCard() {
   // Load profile on mount
   useEffect(() => {
     if (!supabase || !user) return
-    supabase.from('profiles').select('*').eq('id', user.id).maybeSingle().then(({ data }) => {
-      if (!data) return
-      if (data.phone)   setPhone(data.phone)
-      if (data.street)  setStreet(data.street)
-      if (data.zip)     setZip(data.zip)
-      if (data.city)    setCity(data.city)
-      if (data.country) setCountry(data.country)
-    }).catch(() => setLoadErr('Profil konnte nicht geladen werden.'))
+    ;(supabase.from('profiles' as never) as ReturnType<typeof supabase.from>)
+      .select('*').eq('id', user.id).maybeSingle()
+      .then(({ data }: { data: Record<string, string> | null }) => {
+        if (!data) return
+        if (data.phone)   setPhone(data.phone)
+        if (data.street)  setStreet(data.street)
+        if (data.zip)     setZip(data.zip)
+        if (data.city)    setCity(data.city)
+        if (data.country) setCountry(data.country)
+      })
+      .catch(() => setLoadErr('Profil konnte nicht geladen werden.'))
   }, [user?.id])
 
   async function handleSave() {
