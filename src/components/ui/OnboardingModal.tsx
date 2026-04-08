@@ -1,0 +1,258 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight, Check, FileText, Sparkles, Share2, Bell, Wand2 } from 'lucide-react';
+import { useResumeStore } from '../../store/resumeStore';
+import { LogoIcon } from '../layout/Logo';
+
+const ONBOARDING_KEY = 'path_onboarding_done';
+
+export function isOnboardingDone(): boolean {
+  return localStorage.getItem(ONBOARDING_KEY) === '1';
+}
+
+export function resetOnboarding(): void {
+  localStorage.removeItem(ONBOARDING_KEY);
+  window.dispatchEvent(new CustomEvent('start-onboarding'));
+}
+
+export function markOnboardingDone() {
+  localStorage.setItem(ONBOARDING_KEY, '1');
+}
+
+const FEATURES = [
+  { icon: <FileText size={18} />, color: 'var(--ios-blue)', title: 'Bewerbungsmappen', desc: 'Erstelle für jede Stelle eine eigene Mappe mit Lebenslauf und Anschreiben.' },
+  { icon: <Sparkles size={18} />, color: '#FF9F0A', title: 'KI-Unterstützung', desc: 'Lass dir Anschreiben generieren, Texte verbessern und in andere Sprachen übersetzen.' },
+  { icon: <Share2 size={18} />, color: '#5856D6', title: 'Link teilen & Export', desc: 'Teile deinen Lebenslauf als Link oder exportiere ihn als professionelles PDF.' },
+  { icon: <Bell size={18} />, color: 'var(--ios-green)', title: 'Deadline-Reminder', desc: 'Verpasse keine Bewerbungsfrist — erhalte Erinnerungen per E-Mail.' },
+];
+
+function buildSampleData(firstName: string, lastName: string) {
+  const fn = firstName || 'Max';
+  const ln = lastName || 'Mustermann';
+  return {
+    personalInfo: {
+      firstName: fn, lastName: ln,
+      title: 'Senior Softwareentwickler',
+      email: `${fn.toLowerCase()}.${ln.toLowerCase()}@beispiel.ch`,
+      phone: '+41 79 123 45 67',
+      street: 'Musterstrasse 12',
+      location: '8001 Zürich',
+      website: `www.${ln.toLowerCase()}.ch`,
+      linkedin: `linkedin.com/in/${fn.toLowerCase()}${ln.toLowerCase()}`,
+      github: `github.com/${fn.toLowerCase()}${ln.toLowerCase()}`,
+      summary: 'Erfahrener Softwareentwickler mit über 5 Jahren Erfahrung in der Entwicklung moderner Webanwendungen. Leidenschaft für sauberen Code, nutzerzentriertes Design und agile Teamarbeit. Spezialisiert auf React, TypeScript und Node.js.',
+    },
+    workExperience: [
+      {
+        id: 'sample-job-1',
+        company: 'Tech Solutions AG', position: 'Senior Frontend Entwickler',
+        location: 'Zürich', startDate: '2022-03', endDate: '', current: true,
+        description: 'Entwicklung und Wartung einer Enterprise SaaS-Plattform mit React und TypeScript. Leitung eines 4-köpfigen Frontend-Teams, Code Reviews und technisches Mentoring. Einführung von automatisierten Tests und Reduktion der Bug-Rate um 60 %.',
+        highlights: [],
+      },
+      {
+        id: 'sample-job-2',
+        company: 'Digital Agency GmbH', position: 'Frontend Entwickler',
+        location: 'Basel', startDate: '2019-06', endDate: '2022-02', current: false,
+        description: 'Umsetzung von Kundenprojekten in React und Vue.js. Enge Zusammenarbeit mit UI/UX-Designern. Optimierung der Core Web Vitals und Verbesserung der PageSpeed-Scores um durchschnittlich 40 %.',
+        highlights: [],
+      },
+    ],
+    education: [
+      {
+        id: 'sample-edu-1',
+        degree: 'Bachelor of Science', field: 'Informatik',
+        institution: 'ETH Zürich', location: 'Zürich',
+        startDate: '2015-09', endDate: '2019-06', grade: '5.4',
+        description: 'Schwerpunkte: Software Engineering, verteilte Systeme und Mensch-Computer-Interaktion.',
+      },
+    ],
+    skills: [
+      { id: 's1', name: 'React', level: 5 as const, category: 'Frontend' },
+      { id: 's2', name: 'TypeScript', level: 5 as const, category: 'Frontend' },
+      { id: 's3', name: 'Node.js', level: 4 as const, category: 'Backend' },
+      { id: 's4', name: 'PostgreSQL', level: 3 as const, category: 'Backend' },
+      { id: 's5', name: 'Docker', level: 3 as const, category: 'DevOps' },
+      { id: 's6', name: 'Git', level: 5 as const, category: 'Tools' },
+    ],
+    languages: [
+      { id: 'l1', name: 'Deutsch', level: 'Muttersprache' as const },
+      { id: 'l2', name: 'Englisch', level: 'Fließend' as const },
+      { id: 'l3', name: 'Französisch', level: 'Grundkenntnisse' as const },
+    ],
+  };
+}
+
+interface Props {
+  onClose: () => void;
+}
+
+export default function OnboardingModal({ onClose }: Props) {
+  const [step, setStep] = useState(0);
+  const [name, setName] = useState('');
+  const [creating, setCreating] = useState(false);
+  const { addPerson, persons, updateResume } = useResumeStore();
+  const navigate = useNavigate();
+  const hasPersons = persons.length > 0;
+
+  async function handleCreate() {
+    if (!name.trim()) return;
+    setCreating(true);
+    await addPerson(name.trim());
+    setCreating(false);
+    setStep(2);
+  }
+
+  function goNext() {
+    setStep(hasPersons ? 2 : 1);
+  }
+
+  function finish(withSampleData: boolean) {
+    markOnboardingDone();
+    if (withSampleData) {
+      const { persons: currentPersons, resumes: currentResumes } = useResumeStore.getState();
+      const activePerson = currentPersons[0];
+      if (activePerson) {
+        const resume = currentResumes.find(r => r.personId === activePerson.id);
+        if (resume) {
+          const nameParts = (name.trim() || activePerson.name).split(' ');
+          const firstName = nameParts[0] ?? '';
+          const lastName = nameParts.slice(1).join(' ') || firstName;
+          updateResume(resume.id, buildSampleData(firstName, lastName));
+        }
+      }
+    }
+    onClose();
+    navigate('/editor');
+  }
+
+  function skip() {
+    markOnboardingDone();
+    onClose();
+  }
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 10000,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(16px)',
+      padding: '20px 16px',
+    }}>
+      <div className="glass-card animate-scale-in" style={{
+        width: '100%', maxWidth: 440, padding: '32px 28px',
+        background: 'rgba(16,16,28,0.98)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        boxShadow: '0 24px 60px rgba(0,0,0,0.6)',
+      }}>
+
+        {/* Step 0: Welcome */}
+        {step === 0 && (
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ marginBottom: 16 }}><LogoIcon size={56} /></div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 8px', letterSpacing: '-0.5px' }}>
+              Willkommen bei PATH
+            </h1>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', margin: '0 0 28px', lineHeight: 1.6 }}>
+              Dein persönlicher Bewerbungsassistent.<br />
+              Lass uns in 2 Minuten alles einrichten.
+            </p>
+            <button className="btn-glass btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '14px', fontWeight: 700, fontSize: 15, gap: 8 }}
+              onClick={goNext}>
+              Loslegen <ArrowRight size={16} />
+            </button>
+            <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 12, fontFamily: 'var(--font-sf)' }}>
+              Überspringen
+            </button>
+          </div>
+        )}
+
+        {/* Step 1: Create person */}
+        {step === 1 && (
+          <div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ios-blue)', marginBottom: 6 }}>SCHRITT 1 VON 2</div>
+              <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 6px', letterSpacing: '-0.4px' }}>Wie heisst du?</h2>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: 0 }}>Wir legen dein erstes Profil an.</p>
+            </div>
+            <input
+              className="input-glass"
+              placeholder="Vorname Nachname"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && name.trim() && handleCreate()}
+              autoFocus maxLength={100}
+              style={{ marginBottom: 16, fontSize: 15 }}
+            />
+            <button className="btn-glass btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '13px', fontWeight: 700, gap: 8 }}
+              disabled={!name.trim() || creating}
+              onClick={handleCreate}>
+              {creating ? 'Erstelle…' : <>Profil anlegen <ArrowRight size={15} /></>}
+            </button>
+            <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 12, fontFamily: 'var(--font-sf)', width: '100%' }}>
+              Überspringen
+            </button>
+          </div>
+        )}
+
+        {/* Step 2: Features + sample data choice */}
+        {step === 2 && (
+          <div>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ios-blue)', marginBottom: 6 }}>SCHRITT 2 VON 2</div>
+              <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 6px', letterSpacing: '-0.4px' }}>Was PATH kann</h2>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+                Ein kurzer Überblick — du findest alles auch später wieder.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+              {FEATURES.map(f => (
+                <div key={f.title} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: `${f.color}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: f.color }}>
+                    {f.icon}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{f.title}</div>
+                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 }}>{f.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Sample data card */}
+            <div style={{ background: 'rgba(0,122,255,0.08)', border: '1px solid rgba(0,122,255,0.2)', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <Wand2 size={13} style={{ color: 'var(--ios-blue)', flexShrink: 0 }} />
+                <span style={{ fontSize: 13, fontWeight: 600 }}>Mit Beispieldaten starten</span>
+              </div>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: '0 0 12px', lineHeight: 1.5 }}>
+                Sieh sofort wie dein Lebenslauf aussehen könnte — wir füllen ihn mit realistischen Musterdaten vor.
+              </p>
+              <button className="btn-glass btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '11px', fontWeight: 700, fontSize: 13, gap: 7 }}
+                onClick={() => finish(true)}>
+                <Wand2 size={13} /> Beispieldaten laden & starten
+              </button>
+            </div>
+
+            <button className="btn-glass" style={{ width: '100%', justifyContent: 'center', padding: '11px', gap: 7, fontSize: 13 }}
+              onClick={() => finish(false)}>
+              <Check size={13} /> Ohne Beispieldaten starten
+            </button>
+
+            <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 12, fontFamily: 'var(--font-sf)', width: '100%' }}>
+              Schliessen
+            </button>
+          </div>
+        )}
+
+        {step > 0 && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 20 }}>
+            {[1, 2].map(s => (
+              <div key={s} style={{ width: s === step ? 20 : 6, height: 6, borderRadius: 3, background: s === step ? 'var(--ios-blue)' : 'rgba(255,255,255,0.15)', transition: 'all 0.3s' }} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

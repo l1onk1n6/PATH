@@ -4,9 +4,19 @@ import { v4 as uuidv4 } from 'uuid';
 import type {
   Person, Resume, PersonalInfo, CoverLetter, WorkExperience, Education,
   Skill, Language, Project, Certificate, UploadedDocument, TemplateId, EditorSection,
-  ApplicationStatus,
+  ApplicationStatus, CustomSection,
 } from '../types/resume';
 import * as db from '../lib/db';
+import { LIMITS, getPlanFromMetadata } from '../lib/plan';
+import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
+
+async function getCurrentPlan() {
+  if (!isSupabaseConfigured()) return 'free' as const;
+  try {
+    const { data } = await getSupabase().auth.getUser();
+    return getPlanFromMetadata(data.user?.user_metadata as Record<string, unknown> | undefined);
+  } catch { return 'free' as const; }
+}
 
 // ── Debounce helper with savePending tracking ─────────────
 const debounceMap = new Map<string, ReturnType<typeof setTimeout>>();
@@ -39,18 +49,19 @@ interface ResumeStore {
   activeSection: EditorSection;
   syncing: boolean;
   savePending: boolean;
+  limitError: string | null;   // shown when a plan limit is hit
 
   // Cloud sync
   syncFromCloud: () => Promise<void>;
 
   // Person actions
-  addPerson: (name: string) => Person;
+  addPerson: (name: string) => Promise<Person | null>;
   updatePerson: (id: string, data: Partial<Person>) => void;
   deletePerson: (id: string) => void;
   setActivePerson: (id: string) => void;
 
   // Resume actions
-  addResume: (personId: string, name?: string) => Resume;
+  addResume: (personId: string, name?: string) => Promise<Resume | null>;
   duplicateResume: (id: string) => Resume;
   updateResume: (id: string, data: Partial<Resume>) => void;
   deleteResume: (id: string) => void;
@@ -89,6 +100,19 @@ interface ResumeStore {
   addDocument: (resumeId: string, doc: Omit<UploadedDocument, 'id' | 'uploadedAt'>) => void;
   removeDocument: (resumeId: string, id: string) => void;
 
+  // Custom sections
+  addCustomSection: (resumeId: string) => void;
+  updateCustomSection: (resumeId: string, id: string, data: Partial<CustomSection>) => void;
+  removeCustomSection: (resumeId: string, id: string) => void;
+  reorderCustomSections: (resumeId: string, from: number, to: number) => void;
+
+  // Share token
+  setShareToken: (resumeId: string, token: string | null) => void;
+  clearLimitError: () => void;
+
+  // GDPR export
+  exportGdprData: () => void;
+
   setActiveSection: (section: EditorSection) => void;
   getActiveResume: () => Resume | null;
   getActivePerson: () => Person | null;
@@ -98,12 +122,12 @@ interface ResumeStore {
 function createDefaultResume(personId: string, name = 'Bewerbungsmappe'): Resume {
   return {
     id: uuidv4(), personId,
-    name, status: 'entwurf', jobUrl: '', deadline: '',
+    name, status: 'entwurf', jobUrl: '', deadline: '', reminderDays: [],
     templateId: 'minimal', accentColor: '#007AFF',
     personalInfo: { firstName: '', lastName: '', title: '', email: '', phone: '', street: '', location: '', website: '', linkedin: '', github: '', summary: '' },
     coverLetter: { recipient: '', subject: '', body: '', closing: 'Mit freundlichen Grüssen' },
     workExperience: [], education: [], skills: [], languages: [],
-    projects: [], certificates: [], documents: [],
+    projects: [], certificates: [], documents: [], customSections: [],
     createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
   };
 }
@@ -113,7 +137,7 @@ export const useResumeStore = create<ResumeStore>()(
   persist(
     (set, get) => ({
       persons: [], resumes: [], activePersonId: null, activeResumeId: null,
-      activeSection: 'personal', syncing: false, savePending: false,
+      activeSection: 'personal', syncing: false, savePending: false, limitError: null,
 
       // ── Cloud sync ──────────────────────────────────────
       syncFromCloud: async () => {
@@ -140,6 +164,7 @@ export const useResumeStore = create<ResumeStore>()(
             }));
             const resumes = cloudResumes.map(r => ({
               ...r,
+              customSections: r.customSections ?? [],
               documents: cloudDocs.filter(d => d.resumeId === r.id).map(({ resumeId: _rid, ...d }) => d),
             }));
             set({ persons, resumes });
@@ -150,7 +175,13 @@ export const useResumeStore = create<ResumeStore>()(
       },
 
       // ── Persons ─────────────────────────────────────────
-      addPerson: (name) => {
+      addPerson: async (name) => {
+        const plan = await getCurrentPlan();
+        const limit = LIMITS[plan].persons;
+        if (get().persons.length >= limit) {
+          set({ limitError: `Maximale Anzahl Personen (${limit}) für deinen Plan erreicht.` });
+          return null;
+        }
         const resume = createDefaultResume('', 'Bewerbungsmappe 1');
         const person: Person = { id: uuidv4(), name, resumeIds: [resume.id], activeResumeId: resume.id, createdAt: new Date().toISOString() };
         resume.personId = person.id;
@@ -186,11 +217,16 @@ export const useResumeStore = create<ResumeStore>()(
       },
 
       // ── Resumes ─────────────────────────────────────────
-      addResume: (personId, name) => {
+      addResume: async (personId, name) => {
+        const plan = await getCurrentPlan();
+        const limit = LIMITS[plan].resumes;
+        if (get().resumes.length >= limit) {
+          set({ limitError: `Maximale Anzahl Bewerbungsmappen (${limit}) für deinen Plan erreicht.` });
+          return null;
+        }
         const existing = get().resumes.filter(r => r.personId === personId);
         const resumeName = name || `Bewerbungsmappe ${existing.length + 1}`;
         const resume = createDefaultResume(personId, resumeName);
-        // Inherit personalInfo from an existing resume of this person
         if (existing.length > 0) {
           resume.personalInfo = { ...existing[0].personalInfo };
         }
@@ -425,6 +461,52 @@ export const useResumeStore = create<ResumeStore>()(
         db.deleteDocument(id);
       },
 
+      // ── Custom sections ──────────────────────────────────
+      addCustomSection: (resumeId) => {
+        const item: CustomSection = { id: uuidv4(), title: 'Eigene Sektion', items: [''] };
+        set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, customSections: [...(r.customSections ?? []), item], updatedAt: new Date().toISOString() } : r) }));
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+      },
+
+      updateCustomSection: (resumeId, id, data) => {
+        set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, customSections: (r.customSections ?? []).map(cs => cs.id === id ? { ...cs, ...data } : cs), updatedAt: new Date().toISOString() } : r) }));
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+      },
+
+      removeCustomSection: (resumeId, id) => {
+        set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, customSections: (r.customSections ?? []).filter(cs => cs.id !== id), updatedAt: new Date().toISOString() } : r) }));
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+      },
+
+      reorderCustomSections: (resumeId, from, to) => {
+        set((s) => ({ resumes: s.resumes.map(r => { if (r.id !== resumeId) return r; const a = [...(r.customSections ?? [])]; const [m] = a.splice(from, 1); a.splice(to, 0, m); return { ...r, customSections: a, updatedAt: new Date().toISOString() }; }) }));
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+      },
+
+      // ── Share token ──────────────────────────────────────
+      setShareToken: (resumeId, token) => {
+        set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, shareToken: token ?? undefined, updatedAt: new Date().toISOString() } : r) }));
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+      },
+
+      // ── GDPR export ──────────────────────────────────────
+      exportGdprData: () => {
+        const { persons, resumes } = get();
+        const exportData = {
+          exportedAt: new Date().toISOString(),
+          persons,
+          resumes: resumes.map(r => ({ ...r, documents: r.documents.map(d => ({ ...d, dataUrl: '[base64 omitted]' })) })),
+        };
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `path-export-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+
+      clearLimitError: () => set({ limitError: null }),
       setActiveSection: (section) => set({ activeSection: section }),
       getActiveResume: () => { const { resumes, activeResumeId } = get(); return resumes.find(r => r.id === activeResumeId) ?? null; },
       getActivePerson: () => { const { persons, activePersonId } = get(); return persons.find(p => p.id === activePersonId) ?? null; },

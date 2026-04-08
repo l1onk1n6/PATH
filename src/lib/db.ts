@@ -93,6 +93,9 @@ export async function upsertResume(resume: Resume): Promise<void> {
       languages: resume.languages,
       projects: resume.projects,
       certificates: resume.certificates,
+      custom_sections: resume.customSections ?? [],
+      share_token: resume.shareToken ?? null,
+      reminder_days: resume.reminderDays ?? [],
     });
   } catch (e) {
     console.warn('[db] upsertResume', e);
@@ -183,10 +186,31 @@ function rowToResume(row: Record<string, unknown>): Resume {
     languages: (row.languages as Resume['languages']) ?? [],
     projects: (row.projects as Resume['projects']) ?? [],
     certificates: (row.certificates as Resume['certificates']) ?? [],
-    documents: [],           // werden separat via fetchDocuments geladen
+    documents: [],
+    customSections: (row.custom_sections as Resume['customSections']) ?? [],
+    shareToken: (row.share_token as string) ?? undefined,
+    reminderDays: (row.reminder_days as number[]) ?? [],
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };
+}
+
+// ── Public shared resume (no auth required) ────────────────
+export async function fetchSharedResume(token: string): Promise<Resume | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    const { data, error } = await sb()
+      .from('resumes')
+      .select('*')
+      .eq('share_token', token)
+      .not('share_token', 'is', null)
+      .maybeSingle();
+    if (error || !data) return null;
+    return rowToResume(data as Record<string, unknown>);
+  } catch (e) {
+    console.warn('[db] fetchSharedResume', e);
+    return null;
+  }
 }
 
 function rowToDocument(row: Record<string, unknown>): UploadedDocument & { resumeId: string } {

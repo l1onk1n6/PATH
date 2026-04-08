@@ -28,6 +28,7 @@ export default function TemplateSelector() {
         gridTemplateColumns: 'repeat(2, 1fr)',
         gap: 10,
         marginBottom: 24,
+        paddingRight: 2,
       }}>
         {TEMPLATES.map((tmpl) => {
           const isSelected = resume.templateId === tmpl.id;

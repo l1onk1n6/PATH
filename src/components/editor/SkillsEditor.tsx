@@ -44,6 +44,13 @@ export default function SkillsEditor() {
           </div>
         )}
 
+        {skills.length > 0 && (
+          <div style={{ display: 'flex', gap: 10, paddingLeft: isMobile ? 32 : 22, paddingRight: 38, marginBottom: 4 }}>
+            <span style={{ flex: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>Fähigkeit</span>
+            <span style={{ flex: 1, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>Kategorie</span>
+            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', minWidth: 114 }}>Niveau</span>
+          </div>
+        )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {skills.map((skill, i) => (
             <div
@@ -79,14 +86,14 @@ export default function SkillsEditor() {
                 <input
                   className="input-glass"
                   placeholder="Fähigkeit (z.B. React, Python...)"
-                  value={skill.name}
+                  value={skill.name} maxLength={80}
                   onChange={(e) => updateSkill(resume.id, skill.id, { name: e.target.value })}
                   style={{ flex: 2, fontSize: 13, padding: '8px 10px' }}
                 />
                 <input
                   className="input-glass"
                   placeholder="Kategorie"
-                  value={skill.category}
+                  value={skill.category} maxLength={50}
                   onChange={(e) => updateSkill(resume.id, skill.id, { category: e.target.value })}
                   style={{ flex: 1, fontSize: 13, padding: '8px 10px' }}
                 />
@@ -143,7 +150,7 @@ export default function SkillsEditor() {
                 <input
                   className="input-glass"
                   placeholder="Sprache (z.B. Englisch)"
-                  value={lang.name}
+                  value={lang.name} maxLength={60}
                   onChange={(e) => updateLanguage(resume.id, lang.id, { name: e.target.value })}
                   style={{ flex: 2, fontSize: 13, padding: '8px 10px' }}
                 />

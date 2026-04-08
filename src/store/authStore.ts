@@ -20,6 +20,7 @@ interface AuthStore {
   updateName: (name: string) => Promise<void>;
   deleteAccount: () => Promise<void>;
   resendConfirmation: (email: string) => Promise<void>;
+  refreshUser: () => Promise<void>;
   clearError: () => void;
 }
 
@@ -173,6 +174,23 @@ export const useAuthStore = create<AuthStore>((set) => ({
     } catch (e) {
       set({ error: toGermanError(e), loading: false });
     }
+  },
+
+  refreshUser: async () => {
+    if (!isSupabaseConfigured()) return;
+    try {
+      const supabase = getSupabase();
+      // getUser() always fetches fresh metadata from the server (no JWT cache)
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData.user) {
+        set((s) => ({ user: userData.user, session: s.session }));
+      }
+      // Also refresh the session token so the new metadata is in the JWT
+      const { data: sessionData } = await supabase.auth.refreshSession();
+      if (sessionData.session) {
+        set({ session: sessionData.session, user: sessionData.session.user });
+      }
+    } catch { /* ignore */ }
   },
 
   clearError: () => set({ error: null }),

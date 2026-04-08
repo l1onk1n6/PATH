@@ -2,11 +2,17 @@ import { useCallback, useState } from 'react';
 import { User, Mail, Phone, MapPin, Globe, Link2, FileText, Camera, AlertCircle } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { validatePhotoFile, sanitizePhotoUrl } from '../../lib/security';
+import { usePlan } from '../../lib/plan';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import LinkedInImportDialog from './LinkedInImport';
 
 export default function PersonalInfoEditor() {
   const { getActiveResume, updatePersonalInfo } = useResumeStore();
+  const { limits } = usePlan();
   const resume = getActiveResume();
   const [photoError, setPhotoError] = useState('');
+  const [showLinkedIn, setShowLinkedIn] = useState(false);
+  const isMobile = useIsMobile();
 
   const update = useCallback((field: string, value: string) => {
     if (!resume) return;
@@ -20,7 +26,7 @@ export default function PersonalInfoEditor() {
   function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !resume) return;
-    const { valid, error } = validatePhotoFile(file);
+    const { valid, error } = validatePhotoFile(file, limits.photoMb);
     if (!valid) {
       setPhotoError(error ?? 'Ungültige Datei.');
       e.target.value = '';
@@ -38,6 +44,15 @@ export default function PersonalInfoEditor() {
 
   return (
     <div className="animate-fade-in">
+      {showLinkedIn && <LinkedInImportDialog onClose={() => setShowLinkedIn(false)} />}
+
+      {/* LinkedIn import button */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+        <button className="btn-glass btn-sm" onClick={() => setShowLinkedIn(true)} style={{ fontSize: 12, gap: 6 }}>
+          <span style={{ fontSize: 14 }}>in</span> LinkedIn importieren
+        </button>
+      </div>
+
       {/* Photo + Name row */}
       <div style={{ display: 'flex', gap: 20, marginBottom: 20, alignItems: 'flex-start' }}>
         {/* Photo */}
@@ -74,22 +89,22 @@ export default function PersonalInfoEditor() {
         )}
 
         {/* Name fields */}
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
           <div>
             <label className="section-label">Vorname</label>
-            <input className="input-glass" placeholder="Max" value={info.firstName}
+            <input className="input-glass" placeholder="Max" value={info.firstName} maxLength={50}
               onChange={(e) => update('firstName', e.target.value)} />
           </div>
           <div>
             <label className="section-label">Nachname</label>
-            <input className="input-glass" placeholder="Mustermann" value={info.lastName}
+            <input className="input-glass" placeholder="Mustermann" value={info.lastName} maxLength={50}
               onChange={(e) => update('lastName', e.target.value)} />
           </div>
-          <div style={{ gridColumn: 'span 2' }}>
+          <div style={{ gridColumn: isMobile ? 'auto' : 'span 2' }}>
             <label className="section-label">
               <FileText size={10} style={{ display: 'inline', marginRight: 4 }} />Berufsbezeichnung
             </label>
-            <input className="input-glass" placeholder="z.B. Senior Software Engineer" value={info.title}
+            <input className="input-glass" placeholder="z.B. Senior Software Engineer" value={info.title} maxLength={100}
               onChange={(e) => update('title', e.target.value)} />
           </div>
         </div>
@@ -99,54 +114,54 @@ export default function PersonalInfoEditor() {
       <div className="section-label">
         <User size={10} style={{ display: 'inline', marginRight: 4 }} />Kontaktdaten
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10, marginBottom: 16 }}>
         <div>
           <label className="section-label">
             <Mail size={9} style={{ display: 'inline', marginRight: 3 }} />E-Mail
           </label>
-          <input className="input-glass" type="email" placeholder="max@beispiel.de" value={info.email}
+          <input className="input-glass" type="email" placeholder="max@beispiel.de" value={info.email} maxLength={254}
             onChange={(e) => update('email', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
             <Phone size={9} style={{ display: 'inline', marginRight: 3 }} />Telefon
           </label>
-          <input className="input-glass" type="tel" placeholder="+49 123 456789" value={info.phone}
+          <input className="input-glass" type="tel" placeholder="+49 123 456789" value={info.phone} maxLength={30}
             onChange={(e) => update('phone', e.target.value)} />
         </div>
-        <div style={{ gridColumn: 'span 2' }}>
+        <div style={{ gridColumn: isMobile ? 'auto' : 'span 2' }}>
           <label className="section-label">
             <MapPin size={9} style={{ display: 'inline', marginRight: 3 }} />Strasse und Hausnummer
           </label>
-          <input className="input-glass" placeholder="Musterstrasse 12" value={info.street ?? ''}
+          <input className="input-glass" placeholder="Musterstrasse 12" value={info.street ?? ''} maxLength={150}
             onChange={(e) => update('street', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
             <MapPin size={9} style={{ display: 'inline', marginRight: 3 }} />Ort / PLZ
           </label>
-          <input className="input-glass" placeholder="8000 Zürich" value={info.location}
+          <input className="input-glass" placeholder="8000 Zürich" value={info.location} maxLength={100}
             onChange={(e) => update('location', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
             <Globe size={9} style={{ display: 'inline', marginRight: 3 }} />Website
           </label>
-          <input className="input-glass" placeholder="www.beispiel.de" value={info.website}
+          <input className="input-glass" placeholder="www.beispiel.de" value={info.website} maxLength={300}
             onChange={(e) => update('website', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
             <Link2 size={9} style={{ display: 'inline', marginRight: 3 }} />LinkedIn
           </label>
-          <input className="input-glass" placeholder="linkedin.com/in/max" value={info.linkedin}
+          <input className="input-glass" placeholder="linkedin.com/in/max" value={info.linkedin} maxLength={200}
             onChange={(e) => update('linkedin', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
             <Link2 size={9} style={{ display: 'inline', marginRight: 3 }} />GitHub
           </label>
-          <input className="input-glass" placeholder="github.com/max" value={info.github}
+          <input className="input-glass" placeholder="github.com/max" value={info.github} maxLength={200}
             onChange={(e) => update('github', e.target.value)} />
         </div>
       </div>
@@ -159,6 +174,7 @@ export default function PersonalInfoEditor() {
           placeholder="Kurze Beschreibung Ihrer Berufserfahrung, Stärken und Ziele..."
           value={info.summary}
           onChange={(e) => update('summary', e.target.value)}
+          maxLength={800}
           style={{ minHeight: 100 }}
         />
       </div>

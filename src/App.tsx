@@ -1,30 +1,46 @@
 import { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Cloud, Loader, ShieldAlert } from 'lucide-react';
+import { useSessionTimeout } from './hooks/useSessionTimeout';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 import Dashboard from './pages/Dashboard';
 import Editor from './pages/Editor';
 import Preview from './pages/Preview';
-import AccountPage from './pages/AccountPage';
 import AuthPage from './pages/AuthPage';
+import LandingPage from './pages/LandingPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
+import SharedResumePage from './pages/SharedResumePage';
+import AccountPage from './pages/AccountPage';
+import Tracker from './pages/Tracker';
 import { useAuthStore } from './store/authStore';
 import { useResumeStore } from './store/resumeStore';
-import { isSupabaseConfigured } from './lib/supabase';
+import { isSupabaseConfigured, getSupabase } from './lib/supabase';
 import { useIsMobile } from './hooks/useBreakpoint';
+import OnboardingModal, { isOnboardingDone } from './components/ui/OnboardingModal';
 
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.8.0';
 
 function AppShell() {
   const isMobile = useIsMobile();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => !isOnboardingDone());
+  const { savePending, syncing } = useResumeStore();
+  const { signOut } = useAuthStore();
+  const { countdown, stayLoggedIn } = useSessionTimeout(signOut);
 
   // Close drawer on resize to desktop
   useEffect(() => {
     if (!isMobile) setDrawerOpen(false);
   }, [isMobile]);
+
+  // Allow triggering onboarding from anywhere via custom event
+  useEffect(() => {
+    const handler = () => setShowOnboarding(true);
+    window.addEventListener('start-onboarding', handler);
+    return () => window.removeEventListener('start-onboarding', handler);
+  }, []);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', overflow: 'hidden' }}>
@@ -96,23 +112,78 @@ function AppShell() {
               <Route path="/editor" element={<Editor />} />
               <Route path="/preview" element={<Preview />} />
               <Route path="/account" element={<AccountPage />} />
+              <Route path="/tracker" element={<Tracker />} />
+              <Route path="/shared" element={<SharedResumePage />} />
             </Routes>
           </div>
         </div>
       </div>
 
+      {/* ── Onboarding ────────────────────────────────────── */}
+      {showOnboarding && (
+        <OnboardingModal onClose={() => setShowOnboarding(false)} />
+      )}
+
+      {/* ── Session timeout warning ───────────────────────── */}
+      {countdown !== null && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 9999,
+          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: 24,
+        }}>
+          <div className="glass-card" style={{ width: '100%', maxWidth: 360, padding: '28px 24px', textAlign: 'center' }}>
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(255,149,0,0.15)', border: '1px solid rgba(255,149,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <ShieldAlert size={22} style={{ color: '#FF9500' }} />
+            </div>
+            <h2 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 8px' }}>Sitzung läuft ab</h2>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: '0 0 20px', lineHeight: 1.5 }}>
+              Du wirst in <strong style={{ color: '#FF9500' }}>{countdown} Sekunden</strong> automatisch abgemeldet.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                className="btn-glass btn-primary"
+                onClick={stayLoggedIn}
+                style={{ flex: 1, justifyContent: 'center', padding: '11px 16px', fontWeight: 600 }}
+              >
+                Angemeldet bleiben
+              </button>
+              <button
+                className="btn-glass btn-danger"
+                onClick={signOut}
+                style={{ padding: '11px 16px' }}
+              >
+                Abmelden
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Footer ────────────────────────────────────────── */}
       <footer style={{
         padding: isMobile ? '4px 14px' : '6px 20px',
         display: 'flex',
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between',
         alignItems: 'center',
         fontSize: 11,
         color: 'rgba(255,255,255,0.2)',
         flexShrink: 0,
         userSelect: 'none',
       }}>
-        by pixmatic · v{APP_VERSION}
+        <span>by pixmatic · v{APP_VERSION}</span>
+        {(savePending || syncing) ? (
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'rgba(255,255,255,0.35)' }}>
+            <Loader size={11} style={{ animation: 'spin 1s linear infinite' }} />
+            Speichert…
+          </span>
+        ) : (
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Cloud size={11} />
+            Gespeichert
+          </span>
+        )}
       </footer>
     </div>
   );
@@ -138,6 +209,9 @@ export default function App() {
   const { syncFromCloud } = useResumeStore();
   const [authType] = useState(() => getAuthTypeFromUrl());
 
+  // Public shared CV route — accessible without login
+  const isSharedRoute = window.location.hash.startsWith('#/shared');
+
   useEffect(() => {
     initialize();
   }, [initialize]);
@@ -145,6 +219,26 @@ export default function App() {
   useEffect(() => {
     if (user && !passwordRecovery) syncFromCloud();
   }, [user, passwordRecovery, syncFromCloud]);
+
+  // Process pending referral after login/signup
+  useEffect(() => {
+    if (!user || !isSupabaseConfigured()) return;
+    const ref = localStorage.getItem('path_ref');
+    if (!ref) return;
+    localStorage.removeItem('path_ref');
+    getSupabase().auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        getSupabase().functions.invoke('record-referral', {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+          body: { referrer_id: ref },
+        }).catch(() => {});
+      }
+    });
+  }, [user]);
+
+  if (isSharedRoute) {
+    return <HashRouter><Routes><Route path="/shared" element={<SharedResumePage />} /></Routes></HashRouter>;
+  }
 
   if (!isSupabaseConfigured()) {
     return (
@@ -178,7 +272,7 @@ export default function App() {
   }
 
   if (!user) {
-    return <HashRouter><AuthPage /></HashRouter>;
+    return <HashRouter><LandingPage /></HashRouter>;
   }
 
   return (

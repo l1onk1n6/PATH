@@ -4,12 +4,12 @@ import { useAuthStore } from '../store/authStore';
 import { LogoIcon } from '../components/layout/Logo';
 import { passwordStrength, STRENGTH_LABEL, STRENGTH_COLOR, RateLimiter } from '../lib/security';
 
-const limiter = new RateLimiter(5, 30_000);
+const limiter = new RateLimiter(5, 300_000); // 5 min lockout
 
 type Mode = 'login' | 'register' | 'forgot' | 'reset';
 
-export default function AuthPage() {
-  const [mode, setMode] = useState<Mode>('login');
+export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: () => void; initialMode?: Mode } = {}) {
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -28,6 +28,16 @@ export default function AuthPage() {
   useEffect(() => {
     if (passwordRecovery) setMode('reset');
   }, [passwordRecovery]);
+
+  // Capture referral code from URL hash (e.g. /#/?ref=<uuid>)
+  useEffect(() => {
+    const hash = window.location.hash;
+    const q = hash.includes('?') ? hash.slice(hash.indexOf('?')) : '';
+    const ref = new URLSearchParams(q).get('ref');
+    if (ref && ref.length >= 32) {
+      localStorage.setItem('path_ref', ref);
+    }
+  }, []);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -86,6 +96,24 @@ export default function AuthPage() {
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       padding: '20px 16px', boxSizing: 'border-box', overflow: 'auto',
     }}>
+      {onBack && (
+        <button
+          onClick={onBack}
+          style={{
+            position: 'fixed', top: 20, left: 20,
+            display: 'flex', alignItems: 'center', gap: 6,
+            background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+            borderRadius: 10, padding: '8px 14px',
+            color: 'rgba(255,255,255,0.7)', fontSize: 14, cursor: 'pointer',
+            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            zIndex: 10, transition: 'background 0.2s',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+        >
+          <ArrowLeft size={15} /> Zurück
+        </button>
+      )}
       <div className="glass-card animate-scale-in" style={{ width: '100%', maxWidth: 380, padding: '24px 22px' }}>
 
         {/* Logo */}
@@ -138,10 +166,14 @@ export default function AuthPage() {
           <>
             <div style={{ display: 'flex', background: 'rgba(255,255,255,0.06)', borderRadius: 'var(--radius-full)', padding: 3, marginBottom: 16 }}>
               {(['login', 'register'] as const).map((m) => (
-                <button key={m} onClick={() => switchMode(m)} className="btn-glass" style={{
-                  flex: 1, borderRadius: 'var(--radius-full)', padding: '8px 0', boxShadow: 'none',
-                  background: mode === m ? 'rgba(255,255,255,0.12)' : 'transparent',
+                <button key={m} onClick={() => switchMode(m)} style={{
+                  flex: 1, borderRadius: 'var(--radius-full)', padding: '9px 0',
+                  background: mode === m ? 'rgba(255,255,255,0.14)' : 'transparent',
                   border: 'none', fontSize: 14, fontWeight: mode === m ? 600 : 400,
+                  color: mode === m ? '#fff' : 'rgba(255,255,255,0.5)',
+                  cursor: 'pointer', fontFamily: 'var(--font-sf)',
+                  transition: 'all 0.2s', whiteSpace: 'nowrap', overflow: 'hidden',
+                  boxShadow: mode === m ? '0 1px 4px rgba(0,0,0,0.2)' : 'none',
                 }}>
                   {m === 'login' ? 'Anmelden' : 'Registrieren'}
                 </button>
@@ -152,14 +184,14 @@ export default function AuthPage() {
               {mode === 'register' && (
                 <div style={{ marginBottom: 12 }}>
                   <label className="section-label"><User size={9} style={{ display: 'inline', marginRight: 3 }} />Name</label>
-                  <input className="input-glass" placeholder="Max Mustermann" value={name}
+                  <input className="input-glass" placeholder="Max Mustermann" value={name} maxLength={100}
                     onChange={(e) => setName(e.target.value)} required autoFocus />
                 </div>
               )}
 
               <div style={{ marginBottom: 12 }}>
                 <label className="section-label"><Mail size={9} style={{ display: 'inline', marginRight: 3 }} />E-Mail</label>
-                <input className="input-glass" type="email" placeholder="max@beispiel.de" value={email}
+                <input className="input-glass" type="email" placeholder="max@beispiel.de" value={email} maxLength={254}
                   onChange={(e) => setEmail(e.target.value)} required autoFocus={mode === 'login'}
                   autoComplete={mode === 'login' ? 'username' : 'email'} />
               </div>
@@ -169,7 +201,7 @@ export default function AuthPage() {
                 <input className="input-glass" type={showPw ? 'text' : 'password'}
                   placeholder={mode === 'register' ? 'Mindestens 8 Zeichen' : 'Passwort eingeben'}
                   value={password} onChange={(e) => setPassword(e.target.value)}
-                  required minLength={mode === 'register' ? 8 : 1}
+                  required minLength={mode === 'register' ? 8 : 1} maxLength={128}
                   autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                   style={{ paddingRight: 42 }} />
                 <button type="button" onClick={() => setShowPw(!showPw)} style={{

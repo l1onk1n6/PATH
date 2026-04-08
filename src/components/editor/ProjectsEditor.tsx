@@ -1,4 +1,5 @@
 import { Plus, Trash2, FolderOpen, Award, ChevronDown, ChevronUp, GripVertical } from 'lucide-react';
+import MonthYearPicker from '../ui/MonthYearPicker';
 import { useState } from 'react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -104,38 +105,36 @@ export default function ProjectsEditor() {
 
             {expandedProject === project.id && (
               <div style={{ marginTop: 12 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10, marginBottom: 10 }}>
                   <div>
                     <label className="section-label">Projektname</label>
-                    <input className="input-glass" placeholder="z.B. E-Commerce App" value={project.name}
+                    <input className="input-glass" placeholder="z.B. E-Commerce App" value={project.name} maxLength={150}
                       onChange={(e) => updateProject(resume.id, project.id, { name: e.target.value })} />
                   </div>
                   <div>
                     <label className="section-label">URL</label>
-                    <input className="input-glass" placeholder="github.com/..." value={project.url}
+                    <input className="input-glass" placeholder="github.com/..." value={project.url} maxLength={300}
                       onChange={(e) => updateProject(resume.id, project.id, { url: e.target.value })} />
                   </div>
                   <div>
                     <label className="section-label">Von</label>
-                    <input className="input-glass" type="month" value={project.startDate}
-                      onChange={(e) => updateProject(resume.id, project.id, { startDate: e.target.value })} />
+                    <MonthYearPicker value={project.startDate} onChange={(v) => updateProject(resume.id, project.id, { startDate: v })} />
                   </div>
                   <div>
                     <label className="section-label">Bis</label>
-                    <input className="input-glass" type="month" value={project.endDate}
-                      onChange={(e) => updateProject(resume.id, project.id, { endDate: e.target.value })} />
+                    <MonthYearPicker value={project.endDate} onChange={(v) => updateProject(resume.id, project.id, { endDate: v })} />
                   </div>
-                  <div style={{ gridColumn: 'span 2' }}>
+                  <div style={{ gridColumn: isMobile ? 'auto' : 'span 2' }}>
                     <label className="section-label">Technologien (Komma-getrennt)</label>
                     <input className="input-glass"
                       placeholder="z.B. React, TypeScript, Node.js"
-                      value={project.technologies.join(', ')}
+                      value={project.technologies.join(', ')} maxLength={300}
                       onChange={(e) => updateProject(resume.id, project.id, { technologies: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })} />
                   </div>
                 </div>
                 <div>
                   <label className="section-label">Beschreibung</label>
-                  <textarea className="input-glass" placeholder="Was wurde entwickelt?" value={project.description}
+                  <textarea className="input-glass" placeholder="Was wurde entwickelt?" value={project.description} maxLength={1000}
                     onChange={(e) => updateProject(resume.id, project.id, { description: e.target.value })} />
                 </div>
               </div>
@@ -204,25 +203,24 @@ export default function ProjectsEditor() {
               )}
               {!isMobile && <GripVertical size={14} style={{ opacity: 0.3, flexShrink: 0, cursor: 'grab', marginTop: 4 }} />}
               <div style={{ flex: 1 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
                   <div>
                     <label className="section-label">Zertifikat</label>
-                    <input className="input-glass" placeholder="z.B. AWS Certified" value={cert.name}
+                    <input className="input-glass" placeholder="z.B. AWS Certified" value={cert.name} maxLength={150}
                       onChange={(e) => updateCertificate(resume.id, cert.id, { name: e.target.value })} />
                   </div>
                   <div>
                     <label className="section-label">Aussteller</label>
-                    <input className="input-glass" placeholder="z.B. Amazon Web Services" value={cert.issuer}
+                    <input className="input-glass" placeholder="z.B. Amazon Web Services" value={cert.issuer} maxLength={150}
                       onChange={(e) => updateCertificate(resume.id, cert.id, { issuer: e.target.value })} />
                   </div>
                   <div>
                     <label className="section-label">Datum</label>
-                    <input className="input-glass" type="month" value={cert.date}
-                      onChange={(e) => updateCertificate(resume.id, cert.id, { date: e.target.value })} />
+                    <MonthYearPicker value={cert.date} onChange={(v) => updateCertificate(resume.id, cert.id, { date: v })} placeholder="Monat / Jahr" />
                   </div>
                   <div>
                     <label className="section-label">URL</label>
-                    <input className="input-glass" placeholder="Zertifikat-Link" value={cert.url}
+                    <input className="input-glass" placeholder="Zertifikat-Link" value={cert.url} maxLength={300}
                       onChange={(e) => updateCertificate(resume.id, cert.id, { url: e.target.value })} />
                   </div>
                 </div>
