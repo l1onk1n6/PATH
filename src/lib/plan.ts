@@ -38,7 +38,7 @@ export const LIMITS: Record<PlanType, PlanLimits> = {
     shareLinks:          10,
     documentsMb:         200,
     pdfExportsPerMonth:  20,
-    photoMb:             10,
+    photoMb:             2,
     versionHistory:      true,
   },
 };
@@ -58,7 +58,7 @@ export const PRO_FEATURES: ProFeature[] = [
   { id: 'sections',  label: 'Eigene Sektionen',         icon: '📋', description: 'Beliebig viele eigene Sektionen im Lebenslauf (Free: keine)',           available: true },
   { id: 'share',     label: '10 Share-Links',           icon: '🔗', description: 'Bis zu 10 aktive öffentliche Links gleichzeitig (Free: 1)',             available: true },
   { id: 'pdf',       label: '20 PDF-Exports / Monat',  icon: '📄', description: 'Mehr PDF-Exporte pro Monat (Free: 5)',                                   available: true },
-  { id: 'photo',     label: '10 MB Foto-Upload',        icon: '🖼️', description: 'Grössere Profilfotos hochladen (Free: 1 MB)',                           available: true },
+  { id: 'photo',     label: '2 MB Foto-Upload',         icon: '🖼️', description: 'Grössere Profilfotos hochladen (Free: 1 MB)',                           available: true },
   // ── Coming soon ───────────────────────────────────────────
   { id: 'ai',        label: 'KI-Assistent',             icon: '✦', description: 'Anschreiben generieren & Texte mit Claude KI verbessern',               available: true },
   { id: 'ats',       label: 'ATS-Score',                icon: '📊', description: 'Lebenslauf gegen Stellenbeschreibung prüfen & Keywords optimieren',     available: false },

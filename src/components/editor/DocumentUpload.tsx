@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, File, Trash2, FileText, Image, ExternalLink } from 'lucide-react';
+import { Upload, File, Trash2, FileText, Image, ExternalLink, AlertCircle } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import type { UploadedDocument } from '../../types/resume';
 
@@ -22,12 +22,17 @@ function formatBytes(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+const MAX_FILE_MB = 2;
+const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
+
 export default function DocumentUpload() {
   const { getActiveResume, addDocument, removeDocument } = useResumeStore();
   const resume = getActiveResume();
+  const [sizeError, setSizeError] = useState('');
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (!resume) return;
+    setSizeError('');
     acceptedFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -43,10 +48,16 @@ export default function DocumentUpload() {
     });
   }, [resume, addDocument]);
 
+  const onDropRejected = useCallback((rejections: { file: File }[]) => {
+    const tooBig = rejections.some(r => r.file.size > MAX_FILE_BYTES);
+    if (tooBig) setSizeError(`Datei zu gross — max. ${MAX_FILE_MB} MB pro Datei erlaubt.`);
+  }, []);
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
+    onDropRejected,
     multiple: true,
-    maxSize: 10 * 1024 * 1024, // 10MB
+    maxSize: MAX_FILE_BYTES,
   });
 
   if (!resume) return null;
@@ -76,9 +87,14 @@ export default function DocumentUpload() {
           {isDragActive ? 'Dateien hier ablegen...' : 'Dokumente hochladen'}
         </div>
         <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
-          Dateien hierher ziehen oder klicken · PDF, Bilder, Word · max. 10 MB
+          Dateien hierher ziehen oder klicken · PDF, Bilder, Word · max. {MAX_FILE_MB} MB
         </div>
       </div>
+      {sizeError && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--ios-red)', marginBottom: 12 }}>
+          <AlertCircle size={13} /> {sizeError}
+        </div>
+      )}
 
       {/* Uploaded files */}
       {documents.length === 0 && (
