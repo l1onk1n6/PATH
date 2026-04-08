@@ -1,0 +1,50 @@
+-- ─────────────────────────────────────────────────────────────────────────────
+-- on-user-signup: Listmonk + InvoiceNinja Integration
+-- ─────────────────────────────────────────────────────────────────────────────
+-- This function is deployed as a Supabase Edge Function.
+-- It must be wired up via a Database Webhook — no SQL migration needed for
+-- the function itself. This file documents the required setup steps.
+--
+-- ── Step 1: Deploy the Edge Function ──────────────────────────────────────────
+-- The function is at: supabase/functions/on-user-signup/index.ts
+-- Deploy via Supabase CLI:
+--   supabase functions deploy on-user-signup --project-ref <ref>
+--
+-- Or via GitHub Actions if you have CI/CD set up.
+--
+-- ── Step 2: Add Secrets ───────────────────────────────────────────────────────
+-- Supabase Dashboard → Edge Functions → on-user-signup → Secrets
+--
+--   LISTMONK_URL        = https://listmonk.yourdomain.com
+--   LISTMONK_USERNAME   = admin
+--   LISTMONK_PASSWORD   = yourpassword
+--   LISTMONK_LIST_ID    = 1              ← integer ID of the list in Listmonk
+--   INVOICE_NINJA_URL   = https://invoiceninja.yourdomain.com
+--   INVOICE_NINJA_TOKEN = your-api-token ← Company → API Tokens in InvoiceNinja
+--
+-- ── Step 3: Create Database Webhook ──────────────────────────────────────────
+-- Supabase Dashboard → Database → Webhooks → Create a new webhook
+--
+--   Name:         on-user-signup
+--   Schema:       auth
+--   Table:        users
+--   Events:       ☑ INSERT
+--   Type:         HTTP Request
+--   Method:       POST
+--   URL:          https://<project-ref>.supabase.co/functions/v1/on-user-signup
+--   HTTP Headers:
+--     Authorization: Bearer <SUPABASE_SERVICE_ROLE_KEY>
+--     Content-Type:  application/json
+--
+-- ── Listmonk: Finding the List ID ─────────────────────────────────────────────
+-- In Listmonk: Lists → click your list → the ID is in the URL:
+--   https://listmonk.yourdomain.com/lists/1/subscribers  →  ID = 1
+--
+-- ── InvoiceNinja: Creating an API Token ───────────────────────────────────────
+-- In InvoiceNinja: Settings → API Tokens → New Token
+-- Give it a name like "PATH App" and copy the token.
+--
+-- ── Optional: Custom Field in InvoiceNinja ────────────────────────────────────
+-- The function stores the Supabase user_id in custom_value1.
+-- To label it: Settings → Custom Fields → Clients → Field 1 Label: "PATH User ID"
+-- ─────────────────────────────────────────────────────────────────────────────

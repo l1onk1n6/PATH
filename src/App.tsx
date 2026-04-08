@@ -19,7 +19,7 @@ import { isSupabaseConfigured, getSupabase } from './lib/supabase';
 import { useIsMobile } from './hooks/useBreakpoint';
 import OnboardingModal, { isOnboardingDone } from './components/ui/OnboardingModal';
 
-const APP_VERSION = '1.7.0';
+const APP_VERSION = '1.8.0';
 
 function AppShell() {
   const isMobile = useIsMobile();
