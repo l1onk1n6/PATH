@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp,
@@ -283,7 +284,8 @@ export default function Dashboard() {
   const [statusMenuResumeId, setStatusMenuResumeId] = useState<string | null>(null);
   const [shareModalResumeId, setShareModalResumeId] = useState<string | null>(null);
   const [menuOpenResumeId, setMenuOpenResumeId] = useState<string | null>(null);
-  const [menuPos, setMenuPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const menuBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   // Persons beyond the plan limit are frozen (read-only)
   const frozenPersonIds = new Set(
@@ -375,60 +377,78 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Resume action menu */}
+      {/* Resume action menu — rendered via portal so position:fixed works outside transforms */}
       {menuOpenResumeId && (() => {
         const mr = resumes.find(r => r.id === menuOpenResumeId);
         const mp = mr ? persons.find(p => p.resumeIds.includes(mr.id)) : null;
         const mpResumes = mp ? mp.resumeIds.length : 0;
         if (!mr) return null;
-        // Smart positioning: flip left if near right edge, flip up if near bottom
-        const menuW = 210;
-        const menuH = mpResumes > 1 ? 230 : 185;
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-        const left = menuPos.x + menuW > vw ? menuPos.x - menuW : menuPos.x;
-        const top  = menuPos.y + menuH > vh ? menuPos.y - menuH : menuPos.y + 8;
-        return (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 200 }}
+
+        const itemStyle: React.CSSProperties = {
+          display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+          padding: '9px 12px', fontSize: 13, background: 'none', border: 'none',
+          color: 'rgba(255,255,255,0.85)', cursor: 'pointer', borderRadius: 8,
+          fontFamily: 'var(--font-sf)', textDecoration: 'none', textAlign: 'left',
+          transition: 'background 0.12s',
+        };
+
+        return createPortal(
+          <div style={{ position: 'fixed', inset: 0, zIndex: 9000 }}
             onClick={() => setMenuOpenResumeId(null)}>
-            <div className="glass-card animate-scale-in"
+            <div
               onClick={e => e.stopPropagation()}
-              style={{ position: 'fixed', top, left, zIndex: 201, padding: 6, minWidth: menuW, background: 'rgba(14,14,22,0.97)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <div style={{ fontSize: 11, fontWeight: 600, opacity: 0.4, padding: '6px 10px 4px', textTransform: 'uppercase' }}>
+              style={{
+                position: 'fixed', top: menuPos.top, left: menuPos.left,
+                zIndex: 9001, minWidth: 200,
+                background: 'rgba(30,30,46,0.96)',
+                backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+                borderRadius: 13, padding: '5px',
+                border: '1px solid rgba(255,255,255,0.1)',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
+                animation: 'scaleIn 0.15s cubic-bezier(0.34,1.56,0.64,1) both',
+              }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', padding: '6px 12px 4px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                 {mr.name || 'Bewerbungsmappe'}
               </div>
-              {[
-                { icon: Share2, label: mr.shareToken ? 'Link teilen (aktiv)' : 'Link teilen', color: mr.shareToken ? 'var(--ios-blue)' : undefined,
+              <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '4px 0' }} />
+              {([
+                { icon: Share2, label: mr.shareToken ? 'Link teilen ·  aktiv' : 'Link teilen', color: mr.shareToken ? 'var(--ios-blue)' : undefined,
                   action: () => { setShareModalResumeId(mr.id); setMenuOpenResumeId(null); } },
-                { icon: Pencil, label: 'Umbenennen', action: () => { setRenamingResumeId(mr.id); setRenameValue(mr.name || 'Bewerbungsmappe'); setMenuOpenResumeId(null); } },
-                { icon: Copy, label: 'Duplizieren', action: () => { duplicateResume(mr.id); setMenuOpenResumeId(null); } },
-              ].map(({ icon: Icon, label, color, action }) => (
-                <button key={label} className="btn-glass"
-                  style={{ width: '100%', justifyContent: 'flex-start', gap: 10, fontSize: 13, padding: '9px 10px', color, boxShadow: 'none' }}
+                { icon: Pencil, label: 'Umbenennen',
+                  action: () => { setRenamingResumeId(mr.id); setRenameValue(mr.name || 'Bewerbungsmappe'); setMenuOpenResumeId(null); } },
+                { icon: Copy, label: 'Duplizieren',
+                  action: () => { duplicateResume(mr.id); setMenuOpenResumeId(null); } },
+              ] as { icon: React.ComponentType<{size:number}>, label: string, color?: string, action: () => void }[]).map(({ icon: Icon, label, color, action }) => (
+                <button key={label} style={{ ...itemStyle, color: color ?? 'rgba(255,255,255,0.85)' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.07)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'none')}
                   onClick={action}>
                   <Icon size={14} /> {label}
                 </button>
               ))}
               {mr.jobUrl && (
                 <a href={safeUrl(mr.jobUrl)} target="_blank" rel="noopener noreferrer"
-                  className="btn-glass"
-                  style={{ display: 'flex', width: '100%', justifyContent: 'flex-start', gap: 10, fontSize: 13, padding: '9px 10px', textDecoration: 'none', color: 'inherit', boxShadow: 'none' }}
+                  style={itemStyle}
+                  onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)')}
+                  onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'none')}
                   onClick={() => setMenuOpenResumeId(null)}>
                   <ExternalLink size={14} /> Stelle öffnen
                 </a>
               )}
               {mpResumes > 1 && (
                 <>
-                  <div className="divider" style={{ margin: '6px 0' }} />
-                  <button className="btn-glass"
-                    style={{ width: '100%', justifyContent: 'flex-start', gap: 10, fontSize: 13, padding: '9px 10px', color: 'var(--ios-red)', borderColor: 'transparent', boxShadow: 'none' }}
-                    onClick={() => { if (confirm(`"${mr.name || 'Bewerbungsmappe'}" löschen?`)) { deleteResume(mr.id); } setMenuOpenResumeId(null); }}>
+                  <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '4px 0' }} />
+                  <button style={{ ...itemStyle, color: 'var(--ios-red)' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,59,48,0.1)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+                    onClick={() => { if (confirm(`"${mr.name || 'Bewerbungsmappe'}" löschen?`)) deleteResume(mr.id); setMenuOpenResumeId(null); }}>
                     <Trash2 size={14} /> Löschen
                   </button>
                 </>
               )}
             </div>
-          </div>
+          </div>,
+          document.body
         );
       })()}
 
@@ -723,9 +743,16 @@ export default function Dashboard() {
                                   className="btn-glass btn-icon"
                                   title="Aktionen"
                                   style={{ padding: 6, color: r.shareToken ? 'var(--ios-blue)' : undefined }}
+                                  ref={el => { menuBtnRefs.current[r.id] = el; }}
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    setMenuPos({ x: e.clientX, y: e.clientY });
+                                    const btn = menuBtnRefs.current[r.id];
+                                    if (!btn) return;
+                                    const rect = btn.getBoundingClientRect();
+                                    const menuW = 210, menuH = 220;
+                                    const left = rect.right - menuW < 0 ? rect.left : rect.right - menuW;
+                                    const top  = rect.bottom + menuH > window.innerHeight ? rect.top - menuH : rect.bottom + 4;
+                                    setMenuPos({ top, left });
                                     setMenuOpenResumeId(r.id);
                                   }}>
                                   <MoreHorizontal size={15} />
