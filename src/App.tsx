@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Editor from './pages/Editor';
 import Preview from './pages/Preview';
 import AuthPage from './pages/AuthPage';
+import LandingPage from './pages/LandingPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import SharedResumePage from './pages/SharedResumePage';
 import AccountPage from './pages/AccountPage';
@@ -229,7 +230,7 @@ export default function App() {
   }
 
   if (!user) {
-    return <HashRouter><AuthPage /></HashRouter>;
+    return <HashRouter><LandingPage /></HashRouter>;
   }
 
   return (

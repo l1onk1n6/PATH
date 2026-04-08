@@ -298,7 +298,7 @@ function PlanSection() {
 // ── Section: Account ───────────────────────────────────────
 function AccountSection() {
   const { user, signOut } = useAuthStore();
-  const { exportGdprData, persons, resumes } = useResumeStore();
+  const { persons, resumes } = useResumeStore();
   const navigate = useNavigate();
 
   return (
