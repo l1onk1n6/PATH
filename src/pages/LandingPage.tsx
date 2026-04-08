@@ -121,11 +121,11 @@ export default function LandingPage() {
         position: 'sticky', top: 0, zIndex: 100,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: isMobile ? '14px 20px' : '16px 48px',
-        background: scrolled ? 'rgba(8,15,30,0.85)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(20px)' : 'none',
-        WebkitBackdropFilter: scrolled ? 'blur(20px)' : 'none',
-        borderBottom: scrolled ? '1px solid rgba(255,255,255,0.08)' : '1px solid transparent',
-        transition: 'background 0.3s, border-color 0.3s, backdrop-filter 0.3s',
+        background: scrolled ? 'rgba(8,15,30,0.92)' : 'rgba(8,15,30,0.55)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        transition: 'background 0.3s',
       }}>
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} onClick={() => containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}>
