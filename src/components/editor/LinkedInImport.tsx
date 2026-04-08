@@ -395,9 +395,9 @@ export default function LinkedInImportDialog({ onClose }: Props) {
             <div style={{
               padding: '12px 14px', borderRadius: 10,
               background: 'rgba(10,102,194,0.08)', border: '1px solid rgba(10,102,194,0.2)',
-              fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, marginBottom: 16,
+              fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 16,
             }}>
-              <strong style={{ display: 'block', marginBottom: 6, color: '#fff' }}>So funktioniert's:</strong>
+              <strong style={{ display: 'block', marginBottom: 6, color: 'var(--text-primary)' }}>So funktioniert's:</strong>
               <ol style={{ margin: 0, padding: '0 0 0 18px', display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <li>Öffne dein LinkedIn-Profil im Browser</li>
                 <li>Wähle den gesamten Seiteninhalt aus (<kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '1px 5px', borderRadius: 4, fontSize: 11 }}>Ctrl+A</kbd>)</li>
@@ -452,7 +452,7 @@ export default function LinkedInImportDialog({ onClose }: Props) {
               fontSize: 13, marginBottom: 16,
             }}>
               <strong style={{ color: '#34C759', display: 'block', marginBottom: 8 }}>Extrahierte Daten</strong>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, color: 'rgba(255,255,255,0.75)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, color: 'var(--text-secondary)' }}>
                 {(parsed.firstName || parsed.lastName) && (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <span style={{ opacity: 0.5, minWidth: 110 }}>Name:</span>

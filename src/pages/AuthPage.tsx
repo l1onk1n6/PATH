@@ -104,7 +104,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
             display: 'flex', alignItems: 'center', gap: 6,
             background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
             borderRadius: 10, padding: '8px 14px',
-            color: 'rgba(255,255,255,0.7)', fontSize: 14, cursor: 'pointer',
+            color: 'var(--text-secondary)', fontSize: 14, cursor: 'pointer',
             backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
             zIndex: 10, transition: 'background 0.2s',
           }}

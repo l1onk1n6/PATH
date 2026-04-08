@@ -89,7 +89,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
         <div style={{
           display: 'flex', alignItems: 'flex-start', gap: 8, padding: '10px 12px',
           background: 'rgba(255,59,48,0.12)', border: '1px solid rgba(255,59,48,0.3)',
-          borderRadius: 10, marginBottom: 16, fontSize: 12, color: 'rgba(255,255,255,0.75)',
+          borderRadius: 10, marginBottom: 16, fontSize: 12, color: 'var(--text-secondary)',
         }}>
           <AlertCircle size={14} style={{ color: '#FF3B30', flexShrink: 0, marginTop: 1 }} />
           <span>{error}</span>
@@ -161,7 +161,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
 
               {/* Info */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: v.label ? 600 : 400, color: v.label ? '#fff' : 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: 13, fontWeight: v.label ? 600 : 400, color: v.label ? 'var(--text-primary)' : 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {v.label ?? 'Version'}
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>

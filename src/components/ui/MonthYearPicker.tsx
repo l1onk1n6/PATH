@@ -81,12 +81,12 @@ export default function MonthYearPicker({ value, onChange, disabled, placeholder
       {/* Year row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <button type="button" onClick={() => setViewYear(y => y - 1)}
-          style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.07)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.07)', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <ChevronLeft size={14} />
         </button>
         <span style={{ fontWeight: 700, fontSize: 16, letterSpacing: '-0.3px', color: '#fff' }}>{viewYear}</span>
         <button type="button" onClick={() => setViewYear(y => y + 1)}
-          style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.07)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.07)', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <ChevronRight size={14} />
         </button>
       </div>
@@ -102,7 +102,7 @@ export default function MonthYearPicker({ value, onChange, disabled, placeholder
                 borderRadius: 9, border: sel ? 'none' : '1px solid rgba(255,255,255,0.06)',
                 cursor: 'pointer', transition: 'all 0.12s',
                 background: sel ? 'var(--ios-blue)' : 'rgba(255,255,255,0.05)',
-                color: sel ? '#fff' : 'rgba(255,255,255,0.75)',
+                color: sel ? '#fff' : 'var(--text-secondary)',
                 boxShadow: sel ? '0 2px 8px rgba(0,122,255,0.4)' : 'none',
                 fontFamily: 'var(--font-sf)',
               }}>

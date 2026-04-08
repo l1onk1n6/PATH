@@ -53,7 +53,7 @@ export default function SetupPage() {
         {/* Instructions */}
         <div className="glass-card" style={{ padding: '12px 16px', marginBottom: 24, borderRadius: 'var(--radius-sm)' }}>
           <div className="section-label" style={{ marginBottom: 8 }}>So richten Sie Supabase ein</div>
-          <ol style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 2 }}>
+          <ol style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: 'var(--text-secondary)', lineHeight: 2 }}>
             <li>Kostenloses Konto auf <a href="https://supabase.com" target="_blank" rel="noreferrer" style={{ color: 'var(--ios-blue)' }}>supabase.com</a> erstellen</li>
             <li>Neues Projekt anlegen</li>
             <li>SQL Editor → <code style={{ background: 'rgba(255,255,255,0.1)', padding: '1px 5px', borderRadius: 4 }}>supabase/schema.sql</code> ausführen</li>

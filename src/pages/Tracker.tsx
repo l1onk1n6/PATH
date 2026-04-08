@@ -448,7 +448,7 @@ export default function Tracker() {
                         borderRadius: 8,
                       }}
                     >
-                      <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
                         {resume.name || 'Unbenannte Mappe'}
                       </span>
                       {personName && (

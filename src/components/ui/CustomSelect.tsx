@@ -120,7 +120,7 @@ export function CustomSelect({ value, onChange, options, style, placeholder = 'A
                   margin: '2px 4px',
                   borderRadius: 7,
                   transition: 'background 0.1s',
-                  color: isSelected ? '#fff' : 'rgba(255,255,255,0.85)',
+                  color: isSelected ? '#fff' : 'var(--text-primary)',
                 }}
                 onMouseEnter={(e) => {
                   if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.08)';

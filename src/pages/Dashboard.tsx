@@ -377,7 +377,7 @@ export default function Dashboard() {
         const itemStyle: React.CSSProperties = {
           display: 'flex', alignItems: 'center', gap: 10, width: '100%',
           padding: '10px 13px', fontSize: 13, background: 'none', border: 'none',
-          color: 'rgba(255,255,255,0.85)', cursor: 'pointer', borderRadius: 8,
+          color: 'var(--text-primary)', cursor: 'pointer', borderRadius: 8,
           fontFamily: 'var(--font-sf)', textDecoration: 'none', textAlign: 'left',
           transition: 'background 0.12s',
         };
@@ -409,7 +409,7 @@ export default function Dashboard() {
                 { icon: Copy, label: 'Duplizieren',
                   action: () => { duplicateResume(mr.id); setMenuOpenResumeId(null); } },
               ] as { icon: React.ComponentType<{size:number}>, label: string, color?: string, action: () => void }[]).map(({ icon: Icon, label, color, action }) => (
-                <button key={label} style={{ ...itemStyle, color: color ?? 'rgba(255,255,255,0.85)' }}
+                <button key={label} style={{ ...itemStyle, color: color ?? 'var(--text-primary)' }}
                   onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.07)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'none')}
                   onClick={action}>
