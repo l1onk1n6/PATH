@@ -5,69 +5,56 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 import {
   FileText, Sparkles, Globe, Clock, Share2, Download,
   Check, ChevronRight, ArrowRight, Star, ClipboardList, Mail, Import,
+  Users, Bell, Shield, Smartphone, PenLine, Wand2, Brain, Languages,
+  Zap, BookOpen, Layers,
 } from 'lucide-react';
 
 const FEATURES = [
+  { icon: FileText,     color: '#007AFF', title: '15+ professionelle Vorlagen',   desc: 'Von klassisch bis modern – für jede Branche und jeden Stil. Pixelgenaue PDFs direkt aus dem Browser.' },
+  { icon: Download,     color: '#34C759', title: 'PDF-Export mit einem Klick',     desc: 'Druckfertiges PDF in Sekunden – perfekt formatiert für Online-Bewerbungen und den Postversand.' },
+  { icon: ClipboardList,color: '#5856D6', title: 'Bewerbungs-Tracker',             desc: 'Alle Bewerbungen im Überblick: Status, Deadline, Notizen und verknüpfte Unterlagen an einem Ort.' },
+  { icon: Bell,         color: '#FF9F0A', title: 'Deadline-Reminder',              desc: 'Verpasse keine Bewerbungsfrist mehr – automatische Erinnerungen für alle offenen Bewerbungen.' },
+  { icon: Share2,       color: '#FF2D55', title: 'Online teilen',                  desc: 'Erstelle einen öffentlichen Link zu deinem Lebenslauf – ideal für LinkedIn, E-Mail und digitale Bewerbungen.' },
+  { icon: Clock,        color: '#5AC8FA', title: 'Versionshistorie',               desc: 'Speichere Versionen deines CVs und stelle frühere Stände jederzeit wieder her.' },
+  { icon: Globe,        color: '#FF6B35', title: 'Mehrsprachig',                   desc: 'KI-gestützte Übersetzung deines Lebenslaufs in jede Sprache – für internationale Bewerbungen.' },
+  { icon: Layers,       color: '#AF52DE', title: 'Eigene Sektionen',               desc: 'Füge beliebige Sektionen hinzu – Publikationen, Projekte, Ehrenamt und mehr.' },
+  { icon: Users,        color: '#30D158', title: 'Mehrere Personen & Mappen',      desc: 'Verwalte CVs für verschiedene Personen oder erstelle mehrere Versionen für verschiedene Stellen.' },
+  { icon: Mail,         color: '#FF6B6B', title: 'Anschreiben-Vorlagen',           desc: '4 professionelle Strukturen als Startpunkt – individuell anpassbar, mit KI-Unterstützung.' },
+  { icon: BookOpen,     color: '#64D2FF', title: 'Strukturierter Editor',          desc: 'Alle Sektionen – Person, Erfahrung, Ausbildung, Skills, Projekte – übersichtlich und intuitiv.' },
+  { icon: Shield,       color: '#4CAF50', title: 'DSGVO-konform & sicher',         desc: 'Deine Daten bleiben in der Schweiz. Kein Tracking, keine Weitergabe an Dritte.' },
+];
+
+const AI_FEATURES = [
   {
-    icon: FileText,
-    color: '#007AFF',
-    title: '15+ professionelle Vorlagen',
-    desc: 'Von klassisch bis modern – für jede Branche und jeden Stil. Pixelgenaue PDFs direkt aus dem Browser.',
+    icon: PenLine,
+    title: 'Anschreiben generieren',
+    desc: 'Stelle, Unternehmen und Ton eingeben – Claude AI schreibt in Sekunden ein vollständiges, individuelles Anschreiben.',
+    badge: 'Claude AI',
   },
   {
-    icon: Sparkles,
-    color: '#AF52DE',
-    title: 'KI-Assistent',
-    desc: 'Anschreiben generieren, Texte verbessern und optimieren – powered by Claude AI.',
-  },
-  {
-    icon: Download,
-    color: '#34C759',
-    title: 'PDF-Export',
-    desc: 'Ein Klick, fertig. Druckfertige PDFs in Sekunden – perfekt für Online-Bewerbungen.',
-  },
-  {
-    icon: Globe,
-    color: '#FF9F0A',
-    title: 'Mehrsprachig',
-    desc: 'Automatische Übersetzung deines Lebenslaufs in jede Sprache für internationale Stellen.',
-  },
-  {
-    icon: Clock,
-    color: '#5AC8FA',
-    title: 'Versionshistorie',
-    desc: 'Speichere Versionen deines CVs und stelle frühere Stände jederzeit wieder her.',
-  },
-  {
-    icon: Share2,
-    color: '#FF2D55',
-    title: 'Online teilen',
-    desc: 'Erstelle einen öffentlichen Link zu deinem Lebenslauf – ideal für digitale Bewerbungen.',
-  },
-  {
-    icon: ClipboardList,
-    color: '#5856D6',
-    title: 'Bewerbungs-Tracker',
-    desc: 'Behalte den Überblick über alle Bewerbungen — Status, Deadline, Notizen und verknüpfte Unterlagen.',
-  },
-  {
-    icon: Mail,
-    color: '#FF6B6B',
-    title: 'Anschreiben & Vorlagen',
-    desc: '4 professionelle Anschreiben-Strukturen als Startpunkt – individuell anpassbar, mit KI-Unterstützung.',
+    icon: Wand2,
+    title: 'Texte verbessern',
+    desc: 'Bestehende Formulierungen professionell optimieren, umschreiben oder auf Stelle zuschneiden – mit einem Klick.',
+    badge: 'Claude AI',
   },
   {
     icon: Import,
-    color: '#0A66C2',
     title: 'LinkedIn-Import',
-    desc: 'LinkedIn-Profil einfügen und automatisch in einen strukturierten Lebenslauf umwandeln.',
+    desc: 'LinkedIn-Profiltext einfügen – die KI erkennt automatisch Name, Erfahrungen, Ausbildung und Skills.',
+    badge: 'Claude AI',
+  },
+  {
+    icon: Languages,
+    title: 'Automatische Übersetzung',
+    desc: 'Den gesamten Lebenslauf in jede Sprache übersetzen – Deutsch, Englisch, Französisch, Italienisch und mehr.',
+    badge: 'Claude AI',
   },
 ];
 
 const STEPS = [
-  { num: '1', title: 'Konto erstellen', desc: 'Kostenlos registrieren, keine Kreditkarte nötig.' },
-  { num: '2', title: 'Vorlage wählen', desc: 'Passende Vorlage für deine Branche und deinen Stil aussuchen.' },
-  { num: '3', title: 'Daten eintragen', desc: 'Lebenslauf ausfüllen, Anschreiben per KI generieren.' },
+  { num: '1', title: 'Konto erstellen',   desc: 'Kostenlos registrieren, keine Kreditkarte nötig.' },
+  { num: '2', title: 'Vorlage wählen',    desc: 'Passende Vorlage für deine Branche und deinen Stil aussuchen.' },
+  { num: '3', title: 'Daten eintragen',   desc: 'Lebenslauf ausfüllen – oder per LinkedIn-Import & KI in Sekunden befüllen.' },
   { num: '4', title: 'PDF herunterladen', desc: 'Mit einem Klick als druckfertiges PDF exportieren.' },
 ];
 
@@ -76,10 +63,10 @@ const FREE_FEATURES = [
   '6 Templates',
   '5 PDF-Exporte / Monat',
   '1 Share-Link',
-  'Basis-Editor',
   'Bewerbungs-Tracker',
   'Anschreiben-Vorlagen',
-  'LinkedIn-Import',
+  'LinkedIn-Import (KI)',
+  'DSGVO-konform',
 ];
 
 const PRO_FEATURES = [
@@ -87,9 +74,9 @@ const PRO_FEATURES = [
   'Alle 15+ Templates',
   'Unbegrenzte PDF-Exporte',
   '10 Share-Links',
-  'KI-Assistent (Claude AI)',
+  'KI-Assistent – Anschreiben & Texte (Claude AI)',
+  'KI-Übersetzung in alle Sprachen',
   'Versionshistorie',
-  'Automatische Übersetzung',
   'Eigene Sektionen',
   'Deadline-Reminder',
 ];
@@ -295,6 +282,7 @@ export default function LandingPage() {
         }}>
           {[
             ['15+', 'Professionelle Vorlagen'],
+            ['4x', 'KI-Features (Claude AI)'],
             ['1-Klick', 'PDF-Export'],
             ['100%', 'DSGVO-konform'],
             ['CHF 0', 'Kostenlos starten'],
@@ -344,6 +332,51 @@ export default function LandingPage() {
               <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', margin: 0, lineHeight: 1.6 }}>{desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── AI Features Spotlight ───────────────────────────── */}
+      <section style={{
+        padding: isMobile ? '80px 24px' : '100px 48px',
+        background: 'linear-gradient(180deg, rgba(175,82,222,0.04) 0%, rgba(0,122,255,0.04) 100%)',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 56 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 12, fontWeight: 700, padding: '5px 14px', borderRadius: 99, background: 'rgba(175,82,222,0.15)', border: '1px solid rgba(175,82,222,0.3)', color: '#CF9FFF', marginBottom: 20, letterSpacing: '0.06em' }}>
+              <Brain size={13} /> POWERED BY CLAUDE AI
+            </div>
+            <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
+              KI übernimmt die schwere Arbeit
+            </h2>
+            <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.5)', margin: 0, maxWidth: 520, marginInline: 'auto', lineHeight: 1.6 }}>
+              Claude AI – eines der leistungsfähigsten Sprachmodelle der Welt – ist direkt in PATH integriert.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: 20 }}>
+            {AI_FEATURES.map(({ icon: Icon, title, desc, badge }) => (
+              <div key={title} style={{
+                display: 'flex', gap: 18, padding: 28,
+                background: 'rgba(175,82,222,0.06)', border: '1px solid rgba(175,82,222,0.18)',
+                borderRadius: 20, transition: 'background 0.2s, transform 0.2s',
+              }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(175,82,222,0.1)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(175,82,222,0.06)'; (e.currentTarget as HTMLDivElement).style.transform = 'none'; }}>
+                <div style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0, background: 'rgba(175,82,222,0.15)', border: '1px solid rgba(175,82,222,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon size={22} style={{ color: '#CF9FFF' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{title}</h3>
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 99, background: 'rgba(175,82,222,0.25)', color: '#CF9FFF', letterSpacing: '0.04em', flexShrink: 0 }}>{badge}</span>
+                  </div>
+                  <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', margin: 0, lineHeight: 1.65 }}>{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

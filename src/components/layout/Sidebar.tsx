@@ -47,10 +47,11 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
-  const navPad   = isMobile ? '7px 10px' : '10px 12px';
+  const navPad   = isMobile ? '11px 14px' : '10px 12px';
   const navStyle = (active: boolean): React.CSSProperties => ({
     width: '100%', justifyContent: 'flex-start',
-    borderRadius: 'var(--radius-sm)', padding: navPad, marginBottom: 1,
+    borderRadius: 'var(--radius-sm)', padding: navPad, marginBottom: isMobile ? 3 : 1,
+    fontSize: isMobile ? 15 : undefined,
     background: active ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent',
     border: active ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent',
     boxShadow: 'none',
@@ -155,7 +156,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
 
   // ── Full sidebar ────────────────────────────────────────────
   return (
-    <aside style={{ display: 'flex', flexDirection: 'column', height: '100%', width: isMobile ? 260 : 240, flexShrink: 0, padding: isMobile ? '12px 10px' : '16px 12px' }}>
+    <aside style={{ display: 'flex', flexDirection: 'column', height: '100%', width: isMobile ? 280 : 240, flexShrink: 0, padding: isMobile ? '16px 12px' : '16px 12px' }}>
       {/* Logo + collapse */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? 12 : 20, paddingLeft: 4 }}>
         <LogoFull size={32} />
