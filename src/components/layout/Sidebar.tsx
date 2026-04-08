@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  Users, FileText, Plus, ChevronRight, Trash2,
+  Users, FileText, Plus, ChevronRight, ChevronDown, Trash2,
   LayoutDashboard, Eye, FilePlus, LogOut,
   PanelLeftClose, PanelLeftOpen, Sparkles, UserCircle, Lock,
   User, Briefcase, GraduationCap, Zap, FolderOpen,
@@ -56,6 +56,10 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
 
   const isEditorActive  = location.pathname === '/editor';
   const isAccountActive = location.pathname === '/account';
+
+  // Collapsible sub-navs — open by default when route is active
+  const [editorOpen,  setEditorOpen]  = useState(isEditorActive);
+  const [accountOpen, setAccountOpen] = useState(isAccountActive);
 
   function toggleExpand(id: string) {
     setExpandedPersonIds(prev => {
@@ -167,13 +171,19 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         </button>
 
         {/* Editor + sub-nav */}
-        <button onClick={() => go('/editor')} className="btn-glass"
+        <button
+          onClick={() => {
+            if (isEditorActive) { setEditorOpen(v => !v); }
+            else { setActiveSection('personal'); setEditorOpen(true); go('/editor'); }
+          }}
+          className="btn-glass"
           style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isEditorActive ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isEditorActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
           <FileText size={16} style={{ opacity: isEditorActive ? 1 : 0.6 }} />
-          <span style={{ opacity: isEditorActive ? 1 : 0.7 }}>Editor</span>
+          <span style={{ opacity: isEditorActive ? 1 : 0.7, flex: 1 }}>Editor</span>
+          <ChevronDown size={12} style={{ opacity: 0.4, transform: editorOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
         </button>
 
-        {isEditorActive && (
+        {isEditorActive && editorOpen && (
           <div style={{ marginLeft: 14, paddingLeft: 10, borderLeft: '1px solid rgba(255,255,255,0.1)', marginBottom: 4 }}>
             {EDITOR_SECTIONS.map(({ id, label, icon: Icon }) => (
               <button key={id} style={subItem(activeSection === id && activeSection !== 'translate' && activeSection !== 'history')}
@@ -224,13 +234,19 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         </button>
 
         {/* Konto + sub-nav */}
-        <button onClick={() => go('/account')} className="btn-glass"
+        <button
+          onClick={() => {
+            if (isAccountActive) { setAccountOpen(v => !v); }
+            else { setAccountSection('account'); setAccountOpen(true); go('/account'); }
+          }}
+          className="btn-glass"
           style={{ width: '100%', justifyContent: 'flex-start', borderRadius: 'var(--radius-sm)', padding: '10px 12px', marginBottom: 2, background: isAccountActive ? 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))' : 'transparent', border: isAccountActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid transparent', boxShadow: 'none' }}>
           <UserCircle size={16} style={{ opacity: isAccountActive ? 1 : 0.6 }} />
-          <span style={{ opacity: isAccountActive ? 1 : 0.7 }}>Konto</span>
+          <span style={{ opacity: isAccountActive ? 1 : 0.7, flex: 1 }}>Konto</span>
+          <ChevronDown size={12} style={{ opacity: 0.4, transform: accountOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
         </button>
 
-        {isAccountActive && (
+        {isAccountActive && accountOpen && (
           <div style={{ marginLeft: 14, paddingLeft: 10, borderLeft: '1px solid rgba(255,255,255,0.1)', marginBottom: 4 }}>
             {ACCOUNT_SECTIONS.map(({ id, label, icon: Icon }) => (
               <button key={id} style={subItem(accountSection === id)}
