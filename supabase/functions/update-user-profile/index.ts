@@ -19,7 +19,7 @@ const COUNTRY_IDS: Record<string, string> = {
   'Schweiz': '756', 'Deutschland': '276', 'Österreich': '40', 'Liechtenstein': '438',
 }
 
-// Find InvoiceNinja client ID by contact email
+// Find active (non-deleted) InvoiceNinja client ID by contact email
 async function findNinjaClientId(url: string, token: string, email: string): Promise<string | null> {
   const res = await fetch(`${url}/api/v1/clients?filter=${encodeURIComponent(email)}&per_page=10`, {
     headers: { 'X-Api-Token': token, Accept: 'application/json' },
@@ -30,6 +30,7 @@ async function findNinjaClientId(url: string, token: string, email: string): Pro
   }
   const data = await res.json()
   const client = (data?.data ?? []).find((c: Record<string, unknown>) =>
+    !c.is_deleted &&
     (c.contacts as Array<{ email: string }>)?.some(
       (ct) => ct.email?.toLowerCase() === email.toLowerCase()
     )
