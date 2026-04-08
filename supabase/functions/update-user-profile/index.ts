@@ -64,13 +64,14 @@ Deno.serve(async (req) => {
   const results: Record<string, string> = {}
 
   // 2. Listmonk
-  const lmUrl  = Deno.env.get('LISTMONK_URL')?.replace(/\/$/, '')  // strip trailing slash
-  const lmUser = Deno.env.get('LISTMONK_USERNAME')
-  const lmPass = Deno.env.get('LISTMONK_PASSWORD')
+  const lmUrl  = Deno.env.get('LISTMONK_URL')?.replace(/\/$/, '')
+  const lmUser = Deno.env.get('LISTMONK_USERNAME')?.trim()
+  const lmPass = Deno.env.get('LISTMONK_PASSWORD')?.trim()
 
   if (lmUrl && lmUser && lmPass) {
     try {
-      const lmAuth = `Basic ${btoa(`${lmUser}:${lmPass}`)}`
+      const lmAuth = `Basic ${btoa(unescape(encodeURIComponent(`${lmUser}:${lmPass}`)))}`
+      console.log('[update-user-profile] listmonk user:', lmUser, 'pass length:', lmPass.length)
       const query  = encodeURIComponent(`subscribers.email = '${email}'`)
       const searchUrl = `${lmUrl}/api/subscribers?query=${query}&page=1&per_page=1`
       console.log('[update-user-profile] listmonk search:', searchUrl)
