@@ -460,7 +460,7 @@ function ReferralSection() {
       <div className="glass-card" style={{ padding: 20, background: 'rgba(0,122,255,0.06)', border: '1px solid rgba(0,122,255,0.2)' }}>
         <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>Freunde einladen, 1 Monat gratis</div>
         <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', lineHeight: 1.65, margin: 0 }}>
-          Teile deinen persönlichen Link. Wenn sich jemand über deinen Link registriert und ein Pro-Abo abschliesst, bekommst du automatisch einen Gratismonat gutgeschrieben.
+          Teile deinen persönlichen Link. Wenn sich jemand über deinen Link registriert und ein Pro-Abo abschliesst, bekommst du automatisch CHF 5.00 auf dein Konto gutgeschrieben.
         </p>
       </div>
 
@@ -492,7 +492,7 @@ function ReferralSection() {
             {[
               { label: 'Eingeladen', value: stats.total },
               { label: 'Pro-Abos',   value: stats.subscribed },
-              { label: 'Gratismonate', value: stats.rewarded },
+              { label: 'Gutschriften', value: stats.rewarded },
             ].map(({ label, value }) => (
               <div key={label} style={{
                 textAlign: 'center', padding: '14px 8px',

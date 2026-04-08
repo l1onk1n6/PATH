@@ -91,9 +91,9 @@ Deno.serve(async (req) => {
               if (referrerStripe?.stripe_customer_id) {
                 await stripe.customers.createBalanceTransaction(
                   referrerStripe.stripe_customer_id,
-                  { amount: -990, currency: 'chf', description: 'Referral reward: 1 free month' },
+                  { amount: -500, currency: 'chf', description: 'Referral reward: CHF 5.00 credit' },
                 )
-                console.log(`✓ Referral reward (−CHF 9.90) credited to ${referral.referrer_id}`)
+                console.log(`✓ Referral reward (−CHF 5.00) credited to ${referral.referrer_id}`)
               }
             }
           } catch (e) {
