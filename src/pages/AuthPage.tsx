@@ -138,10 +138,14 @@ export default function AuthPage() {
           <>
             <div style={{ display: 'flex', background: 'rgba(255,255,255,0.06)', borderRadius: 'var(--radius-full)', padding: 3, marginBottom: 16 }}>
               {(['login', 'register'] as const).map((m) => (
-                <button key={m} onClick={() => switchMode(m)} className="btn-glass" style={{
-                  flex: 1, borderRadius: 'var(--radius-full)', padding: '8px 0', boxShadow: 'none',
-                  background: mode === m ? 'rgba(255,255,255,0.12)' : 'transparent',
+                <button key={m} onClick={() => switchMode(m)} style={{
+                  flex: 1, borderRadius: 'var(--radius-full)', padding: '9px 0',
+                  background: mode === m ? 'rgba(255,255,255,0.14)' : 'transparent',
                   border: 'none', fontSize: 14, fontWeight: mode === m ? 600 : 400,
+                  color: mode === m ? '#fff' : 'rgba(255,255,255,0.5)',
+                  cursor: 'pointer', fontFamily: 'var(--font-sf)',
+                  transition: 'all 0.2s', whiteSpace: 'nowrap', overflow: 'hidden',
+                  boxShadow: mode === m ? '0 1px 4px rgba(0,0,0,0.2)' : 'none',
                 }}>
                   {m === 'login' ? 'Anmelden' : 'Registrieren'}
                 </button>
