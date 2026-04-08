@@ -76,7 +76,19 @@ Deno.serve(async (req) => {
       } else {
         const sub = (await searchRes.json())?.data?.results?.[0]
         if (!sub) {
-          results.listmonk = 'not_found'
+          // Not yet subscribed — create
+          const listmonkList = Number(Deno.env.get('LISTMONK_LIST_ID') ?? '1')
+          const createRes = await fetch(`${lmUrl}/api/subscribers`, {
+            method: 'POST',
+            headers: { Authorization: lmAuth, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email, name, status: 'enabled',
+              lists: [listmonkList],
+              attribs: { user_id: user.id, phone, street, zip, city, country },
+              preconfirm_subscriptions: true,
+            }),
+          })
+          results.listmonk = createRes.ok ? 'created' : createRes.status === 409 ? 'already_exists' : `create_error_${createRes.status}`
         } else {
           const putRes = await fetch(`${lmUrl}/api/subscribers/${sub.id}`, {
             method: 'PUT',
