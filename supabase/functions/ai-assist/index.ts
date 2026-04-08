@@ -1,14 +1,10 @@
 // Secrets required: ANTHROPIC_API_KEY
+// JWT enforcement: ON (Supabase gateway validates auth — no manual check needed)
 
 const cors = {
   'Access-Control-Allow-Origin':  '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-}
-
-function jwtPayload(token: string): Record<string, unknown> {
-  const part = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
-  return JSON.parse(atob(part))
 }
 
 async function callClaude(prompt: string, maxTokens = 2048): Promise<string> {
@@ -37,13 +33,6 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
 
   try {
-    // Auth
-    const authHeader = req.headers.get('Authorization') ?? ''
-    const token = authHeader.replace('Bearer ', '').trim()
-    if (!token) return new Response('Unauthorized', { status: 401, headers: cors })
-    const payload = jwtPayload(token)
-    if (!payload.sub) return new Response('Unauthorized', { status: 401, headers: cors })
-
     const body = await req.json()
     const { action } = body
 
