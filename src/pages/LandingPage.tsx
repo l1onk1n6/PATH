@@ -102,7 +102,7 @@ export default function LandingPage() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  if (showAuth) return <AuthPage />;
+  if (showAuth) return <AuthPage onBack={() => setShowAuth(false)} />;
 
   return (
     <div

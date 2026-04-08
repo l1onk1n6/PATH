@@ -8,7 +8,7 @@ const limiter = new RateLimiter(5, 30_000);
 
 type Mode = 'login' | 'register' | 'forgot' | 'reset';
 
-export default function AuthPage() {
+export default function AuthPage({ onBack }: { onBack?: () => void } = {}) {
   const [mode, setMode] = useState<Mode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -96,6 +96,24 @@ export default function AuthPage() {
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       padding: '20px 16px', boxSizing: 'border-box', overflow: 'auto',
     }}>
+      {onBack && (
+        <button
+          onClick={onBack}
+          style={{
+            position: 'fixed', top: 20, left: 20,
+            display: 'flex', alignItems: 'center', gap: 6,
+            background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+            borderRadius: 10, padding: '8px 14px',
+            color: 'rgba(255,255,255,0.7)', fontSize: 14, cursor: 'pointer',
+            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+            zIndex: 10, transition: 'background 0.2s',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+        >
+          <ArrowLeft size={15} /> Zurück
+        </button>
+      )}
       <div className="glass-card animate-scale-in" style={{ width: '100%', maxWidth: 380, padding: '24px 22px' }}>
 
         {/* Logo */}
