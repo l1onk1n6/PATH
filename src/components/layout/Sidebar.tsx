@@ -152,6 +152,9 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         )}
       </div>
 
+      {/* Scrollable content */}
+      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column', marginRight: -4, paddingRight: 4 }}>
+
       {/* Navigation */}
       <nav style={{ marginBottom: 8 }}>
         <div className="section-label" style={{ paddingLeft: 8 }}>Navigation</div>
@@ -243,7 +246,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
       <div className="divider" />
 
       {/* Persons */}
-      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, paddingLeft: 8 }}>
           <div className="section-label" style={{ marginBottom: 0 }}>
             <Users size={10} style={{ display: 'inline', marginRight: 5 }} />
@@ -267,7 +270,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
           </div>
         )}
 
-        <div style={{ overflow: 'auto', flex: 1 }}>
+        <div>
           {persons.length === 0 && (
             <div style={{ textAlign: 'center', padding: '20px 8px', color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>
               Noch keine Personen.<br />
@@ -372,6 +375,8 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
           <LogOut size={13} /> Logout
         </button>
       </div>
+
+      </div>{/* end scrollable */}
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </aside>
   );
