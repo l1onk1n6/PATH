@@ -179,7 +179,44 @@ body::before {
 
 textarea.input-glass { resize: vertical; min-height: 80px; }
 
-select.input-glass option { background: #1a1a2e; color: #fff; }
+/* ─── Select: custom chevron, no browser default ─── */
+select.input-glass {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.45)' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+select.input-glass:focus {
+  background-color: rgba(255,255,255,0.12);
+}
+select.input-glass option {
+  background: #16162a;
+  color: #fff;
+}
+
+/* ─── Date input: dark calendar icon ─── */
+input[type="date"].input-glass,
+input[type="month"].input-glass {
+  appearance: none;
+  -webkit-appearance: none;
+  color-scheme: dark;
+}
+input[type="date"].input-glass::-webkit-calendar-picker-indicator,
+input[type="month"].input-glass::-webkit-calendar-picker-indicator {
+  filter: invert(0.6) brightness(1.2);
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+input[type="date"].input-glass::-webkit-calendar-picker-indicator:hover,
+input[type="month"].input-glass::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
 
 /* ─── Scrollbar ─── */
 ::-webkit-scrollbar { width: 5px; }

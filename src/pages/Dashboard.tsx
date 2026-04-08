@@ -283,6 +283,7 @@ export default function Dashboard() {
   const [statusMenuResumeId, setStatusMenuResumeId] = useState<string | null>(null);
   const [shareModalResumeId, setShareModalResumeId] = useState<string | null>(null);
   const [menuOpenResumeId, setMenuOpenResumeId] = useState<string | null>(null);
+  const [menuPos, setMenuPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   // Persons beyond the plan limit are frozen (read-only)
   const frozenPersonIds = new Set(
@@ -380,12 +381,19 @@ export default function Dashboard() {
         const mp = mr ? persons.find(p => p.resumeIds.includes(mr.id)) : null;
         const mpResumes = mp ? mp.resumeIds.length : 0;
         if (!mr) return null;
+        // Smart positioning: flip left if near right edge, flip up if near bottom
+        const menuW = 210;
+        const menuH = 220;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const left = menuPos.x + menuW > vw ? menuPos.x - menuW : menuPos.x;
+        const top  = menuPos.y + menuH > vh ? menuPos.y - menuH - 8 : menuPos.y + 4;
         return (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)' }}
+          <div style={{ position: 'fixed', inset: 0, zIndex: 200 }}
             onClick={() => setMenuOpenResumeId(null)}>
             <div className="glass-card animate-scale-in"
               onClick={e => e.stopPropagation()}
-              style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', zIndex: 201, padding: 8, minWidth: 200, background: 'rgba(14,14,22,0.97)' }}>
+              style={{ position: 'fixed', top, left, zIndex: 201, padding: 6, minWidth: menuW, background: 'rgba(14,14,22,0.97)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
               <div style={{ fontSize: 11, fontWeight: 600, opacity: 0.4, padding: '6px 10px 4px', textTransform: 'uppercase' }}>
                 {mr.name || 'Bewerbungsmappe'}
               </div>
@@ -715,7 +723,12 @@ export default function Dashboard() {
                                   className="btn-glass btn-icon"
                                   title="Aktionen"
                                   style={{ padding: 6, color: r.shareToken ? 'var(--ios-blue)' : undefined }}
-                                  onClick={(e) => { e.stopPropagation(); setMenuOpenResumeId(r.id); }}>
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const rect = e.currentTarget.getBoundingClientRect();
+                                    setMenuPos({ x: rect.left, y: rect.bottom });
+                                    setMenuOpenResumeId(r.id);
+                                  }}>
                                   <MoreHorizontal size={15} />
                                 </button>
                               )}
