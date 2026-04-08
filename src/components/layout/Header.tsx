@@ -36,14 +36,12 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
 
   return (
     <header
-      className="glass"
       style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: isMobile ? '10px 14px' : '12px 20px',
-        borderRadius: 'var(--radius-lg)',
-        marginBottom: isMobile ? 10 : 16,
+        padding: isMobile ? '6px 4px 10px' : '4px 4px 14px',
+        marginBottom: 0,
         flexShrink: 0,
         gap: 10,
       }}
