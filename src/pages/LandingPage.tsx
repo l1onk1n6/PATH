@@ -5,8 +5,8 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 import {
   FileText, Sparkles, Globe, Clock, Share2, Download,
   Check, ChevronRight, ArrowRight, Star, ClipboardList, Mail, Import,
-  Users, Bell, Shield, Smartphone, PenLine, Wand2, Brain, Languages,
-  Zap, BookOpen, Layers,
+  Users, Bell, Shield, PenLine, Wand2, Brain, Languages,
+  BookOpen, Layers,
 } from 'lucide-react';
 
 const FEATURES = [
