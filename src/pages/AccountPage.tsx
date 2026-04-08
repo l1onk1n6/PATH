@@ -31,6 +31,8 @@ function PlanSection() {
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [webhookPending, setWebhookPending] = useState(false);
+  const [webhookFailed, setWebhookFailed] = useState(false);
   const pdfCount = getPdfExportCount();
   const activeShareLinks = resumes.filter(r => r.shareToken).length;
   const isGift = user?.user_metadata?.gift_pro === true;
@@ -40,19 +42,24 @@ function PlanSection() {
     const isSuccess = location.search.includes('success=1') || location.hash.includes('success=1');
     if (isSuccess) {
       setShowSuccess(true);
+      setWebhookPending(true);
       window.history.replaceState(null, '', window.location.pathname + window.location.hash.replace('?success=1', ''));
-      // Webhook is async — poll until plan is updated (max 5 attempts, 2s apart)
+      // Webhook is async — poll until plan is updated (max 6 attempts, 2s apart = 13s total)
       let attempts = 0;
       const poll = async () => {
         await refreshUser();
         attempts++;
-        // useAuthStore state is updated by refreshUser; check via getState
         const { user: u } = useAuthStore.getState();
-        if (u?.user_metadata?.plan !== 'pro' && attempts < 5) {
+        if (u?.user_metadata?.plan === 'pro') {
+          setWebhookPending(false);
+        } else if (attempts < 6) {
           setTimeout(poll, 2000);
+        } else {
+          setWebhookPending(false);
+          setWebhookFailed(true);
         }
       };
-      setTimeout(poll, 1500); // first check after 1.5s
+      setTimeout(poll, 1500);
     } else {
       refreshUser();
     }
@@ -79,13 +86,38 @@ function PlanSection() {
       {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
 
       {/* Payment success banner */}
-      {showSuccess && (
+      {showSuccess && !webhookPending && !webhookFailed && (
         <div className="glass-card" style={{ padding: '14px 16px', border: '1px solid rgba(52,199,89,0.4)', background: 'rgba(52,199,89,0.1)', display: 'flex', alignItems: 'center', gap: 10 }}>
           <CheckCircle size={18} style={{ color: 'var(--ios-green)', flexShrink: 0 }} />
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ios-green)' }}>Willkommen bei PATH Pro!</div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>Dein Upgrade war erfolgreich. Alle Pro-Features sind jetzt aktiv.</div>
           </div>
+        </div>
+      )}
+
+      {/* Webhook pending — plan not yet reflected */}
+      {webhookPending && (
+        <div className="glass-card" style={{ padding: '14px 16px', border: '1px solid rgba(0,122,255,0.35)', background: 'rgba(0,122,255,0.08)', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Loader2 size={18} style={{ color: 'var(--ios-blue)', flexShrink: 0, animation: 'spin 1s linear infinite' }} />
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ios-blue)' }}>Pro wird aktiviert…</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>Zahlung bestätigt — warte auf Aktivierung (max. 15 Sek.)</div>
+          </div>
+        </div>
+      )}
+
+      {/* Webhook failed — plan not updated after polling */}
+      {webhookFailed && (
+        <div className="glass-card" style={{ padding: '14px 16px', border: '1px solid rgba(255,159,10,0.4)', background: 'rgba(255,159,10,0.08)', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <AlertTriangle size={18} style={{ color: '#FF9F0A', flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#FF9F0A' }}>Aktivierung verzögert</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>Zahlung war erfolgreich. Lade die Seite in einer Minute neu oder kontaktiere uns.</div>
+          </div>
+          <button className="btn-glass btn-sm" onClick={() => { setWebhookFailed(false); setWebhookPending(true); let a = 0; const p = async () => { await refreshUser(); a++; const { user: u } = useAuthStore.getState(); if (u?.user_metadata?.plan === 'pro') { setWebhookPending(false); setShowSuccess(true); } else if (a < 4) { setTimeout(p, 3000); } else { setWebhookPending(false); setWebhookFailed(true); } }; setTimeout(p, 1000); }} style={{ fontSize: 11, padding: '6px 10px', flexShrink: 0 }}>
+            Nochmals prüfen
+          </button>
         </div>
       )}
 

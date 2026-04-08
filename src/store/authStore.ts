@@ -150,9 +150,15 @@ export const useAuthStore = create<AuthStore>((set) => ({
     if (!isSupabaseConfigured()) return;
     try {
       const supabase = getSupabase();
-      const { data } = await supabase.auth.refreshSession();
-      if (data.session) {
-        set({ session: data.session, user: data.session.user });
+      // getUser() always fetches fresh metadata from the server (no JWT cache)
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData.user) {
+        set((s) => ({ user: userData.user, session: s.session }));
+      }
+      // Also refresh the session token so the new metadata is in the JWT
+      const { data: sessionData } = await supabase.auth.refreshSession();
+      if (sessionData.session) {
+        set({ session: sessionData.session, user: sessionData.session.user });
       }
     } catch { /* ignore */ }
   },
