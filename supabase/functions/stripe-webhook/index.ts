@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
       .from('stripe_customers')
       .select('user_id')
       .eq('stripe_customer_id', customerId)
-      .single()
+      .maybeSingle()
     return data?.user_id ?? null
   }
 
@@ -60,8 +60,9 @@ Deno.serve(async (req) => {
         }
         // Fetch subscription to get period end
         let periodEnd: number | null = null
-        if (session.subscription) {
-          const sub = await stripe.subscriptions.retrieve(session.subscription as string)
+        const subId = typeof session.subscription === 'string' ? session.subscription : session.subscription?.id
+        if (subId) {
+          const sub = await stripe.subscriptions.retrieve(subId)
           periodEnd = sub.current_period_end ?? null
         }
         await setPlan(userId, 'pro', periodEnd ? { subscription_period_end: periodEnd } : {})
