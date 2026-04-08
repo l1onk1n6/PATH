@@ -51,7 +51,7 @@ export default function Editor() {
       <div className="glass-card animate-fade-in" style={{ padding: '48px 32px', textAlign: 'center', margin: 'auto' }}>
         <AlertCircle size={40} style={{ margin: '0 auto 16px', opacity: 0.5 }} />
         <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 600 }}>Kein Lebenslauf ausgewählt</h3>
-        <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 20 }}>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 20 }}>
           Wählen Sie eine Person in der Seitenleiste oder legen Sie eine neue an.
         </p>
         <button className="btn-glass btn-primary" onClick={() => navigate('/')}>
@@ -86,7 +86,7 @@ export default function Editor() {
           <Lock size={24} style={{ color: '#FF9F0A' }} />
         </div>
         <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 700 }}>Mappe eingefroren</h3>
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, marginBottom: 20 }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginBottom: 20 }}>
           «{resume.name || 'Bewerbungsmappe'}» überschreitet dein Free-Limit von {limits.resumes} Mappen.
           Upgrade auf Pro oder lösche andere Mappen um diese wieder zu bearbeiten.
         </p>

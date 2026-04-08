@@ -6,12 +6,12 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 import { CustomSelect } from '../components/ui/CustomSelect';
 
 const STATUS_CONFIG: Record<ApplicationStatus, { label: string; color: string; bg: string }> = {
-  offen:          { label: 'Offen',           color: 'rgba(255,255,255,0.55)', bg: 'rgba(255,255,255,0.08)' },
+  offen:          { label: 'Offen',           color: 'var(--text-secondary)', bg: 'rgba(255,255,255,0.08)' },
   beworben:       { label: 'Beworben',        color: '#007AFF',                bg: 'rgba(0,122,255,0.15)'    },
   interview:      { label: 'Interview',       color: '#FF9F0A',                bg: 'rgba(255,159,10,0.15)'   },
   angebot:        { label: 'Angebot',         color: '#34C759',                bg: 'rgba(52,199,89,0.15)'    },
   abgelehnt:      { label: 'Abgelehnt',       color: '#FF3B30',                bg: 'rgba(255,59,48,0.12)'    },
-  zurueckgezogen: { label: 'Zurückgezogen',   color: 'rgba(255,255,255,0.35)', bg: 'rgba(255,255,255,0.05)'  },
+  zurueckgezogen: { label: 'Zurückgezogen',   color: 'var(--text-muted)', bg: 'rgba(255,255,255,0.05)'  },
 };
 
 const TYPE_CONFIG: Record<ApplicationType, { label: string; icon: string }> = {
@@ -53,7 +53,7 @@ function TypeBadge({ type }: { type: ApplicationType }) {
       display: 'inline-flex', alignItems: 'center', gap: 4,
       padding: '2px 8px', borderRadius: 20,
       fontSize: 11, fontWeight: 500, whiteSpace: 'nowrap',
-      color: 'rgba(255,255,255,0.5)',
+      color: 'var(--text-secondary)',
       background: 'rgba(255,255,255,0.06)',
       border: '1px solid rgba(255,255,255,0.1)',
     }}>
@@ -141,7 +141,7 @@ export default function Tracker() {
             </div>
             <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>Bewerbungs-Tracker</h2>
           </div>
-          <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>
+          <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary)' }}>
             {applications.length} Bewerbung{applications.length !== 1 ? 'en' : ''} total
           </p>
         </div>
@@ -201,7 +201,7 @@ export default function Tracker() {
         <div className="glass-card" style={{ padding: '48px 24px', textAlign: 'center' }}>
           <ClipboardList size={36} style={{ margin: '0 auto 12px', opacity: 0.3, display: 'block' }} />
           <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 6 }}>Noch keine Bewerbungen</div>
-          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
             Füge deine erste Bewerbung hinzu und behalte den Überblick.
           </p>
           <button className="btn-glass btn-primary" onClick={addApplication}>
@@ -230,13 +230,13 @@ export default function Tracker() {
                       {app.company || <span style={{ opacity: 0.4 }}>Firma</span>}
                     </span>
                     {app.position && (
-                      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>· {app.position}</span>
+                      <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>· {app.position}</span>
                     )}
                   </div>
                   {!isMobile && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3 }}>
                       {app.appliedDate && (
-                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                           Beworben: {formatDate(app.appliedDate)}
                         </span>
                       )}
@@ -335,7 +335,7 @@ export default function Tracker() {
                               cursor: 'pointer',
                               border: isActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid rgba(255,255,255,0.1)',
                               background: isActive ? 'rgba(0,122,255,0.2)' : 'rgba(255,255,255,0.06)',
-                              color: isActive ? '#fff' : 'rgba(255,255,255,0.55)',
+                              color: isActive ? '#fff' : 'var(--text-secondary)',
                               transition: 'all 0.15s',
                             }}
                           >
@@ -383,7 +383,7 @@ export default function Tracker() {
       </div>
 
       {filtered.length === 0 && applications.length > 0 && (
-        <div style={{ textAlign: 'center', padding: 32, color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>
+        <div style={{ textAlign: 'center', padding: 32, color: 'var(--text-muted)', fontSize: 13 }}>
           Keine Bewerbungen mit diesem Filter.
         </div>
       )}
@@ -423,7 +423,7 @@ export default function Tracker() {
             </div>
 
             {resumes.length === 0 ? (
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: '24px 0' }}>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', padding: '24px 0' }}>
                 Keine Mappen vorhanden.
               </p>
             ) : (
@@ -452,7 +452,7 @@ export default function Tracker() {
                         {resume.name || 'Unbenannte Mappe'}
                       </span>
                       {personName && (
-                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>{personName}</span>
+                        <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{personName}</span>
                       )}
                     </button>
                   );

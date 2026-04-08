@@ -68,8 +68,8 @@ export default function TemplateSelector() {
                 }}>
                   {/* Simulated resume lines */}
                   <div style={{ position: 'absolute', inset: 0, padding: '10px 12px' }}>
-                    <div style={{ width: '40%', height: 8, background: 'rgba(255,255,255,0.6)', borderRadius: 4, marginBottom: 5 }} />
-                    <div style={{ width: '60%', height: 5, background: 'rgba(255,255,255,0.35)', borderRadius: 3, marginBottom: 8 }} />
+                    <div style={{ width: '40%', height: 8, background: 'var(--text-secondary)', borderRadius: 4, marginBottom: 5 }} />
+                    <div style={{ width: '60%', height: 5, background: 'var(--text-muted)', borderRadius: 3, marginBottom: 8 }} />
                     <div style={{ width: '80%', height: 3, background: 'rgba(255,255,255,0.2)', borderRadius: 2, marginBottom: 3 }} />
                     <div style={{ width: '65%', height: 3, background: 'rgba(255,255,255,0.2)', borderRadius: 2, marginBottom: 3 }} />
                     <div style={{ width: '70%', height: 3, background: 'rgba(255,255,255,0.15)', borderRadius: 2 }} />
@@ -88,7 +88,7 @@ export default function TemplateSelector() {
 
                 {/* Info */}
                 <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 3 }}>{tmpl.name}</div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginBottom: 6, lineHeight: 1.3 }}>
+                <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 6, lineHeight: 1.3 }}>
                   {tmpl.description}
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
@@ -131,7 +131,7 @@ export default function TemplateSelector() {
           <div style={{
             width: 28, height: 28, borderRadius: '50%',
             background: 'conic-gradient(red, yellow, green, blue, red)',
-            border: '2px solid rgba(255,255,255,0.3)',
+            border: '2px solid var(--text-muted)',
             cursor: 'pointer',
           }} />
           <input

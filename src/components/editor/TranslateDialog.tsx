@@ -134,7 +134,7 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
             </div>
             <div>
               <div style={{ fontWeight: 700, fontSize: 15 }}>Lebenslauf übersetzen</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Alle Textfelder werden übersetzt</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Alle Textfelder werden übersetzt</div>
             </div>
           </div>
           <button className="btn-glass btn-icon" onClick={onClose} style={{ padding: 6 }}><X size={14} /></button>
@@ -177,7 +177,7 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
               )}
             </div>
 
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 16, padding: '8px 12px', background: 'rgba(255,255,255,0.04)', borderRadius: 8 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16, padding: '8px 12px', background: 'rgba(255,255,255,0.04)', borderRadius: 8 }}>
               Übersetzt: Zusammenfassung, Berufserfahrung, Ausbildung, Projekte, eigene Sektionen, Anschreiben.
               Namen, Daten und Kontaktdaten bleiben unverändert.
             </div>

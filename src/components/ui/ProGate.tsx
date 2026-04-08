@@ -61,7 +61,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
               </div>
               <span style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.3px' }}>PATH Pro</span>
             </div>
-            <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary)' }}>
               Alle Funktionen für professionelle Bewerbungen
             </p>
           </div>
@@ -86,14 +86,14 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
                 <span style={{ fontSize: 15, flexShrink: 0, lineHeight: 1.4 }}>{f.icon}</span>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 1 }}>{f.label}</div>
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>{f.description}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{f.description}</div>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Coming soon */}
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', padding: '2px 4px', marginBottom: 8 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'var(--text-muted)', textTransform: 'uppercase', padding: '2px 4px', marginBottom: 8 }}>
             ⏳ In Entwicklung
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 6 }}>
@@ -107,7 +107,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
                 <span style={{ fontSize: 15, flexShrink: 0, lineHeight: 1.4 }}>{f.icon}</span>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 1 }}>{f.label}</div>
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{f.description}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{f.description}</div>
                 </div>
               </div>
             ))}
@@ -142,7 +142,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
             </p>
           )}
 
-          <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>
+          <p style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)', textAlign: 'center' }}>
             Sichere Zahlung via Stripe · Jederzeit kündbar
           </p>
         </div>

@@ -22,7 +22,7 @@ export default function CustomSectionEditor() {
         </div>
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Eigene Sektionen</div>
-          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', maxWidth: 280 }}>
+          <div style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 280 }}>
             Erstelle eigene Abschnitte wie Projekte, Publikationen oder Zertifikate — mit PATH Pro.
           </div>
         </div>
@@ -40,7 +40,7 @@ export default function CustomSectionEditor() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {sections.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '28px 16px', color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>
+        <div style={{ textAlign: 'center', padding: '28px 16px', color: 'var(--text-muted)', fontSize: 13 }}>
           Noch keine eigenen Sektionen.<br />
           Klicke auf „Sektion hinzufügen" um loszulegen.
         </div>

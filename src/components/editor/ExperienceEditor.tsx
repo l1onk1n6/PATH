@@ -33,7 +33,7 @@ export default function ExperienceEditor() {
       </div>
 
       {jobs.length === 0 && (
-        <div className="glass-card" style={{ padding: 24, textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>
+        <div className="glass-card" style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)' }}>
           <Briefcase size={28} style={{ marginBottom: 8, opacity: 0.4 }} />
           <div style={{ fontSize: 14 }}>Noch keine Berufserfahrung eingetragen</div>
         </div>
@@ -79,7 +79,7 @@ export default function ExperienceEditor() {
                   {job.position || job.company || `Eintrag ${i + 1}`}
                 </div>
                 {job.company && (
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
                     {job.company}{job.location ? ` · ${job.location}` : ''}
                   </div>
                 )}

@@ -143,7 +143,7 @@ export default function ProjectsEditor() {
         ))}
 
         {projects.length === 0 && (
-          <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
+          <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 }}>
             <FolderOpen size={24} style={{ marginBottom: 8, opacity: 0.4 }} />
             <div>Noch keine Projekte eingetragen</div>
           </div>
@@ -235,7 +235,7 @@ export default function ProjectsEditor() {
         ))}
 
         {certificates.length === 0 && (
-          <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
+          <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 }}>
             Noch keine Zertifikate eingetragen
           </div>
         )}

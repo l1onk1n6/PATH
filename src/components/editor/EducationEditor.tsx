@@ -33,7 +33,7 @@ export default function EducationEditor() {
       </div>
 
       {education.length === 0 && (
-        <div className="glass-card" style={{ padding: 24, textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>
+        <div className="glass-card" style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)' }}>
           <GraduationCap size={28} style={{ marginBottom: 8, opacity: 0.4 }} />
           <div style={{ fontSize: 14 }}>Noch keine Ausbildung eingetragen</div>
         </div>
@@ -79,7 +79,7 @@ export default function EducationEditor() {
                   {edu.degree || edu.institution || `Eintrag ${i + 1}`}
                 </div>
                 {edu.institution && (
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
                     {edu.institution}{edu.field ? ` · ${edu.field}` : ''}
                   </div>
                 )}

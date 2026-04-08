@@ -377,14 +377,14 @@ export default function LinkedInImportDialog({ onClose }: Props) {
             }}>in</div>
             <div>
               <div style={{ fontWeight: 700, fontSize: 15 }}>LinkedIn importieren</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
                 Schritt {step} von 2
               </div>
             </div>
           </div>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', padding: 4 }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4 }}
           >
             <X size={18} />
           </button>
@@ -420,7 +420,7 @@ export default function LinkedInImportDialog({ onClose }: Props) {
             </div>
 
             {!text.trim() && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
                 <AlertCircle size={12} />
                 Füge den kopierten LinkedIn-Text ein, um fortzufahren.
               </div>
@@ -498,7 +498,7 @@ export default function LinkedInImportDialog({ onClose }: Props) {
               </div>
             )}
 
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: '0 0 16px', lineHeight: 1.55 }}>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '0 0 16px', lineHeight: 1.55 }}>
               Die Daten werden zu deinem aktuellen Lebenslauf hinzugefügt (bestehende Einträge bleiben erhalten).
             </p>
 

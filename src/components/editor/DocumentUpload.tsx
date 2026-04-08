@@ -95,9 +95,9 @@ export default function DocumentUpload() {
     <div className="animate-fade-in">
       {/* Storage bar */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 5 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-muted)', marginBottom: 5 }}>
           <span>Speicher</span>
-          <span style={{ color: storageFullPct >= 1 ? 'var(--ios-red)' : storageFullPct >= 0.8 ? '#FF9F0A' : 'rgba(255,255,255,0.4)' }}>
+          <span style={{ color: storageFullPct >= 1 ? 'var(--ios-red)' : storageFullPct >= 0.8 ? '#FF9F0A' : 'var(--text-muted)' }}>
             {formatBytes(totalUsedBytes)} / {limits.documentsMb} MB
           </span>
         </div>
@@ -123,7 +123,7 @@ export default function DocumentUpload() {
         <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 4 }}>
           {storageFull ? 'Speicher voll' : isDragActive ? 'Dateien hier ablegen...' : 'Dokumente hochladen'}
         </div>
-        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
           {storageFull
             ? `Limit von ${limits.documentsMb} MB erreicht — Dateien löschen um Platz zu schaffen`
             : `Dateien hierher ziehen oder klicken · PDF, Bilder, Word · max. ${MAX_FILE_MB} MB`}
@@ -138,7 +138,7 @@ export default function DocumentUpload() {
 
       {/* Uploaded files */}
       {documents.length === 0 && (
-        <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
+        <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 }}>
           <File size={24} style={{ marginBottom: 8, opacity: 0.4 }} />
           <div>Noch keine Dokumente hochgeladen</div>
         </div>
@@ -161,7 +161,7 @@ export default function DocumentUpload() {
                 <div style={{ fontWeight: 500, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {doc.name}
                 </div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
                   {formatBytes(doc.size)} · {new Date(doc.uploadedAt).toLocaleDateString('de-DE')}
                 </div>
               </div>

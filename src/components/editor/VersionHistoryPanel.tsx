@@ -77,7 +77,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
           </div>
           <div>
             <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>Versionshistorie</h2>
-            <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+            <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
               Bis zu 20 gespeicherte Versionen pro Mappe
             </p>
           </div>
@@ -130,11 +130,11 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
 
       {/* Version list */}
       {loading ? (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: 8, color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: 8, color: 'var(--text-muted)', fontSize: 13 }}>
           <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Lädt…
         </div>
       ) : versions.length === 0 && !error ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'rgba(255,255,255,0.3)' }}>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
           <Clock size={32} style={{ margin: '0 auto 12px', opacity: 0.4 }} />
           <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Noch keine Versionen gespeichert</div>
           <div style={{ fontSize: 12 }}>Speichere manuell eine Version um Änderungen festzuhalten.</div>
@@ -154,17 +154,17 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
                 border: i === 0 ? '1px solid rgba(0,122,255,0.3)' : '1px solid rgba(255,255,255,0.08)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 11, fontWeight: 700,
-                color: i === 0 ? 'var(--ios-blue)' : 'rgba(255,255,255,0.4)',
+                color: i === 0 ? 'var(--ios-blue)' : 'var(--text-muted)',
               }}>
                 {versions.length - i}
               </div>
 
               {/* Info */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: v.label ? 600 : 400, color: v.label ? '#fff' : 'rgba(255,255,255,0.65)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: 13, fontWeight: v.label ? 600 : 400, color: v.label ? '#fff' : 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {v.label ?? 'Version'}
                 </div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
                   {relativeTime(v.created_at)} · {new Date(v.created_at).toLocaleString('de-CH', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>

@@ -39,16 +39,16 @@ export default function SkillsEditor() {
         </div>
 
         {skills.length === 0 && (
-          <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
+          <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 }}>
             Noch keine Fähigkeiten eingetragen
           </div>
         )}
 
         {skills.length > 0 && (
           <div style={{ display: 'flex', gap: 10, paddingLeft: isMobile ? 32 : 22, paddingRight: 38, marginBottom: 4 }}>
-            <span style={{ flex: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>Fähigkeit</span>
-            <span style={{ flex: 1, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>Kategorie</span>
-            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', minWidth: 114 }}>Niveau</span>
+            <span style={{ flex: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Fähigkeit</span>
+            <span style={{ flex: 1, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Kategorie</span>
+            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', minWidth: 114 }}>Niveau</span>
           </div>
         )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -112,7 +112,7 @@ export default function SkillsEditor() {
                     />
                   ))}
                 </div>
-                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', minWidth: 70 }}>
+                <span style={{ fontSize: 11, color: 'var(--text-secondary)', minWidth: 70 }}>
                   {LEVEL_LABELS[skill.level - 1]}
                 </span>
                 <button
@@ -175,7 +175,7 @@ export default function SkillsEditor() {
             </div>
           ))}
           {languages.length === 0 && (
-            <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
+            <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 }}>
               Noch keine Sprachen eingetragen
             </div>
           )}

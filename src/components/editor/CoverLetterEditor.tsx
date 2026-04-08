@@ -89,7 +89,7 @@ function ReminderPanel({ resumeId, deadline, reminderDays, onClose }: {
         E-Mail-Reminder vor Frist
       </div>
       {!deadline && (
-        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 10 }}>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>
           Zuerst eine Bewerbungsfrist setzen.
         </div>
       )}
@@ -237,7 +237,7 @@ export default function CoverLetterEditor() {
               </div>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 15 }}>Bestehenden Text überschreiben?</div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
                   {confirmOverwrite === 'generate'
                     ? 'Der KI-Assistent ersetzt deinen aktuellen Anschreiben-Text.'
                     : confirmOverwrite === 'template'
@@ -246,7 +246,7 @@ export default function CoverLetterEditor() {
                 </div>
               </div>
             </div>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: '0 0 20px', lineHeight: 1.55 }}>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 20px', lineHeight: 1.55 }}>
               Dein bestehender Text wird unwiderruflich ersetzt. Möchtest du fortfahren?
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -427,8 +427,8 @@ export default function CoverLetterEditor() {
           }}
           onClick={() => isPro ? setShowAiPanel(v => !v) : setShowUpgrade(true)}
         >
-          <Sparkles size={14} style={{ color: isPro ? '#FF9F0A' : 'rgba(255,255,255,0.4)' }} />
-          <span style={{ fontSize: 13, fontWeight: 600, flex: 1, textAlign: 'left', color: isPro ? '#FF9F0A' : 'rgba(255,255,255,0.5)' }}>
+          <Sparkles size={14} style={{ color: isPro ? '#FF9F0A' : 'var(--text-muted)' }} />
+          <span style={{ fontSize: 13, fontWeight: 600, flex: 1, textAlign: 'left', color: isPro ? '#FF9F0A' : 'var(--text-secondary)' }}>
             KI-Assistent — Anschreiben generieren
           </span>
           {!isPro && (

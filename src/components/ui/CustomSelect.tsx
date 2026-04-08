@@ -65,7 +65,7 @@ export function CustomSelect({ value, onChange, options, style, placeholder = 'A
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <span style={{ color: hasValue ? undefined : 'rgba(255,255,255,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, textAlign: 'left' }}>
+        <span style={{ color: hasValue ? undefined : 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, textAlign: 'left' }}>
           {displayLabel}
         </span>
         <ChevronDown

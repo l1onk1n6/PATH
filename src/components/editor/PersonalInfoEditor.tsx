@@ -69,7 +69,7 @@ export default function PersonalInfoEditor() {
               {info.photo ? (
                 <img src={info.photo} alt="Foto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>
+                <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
                   <Camera size={20} />
                   <div style={{ fontSize: 9, marginTop: 3 }}>Foto</div>
                 </div>

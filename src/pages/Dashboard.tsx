@@ -22,7 +22,6 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 import { v4 as uuidv4 } from 'uuid';
 import { UpgradeModal } from '../components/ui/ProGate';
 import { usePlan } from '../lib/plan';
-import { useUIStore } from '../store/uiStore';
 
 const ALL_STATUSES: ApplicationStatus[] = ['entwurf', 'gesendet', 'interview', 'abgelehnt', 'angenommen'];
 
@@ -40,7 +39,7 @@ function AtsButton() {
           <div className="glass-card animate-scale-in" style={{ padding: '24px 28px', maxWidth: 320, textAlign: 'center', background: 'rgba(14,14,22,0.97)' }} onClick={e => e.stopPropagation()}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>📊</div>
             <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>ATS-Score — bald verfügbar</div>
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 16 }}>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 16 }}>
               Lebenslauf gegen Stellenbeschreibung matchen & Keywords optimieren. Dieses Feature ist in Entwicklung.
             </div>
             <button className="btn-glass btn-primary btn-sm" onClick={() => setShowSoon(false)}>Schliessen</button>
@@ -103,7 +102,7 @@ function ShareModal({ resumeId, token, onClose }: { resumeId: string; token?: st
 
         {!shareUrl ? (
           <>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 14 }}>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 14 }}>
               Erstelle einen öffentlichen Link — der Lebenslauf ist ohne Login einsehbar.
             </p>
             {atShareLimit ? (
@@ -144,7 +143,7 @@ function CompletenessBar({ score }: { score: number }) {
   const color = completenessColor(score);
   return (
     <div title={`Vollständigkeit: ${score}%`} style={{ marginBottom: 10 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 11, color: 'var(--text-secondary)' }}>
         <span>Vollständigkeit</span>
         <span style={{ color, fontWeight: 600 }}>{score}%</span>
       </div>
@@ -221,12 +220,12 @@ function TrackerView() {
                       </div>
                     </div>
                     {person && (
-                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>
+                      <div style={{ fontSize: 12, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>
                         {person.name}
                       </div>
                     )}
                     {r.deadline && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6, fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6, fontSize: 11, color: 'var(--text-muted)' }}>
                         <Clock size={11} />
                         {new Date(r.deadline).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: '2-digit' })}
                       </div>
@@ -274,7 +273,6 @@ export default function Dashboard() {
   const [newName, setNewName] = useState('');
   const [showAdd, setShowAdd] = useState(false);
   const [view, setView] = useState<'list' | 'tracker'>('list');
-  const { theme } = useUIStore();
 
   const [addingResumeForPersonId, setAddingResumeForPersonId] = useState<string | null>(null);
   const [newResumeName, setNewResumeName] = useState('');
@@ -399,7 +397,7 @@ export default function Dashboard() {
                 boxShadow: '0 12px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)',
                 animation: 'scaleIn 0.15s cubic-bezier(0.34,1.56,0.64,1) both',
               }}>
-              <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', padding: '6px 12px 4px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', padding: '6px 12px 4px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                 {mr.name || 'Bewerbungsmappe'}
               </div>
               <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '4px 0' }} />
@@ -470,7 +468,7 @@ export default function Dashboard() {
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
               <div>
                 <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, letterSpacing: '-1px', lineHeight: 1 }}>{value}</div>
-                <div style={{ fontSize: isMobile ? 11 : 12, color: theme === 'light' ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.5)', marginTop: 5 }}>{label}</div>
+                <div style={{ fontSize: isMobile ? 11 : 12, color: 'var(--text-secondary)', marginTop: 5 }}>{label}</div>
               </div>
               <div style={{
                 width: isMobile ? 34 : 42, height: isMobile ? 34 : 42, borderRadius: isMobile ? 10 : 12,
@@ -553,7 +551,7 @@ export default function Dashboard() {
                 <Users size={24} style={{ color: 'var(--ios-blue)' }} />
               </div>
               <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 700 }}>Noch keine Profile</h3>
-              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, marginBottom: 20 }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 20 }}>
                 Legen Sie Ihre erste Person an und beginnen Sie mit dem Lebenslauf.
               </p>
               <button className="btn-glass btn-primary" onClick={() => setShowAdd(true)}>
@@ -609,9 +607,9 @@ export default function Dashboard() {
                         )}
                       </div>
                       {isPersonFrozen ? (
-                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>Upgrade auf Pro zum Bearbeiten</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Upgrade auf Pro zum Bearbeiten</div>
                       ) : personResumes[0]?.personalInfo.title ? (
-                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: 12, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {personResumes[0].personalInfo.title}
                         </div>
                       ) : null}
@@ -634,7 +632,7 @@ export default function Dashboard() {
                       const frozen = frozenResumeIds.has(r.id);
                       const statusColor = APPLICATION_STATUS_COLORS[r.status ?? 'entwurf'];
                       const deadlineDiff = r.deadline ? (new Date(r.deadline).getTime() - Date.now()) / 86400000 : null;
-                      const deadlineColor = deadlineDiff === null ? undefined : deadlineDiff < 0 ? 'var(--ios-red)' : deadlineDiff <= 7 ? '#FF9F0A' : 'rgba(255,255,255,0.4)';
+                      const deadlineColor = deadlineDiff === null ? undefined : deadlineDiff < 0 ? 'var(--ios-red)' : deadlineDiff <= 7 ? '#FF9F0A' : 'var(--text-muted)';
 
                       if (renamingResumeId === r.id && !frozen && !isPersonFrozen) {
                         return (
@@ -700,7 +698,7 @@ export default function Dashboard() {
                                   )}
                                   {r.jobUrl && (
                                     <a href={r.jobUrl} target="_blank" rel="noopener noreferrer"
-                                      style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}
+                                      style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, color: 'var(--text-muted)', textDecoration: 'none' }}
                                       onClick={(e) => e.stopPropagation()}>
                                       <ExternalLink size={11} /> Stelle
                                     </a>
@@ -708,7 +706,7 @@ export default function Dashboard() {
                                 </div>
                               )}
                               {frozen && (
-                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
+                                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
                                   Upgrade auf Pro zum Bearbeiten
                                 </div>
                               )}
@@ -763,7 +761,7 @@ export default function Dashboard() {
                       />
                     ) : !isPersonFrozen ? (
                       <div title="Neue Bewerbungsmappe"
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, fontSize: 13, border: '1px dashed rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.03)', cursor: 'pointer', opacity: 0.6, color: 'rgba(255,255,255,0.6)' }}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, fontSize: 13, border: '1px dashed rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.03)', cursor: 'pointer', opacity: 0.6, color: 'var(--text-secondary)' }}
                         onClick={(e) => { e.stopPropagation(); setAddingResumeForPersonId(person.id); setNewResumeName(''); }}>
                         <FolderPlus size={15} /> Neue Bewerbungsmappe
                       </div>
