@@ -43,7 +43,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
   async function handleRestore(version: ResumeVersion) {
     if (!resume) return;
     setRestoring(version.id);
-    const { id, personId, documents, createdAt, shareToken, reminderDays, ...restorable } = version.snapshot as any;
+    const { id, personId, createdAt, shareToken, reminderDays, ...restorable } = version.snapshot as any;
     updateResume(resumeId, restorable);
     setRestoring(null);
     setConfirmId(null);
