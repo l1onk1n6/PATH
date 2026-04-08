@@ -15,7 +15,7 @@ import { useResumeStore } from './store/resumeStore';
 import { isSupabaseConfigured } from './lib/supabase';
 import { useIsMobile } from './hooks/useBreakpoint';
 
-const APP_VERSION = '1.5.0';
+const APP_VERSION = '1.6.0';
 
 function AppShell() {
   const isMobile = useIsMobile();
