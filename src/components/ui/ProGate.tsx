@@ -29,7 +29,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
     setLoading(true);
     setCheckoutError('');
     // GA4 event
-    (window as any).gtag?.('event', 'begin_checkout', {
+    (window as any).gtag?.('event', 'ProPlanKlick', {
       event_category: 'upgrade',
       event_label: highlightId ?? 'modal',
     });
