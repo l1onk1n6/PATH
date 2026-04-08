@@ -399,8 +399,10 @@ export default function LinkedInImportDialog({ onClose }: Props) {
             }}>
               <strong style={{ display: 'block', marginBottom: 6, color: '#fff' }}>So funktioniert's:</strong>
               <ol style={{ margin: 0, padding: '0 0 0 18px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <li>Öffne dein LinkedIn-Profil im Browser</li>
-                <li>Wähle den gesamten Seiteninhalt aus (<kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '1px 5px', borderRadius: 4, fontSize: 11 }}>Ctrl+A</kbd>)</li>
+                <li>Öffne dein LinkedIn-Profil im <strong>Browser</strong> (nicht in der App)</li>
+                <li>Wähle den gesamten Seiteninhalt aus
+                  <br /><span style={{ opacity: 0.6, fontSize: 12 }}>Desktop: <kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '1px 5px', borderRadius: 4, fontSize: 11 }}>Ctrl+A</kbd> &nbsp;|&nbsp; Mobile: Tippe lang → „Alles auswählen"</span>
+                </li>
                 <li>Kopiere und füge den Text unten ein</li>
               </ol>
             </div>
