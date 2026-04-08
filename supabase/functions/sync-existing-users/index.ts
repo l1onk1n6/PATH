@@ -28,11 +28,11 @@ Deno.serve(async (req) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   )
 
-  const listmonkUrl  = Deno.env.get('LISTMONK_URL')
-  const listmonkUser = Deno.env.get('LISTMONK_USERNAME')
-  const listmonkPass = Deno.env.get('LISTMONK_PASSWORD')
+  const listmonkUrl  = Deno.env.get('LISTMONK_URL')?.replace(/\/$/, '')
+  const listmonkUser = Deno.env.get('LISTMONK_USERNAME')?.trim()
+  const listmonkPass = Deno.env.get('LISTMONK_PASSWORD')?.trim()
   const listmonkList = Number(Deno.env.get('LISTMONK_LIST_ID') ?? '1')
-  const ninjaUrl     = Deno.env.get('INVOICE_NINJA_URL')
+  const ninjaUrl     = Deno.env.get('INVOICE_NINJA_URL')?.replace(/\/$/, '')
   const ninjaToken   = Deno.env.get('INVOICE_NINJA_TOKEN')
 
   const results: Array<{ email: string; listmonk?: string; ninja?: string }> = []
