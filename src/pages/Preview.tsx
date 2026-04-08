@@ -205,7 +205,7 @@ export default function Preview() {
       const last = resume.personalInfo.lastName ? '_' + resume.personalInfo.lastName : '';
       a.download = `${first}${last}_CV.pdf`;
       a.click(); URL.revokeObjectURL(url);
-      incrementPdfExport();
+      await incrementPdfExport();
     } catch (err) { console.error('PDF export failed:', err); }
     finally { setExporting(false); }
   };
@@ -241,7 +241,7 @@ export default function Preview() {
       const a = document.createElement('a'); a.href = url;
       a.download = buildFilename(resume);
       a.click(); URL.revokeObjectURL(url);
-      incrementPdfExport();
+      await incrementPdfExport();
     } catch (err) { console.error('Mappe export failed:', err); }
     finally { setExporting(false); }
   };
