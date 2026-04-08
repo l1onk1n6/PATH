@@ -296,6 +296,101 @@ function PlanSection() {
 }
 
 // ── Section: Account ───────────────────────────────────────
+const COUNTRIES = ['Schweiz', 'Deutschland', 'Österreich', 'Liechtenstein']
+
+function ProfileCard() {
+  const { user, session } = useAuthStore()
+  const supabase = isSupabaseConfigured() ? getSupabase() : null
+
+  const [phone,   setPhone]   = useState('')
+  const [street,  setStreet]  = useState('')
+  const [zip,     setZip]     = useState('')
+  const [city,    setCity]    = useState('')
+  const [country, setCountry] = useState('Schweiz')
+  const [saving,  setSaving]  = useState(false)
+  const [saved,   setSaved]   = useState(false)
+  const [loadErr, setLoadErr] = useState('')
+
+  // Load profile on mount
+  useEffect(() => {
+    if (!supabase || !user) return
+    supabase.from('profiles').select('*').eq('id', user.id).maybeSingle().then(({ data }) => {
+      if (!data) return
+      if (data.phone)   setPhone(data.phone)
+      if (data.street)  setStreet(data.street)
+      if (data.zip)     setZip(data.zip)
+      if (data.city)    setCity(data.city)
+      if (data.country) setCountry(data.country)
+    }).catch(() => setLoadErr('Profil konnte nicht geladen werden.'))
+  }, [user?.id])
+
+  async function handleSave() {
+    if (!session) return
+    setSaving(true)
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
+      const res = await fetch(`${supabaseUrl}/functions/v1/update-user-profile`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ phone, street, zip, city, country }),
+      })
+      if (res.ok) {
+        setSaved(true)
+        setTimeout(() => setSaved(false), 2500)
+      }
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="glass-card" style={{ padding: 20 }}>
+      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 14, opacity: 0.6 }}>PROFIL</div>
+      {loadErr && <div style={{ fontSize: 12, color: '#ff6b6b', marginBottom: 10 }}>{loadErr}</div>}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div>
+          <label className="section-label">Telefon</label>
+          <input className="input-glass" placeholder="+41 79 123 45 67" value={phone}
+            onChange={e => setPhone(e.target.value)} style={{ width: '100%' }} />
+        </div>
+        <div>
+          <label className="section-label">Strasse & Nr.</label>
+          <input className="input-glass" placeholder="Musterstrasse 1" value={street}
+            onChange={e => setStreet(e.target.value)} style={{ width: '100%' }} />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8 }}>
+          <div>
+            <label className="section-label">PLZ</label>
+            <input className="input-glass" placeholder="8000" value={zip}
+              onChange={e => setZip(e.target.value)} />
+          </div>
+          <div>
+            <label className="section-label">Ort</label>
+            <input className="input-glass" placeholder="Zürich" value={city}
+              onChange={e => setCity(e.target.value)} />
+          </div>
+        </div>
+        <div>
+          <label className="section-label">Land</label>
+          <select className="input-glass" value={country} onChange={e => setCountry(e.target.value)}
+            style={{ width: '100%' }}>
+            {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <button className="btn-glass btn-sm btn-primary" onClick={handleSave}
+          disabled={saving} style={{ alignSelf: 'flex-end', gap: 6, marginTop: 4 }}>
+          {saving ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> :
+           saved  ? <CheckCircle size={13} style={{ color: '#34c759' }} /> : null}
+          {saved ? 'Gespeichert' : 'Speichern & synchronisieren'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function AccountSection() {
   const { user, signOut } = useAuthStore();
   const { persons, resumes } = useResumeStore();
@@ -326,6 +421,8 @@ function AccountSection() {
           </div>
         </div>
       </div>
+
+      <ProfileCard />
 
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>APP-TOUR</div>
