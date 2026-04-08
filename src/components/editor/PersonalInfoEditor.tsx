@@ -79,19 +79,19 @@ export default function PersonalInfoEditor() {
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <div>
             <label className="section-label">Vorname</label>
-            <input className="input-glass" placeholder="Max" value={info.firstName}
+            <input className="input-glass" placeholder="Max" value={info.firstName} maxLength={50}
               onChange={(e) => update('firstName', e.target.value)} />
           </div>
           <div>
             <label className="section-label">Nachname</label>
-            <input className="input-glass" placeholder="Mustermann" value={info.lastName}
+            <input className="input-glass" placeholder="Mustermann" value={info.lastName} maxLength={50}
               onChange={(e) => update('lastName', e.target.value)} />
           </div>
           <div style={{ gridColumn: 'span 2' }}>
             <label className="section-label">
               <FileText size={10} style={{ display: 'inline', marginRight: 4 }} />Berufsbezeichnung
             </label>
-            <input className="input-glass" placeholder="z.B. Senior Software Engineer" value={info.title}
+            <input className="input-glass" placeholder="z.B. Senior Software Engineer" value={info.title} maxLength={100}
               onChange={(e) => update('title', e.target.value)} />
           </div>
         </div>
@@ -106,49 +106,49 @@ export default function PersonalInfoEditor() {
           <label className="section-label">
             <Mail size={9} style={{ display: 'inline', marginRight: 3 }} />E-Mail
           </label>
-          <input className="input-glass" type="email" placeholder="max@beispiel.de" value={info.email}
+          <input className="input-glass" type="email" placeholder="max@beispiel.de" value={info.email} maxLength={254}
             onChange={(e) => update('email', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
             <Phone size={9} style={{ display: 'inline', marginRight: 3 }} />Telefon
           </label>
-          <input className="input-glass" type="tel" placeholder="+49 123 456789" value={info.phone}
+          <input className="input-glass" type="tel" placeholder="+49 123 456789" value={info.phone} maxLength={30}
             onChange={(e) => update('phone', e.target.value)} />
         </div>
         <div style={{ gridColumn: 'span 2' }}>
           <label className="section-label">
             <MapPin size={9} style={{ display: 'inline', marginRight: 3 }} />Strasse und Hausnummer
           </label>
-          <input className="input-glass" placeholder="Musterstrasse 12" value={info.street ?? ''}
+          <input className="input-glass" placeholder="Musterstrasse 12" value={info.street ?? ''} maxLength={150}
             onChange={(e) => update('street', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
             <MapPin size={9} style={{ display: 'inline', marginRight: 3 }} />Ort / PLZ
           </label>
-          <input className="input-glass" placeholder="8000 Zürich" value={info.location}
+          <input className="input-glass" placeholder="8000 Zürich" value={info.location} maxLength={100}
             onChange={(e) => update('location', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
             <Globe size={9} style={{ display: 'inline', marginRight: 3 }} />Website
           </label>
-          <input className="input-glass" placeholder="www.beispiel.de" value={info.website}
+          <input className="input-glass" placeholder="www.beispiel.de" value={info.website} maxLength={300}
             onChange={(e) => update('website', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
             <Link2 size={9} style={{ display: 'inline', marginRight: 3 }} />LinkedIn
           </label>
-          <input className="input-glass" placeholder="linkedin.com/in/max" value={info.linkedin}
+          <input className="input-glass" placeholder="linkedin.com/in/max" value={info.linkedin} maxLength={200}
             onChange={(e) => update('linkedin', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
             <Link2 size={9} style={{ display: 'inline', marginRight: 3 }} />GitHub
           </label>
-          <input className="input-glass" placeholder="github.com/max" value={info.github}
+          <input className="input-glass" placeholder="github.com/max" value={info.github} maxLength={200}
             onChange={(e) => update('github', e.target.value)} />
         </div>
       </div>
@@ -161,6 +161,7 @@ export default function PersonalInfoEditor() {
           placeholder="Kurze Beschreibung Ihrer Berufserfahrung, Stärken und Ziele..."
           value={info.summary}
           onChange={(e) => update('summary', e.target.value)}
+          maxLength={800}
           style={{ minHeight: 100 }}
         />
       </div>

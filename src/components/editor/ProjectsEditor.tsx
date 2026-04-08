@@ -108,12 +108,12 @@ export default function ProjectsEditor() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
                   <div>
                     <label className="section-label">Projektname</label>
-                    <input className="input-glass" placeholder="z.B. E-Commerce App" value={project.name}
+                    <input className="input-glass" placeholder="z.B. E-Commerce App" value={project.name} maxLength={150}
                       onChange={(e) => updateProject(resume.id, project.id, { name: e.target.value })} />
                   </div>
                   <div>
                     <label className="section-label">URL</label>
-                    <input className="input-glass" placeholder="github.com/..." value={project.url}
+                    <input className="input-glass" placeholder="github.com/..." value={project.url} maxLength={300}
                       onChange={(e) => updateProject(resume.id, project.id, { url: e.target.value })} />
                   </div>
                   <div>
@@ -128,13 +128,13 @@ export default function ProjectsEditor() {
                     <label className="section-label">Technologien (Komma-getrennt)</label>
                     <input className="input-glass"
                       placeholder="z.B. React, TypeScript, Node.js"
-                      value={project.technologies.join(', ')}
+                      value={project.technologies.join(', ')} maxLength={300}
                       onChange={(e) => updateProject(resume.id, project.id, { technologies: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })} />
                   </div>
                 </div>
                 <div>
                   <label className="section-label">Beschreibung</label>
-                  <textarea className="input-glass" placeholder="Was wurde entwickelt?" value={project.description}
+                  <textarea className="input-glass" placeholder="Was wurde entwickelt?" value={project.description} maxLength={1000}
                     onChange={(e) => updateProject(resume.id, project.id, { description: e.target.value })} />
                 </div>
               </div>
@@ -206,12 +206,12 @@ export default function ProjectsEditor() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <div>
                     <label className="section-label">Zertifikat</label>
-                    <input className="input-glass" placeholder="z.B. AWS Certified" value={cert.name}
+                    <input className="input-glass" placeholder="z.B. AWS Certified" value={cert.name} maxLength={150}
                       onChange={(e) => updateCertificate(resume.id, cert.id, { name: e.target.value })} />
                   </div>
                   <div>
                     <label className="section-label">Aussteller</label>
-                    <input className="input-glass" placeholder="z.B. Amazon Web Services" value={cert.issuer}
+                    <input className="input-glass" placeholder="z.B. Amazon Web Services" value={cert.issuer} maxLength={150}
                       onChange={(e) => updateCertificate(resume.id, cert.id, { issuer: e.target.value })} />
                   </div>
                   <div>
@@ -220,7 +220,7 @@ export default function ProjectsEditor() {
                   </div>
                   <div>
                     <label className="section-label">URL</label>
-                    <input className="input-glass" placeholder="Zertifikat-Link" value={cert.url}
+                    <input className="input-glass" placeholder="Zertifikat-Link" value={cert.url} maxLength={300}
                       onChange={(e) => updateCertificate(resume.id, cert.id, { url: e.target.value })} />
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
-import { Loader2, Cloud, Loader } from 'lucide-react';
+import { Loader2, Cloud, Loader, ShieldAlert } from 'lucide-react';
+import { useSessionTimeout } from './hooks/useSessionTimeout';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 import Dashboard from './pages/Dashboard';
@@ -25,6 +26,8 @@ function AppShell() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => !isOnboardingDone());
   const { savePending, syncing } = useResumeStore();
+  const { signOut } = useAuthStore();
+  const { countdown, stayLoggedIn } = useSessionTimeout(signOut);
 
   // Close drawer on resize to desktop
   useEffect(() => {
@@ -117,6 +120,43 @@ function AppShell() {
       {/* ── Onboarding ────────────────────────────────────── */}
       {showOnboarding && (
         <OnboardingModal onClose={() => setShowOnboarding(false)} />
+      )}
+
+      {/* ── Session timeout warning ───────────────────────── */}
+      {countdown !== null && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 9999,
+          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: 24,
+        }}>
+          <div className="glass-card" style={{ width: '100%', maxWidth: 360, padding: '28px 24px', textAlign: 'center' }}>
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(255,149,0,0.15)', border: '1px solid rgba(255,149,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <ShieldAlert size={22} style={{ color: '#FF9500' }} />
+            </div>
+            <h2 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 8px' }}>Sitzung läuft ab</h2>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: '0 0 20px', lineHeight: 1.5 }}>
+              Du wirst in <strong style={{ color: '#FF9500' }}>{countdown} Sekunden</strong> automatisch abgemeldet.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                className="btn-glass btn-primary"
+                onClick={stayLoggedIn}
+                style={{ flex: 1, justifyContent: 'center', padding: '11px 16px', fontWeight: 600 }}
+              >
+                Angemeldet bleiben
+              </button>
+              <button
+                className="btn-glass btn-danger"
+                onClick={signOut}
+                style={{ padding: '11px 16px' }}
+              >
+                Abmelden
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ── Footer ────────────────────────────────────────── */}

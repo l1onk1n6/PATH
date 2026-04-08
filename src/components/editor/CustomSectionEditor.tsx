@@ -56,7 +56,7 @@ export default function CustomSectionEditor() {
             <input
               className="input-glass"
               placeholder="Titel der Sektion…"
-              value={section.title}
+              value={section.title} maxLength={100}
               onChange={(e) => updateCustomSection(resume.id, section.id, { title: e.target.value })}
               style={{ flex: 1, fontWeight: 600, fontSize: 14 }}
             />
@@ -76,7 +76,7 @@ export default function CustomSectionEditor() {
                 <textarea
                   className="input-glass"
                   placeholder={`Eintrag ${iIdx + 1}…`}
-                  value={item}
+                  value={item} maxLength={500}
                   rows={2}
                   onChange={(e) => {
                     const newItems = [...section.items];

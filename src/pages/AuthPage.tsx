@@ -4,7 +4,7 @@ import { useAuthStore } from '../store/authStore';
 import { LogoIcon } from '../components/layout/Logo';
 import { passwordStrength, STRENGTH_LABEL, STRENGTH_COLOR, RateLimiter } from '../lib/security';
 
-const limiter = new RateLimiter(5, 30_000);
+const limiter = new RateLimiter(5, 300_000); // 5 min lockout
 
 type Mode = 'login' | 'register' | 'forgot' | 'reset';
 
@@ -184,14 +184,14 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
               {mode === 'register' && (
                 <div style={{ marginBottom: 12 }}>
                   <label className="section-label"><User size={9} style={{ display: 'inline', marginRight: 3 }} />Name</label>
-                  <input className="input-glass" placeholder="Max Mustermann" value={name}
+                  <input className="input-glass" placeholder="Max Mustermann" value={name} maxLength={100}
                     onChange={(e) => setName(e.target.value)} required autoFocus />
                 </div>
               )}
 
               <div style={{ marginBottom: 12 }}>
                 <label className="section-label"><Mail size={9} style={{ display: 'inline', marginRight: 3 }} />E-Mail</label>
-                <input className="input-glass" type="email" placeholder="max@beispiel.de" value={email}
+                <input className="input-glass" type="email" placeholder="max@beispiel.de" value={email} maxLength={254}
                   onChange={(e) => setEmail(e.target.value)} required autoFocus={mode === 'login'}
                   autoComplete={mode === 'login' ? 'username' : 'email'} />
               </div>
@@ -201,7 +201,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
                 <input className="input-glass" type={showPw ? 'text' : 'password'}
                   placeholder={mode === 'register' ? 'Mindestens 8 Zeichen' : 'Passwort eingeben'}
                   value={password} onChange={(e) => setPassword(e.target.value)}
-                  required minLength={mode === 'register' ? 8 : 1}
+                  required minLength={mode === 'register' ? 8 : 1} maxLength={128}
                   autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                   style={{ paddingRight: 42 }} />
                 <button type="button" onClick={() => setShowPw(!showPw)} style={{

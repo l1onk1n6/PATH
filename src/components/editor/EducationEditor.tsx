@@ -102,22 +102,22 @@ export default function EducationEditor() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
                 <div>
                   <label className="section-label">Abschluss</label>
-                  <input className="input-glass" placeholder="z.B. Bachelor of Science" value={edu.degree}
+                  <input className="input-glass" placeholder="z.B. Bachelor of Science" value={edu.degree} maxLength={150}
                     onChange={(e) => updateEducation(resume.id, edu.id, { degree: e.target.value })} />
                 </div>
                 <div>
                   <label className="section-label">Fachrichtung</label>
-                  <input className="input-glass" placeholder="z.B. Informatik" value={edu.field}
+                  <input className="input-glass" placeholder="z.B. Informatik" value={edu.field} maxLength={150}
                     onChange={(e) => updateEducation(resume.id, edu.id, { field: e.target.value })} />
                 </div>
                 <div>
                   <label className="section-label">Institution</label>
-                  <input className="input-glass" placeholder="z.B. TU Berlin" value={edu.institution}
+                  <input className="input-glass" placeholder="z.B. TU Berlin" value={edu.institution} maxLength={150}
                     onChange={(e) => updateEducation(resume.id, edu.id, { institution: e.target.value })} />
                 </div>
                 <div>
                   <label className="section-label">Standort</label>
-                  <input className="input-glass" placeholder="Berlin" value={edu.location}
+                  <input className="input-glass" placeholder="Berlin" value={edu.location} maxLength={100}
                     onChange={(e) => updateEducation(resume.id, edu.id, { location: e.target.value })} />
                 </div>
                 <div>
@@ -130,7 +130,7 @@ export default function EducationEditor() {
                 </div>
                 <div>
                   <label className="section-label">Note / GPA</label>
-                  <input className="input-glass" placeholder="z.B. 1,5 oder 3.8" value={edu.grade}
+                  <input className="input-glass" placeholder="z.B. 1,5 oder 3.8" value={edu.grade} maxLength={20}
                     onChange={(e) => updateEducation(resume.id, edu.id, { grade: e.target.value })} />
                 </div>
               </div>
@@ -139,7 +139,7 @@ export default function EducationEditor() {
                 <textarea
                   className="input-glass"
                   placeholder="Beschreiben Sie Schwerpunkte, Projekte oder besondere Leistungen..."
-                  value={edu.description}
+                  value={edu.description} maxLength={1000}
                   onChange={(e) => updateEducation(resume.id, edu.id, { description: e.target.value })}
                 />
               </div>

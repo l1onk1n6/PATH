@@ -86,14 +86,14 @@ export default function SkillsEditor() {
                 <input
                   className="input-glass"
                   placeholder="Fähigkeit (z.B. React, Python...)"
-                  value={skill.name}
+                  value={skill.name} maxLength={80}
                   onChange={(e) => updateSkill(resume.id, skill.id, { name: e.target.value })}
                   style={{ flex: 2, fontSize: 13, padding: '8px 10px' }}
                 />
                 <input
                   className="input-glass"
                   placeholder="Kategorie"
-                  value={skill.category}
+                  value={skill.category} maxLength={50}
                   onChange={(e) => updateSkill(resume.id, skill.id, { category: e.target.value })}
                   style={{ flex: 1, fontSize: 13, padding: '8px 10px' }}
                 />
@@ -150,7 +150,7 @@ export default function SkillsEditor() {
                 <input
                   className="input-glass"
                   placeholder="Sprache (z.B. Englisch)"
-                  value={lang.name}
+                  value={lang.name} maxLength={60}
                   onChange={(e) => updateLanguage(resume.id, lang.id, { name: e.target.value })}
                   style={{ flex: 2, fontSize: 13, padding: '8px 10px' }}
                 />

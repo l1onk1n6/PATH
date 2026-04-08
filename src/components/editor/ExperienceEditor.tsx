@@ -102,17 +102,17 @@ export default function ExperienceEditor() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
                 <div>
                   <label className="section-label">Position</label>
-                  <input className="input-glass" placeholder="z.B. Senior Developer" value={job.position}
+                  <input className="input-glass" placeholder="z.B. Senior Developer" value={job.position} maxLength={150}
                     onChange={(e) => updateWorkExperience(resume.id, job.id, { position: e.target.value })} />
                 </div>
                 <div>
                   <label className="section-label">Unternehmen</label>
-                  <input className="input-glass" placeholder="z.B. Tech GmbH" value={job.company}
+                  <input className="input-glass" placeholder="z.B. Tech GmbH" value={job.company} maxLength={150}
                     onChange={(e) => updateWorkExperience(resume.id, job.id, { company: e.target.value })} />
                 </div>
                 <div>
                   <label className="section-label">Standort</label>
-                  <input className="input-glass" placeholder="Berlin" value={job.location}
+                  <input className="input-glass" placeholder="Berlin" value={job.location} maxLength={100}
                     onChange={(e) => updateWorkExperience(resume.id, job.id, { location: e.target.value })} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 18 }}>
@@ -135,7 +135,7 @@ export default function ExperienceEditor() {
                 <label className="section-label">Beschreibung / Aufgaben</label>
                 <textarea className="input-glass"
                   placeholder="Beschreiben Sie Ihre Aufgaben und Verantwortlichkeiten..."
-                  value={job.description}
+                  value={job.description} maxLength={1500}
                   onChange={(e) => updateWorkExperience(resume.id, job.id, { description: e.target.value })} />
               </div>
             </div>
