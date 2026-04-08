@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
   }
 
   const { id: userId, email, raw_user_meta_data } = payload.record
-  const name = (raw_user_meta_data?.name as string) || ''
+  const name = (raw_user_meta_data?.full_name as string) || (raw_user_meta_data?.name as string) || ''
   const firstName = name.split(' ')[0] ?? ''
   const lastName = name.split(' ').slice(1).join(' ') || firstName
 

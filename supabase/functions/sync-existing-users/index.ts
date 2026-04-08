@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
       const { id: userId, email } = user
       if (!email) continue
 
-      const name = (user.user_metadata?.name as string) || ''
+      const name = (user.user_metadata?.full_name as string) || (user.user_metadata?.name as string) || ''
       const firstName = name.split(' ')[0] ?? ''
       const lastName  = name.split(' ').slice(1).join(' ') || firstName
       const row: { email: string; listmonk?: string; ninja?: string } = { email }
