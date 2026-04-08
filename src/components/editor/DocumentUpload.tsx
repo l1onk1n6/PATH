@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, File, Trash2, FileText, Image, ExternalLink, AlertCircle } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
+import { usePlan } from '../../lib/plan';
 import type { UploadedDocument } from '../../types/resume';
 
 const CATEGORIES: { value: UploadedDocument['category']; label: string }[] = [
@@ -26,13 +27,29 @@ const MAX_FILE_MB = 2;
 const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
 
 export default function DocumentUpload() {
-  const { getActiveResume, addDocument, removeDocument } = useResumeStore();
+  const { getActiveResume, addDocument, removeDocument, resumes } = useResumeStore();
   const resume = getActiveResume();
+  const { limits } = usePlan();
   const [sizeError, setSizeError] = useState('');
+
+  // Total used across ALL resumes (documents are per-user, not per-resume)
+  const totalUsedBytes = resumes.reduce((sum, r) =>
+    sum + r.documents.reduce((s, d) => s + d.size, 0), 0);
+  const totalLimitBytes = limits.documentsMb * 1024 * 1024;
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (!resume) return;
     setSizeError('');
+
+    const newBytes = acceptedFiles.reduce((s, f) => s + f.size, 0);
+    if (totalUsedBytes + newBytes > totalLimitBytes) {
+      const remaining = Math.max(0, totalLimitBytes - totalUsedBytes);
+      setSizeError(
+        `Speicher voll — noch ${formatBytes(remaining)} von ${limits.documentsMb} MB verfügbar.`
+      );
+      return;
+    }
+
     acceptedFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -46,7 +63,7 @@ export default function DocumentUpload() {
       };
       reader.readAsDataURL(file);
     });
-  }, [resume, addDocument]);
+  }, [resume, addDocument, totalUsedBytes, totalLimitBytes, limits.documentsMb]);
 
   const onDropRejected = useCallback((rejections: { file: File }[]) => {
     const tooBig = rejections.some(r => r.file.size > MAX_FILE_BYTES);
@@ -63,10 +80,11 @@ export default function DocumentUpload() {
   if (!resume) return null;
 
   const { documents } = resume;
+  const storageFullPct = totalUsedBytes / totalLimitBytes;
+  const storageFull = totalUsedBytes >= totalLimitBytes;
 
   function updateCategory(docId: string, category: UploadedDocument['category']) {
     if (!resume) return;
-    // Update category directly via store update
     const doc = resume.documents.find(d => d.id === docId);
     if (!doc) return;
     removeDocument(resume.id, docId);
@@ -75,21 +93,43 @@ export default function DocumentUpload() {
 
   return (
     <div className="animate-fade-in">
+      {/* Storage bar */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 5 }}>
+          <span>Speicher</span>
+          <span style={{ color: storageFullPct >= 1 ? 'var(--ios-red)' : storageFullPct >= 0.8 ? '#FF9F0A' : 'rgba(255,255,255,0.4)' }}>
+            {formatBytes(totalUsedBytes)} / {limits.documentsMb} MB
+          </span>
+        </div>
+        <div style={{ height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.08)' }}>
+          <div style={{
+            height: '100%',
+            width: `${Math.min(100, storageFullPct * 100)}%`,
+            borderRadius: 2,
+            background: storageFullPct >= 1 ? 'var(--ios-red)' : storageFullPct >= 0.8 ? '#FF9F0A' : 'var(--ios-green)',
+            transition: 'width 0.3s',
+          }} />
+        </div>
+      </div>
+
       {/* Dropzone */}
       <div
         {...getRootProps()}
-        className={`dropzone ${isDragActive ? 'active' : ''}`}
-        style={{ marginBottom: 20 }}
+        className={`dropzone ${isDragActive ? 'active' : ''} ${storageFull ? 'disabled' : ''}`}
+        style={{ marginBottom: 20, opacity: storageFull ? 0.45 : 1, pointerEvents: storageFull ? 'none' : undefined }}
       >
         <input {...getInputProps()} />
         <Upload size={28} style={{ margin: '0 auto 10px', display: 'block', opacity: isDragActive ? 1 : 0.5 }} />
         <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 4 }}>
-          {isDragActive ? 'Dateien hier ablegen...' : 'Dokumente hochladen'}
+          {storageFull ? 'Speicher voll' : isDragActive ? 'Dateien hier ablegen...' : 'Dokumente hochladen'}
         </div>
         <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
-          Dateien hierher ziehen oder klicken · PDF, Bilder, Word · max. {MAX_FILE_MB} MB
+          {storageFull
+            ? `Limit von ${limits.documentsMb} MB erreicht — Dateien löschen um Platz zu schaffen`
+            : `Dateien hierher ziehen oder klicken · PDF, Bilder, Word · max. ${MAX_FILE_MB} MB`}
         </div>
       </div>
+
       {sizeError && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--ios-red)', marginBottom: 12 }}>
           <AlertCircle size={13} /> {sizeError}
@@ -159,6 +199,13 @@ export default function DocumentUpload() {
           </div>
         ))}
       </div>
+
+      {/* Used MB info across all resumes */}
+      {resumes.length > 1 && (
+        <div style={{ marginTop: 10, fontSize: 11, color: 'rgba(255,255,255,0.25)', textAlign: 'center' }}>
+          Speicher gilt für alle {resumes.length} Mappen zusammen
+        </div>
+      )}
     </div>
   );
 }
