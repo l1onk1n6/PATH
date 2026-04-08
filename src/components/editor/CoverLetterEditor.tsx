@@ -8,6 +8,29 @@ import { UpgradeModal } from '../ui/ProGate';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 
+const CL_TEMPLATES = [
+  {
+    id: 'klassisch', label: 'Klassisch', emoji: '📋',
+    desc: 'Formal, bewährt für konservative Branchen',
+    body: `Sehr geehrte Damen und Herren,\n\nmit grossem Interesse habe ich Ihre Stellenausschreibung als [STELLE] bei [UNTERNEHMEN] gelesen. Mit meiner Erfahrung in [BEREICH] bin ich überzeugt, einen wertvollen Beitrag zu Ihrem Team leisten zu können.\n\nIn meiner bisherigen Laufbahn konnte ich [LEISTUNG]. Diese Erfahrungen haben mir gezeigt, wie entscheidend [QUALITÄT] ist — eine Überzeugung, die ich in Ihrer Organisation einbringen möchte.\n\nBesonders angesprochen hat mich an [UNTERNEHMEN]: [GRUND]. Meine Qualifikationen und Ihre Anforderungen ergänzen sich meiner Einschätzung nach sehr gut.\n\nGerne überzeuge ich Sie in einem persönlichen Gespräch von meiner Eignung.`,
+  },
+  {
+    id: 'modern', label: 'Modern', emoji: '⚡',
+    desc: 'Dynamisch und direkt, für innovative Unternehmen',
+    body: `Sehr geehrte Damen und Herren,\n\n[UNTERNEHMEN] steht für [EIGENSCHAFT] — genau das, womit ich meine nächste Station verbinden möchte.\n\nAls [BERUFSBEZEICHNUNG] mit [X] Jahren Erfahrung in [BEREICH] bringe ich mit:\n→ [STÄRKE 1]\n→ [STÄRKE 2]\n→ [STÄRKE 3]\n\nMein Ziel: [MOTIVATION]. Ich bin überzeugt, dass ich in Ihrem Team schnell Wirkung erzeugen kann — und freue mich auf ein Gespräch, in dem wir das gemeinsam herausfinden.`,
+  },
+  {
+    id: 'initiativ', label: 'Initiativ', emoji: '🚀',
+    desc: 'Für Direktbewerbungen ohne offene Stelle',
+    body: `Sehr geehrte Damen und Herren,\n\nIch bewerbe mich initiativ bei [UNTERNEHMEN], weil Ihre Arbeit im Bereich [BEREICH] mich begeistert und ich überzeugt bin, einen echten Mehrwert einbringen zu können.\n\nAls [BERUFSBEZEICHNUNG] habe ich in den letzten [X] Jahren [LEISTUNG]. Meine Kernkompetenzen:\n• [KOMPETENZ 1]\n• [KOMPETENZ 2]\n• [KOMPETENZ 3]\n\nAuch wenn aktuell keine passende Stelle ausgeschrieben ist — ich bin flexibel und offen für verschiedene Möglichkeiten. Darf ich Sie in einem kurzen Gespräch kennenlernen?`,
+  },
+  {
+    id: 'kurz', label: 'Kurz & prägnant', emoji: '✦',
+    desc: 'Auf das Wesentliche reduziert, maximal wirkungsvoll',
+    body: `Guten Tag,\n\nIch bewerbe mich als [STELLE] bei [UNTERNEHMEN].\n\nIch bin [BERUFSBEZEICHNUNG] mit [X] Jahren Erfahrung, zuletzt bei [LETZTER ARBEITGEBER].\n\nWarum [UNTERNEHMEN]? [GRUND IN 1–2 SÄTZEN]\n\nIch freue mich auf Ihre Rückmeldung.`,
+  },
+];
+
 const REMINDER_OPTIONS = [
   { days: 1, label: '1 Tag vorher' },
   { days: 3, label: '3 Tage vorher' },
@@ -95,8 +118,9 @@ export default function CoverLetterEditor() {
   const [generatingCL, setGeneratingCL] = useState(false);
   const [improvingBody, setImprovingBody] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
-  const [confirmOverwrite, setConfirmOverwrite] = useState<'generate' | 'improve' | null>(null);
+  const [confirmOverwrite, setConfirmOverwrite] = useState<'generate' | 'improve' | 'template' | null>(null);
   const [showReminder, setShowReminder] = useState(false);
+  const [pendingTemplate, setPendingTemplate] = useState('');
 
   if (!resume) return null;
 
@@ -178,6 +202,8 @@ export default function CoverLetterEditor() {
                 <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
                   {confirmOverwrite === 'generate'
                     ? 'Der KI-Assistent ersetzt deinen aktuellen Anschreiben-Text.'
+                    : confirmOverwrite === 'template'
+                    ? 'Die Vorlage ersetzt deinen aktuellen Anschreiben-Text.'
                     : 'Der verbesserte Text ersetzt deinen aktuellen Anschreiben-Text.'}
                 </div>
               </div>
@@ -192,7 +218,11 @@ export default function CoverLetterEditor() {
               <button
                 className="btn-glass"
                 style={{ flex: 1, background: 'rgba(255,159,10,0.2)', border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', fontWeight: 700 }}
-                onClick={() => confirmOverwrite === 'generate' ? doGenerateCL() : doImproveBody()}
+                onClick={() => {
+                  if (confirmOverwrite === 'generate') doGenerateCL();
+                  else if (confirmOverwrite === 'template') { update('body', pendingTemplate); setConfirmOverwrite(null); setPendingTemplate(''); }
+                  else doImproveBody();
+                }}
               >
                 Ja, überschreiben
               </button>
@@ -322,6 +352,40 @@ export default function CoverLetterEditor() {
             </button>
           </div>
         )}
+      </div>
+
+      {/* Template picker */}
+      <div>
+        <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.7 }}>
+          Strukturvorlage wählen
+        </label>
+        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, scrollbarWidth: 'none' }}>
+          {CL_TEMPLATES.map(tpl => (
+            <button
+              key={tpl.id}
+              className="btn-glass"
+              onClick={() => {
+                if (cl.body.trim()) {
+                  setConfirmOverwrite('template' as any);
+                  setPendingTemplate(tpl.body);
+                } else {
+                  update('body', tpl.body);
+                }
+              }}
+              style={{
+                flexShrink: 0, flexDirection: 'column', alignItems: 'flex-start',
+                padding: '10px 14px', borderRadius: 12, textAlign: 'left',
+                width: 140, gap: 4, boxShadow: 'none',
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.12)',
+              }}
+            >
+              <span style={{ fontSize: 18 }}>{tpl.emoji}</span>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>{tpl.label}</span>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', lineHeight: 1.3, whiteSpace: 'normal' }}>{tpl.desc}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       <div>

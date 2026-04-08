@@ -4,7 +4,7 @@ import AuthPage from './AuthPage';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import {
   FileText, Sparkles, Globe, Clock, Share2, Download,
-  Check, ChevronRight, ArrowRight, Star,
+  Check, ChevronRight, ArrowRight, Star, ClipboardList,
 } from 'lucide-react';
 
 const FEATURES = [
@@ -44,6 +44,12 @@ const FEATURES = [
     title: 'Online teilen',
     desc: 'Erstelle einen öffentlichen Link zu deinem Lebenslauf – ideal für digitale Bewerbungen.',
   },
+  {
+    icon: ClipboardList,
+    color: '#5856D6',
+    title: 'Bewerbungs-Tracker',
+    desc: 'Behalte den Überblick über alle Bewerbungen — Status, Deadline, Notizen und verknüpfte Unterlagen.',
+  },
 ];
 
 const STEPS = [
@@ -59,6 +65,7 @@ const FREE_FEATURES = [
   '5 PDF-Exporte / Monat',
   '1 Share-Link',
   'Basis-Editor',
+  'Bewerbungs-Tracker',
 ];
 
 const PRO_FEATURES = [
@@ -71,7 +78,6 @@ const PRO_FEATURES = [
   'Automatische Übersetzung',
   'Eigene Sektionen',
   'Deadline-Reminder',
-  'Priority Support',
 ];
 
 export default function LandingPage() {
@@ -300,7 +306,7 @@ export default function LandingPage() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))',
           gap: 20,
         }}>
           {FEATURES.map(({ icon: Icon, color, title, desc }) => (

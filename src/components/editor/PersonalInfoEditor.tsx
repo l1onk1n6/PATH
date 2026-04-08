@@ -4,12 +4,14 @@ import { useResumeStore } from '../../store/resumeStore';
 import { validatePhotoFile, sanitizePhotoUrl } from '../../lib/security';
 import { usePlan } from '../../lib/plan';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import LinkedInImportDialog from './LinkedInImport';
 
 export default function PersonalInfoEditor() {
   const { getActiveResume, updatePersonalInfo } = useResumeStore();
   const { limits } = usePlan();
   const resume = getActiveResume();
   const [photoError, setPhotoError] = useState('');
+  const [showLinkedIn, setShowLinkedIn] = useState(false);
   const isMobile = useIsMobile();
 
   const update = useCallback((field: string, value: string) => {
@@ -42,6 +44,15 @@ export default function PersonalInfoEditor() {
 
   return (
     <div className="animate-fade-in">
+      {showLinkedIn && <LinkedInImportDialog onClose={() => setShowLinkedIn(false)} />}
+
+      {/* LinkedIn import button */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+        <button className="btn-glass btn-sm" onClick={() => setShowLinkedIn(true)} style={{ fontSize: 12, gap: 6 }}>
+          <span style={{ fontSize: 14 }}>in</span> LinkedIn importieren
+        </button>
+      </div>
+
       {/* Photo + Name row */}
       <div style={{ display: 'flex', gap: 20, marginBottom: 20, alignItems: 'flex-start' }}>
         {/* Photo */}

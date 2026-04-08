@@ -192,8 +192,16 @@ select.input-glass {
 select.input-glass:focus {
   background-color: rgba(255,255,255,0.12);
 }
+select.input-glass {
+  color-scheme: dark;
+}
 select.input-glass option {
   background: #16162a;
+  color: #fff;
+}
+select.input-glass option:checked,
+select.input-glass option:hover {
+  background: #007AFF;
   color: #fff;
 }
 

@@ -2,17 +2,19 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type ApplicationStatus = 'offen' | 'beworben' | 'interview' | 'angebot' | 'abgelehnt' | 'zurueckgezogen';
+export type ApplicationType = 'online' | 'email' | 'postalisch' | 'persoenlich' | 'telefonisch';
 
 export interface Application {
   id: string;
   company: string;
   position: string;
   status: ApplicationStatus;
+  type: ApplicationType;
   appliedDate: string;   // YYYY-MM-DD
   deadline: string;      // YYYY-MM-DD
   notes: string;
   url: string;
-  resumeId?: string;
+  resumeId: string;
 }
 
 interface TrackerState {
@@ -28,10 +30,12 @@ function newApp(): Application {
     company: '',
     position: '',
     status: 'offen',
+    type: 'online',
     appliedDate: new Date().toISOString().slice(0, 10),
     deadline: '',
     notes: '',
     url: '',
+    resumeId: '',
   };
 }
 
