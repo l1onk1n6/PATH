@@ -6,8 +6,9 @@ import { translateFields } from '../../lib/ai';
 import { UpgradeModal } from '../ui/ProGate';
 import type { Resume } from '../../types/resume';
 
+
 const LANGUAGES = [
-  'Englisch', 'Französisch', 'Italienisch', 'Spanisch',
+  'Deutsch', 'Englisch', 'Französisch', 'Italienisch', 'Spanisch',
   'Portugiesisch', 'Niederländisch', 'Polnisch', 'Russisch',
   'Chinesisch (Vereinfacht)', 'Japanisch', 'Arabisch',
 ];
@@ -85,27 +86,33 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
   const targetLang = language === 'Andere…' ? custom : language;
 
   async function handleTranslate() {
-    if (!targetLang.trim()) return;
+    // Capture lang immediately at click time — avoid stale closure
+    const lang = (language === 'Andere…' ? custom : language).trim();
+    if (!lang) return;
     setLoading(true);
     setError('');
+    const resumeId = resume!.id;
     const fields = collectFields(resume!);
     const count = Object.keys(fields).length;
     if (count === 0) { setError('Kein übersetzbarer Text gefunden.'); setLoading(false); return; }
 
-    const translated = await translateFields(fields, targetLang);
+    const translated = await translateFields(fields, lang);
     if (!translated) { setError('Übersetzung fehlgeschlagen. Bitte versuche es erneut.'); setLoading(false); return; }
 
-    // Apply to a copy of the resume data and update via store
-    const updated = { ...resume! };
+    // Get latest resume state from store (not stale closure)
+    const latest = useResumeStore.getState().resumes.find(r => r.id === resumeId);
+    if (!latest) { setLoading(false); return; }
+
+    const updated = { ...latest };
     applyTranslations(updated, translated);
-    updateResume(resume!.id, {
+    updateResume(resumeId, {
       personalInfo:   updated.personalInfo,
       workExperience: updated.workExperience,
       education:      updated.education,
       projects:       updated.projects,
       customSections: updated.customSections,
       coverLetter:    updated.coverLetter,
-      name:           resume!.name + ` (${targetLang})`,
+      name:           latest.name + ` (${lang})`,
     });
     setDone(true);
     setLoading(false);
