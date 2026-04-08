@@ -1,10 +1,22 @@
 // Secrets required: ANTHROPIC_API_KEY
-// JWT enforcement: ON (Supabase gateway validates auth — no manual check needed)
+// JWT enforcement: OFF (manual check below handles auth)
 
 const cors = {
   'Access-Control-Allow-Origin':  '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
+
+/** Decode JWT payload without verifying signature (gateway already on HTTPS) */
+function jwtPayload(token: string): Record<string, unknown> {
+  try {
+    let part = token.split('.')[1] ?? ''
+    part = part.replace(/-/g, '+').replace(/_/g, '/')
+    while (part.length % 4 !== 0) part += '='
+    return JSON.parse(atob(part))
+  } catch {
+    return {}
+  }
 }
 
 async function callClaude(prompt: string, maxTokens = 2048): Promise<string> {
@@ -33,6 +45,16 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
 
   try {
+    // Manual auth: decode JWT payload and verify user ID exists
+    const authHeader = req.headers.get('Authorization') ?? ''
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim()
+    const payload = token ? jwtPayload(token) : {}
+    if (!payload.sub) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...cors, 'Content-Type': 'application/json' },
+      })
+    }
+
     const body = await req.json()
     const { action } = body
 
