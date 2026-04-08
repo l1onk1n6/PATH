@@ -306,3 +306,131 @@ input[type="month"].input-glass::-webkit-calendar-picker-indicator:hover {
   border-color: var(--ios-blue);
   background: rgba(0,122,255,0.08);
 }
+
+/* ══════════════════════════════════════════════
+   Light Mode
+   ══════════════════════════════════════════════ */
+
+[data-theme="light"] body {
+  background: #f0f2f7;
+  color: #1a1a2e;
+}
+
+[data-theme="light"] body::before {
+  display: none;
+}
+
+[data-theme="light"] .glass {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: #e0e4ef;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+}
+
+[data-theme="light"] .glass-card {
+  background: #ffffff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: #e0e4ef;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  color: #1a1a2e;
+}
+
+[data-theme="light"] .glass-card::before {
+  display: none;
+}
+
+[data-theme="light"] .glass-card:hover {
+  background: #f8faff;
+  border-color: #c5cee0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+[data-theme="light"] .btn-glass {
+  background: #f0f3fb;
+  border-color: #d8dfee;
+  color: #2d3a55;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+
+[data-theme="light"] .btn-glass:hover {
+  background: #e5eaf8;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+[data-theme="light"] .btn-primary {
+  background: linear-gradient(135deg, var(--ios-blue), var(--ios-indigo)) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+[data-theme="light"] .btn-danger { color: #fff !important; }
+[data-theme="light"] .btn-success { color: #fff !important; }
+
+[data-theme="light"] .input-glass {
+  background: #ffffff;
+  border-color: #dde3f0;
+  color: #1a1a2e;
+}
+
+[data-theme="light"] .input-glass::placeholder {
+  color: #b0baca;
+}
+
+[data-theme="light"] .input-glass:focus {
+  background: #ffffff;
+  border-color: var(--ios-blue);
+  box-shadow: 0 0 0 3px rgba(0,122,255,0.15);
+}
+
+[data-theme="light"] select.input-glass {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(0,0,0,0.45)' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  color-scheme: light;
+}
+
+[data-theme="light"] select.input-glass option {
+  background: #fff;
+  color: #1a1a2e;
+}
+
+[data-theme="light"] input[type="date"].input-glass,
+[data-theme="light"] input[type="month"].input-glass {
+  color-scheme: light;
+}
+
+[data-theme="light"] input[type="date"].input-glass::-webkit-calendar-picker-indicator,
+[data-theme="light"] input[type="month"].input-glass::-webkit-calendar-picker-indicator {
+  filter: none;
+  opacity: 0.5;
+}
+
+[data-theme="light"] .badge {
+  background: rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.12);
+  color: rgba(0,0,0,0.6);
+}
+
+[data-theme="light"] .section-label {
+  color: rgba(0,0,0,0.4);
+}
+
+[data-theme="light"] .divider {
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.08), transparent);
+}
+
+[data-theme="light"] header p {
+  color: rgba(0,0,0,0.45) !important;
+}
+
+[data-theme="light"] footer {
+  color: rgba(0,0,0,0.3) !important;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+}
+
+[data-theme="light"] * {
+  scrollbar-color: rgba(0,0,0,0.15) transparent;
+}

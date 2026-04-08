@@ -1,9 +1,10 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Eye, Edit3, Menu, Sparkles } from 'lucide-react';
+import { Eye, Edit3, Menu, Sparkles, Moon, Sun } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { useState } from 'react';
 import { UpgradeModal } from '../ui/ProGate';
+import { useUIStore } from '../../store/uiStore';
 
 interface Props {
   isMobile?: boolean;
@@ -16,6 +17,7 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
   const { getActivePerson, getActiveResume } = useResumeStore();
   const { plan, isPro } = usePlan();
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const { theme, toggleTheme } = useUIStore();
 
   const person = getActivePerson();
   const resume = getActiveResume();
@@ -73,6 +75,14 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
 
       <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
         {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
+        <button
+          className="btn-glass btn-icon"
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          style={{ padding: 9 }}
+        >
+          {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+        </button>
         <button
           onClick={() => !isPro && setShowUpgrade(true)}
           style={{

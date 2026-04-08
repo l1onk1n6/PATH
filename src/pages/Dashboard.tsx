@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp,
-  FolderPlus, Pencil, Copy, Search, ExternalLink, Clock,
+  FolderPlus, Pencil, Copy, ExternalLink, Clock,
   Download, Share2, CheckCircle, LayoutGrid, List, X, BarChart2,
   Lock, MoreHorizontal,
 } from 'lucide-react';
@@ -22,6 +22,7 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 import { v4 as uuidv4 } from 'uuid';
 import { UpgradeModal } from '../components/ui/ProGate';
 import { usePlan } from '../lib/plan';
+import { useUIStore } from '../store/uiStore';
 
 const ALL_STATUSES: ApplicationStatus[] = ['entwurf', 'gesendet', 'interview', 'abgelehnt', 'angenommen'];
 
@@ -272,8 +273,8 @@ export default function Dashboard() {
 
   const [newName, setNewName] = useState('');
   const [showAdd, setShowAdd] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [view, setView] = useState<'list' | 'tracker'>('list');
+  const { theme } = useUIStore();
 
   const [addingResumeForPersonId, setAddingResumeForPersonId] = useState<string | null>(null);
   const [newResumeName, setNewResumeName] = useState('');
@@ -328,19 +329,10 @@ export default function Dashboard() {
     ? Math.round(resumes.reduce((acc, r) => acc + calcCompleteness(r).score, 0) / resumes.length)
     : 0;
 
-  const filteredPersons = searchQuery.trim()
-    ? persons.filter(p =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        resumes.filter(r => p.resumeIds.includes(r.id)).some(r =>
-          r.name.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      )
-    : persons;
-
   const shareResume = shareModalResumeId ? resumes.find(r => r.id === shareModalResumeId) : null;
 
   return (
-    <div className="animate-fade-in" style={{ height: '100%', overflow: 'auto', padding: isMobile ? '0 0 16px' : undefined }}>
+    <div className="animate-fade-in" style={{ height: '100%', overflow: 'auto', padding: isMobile ? '0 0 16px' : '0 2px 16px' }}>
 
       {/* Limit error toast */}
       {limitError && (
@@ -465,26 +457,26 @@ export default function Dashboard() {
       <div style={{
         display: 'grid',
         gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-        gap: isMobile ? 8 : 12,
-        marginBottom: isMobile ? 12 : 20,
+        gap: isMobile ? 10 : 16,
+        marginBottom: isMobile ? 18 : 28,
       }}>
         {[
-          { icon: Users,      label: 'Personen', value: persons.length,   color: 'var(--ios-blue)' },
-          { icon: FileText,   label: 'Mappen',   value: totalResumes,     color: 'var(--ios-purple)' },
-          { icon: TrendingUp, label: 'Einträge', value: totalSections,    color: 'var(--ios-green)' },
-          { icon: CheckCircle,label: 'Ø Vollst.',value: `${avgCompleteness}%`, color: completenessColor(avgCompleteness) },
-        ].map(({ icon: Icon, label, value, color }) => (
-          <div key={label} className="glass-card" style={{ padding: isMobile ? '12px 14px' : '18px 20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+          { icon: Users,       label: 'Personen',  value: persons.length,        accent: '#007AFF' },
+          { icon: FileText,    label: 'Mappen',    value: totalResumes,          accent: '#34C759' },
+          { icon: TrendingUp,  label: 'Einträge',  value: totalSections,         accent: '#FF9500' },
+          { icon: CheckCircle, label: 'Ø Vollst.', value: `${avgCompleteness}%`, accent: avgCompleteness >= 80 ? '#34C759' : avgCompleteness >= 50 ? '#FF9F0A' : '#FF3B30' },
+        ].map(({ icon: Icon, label, value, accent }) => (
+          <div key={label} className="glass-card" style={{ padding: isMobile ? '14px 16px' : '20px 22px', borderTop: `3px solid ${accent}` }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
               <div>
-                <div style={{ fontSize: isMobile ? 20 : 26, fontWeight: 700, letterSpacing: '-1px' }}>{value}</div>
-                <div style={{ fontSize: isMobile ? 10 : 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{label}</div>
+                <div style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, letterSpacing: '-1px', lineHeight: 1 }}>{value}</div>
+                <div style={{ fontSize: isMobile ? 11 : 12, color: theme === 'light' ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.5)', marginTop: 5 }}>{label}</div>
               </div>
               <div style={{
-                width: isMobile ? 32 : 40, height: isMobile ? 32 : 40, borderRadius: isMobile ? 8 : 12,
-                background: `${color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                width: isMobile ? 34 : 42, height: isMobile ? 34 : 42, borderRadius: isMobile ? 10 : 12,
+                background: `${accent}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
-                <Icon size={isMobile ? 15 : 18} style={{ color }} />
+                <Icon size={isMobile ? 16 : 20} style={{ color: accent }} />
               </div>
             </div>
           </div>
@@ -493,7 +485,7 @@ export default function Dashboard() {
 
 
       {/* Section header + controls */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 8, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, gap: 8, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <button
             className="btn-glass btn-sm"
@@ -532,20 +524,6 @@ export default function Dashboard() {
       {/* List view */}
       {view === 'list' && (
         <>
-          {/* Search bar */}
-          {persons.length > 1 && (
-            <div style={{ position: 'relative', marginBottom: 12 }}>
-              <Search size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', opacity: 0.4, pointerEvents: 'none' }} />
-              <input
-                className="input-glass"
-                placeholder="Personen oder Mappen suchen…"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ width: '100%', paddingLeft: 30, fontSize: 13 }}
-              />
-            </div>
-          )}
-
           {/* Add person form */}
           {showAdd && (
             <div className="glass-card animate-scale-in" style={{ padding: isMobile ? 14 : 20, marginBottom: 14 }}>
@@ -588,9 +566,9 @@ export default function Dashboard() {
           <div style={{
             display: 'grid',
             gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: isMobile ? 10 : 14,
+            gap: isMobile ? 12 : 20,
           }}>
-            {filteredPersons.map((person) => {
+            {persons.map((person) => {
               const personResumes = resumes.filter((r) => person.resumeIds.includes(r.id));
               const isActive = person.id === activePersonId;
               const isPersonFrozen = frozenPersonIds.has(person.id);
@@ -823,11 +801,6 @@ export default function Dashboard() {
             })}
           </div>
 
-          {searchQuery && filteredPersons.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '32px 0', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
-              Keine Ergebnisse für „{searchQuery}"
-            </div>
-          )}
         </>
       )}
     </div>
