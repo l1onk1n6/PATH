@@ -10,6 +10,8 @@ export function SafeImg({ src, alt, style }: { src: string; alt: string; style?:
 
 export function formatDate(dateStr: string) {
   if (!dateStr) return '';
+  // Year-only format (YYYY)
+  if (!dateStr.includes('-')) return dateStr;
   const [year, month] = dateStr.split('-');
   const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
   return `${months[parseInt(month) - 1]} ${year}`;
