@@ -10,7 +10,7 @@ import { usePlan, FREE_TEMPLATE_IDS } from '../lib/plan';
 import { canExportPdf, incrementPdfExport, getPdfExportCount } from '../lib/pdfExports';
 import type { Resume } from '../types/resume';
 
-const MAX_PDF_BYTES = 5 * 1024 * 1024; // 5 MB
+const MAX_PDF_BYTES = 10 * 1024 * 1024; // 10 MB
 
 // Renders an HTML element to jsPDF pages, returns the doc
 async function renderElementToPdfDoc(
