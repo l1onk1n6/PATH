@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SafeImg } from './shared';
+import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
 export default function InternationalTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
@@ -17,7 +17,7 @@ export default function InternationalTemplate({ resume }: { resume: Resume }) {
             <div style={{ marginTop: 12, display: 'flex', flexWrap: 'wrap', gap: '4px 20px', fontSize: 11, color: '#555' }}>
               {info.email && <span>✉ {info.email}</span>}
               {info.phone && <span>✆ {info.phone}</span>}
-              {info.location && <span>⌂ {info.location}</span>}
+              {(info.street || info.location) && <span>⌂ {fullAddress(info)}</span>}
               {info.linkedin && <span>in {info.linkedin}</span>}
               {info.website && <span>↗ {info.website}</span>}
             </div>

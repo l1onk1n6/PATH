@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SkillBar, SafeImg } from './shared';
+import { fullName, formatDate, SkillBar, SafeImg, fullAddress } from './shared';
 
 export default function MagazineTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, projects } = resume;
@@ -25,7 +25,7 @@ export default function MagazineTemplate({ resume }: { resume: Resume }) {
           {[
             { label: 'E-Mail', value: info.email },
             { label: 'Telefon', value: info.phone },
-            { label: 'Ort', value: info.location },
+            { label: 'Adresse', value: fullAddress(info) },
             { label: 'Web', value: info.website },
           ].filter(i => i.value).map(({ label, value }) => (
             <div key={label} style={{ marginBottom: 8 }}>

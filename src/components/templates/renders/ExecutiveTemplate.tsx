@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SkillDots, SafeImg } from './shared';
+import { fullName, formatDate, SkillDots, SafeImg, fullAddress } from './shared';
 
 export default function ExecutiveTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
@@ -19,7 +19,7 @@ export default function ExecutiveTemplate({ resume }: { resume: Resume }) {
         {info.title && <div style={{ fontSize: 12, color, fontWeight: 600, marginBottom: 16 }}>{info.title}</div>}
 
         <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', marginBottom: 20 }}>
-          {[info.email, info.phone, info.location, info.linkedin].filter(Boolean).map((v, i) => (
+          {[info.email, info.phone, fullAddress(info), info.linkedin].filter(Boolean).map((v, i) => (
             <div key={i} style={{ marginBottom: 4 }}>{v}</div>
           ))}
         </div>

@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SafeImg } from './shared';
+import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
 export default function PastelTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
@@ -32,7 +32,7 @@ export default function PastelTemplate({ resume }: { resume: Resume }) {
           )}
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 14 }}>
-          {[info.email, info.phone, info.location, info.linkedin].filter(Boolean).map((v, i) => (
+          {[info.email, info.phone, fullAddress(info), info.linkedin].filter(Boolean).map((v, i) => (
             <span key={i} style={{ fontSize: 11, color: '#666', background: '#fff', padding: '3px 10px', borderRadius: 20, border: `1px solid ${pastelBorder}` }}>{v}</span>
           ))}
         </div>

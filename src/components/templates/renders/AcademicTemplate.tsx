@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate } from './shared';
+import { fullName, formatDate, fullAddress } from './shared';
 
 export default function AcademicTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, certificates, projects } = resume;
@@ -13,7 +13,7 @@ export default function AcademicTemplate({ resume }: { resume: Resume }) {
         <h1 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 4px', letterSpacing: '0.02em' }}>{name}</h1>
         {info.title && <div style={{ fontSize: 13, color: '#444', marginBottom: 8 }}>{info.title}</div>}
         <div style={{ fontSize: 11, color: '#555', display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
-          {[info.email, info.phone, info.location, info.linkedin, info.github].filter(Boolean).map((v, i) => (
+          {[info.email, info.phone, fullAddress(info), info.linkedin, info.github].filter(Boolean).map((v, i) => (
             <span key={i}>{v}</span>
           ))}
         </div>

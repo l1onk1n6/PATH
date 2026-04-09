@@ -22,6 +22,10 @@ export function fullName(resume: Resume) {
   return [firstName, lastName].filter(Boolean).join(' ') || 'Ihr Name';
 }
 
+export function fullAddress(info: Resume['personalInfo']): string {
+  return [info.street, info.location].filter(Boolean).join(', ');
+}
+
 export function SkillBar({ skill, color }: { skill: Skill; color: string }) {
   return (
     <div style={{ marginBottom: 6 }}>

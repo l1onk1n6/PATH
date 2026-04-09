@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate } from './shared';
+import { fullName, formatDate, fullAddress } from './shared';
 
 export default function GeometricTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, projects } = resume;
@@ -26,7 +26,7 @@ export default function GeometricTemplate({ resume }: { resume: Resume }) {
               {info.title && <div style={{ fontSize: 13, color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 4 }}>{info.title}</div>}
             </div>
             <div style={{ textAlign: 'right', fontSize: 11, color: '#666', lineHeight: 1.9 }}>
-              {[info.email, info.phone, info.location, info.linkedin].filter(Boolean).map((v, i) => (
+              {[info.email, info.phone, fullAddress(info), info.linkedin].filter(Boolean).map((v, i) => (
                 <div key={i}>{v}</div>
               ))}
             </div>

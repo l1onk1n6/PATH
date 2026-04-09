@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate } from './shared';
+import { fullName, formatDate, fullAddress } from './shared';
 
 export default function TechTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, projects } = resume;
@@ -20,7 +20,7 @@ export default function TechTemplate({ resume }: { resume: Resume }) {
             <div><span style={{ color: '#79c0ff' }}>"name"</span>: <span style={{ color: '#a5d6ff' }}>"{name}"</span>,</div>
             {info.title && <div><span style={{ color: '#79c0ff' }}>"role"</span>: <span style={{ color: '#a5d6ff' }}>"{info.title}"</span>,</div>}
             {info.email && <div><span style={{ color: '#79c0ff' }}>"email"</span>: <span style={{ color: '#a5d6ff' }}>"{info.email}"</span>,</div>}
-            {info.location && <div><span style={{ color: '#79c0ff' }}>"location"</span>: <span style={{ color: '#a5d6ff' }}>"{info.location}"</span></div>}
+            {(info.street || info.location) && <div><span style={{ color: '#79c0ff' }}>"location"</span>: <span style={{ color: '#a5d6ff' }}>"{fullAddress(info)}"</span></div>}
           </div>
           <span style={{ color: '#58a6ff' }}>{'}'}</span>
         </div>

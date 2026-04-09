@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SafeImg } from './shared';
+import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
 export default function TimelineTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
@@ -16,7 +16,7 @@ export default function TimelineTemplate({ resume }: { resume: Resume }) {
           {info.title && <div style={{ fontSize: 13, color, fontWeight: 600, marginTop: 2 }}>{info.title}</div>}
         </div>
         <div style={{ textAlign: 'right', fontSize: 11, color: '#888', lineHeight: 1.9 }}>
-          {[info.email, info.phone, info.location].filter(Boolean).map((v, i) => <div key={i}>{v}</div>)}
+          {[info.email, info.phone, fullAddress(info)].filter(Boolean).map((v, i) => <div key={i}>{v}</div>)}
         </div>
       </div>
 

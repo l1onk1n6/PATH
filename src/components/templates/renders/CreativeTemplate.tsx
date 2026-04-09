@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SafeImg } from './shared';
+import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
 export default function CreativeTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
@@ -28,7 +28,7 @@ export default function CreativeTemplate({ resume }: { resume: Resume }) {
           <h1 style={{ margin: 0, fontSize: 28, fontWeight: 800, letterSpacing: '-1px' }}>{name}</h1>
           {info.title && <div style={{ fontSize: 14, opacity: 0.9, marginTop: 3 }}>{info.title}</div>}
           <div style={{ fontSize: 11, opacity: 0.75, marginTop: 8, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            {[info.email, info.phone, info.location].filter(Boolean).map((v, i) => <span key={i}>{v}</span>)}
+            {[info.email, info.phone, fullAddress(info)].filter(Boolean).map((v, i) => <span key={i}>{v}</span>)}
           </div>
         </div>
       </div>

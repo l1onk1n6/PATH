@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate } from './shared';
+import { fullName, formatDate, fullAddress } from './shared';
 
 export default function VintageTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
@@ -14,7 +14,7 @@ export default function VintageTemplate({ resume }: { resume: Resume }) {
         <h1 style={{ margin: 0, fontSize: 32, fontWeight: 700, letterSpacing: '0.05em', color: '#1a1206' }}>{name}</h1>
         {info.title && <div style={{ fontSize: 14, color, fontStyle: 'italic', marginTop: 4 }}>{info.title}</div>}
         <div style={{ fontSize: 10, color: '#888', marginTop: 10, display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
-          {[info.email, info.phone, info.location].filter(Boolean).map((v, i) => (
+          {[info.email, info.phone, fullAddress(info)].filter(Boolean).map((v, i) => (
             <span key={i}>{v}</span>
           ))}
         </div>

@@ -1,5 +1,5 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SafeImg } from './shared';
+import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
 export default function BoldTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
@@ -20,7 +20,7 @@ export default function BoldTemplate({ resume }: { resume: Resume }) {
             </div>
           </div>
           <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.8 }}>
-            {[info.email, info.phone, info.location].filter(Boolean).map((v, i) => <div key={i}>{v}</div>)}
+            {[info.email, info.phone, fullAddress(info)].filter(Boolean).map((v, i) => <div key={i}>{v}</div>)}
           </div>
         </div>
       </div>
