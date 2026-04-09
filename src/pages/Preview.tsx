@@ -22,24 +22,31 @@ async function renderElementToPdfDoc(
 
   await document.fonts.ready;
 
-  // Clone element outside any CSS transforms so html2canvas captures correctly
-  const clone = element.cloneNode(true) as HTMLElement;
-  Object.assign(clone.style, {
-    position: 'fixed', top: '-99999px', left: '0',
-    width: '794px', transform: 'none', zIndex: '-1',
-    pointerEvents: 'none',
+  // Clone element outside any CSS transforms so html2canvas captures correctly.
+  // Wrap in a 794px container so layout is correct and scrollHeight is reliable.
+  const wrapper = document.createElement('div');
+  Object.assign(wrapper.style, {
+    position: 'absolute', left: '-9999px', top: '0',
+    width: '794px', overflow: 'visible', pointerEvents: 'none', zIndex: '-1',
   });
-  document.body.appendChild(clone);
+  const clone = element.cloneNode(true) as HTMLElement;
+  clone.style.transform = 'none';
+  clone.style.width = '794px';
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+
+  // Force layout so scrollHeight is accurate before capture
+  void wrapper.offsetHeight;
 
   let canvas: HTMLCanvasElement;
   try {
     canvas = await html2canvas(clone, {
       scale: 2, useCORS: true, allowTaint: true,
-      backgroundColor: '#ffffff', width: 794, height: clone.scrollHeight,
+      backgroundColor: '#ffffff', width: 794,
       logging: false,
     });
   } finally {
-    document.body.removeChild(clone);
+    document.body.removeChild(wrapper);
   }
 
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
