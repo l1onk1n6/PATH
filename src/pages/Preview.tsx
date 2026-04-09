@@ -20,9 +20,13 @@ async function renderElementToPdfDoc(
   const html2canvas = (await import('html2canvas')).default;
   const jsPDF = (await import('jspdf')).default;
 
+  // Wait for fonts to load — prevents garbled/overlapping text in export
+  await document.fonts.ready;
+
   const canvas = await html2canvas(element, {
     scale: 2, useCORS: true, allowTaint: true,
     backgroundColor: '#ffffff', width: 794, height: element.scrollHeight,
+    logging: false,
   });
 
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });

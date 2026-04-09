@@ -5,7 +5,36 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 import {
   FileText, Sparkles, Globe, Clock, Share2, Download,
   Check, ChevronRight, ArrowRight, Star, ClipboardList,
+  Brain, PenLine, Wand2, Languages,
 } from 'lucide-react';
+import { Import } from 'lucide-react';
+
+const AI_FEATURES = [
+  {
+    icon: PenLine,
+    title: 'Anschreiben generieren',
+    desc: 'Stelle, Unternehmen und Ton eingeben – Claude AI schreibt in Sekunden ein vollständiges, individuelles Anschreiben.',
+    badge: 'Claude AI',
+  },
+  {
+    icon: Wand2,
+    title: 'Texte verbessern',
+    desc: 'Bestehende Formulierungen professionell optimieren, umschreiben oder auf Stelle zuschneiden – mit einem Klick.',
+    badge: 'Claude AI',
+  },
+  {
+    icon: Import,
+    title: 'LinkedIn-Import',
+    desc: 'LinkedIn-Profiltext einfügen – die KI erkennt automatisch Name, Erfahrungen, Ausbildung und Skills.',
+    badge: 'Claude AI',
+  },
+  {
+    icon: Languages,
+    title: 'Automatische Übersetzung',
+    desc: 'Den gesamten Lebenslauf in jede Sprache übersetzen – Deutsch, Englisch, Französisch, Italienisch und mehr.',
+    badge: 'Claude AI',
+  },
+];
 
 const FEATURES = [
   {
@@ -330,6 +359,51 @@ export default function LandingPage() {
               <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', margin: 0, lineHeight: 1.6 }}>{desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── AI Features Spotlight ───────────────────────────── */}
+      <section style={{
+        padding: isMobile ? '80px 24px' : '100px 48px',
+        background: 'linear-gradient(180deg, rgba(175,82,222,0.04) 0%, rgba(0,122,255,0.04) 100%)',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 56 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 12, fontWeight: 700, padding: '5px 14px', borderRadius: 99, background: 'rgba(175,82,222,0.15)', border: '1px solid rgba(175,82,222,0.3)', color: '#CF9FFF', marginBottom: 20, letterSpacing: '0.06em' }}>
+              <Brain size={13} /> POWERED BY CLAUDE AI
+            </div>
+            <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
+              KI übernimmt die schwere Arbeit
+            </h2>
+            <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.5)', margin: 0, maxWidth: 520, marginInline: 'auto', lineHeight: 1.6 }}>
+              Claude AI – eines der leistungsfähigsten Sprachmodelle der Welt – ist direkt in PATH integriert.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: 20 }}>
+            {AI_FEATURES.map(({ icon: Icon, title, desc, badge }) => (
+              <div key={title} style={{
+                display: 'flex', gap: 18, padding: 28,
+                background: 'rgba(175,82,222,0.06)', border: '1px solid rgba(175,82,222,0.18)',
+                borderRadius: 20, transition: 'background 0.2s, transform 0.2s',
+              }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(175,82,222,0.1)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(175,82,222,0.06)'; (e.currentTarget as HTMLDivElement).style.transform = 'none'; }}>
+                <div style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0, background: 'rgba(175,82,222,0.15)', border: '1px solid rgba(175,82,222,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon size={22} style={{ color: '#CF9FFF' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{title}</h3>
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 99, background: 'rgba(175,82,222,0.25)', color: '#CF9FFF', letterSpacing: '0.04em', flexShrink: 0 }}>{badge}</span>
+                  </div>
+                  <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', margin: 0, lineHeight: 1.65 }}>{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
