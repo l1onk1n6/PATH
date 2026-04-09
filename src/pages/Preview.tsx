@@ -20,14 +20,27 @@ async function renderElementToPdfDoc(
   const html2canvas = (await import('html2canvas')).default;
   const jsPDF = (await import('jspdf')).default;
 
-  // Wait for fonts to load — prevents garbled/overlapping text in export
   await document.fonts.ready;
 
-  const canvas = await html2canvas(element, {
-    scale: 2, useCORS: true, allowTaint: true,
-    backgroundColor: '#ffffff', width: 794, height: element.scrollHeight,
-    logging: false,
+  // Clone element outside any CSS transforms so html2canvas captures correctly
+  const clone = element.cloneNode(true) as HTMLElement;
+  Object.assign(clone.style, {
+    position: 'fixed', top: '-99999px', left: '0',
+    width: '794px', transform: 'none', zIndex: '-1',
+    pointerEvents: 'none',
   });
+  document.body.appendChild(clone);
+
+  let canvas: HTMLCanvasElement;
+  try {
+    canvas = await html2canvas(clone, {
+      scale: 2, useCORS: true, allowTaint: true,
+      backgroundColor: '#ffffff', width: 794, height: clone.scrollHeight,
+      logging: false,
+    });
+  } finally {
+    document.body.removeChild(clone);
+  }
 
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pdfW = pdf.internal.pageSize.getWidth();   // 210 mm
