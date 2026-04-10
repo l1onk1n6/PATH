@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FileEdit, FileText, FolderDown, Lock } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ProGate from '../components/ui/ProGate';
 import ResumePreview from '../components/templates/ResumePreview';
@@ -8,7 +8,60 @@ import { TEMPLATES } from '../components/templates/templateConfig';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { usePlan, FREE_TEMPLATE_IDS } from '../lib/plan';
 import { canExportPdf, incrementPdfExport, getPdfExportCount } from '../lib/pdfExports';
-import type { Resume } from '../types/resume';
+import type { Resume, UploadedDocument } from '../types/resume';
+
+const CATEGORY_LABELS: Record<UploadedDocument['category'], string> = {
+  certificate: 'Zertifikat',
+  reference: 'Referenz',
+  portfolio: 'Portfolio',
+  other: 'Beilage',
+};
+
+/** Renders a single attached document inline (PDF or image). */
+function DocumentPreviewCard({ doc }: { doc: UploadedDocument }) {
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (doc.type !== 'application/pdf' || !doc.dataUrl) return;
+    if (!doc.dataUrl.startsWith('data:')) {
+      // HTTPS (Supabase Storage) — use directly
+      setPdfUrl(doc.dataUrl);
+      return;
+    }
+    // data: URI — convert to blob URL (Chrome blocks data: URIs in iframes)
+    try {
+      const bytes = Uint8Array.from(atob(doc.dataUrl.split(',')[1]), c => c.charCodeAt(0));
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      setPdfUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } catch { /* ignore */ }
+  }, [doc.dataUrl, doc.type]);
+
+  if (!doc.dataUrl) {
+    return (
+      <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f9f9f9', color: '#aaa', fontSize: 12 }}>
+        Vorschau nach Neuladen verfügbar
+      </div>
+    );
+  }
+  if (doc.type.startsWith('image/')) {
+    return <img src={doc.dataUrl} alt={doc.name} style={{ width: '100%', display: 'block' }} />;
+  }
+  if (doc.type === 'application/pdf') {
+    if (!pdfUrl) return (
+      <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f9f9f9', color: '#aaa', fontSize: 12 }}>
+        Lade Vorschau…
+      </div>
+    );
+    return <iframe src={pdfUrl} style={{ width: '100%', height: 1123, border: 'none', display: 'block' }} title={doc.name} />;
+  }
+  return (
+    <div style={{ height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f9f9f9', color: '#aaa', fontSize: 12 }}>
+      Keine Vorschau verfügbar
+    </div>
+  );
+}
 
 const MAX_PDF_BYTES = 10 * 1024 * 1024; // 10 MB
 
@@ -542,6 +595,26 @@ export default function Preview() {
                 : <div ref={coverLetterRef}><CoverLetterPage /></div>
               }
             </div>
+
+            {/* Attached document previews — user sees full Mappe before downloading */}
+            {resume.documents.map((doc) => (
+              <div key={doc.id} data-html2canvas-ignore="true">
+                <div style={{
+                  padding: '6px 12px',
+                  background: 'rgba(0,0,0,0.35)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  fontSize: 10, color: 'rgba(255,255,255,0.55)', fontFamily: 'sans-serif',
+                  letterSpacing: '0.04em',
+                }}>
+                  <span>{doc.name}</span>
+                  <span style={{ opacity: 0.7 }}>{CATEGORY_LABELS[doc.category]}</span>
+                </div>
+                <div style={{ background: '#fff', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
+                  <DocumentPreviewCard doc={doc} />
+                </div>
+              </div>
+            ))}
+
             {/* Hidden off-screen renders for Mappe export */}
             <div style={{ position: 'absolute', left: -9999, top: 0, pointerEvents: 'none' }}>
               <div ref={activeView === 'resume' ? coverLetterRef : resumePageRef}>
