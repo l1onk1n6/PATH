@@ -267,14 +267,20 @@ function isSectionHeader(line: string): boolean {
 
 interface Props {
   onClose: () => void;
+  linkedinUrl?: string;
 }
 
-export default function LinkedInImportDialog({ onClose }: Props) {
+export default function LinkedInImportDialog({ onClose, linkedinUrl }: Props) {
   const [step, setStep] = useState<1 | 2>(1);
   const [text, setText] = useState('');
   const [parsed, setParsed] = useState<ParsedData | null>(null);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+
+  // Normalise URL so it always has https://
+  const profileUrl = linkedinUrl
+    ? linkedinUrl.startsWith('http') ? linkedinUrl : `https://${linkedinUrl}`
+    : null;
 
   function handleParse() {
     if (!text.trim()) return;
@@ -392,6 +398,32 @@ export default function LinkedInImportDialog({ onClose }: Props) {
 
         {step === 1 && (
           <>
+            {profileUrl && (
+              <div style={{
+                padding: '10px 14px', borderRadius: 10, marginBottom: 14,
+                background: 'rgba(10,102,194,0.12)', border: '1px solid rgba(10,102,194,0.35)',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+              }}>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 11, color: 'rgba(10,102,194,0.9)', fontWeight: 600, marginBottom: 2 }}>
+                    Dein gespeichertes Profil
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {profileUrl}
+                  </div>
+                </div>
+                <a
+                  href={profileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-glass btn-sm"
+                  style={{ fontSize: 12, flexShrink: 0, textDecoration: 'none', color: 'inherit' }}
+                >
+                  Profil öffnen ↗
+                </a>
+              </div>
+            )}
+
             <div style={{
               padding: '12px 14px', borderRadius: 10,
               background: 'rgba(10,102,194,0.08)', border: '1px solid rgba(10,102,194,0.2)',
@@ -399,7 +431,7 @@ export default function LinkedInImportDialog({ onClose }: Props) {
             }}>
               <strong style={{ display: 'block', marginBottom: 6, color: 'var(--text-primary)' }}>So funktioniert's:</strong>
               <ol style={{ margin: 0, padding: '0 0 0 18px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <li>Öffne dein LinkedIn-Profil im Browser</li>
+                <li>{profileUrl ? 'Öffne dein Profil oben' : 'Öffne dein LinkedIn-Profil im Browser'}</li>
                 <li>Wähle den gesamten Seiteninhalt aus (<kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '1px 5px', borderRadius: 4, fontSize: 11 }}>Ctrl+A</kbd>)</li>
                 <li>Kopiere und füge den Text unten ein</li>
               </ol>

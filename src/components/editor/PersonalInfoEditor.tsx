@@ -16,10 +16,18 @@ export default function PersonalInfoEditor() {
   const [showLinkedIn, setShowLinkedIn] = useState(false);
   const isMobile = useIsMobile();
 
+  const [linkedInError, setLinkedInError] = useState('');
+
   const update = useCallback((field: string, value: string) => {
     if (!resume) return;
     updatePersonalInfo(resume.id, { [field]: value });
   }, [resume, updatePersonalInfo]);
+
+  function validateLinkedIn(value: string) {
+    if (!value.trim()) { setLinkedInError(''); return; }
+    const ok = /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[\w%-]+\/?$/.test(value.trim());
+    setLinkedInError(ok ? '' : 'Format: linkedin.com/in/dein-name');
+  }
 
   if (!resume) return null;
 
@@ -64,7 +72,7 @@ export default function PersonalInfoEditor() {
 
   return (
     <div className="animate-fade-in">
-      {showLinkedIn && <LinkedInImportDialog onClose={() => setShowLinkedIn(false)} />}
+      {showLinkedIn && <LinkedInImportDialog onClose={() => setShowLinkedIn(false)} linkedinUrl={info.linkedin} />}
 
       {/* LinkedIn import button */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
@@ -174,8 +182,20 @@ export default function PersonalInfoEditor() {
           <label className="section-label">
             <Link2 size={9} style={{ display: 'inline', marginRight: 3 }} />LinkedIn
           </label>
-          <input className="input-glass" placeholder="linkedin.com/in/max" value={info.linkedin} maxLength={200}
-            onChange={(e) => update('linkedin', e.target.value)} />
+          <input
+            className="input-glass"
+            placeholder="linkedin.com/in/max-mustermann"
+            value={info.linkedin}
+            maxLength={200}
+            onChange={(e) => { update('linkedin', e.target.value); validateLinkedIn(e.target.value); }}
+            onBlur={(e) => validateLinkedIn(e.target.value)}
+            style={linkedInError ? { borderColor: 'var(--ios-red)' } : undefined}
+          />
+          {linkedInError && (
+            <div style={{ fontSize: 11, color: 'var(--ios-red)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <AlertCircle size={10} /> {linkedInError}
+            </div>
+          )}
         </div>
         <div>
           <label className="section-label">
