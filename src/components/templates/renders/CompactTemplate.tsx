@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, fullAddress } from './shared';
 
 export default function CompactTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, certificates, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
@@ -98,6 +98,15 @@ export default function CompactTemplate({ resume }: { resume: Resume }) {
           )}
         </div>
       </div>
+
+      {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+        <div key={section.id}>
+          <Section title={section.title || 'Eigene Sektion'} />
+          {section.items.filter(i => i.trim()).map((item, idx) => (
+            <div key={idx} style={{ fontSize: 10, marginBottom: 4, lineHeight: 1.5, color: '#444' }}>{item}</div>
+          ))}
+        </div>
+      ))}
     </div>
   );
 }

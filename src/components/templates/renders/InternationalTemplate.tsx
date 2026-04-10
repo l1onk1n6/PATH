@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
 export default function InternationalTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, certificates, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
@@ -134,6 +134,15 @@ export default function InternationalTemplate({ resume }: { resume: Resume }) {
             </div>
           )}
         </div>
+
+        {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+          <div key={section.id} style={{ marginBottom: 16, borderTop: `1px solid ${color}40`, paddingTop: 14 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color, marginBottom: 10 }}>{section.title || 'Eigene Sektion'}</div>
+            {section.items.filter(i => i.trim()).map((item, idx) => (
+              <div key={idx} style={{ fontSize: 11, marginBottom: 4, lineHeight: 1.6, color: '#555' }}>{item}</div>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );

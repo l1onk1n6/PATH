@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
 export default function PastelTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, certificates, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
@@ -76,6 +76,15 @@ export default function PastelTemplate({ resume }: { resume: Resume }) {
               ))}
             </>
           )}
+
+          {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+            <div key={section.id}>
+              <SectionTitle title={section.title || 'Eigene Sektion'} />
+              {section.items.filter(i => i.trim()).map((item, idx) => (
+                <div key={idx} style={{ fontSize: 11, marginBottom: 4, lineHeight: 1.6, color: '#777' }}>{item}</div>
+              ))}
+            </div>
+          ))}
         </div>
 
         <div>

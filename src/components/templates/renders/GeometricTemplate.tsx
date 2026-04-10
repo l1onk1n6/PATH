@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, fullAddress } from './shared';
 
 export default function GeometricTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages, projects } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, projects, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
@@ -61,7 +61,7 @@ export default function GeometricTemplate({ resume }: { resume: Resume }) {
             )}
 
             {projects.length > 0 && (
-              <div>
+              <div style={{ marginBottom: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                   <div style={{ width: 12, height: 12, background: color, borderRadius: 2, transform: 'rotate(45deg)' }} />
                   <h2 style={{ margin: 0, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#333' }}>Projekte</h2>
@@ -74,6 +74,18 @@ export default function GeometricTemplate({ resume }: { resume: Resume }) {
                 ))}
               </div>
             )}
+
+            {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+              <div key={section.id} style={{ marginBottom: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                  <div style={{ width: 12, height: 12, background: color, borderRadius: 2, transform: 'rotate(45deg)' }} />
+                  <h2 style={{ margin: 0, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#333' }}>{section.title || 'Eigene Sektion'}</h2>
+                </div>
+                {section.items.filter(i => i.trim()).map((item, idx) => (
+                  <div key={idx} style={{ fontSize: 11, marginBottom: 4, lineHeight: 1.6, color: '#666' }}>{item}</div>
+                ))}
+              </div>
+            ))}
           </div>
 
           <div>
