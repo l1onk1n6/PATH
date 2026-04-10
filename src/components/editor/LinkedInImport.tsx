@@ -369,6 +369,9 @@ export default function LinkedInImportDialog({ onClose, linkedinUrl }: Props) {
         style={{
           padding: '28px 24px', width: 500, maxWidth: '95vw', maxHeight: '90vh',
           overflowY: 'auto',
+          background: 'rgba(20, 24, 40, 0.92)',
+          backdropFilter: 'blur(40px) saturate(1.8)',
+          WebkitBackdropFilter: 'blur(40px) saturate(1.8)',
         }}
         onClick={e => e.stopPropagation()}
       >
