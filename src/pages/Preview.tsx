@@ -1,13 +1,15 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FolderDown, Lock } from 'lucide-react';
+import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FolderDown, Lock, Share2 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ProGate from '../components/ui/ProGate';
 import ResumePreview from '../components/templates/ResumePreview';
+import ShareLinksPanel from '../components/editor/ShareLinksPanel';
 import { TEMPLATES } from '../components/templates/templateConfig';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { usePlan, FREE_TEMPLATE_IDS } from '../lib/plan';
 import { canExportPdf, incrementPdfExport, getPdfExportCount } from '../lib/pdfExports';
+import { isSupabaseConfigured } from '../lib/supabase';
 import type { Resume, UploadedDocument } from '../types/resume';
 
 const CATEGORY_LABELS: Record<UploadedDocument['category'], string> = {
@@ -293,6 +295,7 @@ export default function Preview() {
   const [exportError, setExportError] = useState<string | null>(null);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const [showPasswordSoon, setShowPasswordSoon] = useState(false);
+  const [showSharePanel, setShowSharePanel] = useState(false);
   const resumePageRef = useRef<HTMLDivElement>(null);
   const coverLetterRef = useRef<HTMLDivElement>(null);
 
@@ -1019,6 +1022,15 @@ export default function Preview() {
                 <Lock size={13} />{!isMobile && ' Passwort'}
               </button>
             </ProGate>
+            {isSupabaseConfigured() && (
+              <button
+                className="btn-glass btn-sm"
+                onClick={() => setShowSharePanel(v => !v)}
+                style={{ display: 'flex', alignItems: 'center', gap: 5, background: showSharePanel ? 'rgba(0,122,255,0.2)' : undefined }}
+              >
+                <Share2 size={13} />{!isMobile && ' Teilen'}
+              </button>
+            )}
 
             {showPasswordSoon && (
               <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }}
@@ -1108,6 +1120,37 @@ export default function Preview() {
               <div style={{ overflowY: 'auto', padding: '12px 16px 24px', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: 8 }}>
                 <TemplatePicker />
               </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ── Share Links Panel ── */}
+      {showSharePanel && (
+        <>
+          <div
+            onClick={() => setShowSharePanel(false)}
+            style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}
+          />
+          <div style={{
+            position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 61,
+            width: isMobile ? '100vw' : 380,
+            display: 'flex', flexDirection: 'column',
+            background: 'var(--modal-bg, rgba(15,25,40,0.98))',
+            backdropFilter: 'blur(24px)',
+            borderLeft: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '-8px 0 40px rgba(0,0,0,0.4)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.1)', flexShrink: 0 }}>
+              <div style={{ fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Share2 size={15} style={{ opacity: 0.7 }} /> Teilen
+              </div>
+              <button className="btn-glass btn-icon btn-sm" onClick={() => setShowSharePanel(false)} style={{ padding: 6 }}>
+                <X size={15} />
+              </button>
+            </div>
+            <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
+              <ShareLinksPanel resumeId={resume.id} />
             </div>
           </div>
         </>

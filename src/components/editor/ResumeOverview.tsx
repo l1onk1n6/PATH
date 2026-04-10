@@ -436,7 +436,7 @@ export default function ResumeOverview() {
         <div className="section-label" style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
           <Share2 size={11} /> Link-Analytics
         </div>
-        <ShareLinksPanel resumeId={resume.id} />
+        <ShareLinksPanel resumeId={resume.id} readOnly />
       </div>
     </div>
   );

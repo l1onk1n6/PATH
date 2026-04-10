@@ -180,9 +180,10 @@ function LinkAnalyticsPanel({ link }: { link: ShareLink }) {
 
 interface Props {
   resumeId: string;
+  readOnly?: boolean;
 }
 
-export default function ShareLinksPanel({ resumeId }: Props) {
+export default function ShareLinksPanel({ resumeId, readOnly }: Props) {
   const { limits, isPro } = usePlan();
   const [links, setLinks] = useState<ShareLink[]>([]);
   const [loading, setLoading] = useState(true);
@@ -238,7 +239,7 @@ export default function ShareLinksPanel({ resumeId }: Props) {
           <ExternalLink size={10} style={{ display: 'inline', marginRight: 4 }} />
           {activeCount}/{limits.shareLinks} aktive Links
         </div>
-        {!isPro ? (
+        {!readOnly && (!isPro ? (
           <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 4, background: 'linear-gradient(135deg,#FF9F0A,#FF375F)', color: '#fff', fontWeight: 700 }}>PRO</span>
         ) : (
           <button
@@ -249,11 +250,11 @@ export default function ShareLinksPanel({ resumeId }: Props) {
           >
             <Plus size={11} /> Neuer Link
           </button>
-        )}
+        ))}
       </div>
 
       {/* Create form */}
-      {showCreate && (
+      {!readOnly && showCreate && (
         <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
           <input
             className="input-glass"
