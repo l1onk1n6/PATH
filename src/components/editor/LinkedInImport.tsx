@@ -25,244 +25,261 @@ interface ParsedData {
   skills: Array<{ name: string }>;
 }
 
-function parseDate(raw: string): { date: string; current: boolean } {
-  const current = /heute|today|aktuell|present/i.test(raw);
-  if (current) return { date: '', current: true };
+// ── Date helpers ──────────────────────────────────────────
 
-  // Match "Jan. 2020", "Jan 2020", "January 2020", "Januar 2020", "2020"
+function parseMonthYear(raw: string): string {
   const monthMap: Record<string, string> = {
-    jan: '01', feb: '02', mar: '03', mär: '03', apr: '04',
+    jan: '01', feb: '02', mär: '03', mar: '03', apr: '04',
     mai: '05', may: '05', jun: '06', jul: '07', aug: '08',
     sep: '09', okt: '10', oct: '10', nov: '11', dez: '12', dec: '12',
   };
-  const m = raw.match(/([a-zä]+)\.?\s+(\d{4})/i);
+  const m = raw.match(/([a-zäöü]+)\.?\s*(\d{4})/i);
   if (m) {
-    const monthKey = m[1].toLowerCase().slice(0, 3);
-    const month = monthMap[monthKey] ?? '01';
-    return { date: `${m[2]}-${month}`, current: false };
+    const month = monthMap[m[1].toLowerCase().slice(0, 3)] ?? '01';
+    return `${m[2]}-${month}`;
   }
   const yearOnly = raw.match(/(\d{4})/);
-  if (yearOnly) return { date: `${yearOnly[1]}-01`, current: false };
-  return { date: '', current: false };
+  return yearOnly ? `${yearOnly[1]}-01` : '';
 }
 
 function parseDateRange(line: string): { startDate: string; endDate: string; current: boolean } {
-  // "Jan. 2020 – März 2022" or "2020 – heute"
-  const parts = line.split(/[–—-]/).map(s => s.trim());
-  if (parts.length >= 2) {
-    const start = parseDate(parts[0]);
-    const end = parseDate(parts[1]);
-    return {
-      startDate: start.date,
-      endDate: end.current ? '' : end.date,
-      current: end.current,
-    };
-  }
-  const single = parseDate(line);
-  return { startDate: single.date, endDate: '', current: single.current };
+  const current = /heute|today|aktuell|present/i.test(line);
+  // Split on em-dash, en-dash, or " - "
+  const parts = line.split(/\s*[–—]\s*|\s+-\s+/).map(s => s.trim());
+  const startDate = parseMonthYear(parts[0] ?? '');
+  const endDate = current ? '' : parseMonthYear(parts[1] ?? '');
+  return { startDate, endDate, current };
 }
 
 function isDateRangeLine(line: string): boolean {
-  return /(\d{4}|jan|feb|mär|mar|apr|mai|may|jun|jul|aug|sep|okt|oct|nov|dez|dec).*[–—].*(\d{4}|heute|today|aktuell|present)/i.test(line);
+  return (
+    /\d{4}\s*[–—]/.test(line) ||
+    /[–—]\s*(heute|today|aktuell|present)/i.test(line) ||
+    /(jan|feb|mär|mar|apr|mai|may|jun|jul|aug|sep|okt|oct|nov|dez|dec)\.?\s*\d{4}/i.test(line) &&
+      /[–—]/.test(line)
+  );
 }
+
+// ── Experience parser ─────────────────────────────────────
+
+function parseExperience(lines: string[]): ParsedData['workExperiences'] {
+  // Remove logo lines, work-mode labels, skills-count refs, blanks
+  const clean = lines
+    .map(l => l.trim())
+    .filter(l =>
+      l.length > 0 &&
+      !/^Logo von /i.test(l) &&
+      !/^(Hybrid|Remote|Vor Ort|On-site|Home Office)$/i.test(l) &&
+      !/und \+\d+ Kenntnisse$/i.test(l) &&
+      !/^\d+ Kenntnisse$/i.test(l) &&
+      !/^Alle anzeigen$/i.test(l)
+    );
+
+  // "Vollzeit · 4 Jahre 2 Monate"  →  true   (employment type comes first)
+  const isTypeDuration = (l: string) =>
+    /^(Vollzeit|Teilzeit|Selbstständig|Freiberuflich|Praktikum|Saisonal|Interim|Full-time|Part-time)\s*[·,]/i.test(l);
+
+  // "PIXMATIC · Selbstständig"  →  true   (company name comes first)
+  const isCompanyType = (l: string) =>
+    l.includes('·') &&
+    !isTypeDuration(l) &&
+    !isDateRangeLine(l) &&
+    /(Vollzeit|Teilzeit|Selbstständig|Freiberuflich|Praktikum|Full-time|Part-time)/i.test(l);
+
+  const jobs: ParsedData['workExperiences'] = [];
+  let currentCompany = '';
+
+  for (let i = 0; i < clean.length; i++) {
+    const line = clean[i];
+
+    // ── Type·Duration line: "Vollzeit · 4 Jahre" → skip, sets nothing
+    if (isTypeDuration(line)) continue;
+
+    // ── Company·Type line: "PIXMATIC · Selbstständig"
+    //    Job title is the PREVIOUS line; date range is the NEXT line
+    if (isCompanyType(line)) {
+      currentCompany = line.split('·')[0].trim();
+      const prev = clean[i - 1];
+      const next = clean[i + 1];
+      if (prev && !isDateRangeLine(prev) && !isTypeDuration(prev) && prev.length > 2 &&
+          next && isDateRangeLine(next)) {
+        const { startDate, endDate, current } = parseDateRange(next.split('·')[0].trim());
+        jobs.push({ position: prev, company: currentCompany, startDate, endDate, current, description: '' });
+        i += 1; // skip the date range line we just consumed
+      }
+      continue;
+    }
+
+    // ── Date range line following a job title directly (multi-role at same company)
+    if (isDateRangeLine(line)) {
+      const prev = clean[i - 1];
+      if (prev && !isTypeDuration(prev) && !isDateRangeLine(prev) && prev.length > 2) {
+        const { startDate, endDate, current } = parseDateRange(line.split('·')[0].trim());
+        jobs.push({ position: prev, company: currentCompany, startDate, endDate, current, description: '' });
+      }
+      continue;
+    }
+
+    // ── Standalone company name: followed by a TypeDuration line
+    //    (multi-role header like "Kinderdorf Pestalozzi" then "Vollzeit · 4 Jahre")
+    const nextLine = clean[i + 1];
+    if (nextLine && isTypeDuration(nextLine)) {
+      currentCompany = line;
+    }
+  }
+
+  return jobs;
+}
+
+// ── Education parser ──────────────────────────────────────
+
+function parseEducation(lines: string[]): ParsedData['educations'] {
+  const clean = lines
+    .map(l => l.trim())
+    .filter(l => l.length > 0 && !/^Logo von /i.test(l) && !/^Alle anzeigen$/i.test(l));
+
+  const isYearRange = (l: string) => /^\d{4}[–—-]\d{4}$/.test(l) || /^\d{4}$/.test(l);
+
+  const edus: ParsedData['educations'] = [];
+  let i = 0;
+  while (i < clean.length) {
+    const line = clean[i];
+    if (isDateRangeLine(line) || isYearRange(line)) { i++; continue; }
+
+    const institution = line;
+    let degree = '';
+    let field = '';
+    let startDate = '';
+    let endDate = '';
+
+    i++;
+    // Degree / field line
+    if (i < clean.length && !isDateRangeLine(clean[i]) && !isYearRange(clean[i])) {
+      const parts = clean[i].split(/[·,]/);
+      degree = parts[0].trim();
+      field = parts.slice(1).join(',').trim();
+      i++;
+    }
+    // Date or year range
+    if (i < clean.length && (isDateRangeLine(clean[i]) || isYearRange(clean[i]))) {
+      const raw = clean[i];
+      if (isYearRange(raw) && /^\d{4}$/.test(raw)) {
+        startDate = `${raw}-01`;
+      } else if (/^\d{4}[–—-]\d{4}$/.test(raw)) {
+        const yr = raw.split(/[–—-]/);
+        startDate = `${yr[0]}-01`;
+        endDate = `${yr[1]}-01`;
+      } else {
+        const parsed = parseDateRange(raw);
+        startDate = parsed.startDate;
+        endDate = parsed.endDate;
+      }
+      i++;
+    }
+    // Skip trailing noise (grade, description short lines)
+    while (i < clean.length && !isDateRangeLine(clean[i]) && !isYearRange(clean[i]) && clean[i].length < 80) {
+      i++;
+    }
+
+    if (institution) edus.push({ institution, degree, field, startDate, endDate });
+  }
+  return edus;
+}
+
+// ── Skills parser ─────────────────────────────────────────
+
+function parseSkills(lines: string[]): ParsedData['skills'] {
+  const noise = [
+    /^Alle anzeigen$/i,
+    /LinkedIn Kenntnistest/i,
+    /Nachweis/i,
+    /Ausgestellt/i,
+    /und Microsoft/i,
+    /und \+\d+/i,
+  ];
+
+  const skills: ParsedData['skills'] = [];
+  let lastName = '';
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line || line.length > 70) continue;
+    if (noise.some(p => p.test(line))) continue;
+    // Skip endorsement lines that start with the previous skill name (more specific variant)
+    if (lastName && line.toLowerCase().startsWith(lastName.toLowerCase()) && line !== lastName) continue;
+    skills.push({ name: line });
+    lastName = line;
+  }
+  return skills;
+}
+
+// ── Main parser ───────────────────────────────────────────
 
 function parseLinkedIn(text: string): ParsedData {
-  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const rawLines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
-  const result: ParsedData = {
-    workExperiences: [],
-    educations: [],
-    skills: [],
+  const result: ParsedData = { workExperiences: [], educations: [], skills: [] };
+  if (rawLines.length === 0) return result;
+
+  // Find the index of each major section (take first occurrence)
+  const sectionIdx = {
+    info:       rawLines.findIndex(l => /^Info$/.test(l)),
+    experience: rawLines.findIndex(l => /^(Erfahrung|Experience)$/.test(l)),
+    education:  rawLines.findIndex(l => /^(Ausbildung|Education)$/.test(l)),
+    skills:     rawLines.findIndex(l => /^Kenntnisse(\s*\(\d+\))?$|^Skills(\s*\(\d+\))?$/.test(l)),
+    certs:      rawLines.findIndex(l => /^Bescheinigungen/.test(l)),
   };
 
-  if (lines.length === 0) return result;
+  // All found section starts, sorted ascending
+  const allStarts = Object.values(sectionIdx).filter(i => i >= 0).sort((a, b) => a - b);
 
-  // First non-empty line = full name
-  const nameLine = lines[0];
-  const nameParts = nameLine.trim().split(/\s+/);
-  if (nameParts.length >= 2) {
-    result.firstName = nameParts.slice(0, -1).join(' ');
-    result.lastName = nameParts[nameParts.length - 1];
-  } else {
-    result.firstName = nameLine;
+  function getSectionLines(startIdx: number): string[] {
+    if (startIdx < 0) return [];
+    const nextStart = allStarts.find(i => i > startIdx) ?? rawLines.length;
+    return rawLines.slice(startIdx + 1, nextStart);
   }
 
-  // Second line = headline/title
-  if (lines[1] && !isSectionHeader(lines[1])) {
-    result.title = lines[1];
-  }
-
-  // Find section boundaries
-  const sectionKeywords = {
-    about: /^(über mich|about|zusammenfassung|summary)$/i,
-    experience: /^(berufserfahrung|erfahrung|experience|work experience|tätigkeiten)$/i,
-    education: /^(ausbildung|bildung|education|studium)$/i,
-    skills: /^(kenntnisse|fähigkeiten|skills|kompetenzen|top kenntnisse|top skills)$/i,
-  };
-
-  type SectionName = 'about' | 'experience' | 'education' | 'skills' | null;
-
-  const sections: Array<{ name: SectionName; startIdx: number }> = [];
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    for (const [name, re] of Object.entries(sectionKeywords)) {
-      if (re.test(line)) {
-        sections.push({ name: name as SectionName, startIdx: i });
-        break;
-      }
+  // ── Name: the line immediately before a gender pronoun (Er/Sie/He/She)
+  const pronounIdx = rawLines.findIndex(l => /^(Er|Sie|Es|He|She|They)$/.test(l));
+  if (pronounIdx > 0) {
+    const candidate = rawLines[pronounIdx - 1];
+    if (/^[A-ZÄÖÜ]/.test(candidate) && candidate.split(/\s+/).length >= 2) {
+      const parts = candidate.split(/\s+/);
+      result.firstName = parts.slice(0, -1).join(' ');
+      result.lastName = parts[parts.length - 1];
     }
   }
 
-  function getSectionLines(name: SectionName): string[] {
-    const idx = sections.findIndex(s => s.name === name);
-    if (idx === -1) return [];
-    const start = sections[idx].startIdx + 1;
-    const end = idx + 1 < sections.length ? sections[idx + 1].startIdx : lines.length;
-    return lines.slice(start, end);
-  }
-
-  // About / Summary
-  const aboutLines = getSectionLines('about');
-  if (aboutLines.length > 0) {
-    result.summary = aboutLines.join('\n');
-  }
-
-  // Work Experience
-  const expLines = getSectionLines('experience');
-  if (expLines.length > 0) {
-    // Parse blocks: position → company → date range → (location) → (description...)
-    // Each job starts when we see a non-date, non-location line after a date range
-    const jobs: ParsedData['workExperiences'] = [];
-    let i = 0;
-    while (i < expLines.length) {
-      const line = expLines[i];
-      if (isSectionHeader(line) || line.length === 0) { i++; continue; }
-
-      // Try to identify job position (usually first in a block)
-      // Heuristic: position line doesn't look like a date range and isn't too short
-      if (!isDateRangeLine(line) && line.length > 2) {
-        const position = line;
-        let company = '';
-        let startDate = '';
-        let endDate = '';
-        let current = false;
-        const descLines: string[] = [];
-
-        i++;
-        // Next line: company (may contain " · Vollzeit" etc.)
-        if (i < expLines.length && !isDateRangeLine(expLines[i])) {
-          company = expLines[i].split('·')[0].trim();
-          i++;
-        }
-        // Next line: date range
-        if (i < expLines.length && isDateRangeLine(expLines[i])) {
-          const parsed = parseDateRange(expLines[i]);
-          startDate = parsed.startDate;
-          endDate = parsed.endDate;
-          current = parsed.current;
-          i++;
-        }
-        // Next line might be duration ("1 Jahr 3 Monate") or location — skip
-        if (i < expLines.length && /\d+\s*(Jahr|Monat|month|year)/i.test(expLines[i])) {
-          i++;
-        }
-        // Next might be location
-        if (i < expLines.length && !isDateRangeLine(expLines[i]) && expLines[i].length < 60 && !expLines[i].includes('·')) {
-          // Could be location — if it looks like a city/country, skip it, but don't skip if it looks like description
-          if (/^[A-ZÄÖÜ]/.test(expLines[i]) && expLines[i].split(' ').length <= 4) {
-            i++; // skip location
-          }
-        }
-        // Remaining lines until next job block are description
-        while (i < expLines.length) {
-          const next = expLines[i];
-          if (isDateRangeLine(next)) break;
-          if (!isSectionHeader(next) && next.length > 0) {
-            // Stop if this looks like the start of a new job entry
-            // (short line followed by company pattern or date)
-            if (i + 1 < expLines.length && (isDateRangeLine(expLines[i + 1]) || expLines[i + 1].includes('·'))) break;
-            descLines.push(next);
-          }
-          i++;
-        }
-
-        if (position || company) {
-          jobs.push({ position, company, startDate, endDate, current, description: descLines.join('\n') });
-        }
-      } else {
-        i++;
-      }
-    }
-    result.workExperiences = jobs;
-  }
-
-  // Education
-  const eduLines = getSectionLines('education');
-  if (eduLines.length > 0) {
-    const edus: ParsedData['educations'] = [];
-    let i = 0;
-    while (i < eduLines.length) {
-      const line = eduLines[i];
-      if (isSectionHeader(line) || line.length === 0) { i++; continue; }
-
-      if (!isDateRangeLine(line)) {
-        const institution = line;
-        let degree = '';
-        let field = '';
-        let startDate = '';
-        let endDate = '';
-        i++;
-        if (i < eduLines.length && !isDateRangeLine(eduLines[i])) {
-          // "Bachelor of Science · Informatik" or just "Bachelor Informatik"
-          const degLine = eduLines[i];
-          const parts = degLine.split(/[·,]/);
-          degree = parts[0].trim();
-          field = parts[1]?.trim() ?? '';
-          i++;
-        }
-        if (i < eduLines.length && isDateRangeLine(eduLines[i])) {
-          const parsed = parseDateRange(eduLines[i]);
-          startDate = parsed.startDate;
-          endDate = parsed.endDate;
-          i++;
-        }
-        // Skip duration / grade lines
-        while (i < eduLines.length && !isSectionHeader(eduLines[i]) && !isDateRangeLine(eduLines[i]) && eduLines[i].length < 80) {
-          i++;
-        }
-        if (institution) {
-          edus.push({ institution, degree, field, startDate, endDate });
-        }
-      } else {
-        i++;
-      }
-    }
-    result.educations = edus;
-  }
-
-  // Skills
-  const skillLines = getSectionLines('skills');
-  const skills: ParsedData['skills'] = [];
-  for (const line of skillLines) {
-    if (isSectionHeader(line)) continue;
-    // Skills may be comma-separated on one line or one per line
-    if (line.includes(',')) {
-      for (const part of line.split(',')) {
-        const name = part.trim();
-        if (name.length > 0 && name.length < 60) skills.push({ name });
-      }
-    } else if (line.length > 0 && line.length < 60) {
-      skills.push({ name: line });
+  // ── Summary: first long line in Info section
+  if (sectionIdx.info >= 0) {
+    const infoLines = getSectionLines(sectionIdx.info)
+      .filter(l => l.length > 40 && !/^(mehr|… mehr|Alle anzeigen|Serviceleistungen)$/i.test(l));
+    if (infoLines.length > 0) {
+      result.summary = infoLines[0].replace(/…?\s*mehr$/, '').trim();
     }
   }
-  result.skills = skills;
+
+  // ── Experience
+  if (sectionIdx.experience >= 0) {
+    result.workExperiences = parseExperience(getSectionLines(sectionIdx.experience));
+  }
+
+  // ── Education
+  if (sectionIdx.education >= 0) {
+    result.educations = parseEducation(getSectionLines(sectionIdx.education));
+  }
+
+  // ── Skills
+  if (sectionIdx.skills >= 0) {
+    result.skills = parseSkills(getSectionLines(sectionIdx.skills));
+  }
+
+  // ── Title from most recent position
+  if (result.workExperiences.length > 0 && !result.title) {
+    result.title = result.workExperiences[0].position;
+  }
 
   return result;
-}
-
-function isSectionHeader(line: string): boolean {
-  return /^(über mich|about|zusammenfassung|summary|berufserfahrung|erfahrung|experience|work experience|tätigkeiten|ausbildung|bildung|education|studium|kenntnisse|fähigkeiten|skills|kompetenzen|top kenntnisse|top skills)$/i.test(line);
 }
 
 interface Props {

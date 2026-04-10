@@ -1,7 +1,8 @@
+import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User, Briefcase, GraduationCap, Zap, FolderOpen,
-  Upload, Palette, AlertCircle, FileEdit, LayoutList, Lock,
+  Upload, Palette, AlertCircle, FileEdit, LayoutList, Lock, LayoutDashboard,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import { usePlan } from '../lib/plan';
@@ -19,6 +20,7 @@ import CustomSectionEditor from '../components/editor/CustomSectionEditor';
 import TemplateSelector from '../components/templates/TemplateSelector';
 import TranslateDialog from '../components/editor/TranslateDialog';
 import VersionHistoryPanel from '../components/editor/VersionHistoryPanel';
+import ResumeOverview from '../components/editor/ResumeOverview';
 import { useIsMobile } from '../hooks/useBreakpoint';
 
 // 'personal' is intentionally excluded — it lives at the Person level in the sidebar
@@ -36,7 +38,8 @@ const SECTIONS: { id: EditorSection; label: string; short: string; icon: React.C
 export default function Editor() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { getActiveResume, getActivePerson, activeSection, setActiveSection, resumes, addResume } = useResumeStore();
+  const addingRef = useRef(false);
+  const { getActiveResume, getActivePerson, activeSection, setActiveSection, resumes, addResume, setActiveResume } = useResumeStore();
   const { limits } = usePlan();
   const { showTranslate, setShowTranslate } = useUIStore();
   const resume = getActiveResume();
@@ -46,9 +49,15 @@ export default function Editor() {
   const resumeIndex = resume ? resumes.findIndex(r => r.id === resume.id) : -1;
   const isFrozen = limits.resumes < Infinity && resumeIndex >= limits.resumes;
 
-  // Person exists but has no resume yet → auto-create one so personal data can be filled
+  // Person exists but no active resume → find an existing one or create a new one (guarded by ref)
   if (!resume && person) {
-    addResume(person.id);
+    const existing = resumes.find(r => r.personId === person.id);
+    if (existing) {
+      setActiveResume(existing.id);
+    } else if (!addingRef.current) {
+      addingRef.current = true;
+      addResume(person.id).finally(() => { addingRef.current = false; });
+    }
     return null;
   }
 
@@ -69,6 +78,7 @@ export default function Editor() {
 
   const renderSection = () => {
     switch (activeSection) {
+      case 'overview':     return <ResumeOverview />;
       case 'personal':     return <PersonalInfoEditor />;
       case 'cover-letter': return <CoverLetterEditor />;
       case 'experience':   return <ExperienceEditor />;
@@ -82,7 +92,9 @@ export default function Editor() {
     }
   };
 
-  const currentSection = activeSection === 'personal'
+  const currentSection = activeSection === 'overview'
+    ? { label: resume?.name || 'Übersicht', icon: LayoutDashboard }
+    : activeSection === 'personal'
     ? { label: 'Persönliche Daten', icon: User }
     : SECTIONS.find(s => s.id === activeSection);
 

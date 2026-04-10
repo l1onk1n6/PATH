@@ -169,6 +169,7 @@ export interface CoverLetter {
 }
 
 export type EditorSection =
+  | 'overview'
   | 'personal'
   | 'cover-letter'
   | 'experience'

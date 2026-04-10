@@ -6,7 +6,7 @@ import {
   PanelLeftClose, PanelLeftOpen, Sparkles, UserCircle, Lock,
   User, Briefcase, GraduationCap, Zap, FolderOpen,
   Upload, Palette, LayoutList, FileEdit, Languages, History,
-  Shield, Gift, ClipboardList,
+  Shield, Gift, ClipboardList, Pencil, Check, X,
 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useAuthStore } from '../../store/authStore';
@@ -48,6 +48,8 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
   const [newName, setNewName] = useState('');
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [expandedPersonIds, setExpandedPersonIds] = useState<Set<string>>(new Set());
+  const [renamingResumeId, setRenamingResumeId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
   const { signOut } = useAuthStore();
   const { isPro, limits } = usePlan();
   const { activeSection, setActiveSection } = useResumeStore();
@@ -74,7 +76,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
 
   const {
     persons, resumes, activePersonId, activeResumeId,
-    addPerson, setActivePerson, addResume, setActiveResume, deleteResume,
+    addPerson, setActivePerson, addResume, setActiveResume, deleteResume, renameResume,
   } = useResumeStore();
 
   const frozenPersonIds = new Set(
@@ -333,23 +335,64 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
                       </button>
                     )}
                     <div style={{ height: 1, background: c.lineDash, margin: '3px 0 5px' }} />
-                    {personResumes.map((resume) => {
+                    {personResumes.map((resume, rIdx) => {
                       const isActiveR = resume.id === activeResumeId;
                       const isResumeFrozen = isPersonFrozen || frozenResumeIds.has(resume.id);
-                      const name = resume.name || `Bewerbungsmappe ${personResumes.indexOf(resume) + 1}`;
+                      const name = resume.name || `Bewerbungsmappe ${rIdx + 1}`;
+                      const isRenaming = renamingResumeId === resume.id;
+
+                      function startRename(e: React.MouseEvent) {
+                        e.stopPropagation();
+                        setRenameValue(resume.name || '');
+                        setRenamingResumeId(resume.id);
+                      }
+                      function commitRename() {
+                        if (renameValue.trim()) renameResume(resume.id, renameValue.trim());
+                        setRenamingResumeId(null);
+                      }
+
                       return (
-                        <div key={resume.id} style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 2, opacity: isResumeFrozen ? 0.5 : 1 }}>
-                          <button className="btn-glass"
-                            onClick={() => { if (!isResumeFrozen) { setActiveResume(resume.id); go('/editor'); } }}
-                            style={{ flex: 1, justifyContent: 'flex-start', padding: '6px 8px', borderRadius: 6, background: isActiveR && !isResumeFrozen ? 'rgba(0,122,255,0.2)' : 'transparent', border: isActiveR && !isResumeFrozen ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent', boxShadow: 'none', gap: 5, minWidth: 0, cursor: isResumeFrozen ? 'default' : 'pointer' }}>
-                            {isResumeFrozen ? <Lock size={10} style={{ opacity: 0.5, flexShrink: 0 }} /> : <FileText size={10} style={{ opacity: 0.5, flexShrink: 0 }} />}
-                            <span style={{ fontSize: 11, opacity: isActiveR && !isResumeFrozen ? 1 : 0.65, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-                          </button>
-                          {personResumes.length > 1 && (
-                            <button onClick={() => deleteResume(resume.id)}
-                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, opacity: 0.35, color: 'inherit', flexShrink: 0, display: 'flex' }}>
-                              <Trash2 size={10} />
-                            </button>
+                        <div key={resume.id} style={{ marginBottom: 2, opacity: isResumeFrozen ? 0.5 : 1 }}>
+                          {isRenaming ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '2px 0' }}>
+                              <input
+                                className="input-glass"
+                                value={renameValue}
+                                onChange={e => setRenameValue(e.target.value)}
+                                onKeyDown={e => { if (e.key === 'Enter') commitRename(); if (e.key === 'Escape') setRenamingResumeId(null); }}
+                                autoFocus
+                                maxLength={80}
+                                style={{ flex: 1, fontSize: 11, padding: '5px 8px' }}
+                              />
+                              <button onClick={commitRename} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 3, color: 'var(--ios-green)', display: 'flex' }}>
+                                <Check size={12} />
+                              </button>
+                              <button onClick={() => setRenamingResumeId(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 3, opacity: 0.5, color: 'inherit', display: 'flex' }}>
+                                <X size={12} />
+                              </button>
+                            </div>
+                          ) : (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                              <button className="btn-glass"
+                                onClick={() => { if (!isResumeFrozen) { setActiveResume(resume.id); setActiveSection('overview'); go('/editor'); } }}
+                                style={{ flex: 1, justifyContent: 'flex-start', padding: '6px 8px', borderRadius: 6, background: isActiveR && !isResumeFrozen ? 'rgba(0,122,255,0.2)' : 'transparent', border: isActiveR && !isResumeFrozen ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent', boxShadow: 'none', gap: 5, minWidth: 0, cursor: isResumeFrozen ? 'default' : 'pointer' }}>
+                                {isResumeFrozen ? <Lock size={10} style={{ opacity: 0.5, flexShrink: 0 }} /> : <FileText size={10} style={{ opacity: 0.5, flexShrink: 0 }} />}
+                                <span style={{ fontSize: 11, opacity: isActiveR && !isResumeFrozen ? 1 : 0.65, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+                              </button>
+                              {!isResumeFrozen && (
+                                <button onClick={startRename}
+                                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, opacity: 0.35, color: 'inherit', flexShrink: 0, display: 'flex' }}
+                                  title="Umbenennen">
+                                  <Pencil size={9} />
+                                </button>
+                              )}
+                              {personResumes.length > 1 && (
+                                <button onClick={() => deleteResume(resume.id)}
+                                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, opacity: 0.35, color: 'inherit', flexShrink: 0, display: 'flex' }}>
+                                  <Trash2 size={10} />
+                                </button>
+                              )}
+                            </div>
                           )}
                         </div>
                       );
