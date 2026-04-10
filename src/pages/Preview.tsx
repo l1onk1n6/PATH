@@ -58,14 +58,30 @@ async function renderElementToPdfDoc(
   const pageHeightPx = pdfH * pxPerMm; // canvas pixels per A4 page
 
   /**
+   * Find the last row containing any non-white pixel.
+   * Templates use minHeight: 297mm which leaves trailing white space — without
+   * this trim a single-page CV would always generate an extra blank page.
+   */
+  function findContentHeight(): number {
+    const ctx = canvas.getContext('2d')!;
+    for (let y = canvas.height - 1; y > 0; y--) {
+      const { data } = ctx.getImageData(0, y, canvas.width, 1);
+      for (let i = 0; i < data.length; i += 4) {
+        if (data[i] < 250 || data[i + 1] < 250 || data[i + 2] < 250) return y + 1;
+      }
+    }
+    return canvas.height;
+  }
+
+  /**
    * Scan upward from targetY to find a nearly-blank row (whitespace between
    * paragraphs). Cuts there instead of mid-line. Falls back to targetY if no
    * good break is found within the search window (8% of page height).
    */
-  function findBreakPoint(targetY: number): number {
+  function findBreakPoint(targetY: number, limit: number): number {
     const ctx = canvas.getContext('2d')!;
     const searchPx = Math.round(pageHeightPx * 0.08);
-    const start = Math.min(Math.round(targetY), canvas.height - 1);
+    const start = Math.min(Math.round(targetY), limit - 1);
     for (let y = start; y > start - searchPx; y--) {
       if (y <= 0) break;
       const { data } = ctx.getImageData(0, y, canvas.width, 1);
@@ -78,18 +94,23 @@ async function renderElementToPdfDoc(
     return start; // no whitespace found, cut at original boundary
   }
 
+  // Use content height instead of full canvas height to avoid trailing blank pages
+  const contentHeight = findContentHeight();
+
   let srcY = 0;
   let pageCount = 0;
 
-  while (srcY < canvas.height) {
+  while (srcY < contentHeight) {
     if (pageCount > 0) pdf.addPage();
 
-    const isLastPage = srcY + pageHeightPx >= canvas.height;
+    const isLastPage = srcY + pageHeightPx >= contentHeight;
     const breakY = isLastPage
-      ? canvas.height
-      : findBreakPoint(srcY + pageHeightPx);
+      ? contentHeight
+      : findBreakPoint(srcY + pageHeightPx, contentHeight);
 
     const srcH = Math.round(breakY - srcY);
+    if (srcH <= 0) break; // safety guard
+
     const pg = document.createElement('canvas');
     pg.width = canvas.width;
     pg.height = srcH;
@@ -121,15 +142,34 @@ async function mergePdfs(parts: Uint8Array[]): Promise<Uint8Array> {
   return merged.save();
 }
 
-// Embed an image dataUrl as a full A4 page in a new PDF
-async function imageToPdfBytes(dataUrl: string): Promise<Uint8Array | null> {
+/**
+ * Fetch raw bytes from a data: URI or an HTTPS URL (Supabase Storage).
+ * Returns bytes + mime type, or null on failure.
+ */
+async function fetchBytes(url: string): Promise<{ bytes: Uint8Array; mime: string } | null> {
+  try {
+    if (url.startsWith('data:')) {
+      const mime = url.split(';')[0].split(':')[1];
+      const bytes = Uint8Array.from(atob(url.split(',')[1]), c => c.charCodeAt(0));
+      return { bytes, mime };
+    }
+    // HTTPS (Supabase Storage signed URL or public URL)
+    const resp = await fetch(url);
+    if (!resp.ok) return null;
+    const mime = resp.headers.get('content-type')?.split(';')[0] ?? 'application/octet-stream';
+    return { bytes: new Uint8Array(await resp.arrayBuffer()), mime };
+  } catch { return null; }
+}
+
+// Embed an image (data: URI or HTTPS) as a full A4 page in a new PDF
+async function imageToPdfBytes(url: string): Promise<Uint8Array | null> {
   try {
     const { PDFDocument } = await import('pdf-lib');
+    const fetched = await fetchBytes(url);
+    if (!fetched) return null;
     const doc = await PDFDocument.create();
-    const isJpeg = dataUrl.includes('data:image/jpeg') || dataUrl.includes('data:image/jpg');
-    const base64 = dataUrl.split(',')[1];
-    const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-    const img = isJpeg ? await doc.embedJpg(bytes) : await doc.embedPng(bytes);
+    const isJpeg = fetched.mime.includes('jpeg') || fetched.mime.includes('jpg');
+    const img = isJpeg ? await doc.embedJpg(fetched.bytes) : await doc.embedPng(fetched.bytes);
     const a4w = 595.28, a4h = 841.89; // pts
     const scale = Math.min(a4w / img.width, a4h / img.height);
     const w = img.width * scale, h = img.height * scale;
@@ -155,14 +195,17 @@ async function exportAdaptive(
     }
 
     for (const { dataUrl, type } of docDataUrls) {
-      if (type === 'application/pdf' || dataUrl.startsWith('data:application/pdf')) {
-        const base64 = dataUrl.split(',')[1];
-        const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-        pdfParts.push(bytes);
-      } else {
+      if (!dataUrl) continue; // no URL yet (freshly uploaded, not yet synced)
+      const isPdf = type === 'application/pdf' || dataUrl.startsWith('data:application/pdf');
+      if (isPdf) {
+        // Works for both data: URIs and HTTPS (Supabase Storage)
+        const fetched = await fetchBytes(dataUrl);
+        if (fetched) pdfParts.push(fetched.bytes);
+      } else if (type.startsWith('image/') || dataUrl.startsWith('data:image/')) {
         const imgPdf = await imageToPdfBytes(dataUrl);
         if (imgPdf) pdfParts.push(imgPdf);
       }
+      // Word/other file types: silently skip (can't render client-side)
     }
 
     const merged = await mergePdfs(pdfParts);
