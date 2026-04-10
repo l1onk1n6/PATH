@@ -98,9 +98,12 @@ export default function DocumentUpload() {
     setUploading(false);
   }, [resume, addDocument, totalUsedBytes, totalLimitBytes, limits.documentsMb]);
 
-  const onDropRejected = useCallback((rejections: { file: File }[]) => {
-    const tooBig = rejections.some(r => r.file.size > MAX_FILE_BYTES);
+  const onDropRejected = useCallback((rejections: { file: File; errors: { code: string }[] }[]) => {
+    const tooBig = rejections.some(r => r.errors.some(e => e.code === 'file-too-large'));
+    const wrongType = rejections.some(r => r.errors.some(e => e.code === 'file-invalid-type'));
     if (tooBig) setSizeError(`Datei zu gross — max. ${MAX_FILE_MB} MB pro Datei erlaubt.`);
+    else if (wrongType) setSizeError('Nicht unterstütztes Format — nur PDF, JPG, PNG und WebP erlaubt.');
+    else setSizeError('Datei konnte nicht hinzugefügt werden.');
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -108,6 +111,13 @@ export default function DocumentUpload() {
     onDropRejected,
     multiple: true,
     maxSize: MAX_FILE_BYTES,
+    accept: {
+      'application/pdf': ['.pdf'],
+      'image/jpeg': ['.jpg', '.jpeg'],
+      'image/png': ['.png'],
+      'image/webp': ['.webp'],
+      'image/gif': ['.gif'],
+    },
   });
 
   if (!resume) return null;
@@ -180,7 +190,7 @@ export default function DocumentUpload() {
             <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
               {storageFull
                 ? `Limit von ${limits.documentsMb} MB erreicht — Dateien löschen um Platz zu schaffen`
-                : `Dateien hierher ziehen oder klicken · PDF, Bilder, Word · max. ${MAX_FILE_MB} MB`}
+                : `Dateien hierher ziehen oder klicken · PDF, JPG, PNG, WebP · max. ${MAX_FILE_MB} MB`}
             </div>
           </>
         )}
