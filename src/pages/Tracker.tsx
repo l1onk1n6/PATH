@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp, ClipboardList, Link, LayoutGrid, List } from 'lucide-react';
 import { useTrackerStore, type Application, type ApplicationStatus, type ApplicationType } from '../store/trackerStore';
 import { useResumeStore } from '../store/resumeStore';
+import type { Resume } from '../types/resume';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { CustomSelect } from '../components/ui/CustomSelect';
 
@@ -85,7 +86,7 @@ interface KanbanCardProps {
   onToggleExpand: () => void;
   onStatusChange: (status: ApplicationStatus) => void;
   onDelete: () => void;
-  resumes: ReturnType<typeof useResumeStore>['resumes'];
+  resumes: Resume[];
   updateApplication: (id: string, patch: Partial<Omit<Application, 'id'>>) => void;
   removeApplication: (id: string) => void;
 }
@@ -356,7 +357,7 @@ interface KanbanBoardProps {
   addApplication: () => void;
   updateApplication: (id: string, patch: Partial<Omit<Application, 'id'>>) => void;
   removeApplication: (id: string) => void;
-  resumes: ReturnType<typeof useResumeStore>['resumes'];
+  resumes: Resume[];
 }
 
 function KanbanBoard({

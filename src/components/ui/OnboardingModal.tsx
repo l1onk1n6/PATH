@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Check, FileText, Sparkles, Share2, Bell, Wand2 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
+import type { TemplateId } from '../../types/resume';
 import { LogoIcon } from '../layout/Logo';
 
 const ONBOARDING_KEY = 'path_onboarding_done';
@@ -133,7 +134,7 @@ export default function OnboardingModal({ onClose }: Props) {
     if (activePerson) {
       const resume = currentResumes.find(r => r.personId === activePerson.id);
       if (resume) {
-        updateResume(resume.id, { templateId: selectedTemplate, accentColor: selectedAccent });
+        updateResume(resume.id, { templateId: selectedTemplate as TemplateId, accentColor: selectedAccent });
       }
     }
     setStep(3);
