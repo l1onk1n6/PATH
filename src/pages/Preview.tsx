@@ -288,7 +288,7 @@ export default function Preview() {
   const { getActiveResume, setTemplate } = useResumeStore();
   const { limits, isPro } = usePlan();
   const resume = getActiveResume();
-  const [zoom, setZoom] = useState(isMobile ? 0.42 : 0.7);
+  const [zoom, setZoom] = useState(isMobile ? 0.42 : 1.0);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
