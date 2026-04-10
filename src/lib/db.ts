@@ -5,7 +5,7 @@
  */
 import { getSupabase, isSupabaseConfigured } from './supabase';
 import { getDocumentSignedUrl, deleteStorageFile, DOCUMENTS_BUCKET } from './storage';
-import type { Person, Resume, UploadedDocument, ApplicationStatus } from '../types/resume';
+import type { Person, Resume, UploadedDocument, ApplicationStatus, ShareLink, ShareLinkView } from '../types/resume';
 import type { Application } from '../types/tracker';
 
 function sb() {
@@ -313,4 +313,122 @@ function rowToApplication(row: Record<string, unknown>): Application {
     url: (row.url as string) ?? '',
     resumeId: (row.resume_id as string) ?? '',
   };
+}
+
+// ── Share Links ─────────────────────────────────────────────
+
+export async function getShareLinks(resumeId: string): Promise<ShareLink[]> {
+  if (!isSupabaseConfigured()) return [];
+  try {
+    const { data, error } = await sb()
+      .from('share_links')
+      .select('id, resume_id, token, label, is_active, created_at, resume_views(count)')
+      .eq('resume_id', resumeId)
+      .order('created_at', { ascending: false });
+    if (error || !data) return [];
+    return (data as Record<string, unknown>[]).map(row => ({
+      id: row.id as string,
+      resumeId: row.resume_id as string,
+      token: row.token as string,
+      label: (row.label as string) || '',
+      isActive: row.is_active as boolean,
+      createdAt: row.created_at as string,
+      viewCount: (row.resume_views as { count: number }[])?.[0]?.count ?? 0,
+    }));
+  } catch (e) {
+    console.warn('[db] getShareLinks', e);
+    return [];
+  }
+}
+
+export async function createShareLink(resumeId: string, label: string): Promise<ShareLink | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    const uid = await userId();
+    if (!uid) return null;
+    const { data, error } = await sb()
+      .from('share_links')
+      .insert({ resume_id: resumeId, user_id: uid, label })
+      .select('id, resume_id, token, label, is_active, created_at')
+      .single();
+    if (error || !data) return null;
+    const row = data as Record<string, unknown>;
+    return { id: row.id as string, resumeId: row.resume_id as string, token: row.token as string, label: (row.label as string) || '', isActive: row.is_active as boolean, createdAt: row.created_at as string, viewCount: 0 };
+  } catch (e) {
+    console.warn('[db] createShareLink', e);
+    return null;
+  }
+}
+
+export async function updateShareLink(linkId: string, patch: { label?: string; isActive?: boolean }): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  try {
+    const update: Record<string, unknown> = {};
+    if (patch.label !== undefined) update.label = patch.label;
+    if (patch.isActive !== undefined) update.is_active = patch.isActive;
+    await sb().from('share_links').update(update).eq('id', linkId);
+  } catch (e) {
+    console.warn('[db] updateShareLink', e);
+  }
+}
+
+export async function deleteShareLink(linkId: string): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  try {
+    await sb().from('share_links').delete().eq('id', linkId);
+  } catch (e) {
+    console.warn('[db] deleteShareLink', e);
+  }
+}
+
+export async function getShareLinkViews(linkId: string, limit = 50): Promise<ShareLinkView[]> {
+  if (!isSupabaseConfigured()) return [];
+  try {
+    const { data, error } = await sb()
+      .from('resume_views')
+      .select('id, viewed_at, country, country_code, city, device, browser, referrer, duration_s')
+      .eq('share_link_id', linkId)
+      .order('viewed_at', { ascending: false })
+      .limit(limit);
+    if (error || !data) return [];
+    return (data as Record<string, unknown>[]).map(row => ({
+      id: row.id as string,
+      viewedAt: row.viewed_at as string,
+      country: row.country as string | undefined,
+      countryCode: row.country_code as string | undefined,
+      city: row.city as string | undefined,
+      device: row.device as string | undefined,
+      browser: row.browser as string | undefined,
+      referrer: row.referrer as string | undefined,
+      durationS: row.duration_s as number | undefined,
+    }));
+  } catch (e) {
+    console.warn('[db] getShareLinkViews', e);
+    return [];
+  }
+}
+
+// fetchSharedResume: checks share_links table (new) + resumes.share_token (legacy)
+export async function fetchSharedResumeByToken(token: string): Promise<Resume | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    // New path: share_links table
+    const { data: link } = await sb()
+      .from('share_links')
+      .select('resume_id')
+      .eq('token', token)
+      .eq('is_active', true)
+      .maybeSingle();
+    if (link) {
+      const { data } = await sb().from('resumes').select('*').eq('id', (link as Record<string, unknown>).resume_id as string).maybeSingle();
+      if (data) return rowToResume(data as Record<string, unknown>);
+    }
+    // Legacy path: resumes.share_token
+    const { data } = await sb().from('resumes').select('*').eq('share_token', token).not('share_token', 'is', null).maybeSingle();
+    if (data) return rowToResume(data as Record<string, unknown>);
+    return null;
+  } catch (e) {
+    console.warn('[db] fetchSharedResumeByToken', e);
+    return null;
+  }
 }

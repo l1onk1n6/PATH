@@ -63,7 +63,7 @@ export const PRO_FEATURES: ProFeature[] = [
   { id: 'ai',        label: 'KI-Assistent',             icon: '✦', description: 'Anschreiben generieren & Texte mit Claude KI verbessern',               available: true },
   { id: 'ats',       label: 'ATS-Score',                icon: '📊', description: 'Lebenslauf gegen Stellenbeschreibung prüfen & Keywords optimieren',     available: false },
   { id: 'history',   label: 'CV-Versionshistorie',      icon: '🕓', description: 'Frühere Versionen wiederherstellen',                                     available: true  },
-  { id: 'analytics', label: 'Link-Analytics',           icon: '📈', description: 'Sehen wer deinen geteilten Lebenslauf aufgerufen hat',                  available: false },
+  { id: 'analytics', label: 'Link-Analytics',           icon: '📈', description: 'Sehen wer deinen geteilten Lebenslauf aufgerufen hat',                  available: true },
   { id: 'translate', label: 'Mehrsprachige CVs',        icon: '🌍', description: 'Automatische Übersetzung in jede Sprache',                              available: true },
   { id: 'password',  label: 'PDF-Passwortschutz',       icon: '🔐', description: 'Bewerbungs-PDFs verschlüsselt versenden',                               available: false },
   { id: 'reminder',  label: 'Deadline-Reminder',        icon: '⏰', description: 'E-Mail-Benachrichtigung vor Bewerbungsschluss',                         available: true  },

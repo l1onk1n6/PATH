@@ -1,10 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Loader2, AlertCircle } from 'lucide-react';
 import type { Resume } from '../types/resume';
-import { fetchSharedResume } from '../lib/db';
+import { fetchSharedResumeByToken } from '../lib/db';
 import ResumePreview from '../components/templates/ResumePreview';
 import { LogoFull } from '../components/layout/Logo';
+import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
+
+const TRACK_URL = `${import.meta.env.VITE_SUPABASE_URL ?? ''}/functions/v1/track-view`;
+
+async function trackView(token: string): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    const res = await fetch(TRACK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    });
+    const json = await res.json();
+    return json.view_id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function sendDuration(viewId: string, durationS: number) {
+  if (!isSupabaseConfigured()) return;
+  const body = JSON.stringify({ view_id: viewId, duration_s: durationS });
+  if (navigator.sendBeacon) {
+    const blob = new Blob([body], { type: 'application/json' });
+    navigator.sendBeacon(TRACK_URL.replace('track-view', 'track-view') + '?method=PATCH', blob);
+  } else {
+    fetch(TRACK_URL, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {});
+  }
+}
 
 export default function SharedResumePage() {
   const [params] = useSearchParams();
@@ -12,14 +41,31 @@ export default function SharedResumePage() {
   const [resume, setResume] = useState<Resume | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const viewIdRef = useRef<string | null>(null);
+  const loadTimeRef = useRef<number>(Date.now());
 
   useEffect(() => {
     if (!token) { setLoading(false); setNotFound(true); return; }
-    fetchSharedResume(token).then((r) => {
-      if (r) setResume(r);
-      else setNotFound(true);
+    fetchSharedResumeByToken(token).then((r) => {
+      if (r) {
+        setResume(r);
+        // Track view asynchronously
+        trackView(token).then(id => { viewIdRef.current = id; });
+      } else {
+        setNotFound(true);
+      }
       setLoading(false);
     });
+
+    // Send duration on page unload
+    const handleUnload = () => {
+      if (viewIdRef.current) {
+        const durationS = Math.round((Date.now() - loadTimeRef.current) / 1000);
+        sendDuration(viewIdRef.current, durationS);
+      }
+    };
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
   }, [token]);
 
   if (loading) {

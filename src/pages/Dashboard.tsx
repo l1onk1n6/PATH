@@ -62,29 +62,15 @@ function AtsButton() {
 }
 
 // ── Share modal ────────────────────────────────────────────
-function ShareModal({ resumeId, token, onClose }: { resumeId: string; token?: string; onClose: () => void }) {
-  const { setShareToken, resumes } = useResumeStore();
-  const { limits } = usePlan();
-  const [copied, setCopied] = useState(false);
+function ShareModal({ resumeId, onClose }: { resumeId: string; onClose: () => void }) {
+  const navigate = useNavigate();
+  const { setActiveResume, setActiveSection } = useResumeStore();
 
-  const shareUrl = token ? `${window.location.origin}${window.location.pathname}#/shared?t=${token}` : null;
-  const activeShareCount = resumes.filter(r => r.shareToken && r.id !== resumeId).length;
-  const atShareLimit = !token && activeShareCount >= limits.shareLinks;
-
-  function generate() {
-    if (atShareLimit) return;
-    setShareToken(resumeId, uuidv4());
-  }
-
-  function disable() {
-    setShareToken(resumeId, null);
-  }
-
-  function copy() {
-    if (!shareUrl) return;
-    navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  function goToOverview() {
+    setActiveResume(resumeId);
+    setActiveSection('overview');
+    navigate('/editor');
+    onClose();
   }
 
   return (
@@ -99,40 +85,12 @@ function ShareModal({ resumeId, token, onClose }: { resumeId: string; token?: st
             <X size={14} />
           </button>
         </div>
-
-        {!shareUrl ? (
-          <>
-            <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 14 }}>
-              Erstelle einen öffentlichen Link — der Lebenslauf ist ohne Login einsehbar.
-            </p>
-            {atShareLimit ? (
-              <div style={{ fontSize: 12, color: '#FF9F0A', background: 'rgba(255,159,10,0.1)', border: '1px solid rgba(255,159,10,0.25)', borderRadius: 8, padding: '10px 12px' }}>
-                Share-Link-Limit erreicht ({limits.shareLinks}/{limits.shareLinks}). Deaktiviere einen anderen Link oder upgrade auf Pro.
-              </div>
-            ) : (
-              <button className="btn-glass btn-primary" style={{ width: '100%' }} onClick={generate}>
-                <Share2 size={14} /> Link generieren
-              </button>
-            )}
-          </>
-        ) : (
-          <>
-            <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
-              <input
-                className="input-glass"
-                readOnly
-                value={shareUrl}
-                style={{ flex: 1, fontSize: 11 }}
-              />
-              <button className="btn-glass btn-primary" onClick={copy} style={{ flexShrink: 0, padding: '0 12px' }}>
-                {copied ? <CheckCircle size={14} /> : 'Kopieren'}
-              </button>
-            </div>
-            <button className="btn-glass btn-danger" style={{ width: '100%', fontSize: 12 }} onClick={disable}>
-              Link deaktivieren
-            </button>
-          </>
-        )}
+        <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 16 }}>
+          Erstelle benannte Links pro Stelle und verfolge Aufrufe, Herkunft und Gerät in der Übersicht.
+        </p>
+        <button className="btn-glass btn-primary" style={{ width: '100%' }} onClick={goToOverview}>
+          <Share2 size={14} /> Zu Links & Analytics
+        </button>
       </div>
     </div>
   );
@@ -267,7 +225,7 @@ export default function Dashboard() {
   const { limits } = usePlan();
   const {
     persons, resumes, addPerson, deletePerson, setActivePerson, activePersonId,
-    addResume, deleteResume, setActiveResume, renameResume, duplicateResume, setResumeStatus,
+    addResume, deleteResume, setActiveResume, setActiveSection, renameResume, duplicateResume, setResumeStatus,
     exportGdprData, limitError, clearLimitError,
   } = useResumeStore();
 
@@ -328,7 +286,6 @@ export default function Dashboard() {
     ? Math.round(resumes.reduce((acc, r) => acc + calcCompleteness(r).score, 0) / resumes.length)
     : 0;
 
-  const shareResume = shareModalResumeId ? resumes.find(r => r.id === shareModalResumeId) : null;
 
   return (
     <div className="animate-fade-in" style={{ height: '100%', overflow: 'auto', padding: isMobile ? '0 0 16px' : '0 2px 16px' }}>
@@ -444,10 +401,9 @@ export default function Dashboard() {
       })()}
 
       {/* Share modal */}
-      {shareModalResumeId && shareResume && (
+      {shareModalResumeId && (
         <ShareModal
           resumeId={shareModalResumeId}
-          token={shareResume.shareToken}
           onClose={() => setShareModalResumeId(null)}
         />
       )}

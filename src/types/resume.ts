@@ -144,6 +144,29 @@ export interface Person {
   createdAt: string;
 }
 
+export interface ShareLink {
+  id: string;
+  resumeId: string;
+  token: string;
+  label: string;
+  isActive: boolean;
+  createdAt: string;
+  viewCount?: number;
+  lastViewedAt?: string;
+}
+
+export interface ShareLinkView {
+  id: string;
+  viewedAt: string;
+  country?: string;
+  countryCode?: string;
+  city?: string;
+  device?: string;
+  browser?: string;
+  referrer?: string;
+  durationS?: number;
+}
+
 export type ApplicationStatus = 'entwurf' | 'gesendet' | 'interview' | 'abgelehnt' | 'angenommen';
 
 export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {

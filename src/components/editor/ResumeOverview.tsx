@@ -1,13 +1,14 @@
 import { useState, useCallback } from 'react';
+import {
+  ExternalLink, Pencil, Check, X, Calendar, Link2,
+  CheckCircle2, Circle, Bell, Loader2, Sparkles, Mail, AlertCircle, Share2,
+} from 'lucide-react';
+import ShareLinksPanel from './ShareLinksPanel';
 
 function safeUrl(url: string) {
   if (!url) return url;
   return /^https?:\/\//i.test(url) ? url : `https://${url}`;
 }
-import {
-  ExternalLink, Pencil, Check, X, Calendar, Link2,
-  CheckCircle2, Circle, Bell, Loader2, Sparkles, Mail, AlertCircle,
-} from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useAuthStore } from '../../store/authStore';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
@@ -418,6 +419,14 @@ export default function ResumeOverview() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Share Links & Analytics */}
+      <div className="glass-card" style={{ padding: 16 }}>
+        <div className="section-label" style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
+          <Share2 size={11} /> Link-Analytics
+        </div>
+        <ShareLinksPanel resumeId={resume.id} />
       </div>
     </div>
   );
