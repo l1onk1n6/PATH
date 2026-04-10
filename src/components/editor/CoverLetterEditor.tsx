@@ -214,7 +214,7 @@ export default function CoverLetterEditor() {
       </div>
 
       {/* Structured address */}
-      <div>
+      <div style={{ maxWidth: 420 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
           <label style={{ fontSize: 12, fontWeight: 600, opacity: 0.7 }}>Empfänger / Adresse</label>
           {addr.company && (
