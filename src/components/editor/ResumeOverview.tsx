@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ExternalLink, Pencil, Check, X, Calendar, Link2, Briefcase, GraduationCap, Zap, FileEdit, CheckCircle2, Circle } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
-import { APPLICATION_STATUS_LABELS, APPLICATION_STATUS_COLORS } from '../../types/resume';
+import { APPLICATION_STATUS_LABELS } from '../../types/resume';
 import type { EditorSection } from '../../types/resume';
 
 export default function ResumeOverview() {
