@@ -9,6 +9,7 @@ export interface PersonalInfo {
   website: string;
   linkedin: string;
   github: string;
+  birthDate?: string; // YYYY-MM-DD
   summary: string;
   photo?: string; // base64
 }

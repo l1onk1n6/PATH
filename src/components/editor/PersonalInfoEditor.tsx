@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { User, Mail, Phone, MapPin, Globe, Link2, FileText, Camera, AlertCircle } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Globe, Link2, FileText, Camera, AlertCircle, Cake } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { validatePhotoFile, sanitizePhotoUrl } from '../../lib/security';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
@@ -170,6 +170,13 @@ export default function PersonalInfoEditor() {
           </label>
           <input className="input-glass" placeholder="8000 Zürich" value={info.location} maxLength={100}
             onChange={(e) => update('location', e.target.value)} />
+        </div>
+        <div>
+          <label className="section-label">
+            <Cake size={9} style={{ display: 'inline', marginRight: 3 }} />Geburtsdatum
+          </label>
+          <input className="input-glass" type="date" value={info.birthDate ?? ''}
+            onChange={(e) => update('birthDate', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
