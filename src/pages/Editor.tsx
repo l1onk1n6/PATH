@@ -36,7 +36,7 @@ const SECTIONS: { id: EditorSection; label: string; short: string; icon: React.C
 export default function Editor() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { getActiveResume, getActivePerson, activeSection, setActiveSection, resumes } = useResumeStore();
+  const { getActiveResume, getActivePerson, activeSection, setActiveSection, resumes, addResume } = useResumeStore();
   const { limits } = usePlan();
   const { showTranslate, setShowTranslate } = useUIStore();
   const resume = getActiveResume();
@@ -45,6 +45,12 @@ export default function Editor() {
   // Check if the active resume is frozen (beyond plan limit)
   const resumeIndex = resume ? resumes.findIndex(r => r.id === resume.id) : -1;
   const isFrozen = limits.resumes < Infinity && resumeIndex >= limits.resumes;
+
+  // Person exists but has no resume yet → auto-create one so personal data can be filled
+  if (!resume && person) {
+    addResume(person.id);
+    return null;
+  }
 
   if (!resume || !person) {
     return (

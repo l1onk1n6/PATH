@@ -213,8 +213,13 @@ export const useResumeStore = create<ResumeStore>()(
       },
 
       setActivePerson: (id) => {
-        const person = get().persons.find((p) => p.id === id);
-        set({ activePersonId: id, activeResumeId: person?.activeResumeId ?? null });
+        const state = get();
+        const person = state.persons.find((p) => p.id === id);
+        // Fall back to first resume of this person if activeResumeId is not set
+        const resumeId = person?.activeResumeId
+          || state.resumes.find(r => r.personId === id)?.id
+          || null;
+        set({ activePersonId: id, activeResumeId: resumeId });
       },
 
       // ── Resumes ─────────────────────────────────────────
