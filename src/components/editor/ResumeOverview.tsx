@@ -17,15 +17,18 @@ const REMINDER_OPTS = [
   { days: 14, label: '2 Wochen' },
 ];
 
-function ReminderSection({ resumeId, deadline, reminderDays }: {
+function ReminderSection({ resumeId, deadline, reminderDays, personEmail }: {
   resumeId: string;
   deadline: string;
   reminderDays: number[];
+  personEmail: string;
 }) {
   const { updateResume } = useResumeStore();
   const { session } = useAuthStore();
   const { isPro } = usePlan();
-  const recipientEmail: string = (session?.user?.email as string) ?? '';
+  const accountEmail: string = (session?.user?.email as string) ?? '';
+  const recipientEmail = personEmail || accountEmail;
+  const isUsingFallback = !personEmail && !!accountEmail;
   const [selected, setSelected] = useState<number[]>(reminderDays ?? []);
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<number | null>(null);
@@ -48,7 +51,13 @@ function ReminderSection({ resumeId, deadline, reminderDays }: {
     try {
       const resumeName = useResumeStore.getState().resumes.find(r => r.id === resumeId)?.name ?? '';
       const { error: fnErr } = await getSupabase().functions.invoke('upsert-deadline-reminders', {
-        body: { resume_id: resumeId, deadline, reminder_days: next, resume_name: resumeName },
+        body: {
+          resume_id: resumeId,
+          deadline,
+          reminder_days: next,
+          resume_name: resumeName,
+          recipient_email: recipientEmail || undefined,
+        },
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (fnErr) setError('Sync fehlgeschlagen.');
@@ -167,20 +176,30 @@ function ReminderSection({ resumeId, deadline, reminderDays }: {
       {isPro && (
         recipientEmail ? (
           <div style={{
-            marginTop: 10, display: 'flex', alignItems: 'center', gap: 6,
-            fontSize: 11, color: 'var(--text-muted)',
+            marginTop: 10, padding: '8px 12px', borderRadius: 8,
+            background: isUsingFallback ? 'rgba(255,159,10,0.08)' : 'rgba(255,255,255,0.04)',
+            border: `1px solid ${isUsingFallback ? 'rgba(255,159,10,0.25)' : 'rgba(255,255,255,0.08)'}`,
+            display: 'flex', alignItems: 'flex-start', gap: 7,
           }}>
-            <Mail size={10} style={{ flexShrink: 0, opacity: 0.6 }} />
-            <span>Wird gesendet an <strong style={{ color: 'var(--text-secondary)' }}>{recipientEmail}</strong></span>
+            <Mail size={11} style={{ flexShrink: 0, marginTop: 1, color: isUsingFallback ? '#FF9F0A' : 'var(--text-muted)', opacity: isUsingFallback ? 1 : 0.6 }} />
+            <div style={{ fontSize: 11, lineHeight: 1.5 }}>
+              <span style={{ color: 'var(--text-muted)' }}>Erinnerung wird gesendet an </span>
+              <strong style={{ color: 'var(--text-secondary)' }}>{recipientEmail}</strong>
+              {isUsingFallback && (
+                <div style={{ color: '#FF9F0A', marginTop: 2 }}>
+                  Konto-E-Mail wird verwendet — hinterlege eine E-Mail in den persönlichen Daten für diese Person.
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <div style={{
-            marginTop: 10, display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px',
+            marginTop: 10, display: 'flex', alignItems: 'center', gap: 7, padding: '8px 12px',
             borderRadius: 8, background: 'rgba(255,59,48,0.1)', border: '1px solid rgba(255,59,48,0.25)',
             fontSize: 11, color: '#FF3B30',
           }}>
             <AlertCircle size={12} style={{ flexShrink: 0 }} />
-            Keine E-Mail-Adresse für dein Konto gefunden. Erinnerungen können nicht gesendet werden.
+            Keine E-Mail-Adresse gefunden. Hinterlege eine Mail in den persönlichen Daten oder am Konto.
           </div>
         )
       )}
@@ -326,6 +345,7 @@ export default function ResumeOverview() {
           resumeId={resume.id}
           deadline={resume.deadline}
           reminderDays={resume.reminderDays ?? []}
+          personEmail={info.email ?? ''}
         />
       </div>
 

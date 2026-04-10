@@ -31,12 +31,17 @@ Deno.serve(async (req) => {
     const email   = payload.email as string
     if (!userId || !email) return new Response('Unauthorized', { status: 401, headers: cors })
 
-    const { resume_id, deadline, reminder_days, resume_name } = await req.json() as {
-      resume_id:    string
-      deadline:     string   // YYYY-MM-DD or ''
-      reminder_days: number[] // e.g. [1, 3, 7]
-      resume_name:  string
+    const { resume_id, deadline, reminder_days, resume_name, recipient_email } = await req.json() as {
+      resume_id:      string
+      deadline:       string   // YYYY-MM-DD or ''
+      reminder_days:  number[] // e.g. [1, 3, 7]
+      resume_name:    string
+      recipient_email?: string  // person's email; falls back to account email from JWT
     }
+
+    // Use person email if provided and valid, otherwise fall back to account email
+    const targetEmail = recipient_email?.trim() || email
+    if (!targetEmail) return new Response('No email address available', { status: 422, headers: cors })
 
     const admin = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -70,7 +75,7 @@ Deno.serve(async (req) => {
           resume_name,
           deadline,
           remind_at:   remindAt.toISOString(),
-          email,
+          email:       targetEmail,
           sent:        false,
         } : null
       })
