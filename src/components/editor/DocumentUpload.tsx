@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import type { FileRejection } from 'react-dropzone';
 import { Upload, File, Trash2, FileText, Image, Download, AlertCircle, Loader } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
@@ -98,7 +99,7 @@ export default function DocumentUpload() {
     setUploading(false);
   }, [resume, addDocument, totalUsedBytes, totalLimitBytes, limits.documentsMb]);
 
-  const onDropRejected = useCallback((rejections: { file: File; errors: { code: string }[] }[]) => {
+  const onDropRejected = useCallback((rejections: FileRejection[]) => {
     const tooBig = rejections.some(r => r.errors.some(e => e.code === 'file-too-large'));
     const wrongType = rejections.some(r => r.errors.some(e => e.code === 'file-invalid-type'));
     if (tooBig) setSizeError(`Datei zu gross — max. ${MAX_FILE_MB} MB pro Datei erlaubt.`);
