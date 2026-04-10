@@ -23,7 +23,6 @@ interface SidebarProps {
 }
 
 const EDITOR_SECTIONS: { id: EditorSection; label: string; icon: React.ComponentType<{ size: number; style?: React.CSSProperties }> }[] = [
-  { id: 'personal',     label: 'Persönliche Daten',    icon: User },
   { id: 'cover-letter', label: 'Motivationsschreiben', icon: FileEdit },
   { id: 'experience',   label: 'Berufserfahrung',       icon: Briefcase },
   { id: 'education',    label: 'Ausbildung',            icon: GraduationCap },
@@ -323,6 +322,17 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
 
                 {isExpanded && (
                   <div style={{ marginLeft: 18, marginTop: 3, paddingLeft: 8, borderLeft: `1px solid ${c.line}` }}>
+                    {/* Persönliche Daten gehört zur Person, nicht zur Mappe */}
+                    {!isPersonFrozen && (
+                      <button
+                        style={subItem(isActiveP && activeSection === 'personal' && isEditorActive)}
+                        onClick={() => { setActivePerson(person.id); setActiveSection('personal'); go('/editor'); }}
+                      >
+                        <User size={12} style={{ flexShrink: 0, opacity: 0.7 }} />
+                        <span style={{ fontSize: 12 }}>Persönliche Daten</span>
+                      </button>
+                    )}
+                    <div style={{ height: 1, background: c.lineDash, margin: '3px 0 5px' }} />
                     {personResumes.map((resume) => {
                       const isActiveR = resume.id === activeResumeId;
                       const isResumeFrozen = isPersonFrozen || frozenResumeIds.has(resume.id);

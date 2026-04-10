@@ -21,8 +21,8 @@ import TranslateDialog from '../components/editor/TranslateDialog';
 import VersionHistoryPanel from '../components/editor/VersionHistoryPanel';
 import { useIsMobile } from '../hooks/useBreakpoint';
 
+// 'personal' is intentionally excluded — it lives at the Person level in the sidebar
 const SECTIONS: { id: EditorSection; label: string; short: string; icon: React.ComponentType<LucideProps> }[] = [
-  { id: 'personal',     label: 'Persönliche Daten',     short: 'Person',    icon: User },
   { id: 'cover-letter', label: 'Motivationsschreiben',  short: 'Anschreiben', icon: FileEdit },
   { id: 'experience',   label: 'Berufserfahrung',        short: 'Erfahrung', icon: Briefcase },
   { id: 'education',    label: 'Ausbildung',             short: 'Bildung',   icon: GraduationCap },
@@ -76,7 +76,9 @@ export default function Editor() {
     }
   };
 
-  const currentSection = SECTIONS.find(s => s.id === activeSection);
+  const currentSection = activeSection === 'personal'
+    ? { label: 'Persönliche Daten', icon: User }
+    : SECTIONS.find(s => s.id === activeSection);
 
   // ── Frozen overlay ────────────────────────────────────────
   if (isFrozen) {
@@ -158,7 +160,14 @@ export default function Editor() {
                   <currentSection.icon size={15} />
                 </div>
               )}
-              <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{currentSection?.label}</h2>
+              <div>
+                <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{currentSection?.label}</h2>
+                {activeSection === 'personal' && (
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                    Gilt für alle Mappen von {person.name}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           {renderSection()}
