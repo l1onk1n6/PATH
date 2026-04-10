@@ -30,7 +30,7 @@ const MAX_FILE_MB = 3;
 const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
 
 export default function DocumentUpload() {
-  const { getActiveResume, addDocument, removeDocument, resumes } = useResumeStore();
+  const { getActiveResume, addDocument, updateDocument, removeDocument, resumes } = useResumeStore();
   const resume = getActiveResume();
   const { limits } = usePlan();
   const [sizeError, setSizeError] = useState('');
@@ -129,10 +129,7 @@ export default function DocumentUpload() {
 
   function updateCategory(docId: string, category: UploadedDocument['category']) {
     if (!resume) return;
-    const doc = resume.documents.find(d => d.id === docId);
-    if (!doc) return;
-    removeDocument(resume.id, docId);
-    addDocument(resume.id, { ...doc, category });
+    updateDocument(resume.id, docId, { category });
   }
 
   async function handleDownload(doc: UploadedDocument) {
