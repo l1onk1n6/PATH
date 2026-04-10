@@ -10,6 +10,28 @@ import * as db from '../lib/db';
 import { LIMITS, getPlanFromMetadata } from '../lib/plan';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 
+/** Sort work experience: current jobs first, then by startDate descending. */
+function sortWork(arr: WorkExperience[]): WorkExperience[] {
+  return [...arr].sort((a, b) => {
+    if (a.current && !b.current) return -1;
+    if (!a.current && b.current) return 1;
+    if (!a.startDate && !b.startDate) return 0;
+    if (!a.startDate) return 1;
+    if (!b.startDate) return -1;
+    return b.startDate.localeCompare(a.startDate);
+  });
+}
+
+/** Sort education by startDate descending. */
+function sortEdu(arr: Education[]): Education[] {
+  return [...arr].sort((a, b) => {
+    if (!a.startDate && !b.startDate) return 0;
+    if (!a.startDate) return 1;
+    if (!b.startDate) return -1;
+    return b.startDate.localeCompare(a.startDate);
+  });
+}
+
 async function getCurrentPlan() {
   if (!isSupabaseConfigured()) return 'free' as const;
   try {
@@ -527,7 +549,12 @@ export const useResumeStore = create<ResumeStore>()(
 
       clearLimitError: () => set({ limitError: null }),
       setActiveSection: (section) => set({ activeSection: section }),
-      getActiveResume: () => { const { resumes, activeResumeId } = get(); return resumes.find(r => r.id === activeResumeId) ?? null; },
+      getActiveResume: () => {
+        const { resumes, activeResumeId } = get();
+        const r = resumes.find(r => r.id === activeResumeId);
+        if (!r) return null;
+        return { ...r, workExperience: sortWork(r.workExperience), education: sortEdu(r.education) };
+      },
       getActivePerson: () => { const { persons, activePersonId } = get(); return persons.find(p => p.id === activePersonId) ?? null; },
     }),
     {
