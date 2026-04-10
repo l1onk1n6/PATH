@@ -9,6 +9,16 @@ function safeUrl(url: string) {
   if (!url) return url;
   return /^https?:\/\//i.test(url) ? url : `https://${url}`;
 }
+
+function looksLikeUrl(url: string) {
+  if (!url) return false;
+  try {
+    const u = new URL(/^https?:\/\//i.test(url) ? url : `https://${url}`);
+    return u.hostname.includes('.');
+  } catch {
+    return false;
+  }
+}
 import { useResumeStore } from '../../store/resumeStore';
 import { useAuthStore } from '../../store/authStore';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
@@ -345,7 +355,7 @@ export default function ResumeOverview() {
                 onChange={e => updateResume(resume.id, { jobUrl: e.target.value })}
                 style={{ flex: 1 }}
               />
-              {resume.jobUrl && (
+              {looksLikeUrl(resume.jobUrl) && (
                 <a
                   href={safeUrl(resume.jobUrl)}
                   target="_blank"
