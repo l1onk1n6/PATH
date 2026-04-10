@@ -530,6 +530,14 @@ export const useResumeStore = create<ResumeStore>()(
       getActiveResume: () => { const { resumes, activeResumeId } = get(); return resumes.find(r => r.id === activeResumeId) ?? null; },
       getActivePerson: () => { const { persons, activePersonId } = get(); return persons.find(p => p.id === activePersonId) ?? null; },
     }),
-    { name: 'aicv-storage' }
+    {
+      name: 'aicv-storage',
+      // Transient UI state must not survive a page reload
+      partialize: (state) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { limitError, savePending, syncing, ...persisted } = state;
+        return persisted;
+      },
+    }
   )
 );
