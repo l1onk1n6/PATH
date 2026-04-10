@@ -292,6 +292,7 @@ export default function Preview() {
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+  const [showPasswordSoon, setShowPasswordSoon] = useState(false);
   const resumePageRef = useRef<HTMLDivElement>(null);
   const coverLetterRef = useRef<HTMLDivElement>(null);
 
@@ -639,10 +640,25 @@ export default function Preview() {
               {!isMobile && ' PDF'}
             </button>
             <ProGate featureId="password" badge>
-              <button className="btn-glass btn-sm" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <button className="btn-glass btn-sm" onClick={() => setShowPasswordSoon(true)} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                 <Lock size={13} />{!isMobile && ' Passwort'}
               </button>
             </ProGate>
+
+            {showPasswordSoon && (
+              <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }}
+                onClick={() => setShowPasswordSoon(false)}>
+                <div className="glass-card animate-scale-in" style={{ padding: '24px 28px', maxWidth: 320, textAlign: 'center', background: 'var(--modal-bg)' }}
+                  onClick={e => e.stopPropagation()}>
+                  <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
+                  <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>PDF-Passwortschutz — bald verfügbar</div>
+                  <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 16, lineHeight: 1.55 }}>
+                    Schütze dein PDF mit einem Passwort, bevor du es versendest. Dieses Feature ist in Entwicklung.
+                  </div>
+                  <button className="btn-glass btn-primary btn-sm" onClick={() => setShowPasswordSoon(false)}>Schliessen</button>
+                </div>
+              </div>
+            )}
             <button
               className="btn-glass btn-primary btn-sm"
               onClick={handleExportMappe}
