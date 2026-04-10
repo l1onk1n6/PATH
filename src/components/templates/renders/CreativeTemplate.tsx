@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
 export default function CreativeTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
@@ -61,7 +61,7 @@ export default function CreativeTemplate({ resume }: { resume: Resume }) {
           )}
 
           {education.length > 0 && (
-            <div>
+            <div style={{ marginBottom: 18 }}>
               <h2 style={{ fontSize: 13, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Ausbildung</h2>
               {education.map(edu => (
                 <div key={edu.id} style={{ marginBottom: 10 }}>
@@ -72,6 +72,15 @@ export default function CreativeTemplate({ resume }: { resume: Resume }) {
               ))}
             </div>
           )}
+
+          {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+            <div key={section.id} style={{ marginBottom: 18 }}>
+              <h2 style={{ fontSize: 13, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>{section.title || 'Eigene Sektion'}</h2>
+              {section.items.filter(i => i.trim()).map((item, idx) => (
+                <div key={idx} style={{ fontSize: 11, marginBottom: 4, lineHeight: 1.6, color: '#555' }}>{item}</div>
+              ))}
+            </div>
+          ))}
         </div>
 
         {/* Sidebar */}

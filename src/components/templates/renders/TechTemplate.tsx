@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, fullAddress } from './shared';
 
 export default function TechTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages, projects } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, projects, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
@@ -52,7 +52,7 @@ export default function TechTemplate({ resume }: { resume: Resume }) {
           )}
 
           {projects.length > 0 && (
-            <div>
+            <div style={{ marginBottom: 20 }}>
               <div style={{ fontSize: 9, color: color, fontWeight: 700, letterSpacing: '0.1em', marginBottom: 12 }}>// PROJECTS</div>
               {projects.map(proj => (
                 <div key={proj.id} style={{ marginBottom: 10, background: '#161b22', borderRadius: 6, padding: '10px 14px', border: '1px solid #30363d' }}>
@@ -69,6 +69,15 @@ export default function TechTemplate({ resume }: { resume: Resume }) {
               ))}
             </div>
           )}
+
+          {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+            <div key={section.id} style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 9, color: color, fontWeight: 700, letterSpacing: '0.1em', marginBottom: 12 }}>// {(section.title || 'Eigene Sektion').toUpperCase()}</div>
+              {section.items.filter(i => i.trim()).map((item, idx) => (
+                <div key={idx} style={{ fontSize: 10, marginBottom: 4, lineHeight: 1.6, color: '#8b949e' }}>{item}</div>
+              ))}
+            </div>
+          ))}
         </div>
 
         <div>

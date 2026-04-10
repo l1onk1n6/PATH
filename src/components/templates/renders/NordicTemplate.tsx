@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg } from './shared';
 
 export default function NordicTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, certificates, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
@@ -72,7 +72,7 @@ export default function NordicTemplate({ resume }: { resume: Resume }) {
             )}
 
             {education.length > 0 && (
-              <div>
+              <div style={{ marginBottom: 22 }}>
                 <SectionHeading>Ausbildung</SectionHeading>
                 {education.map(edu => (
                   <div key={edu.id} style={{ marginBottom: 11, paddingLeft: 12, borderLeft: '2px solid #e2e8f0' }}>
@@ -86,6 +86,15 @@ export default function NordicTemplate({ resume }: { resume: Resume }) {
                 ))}
               </div>
             )}
+
+            {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+              <div key={section.id} style={{ marginBottom: 22 }}>
+                <SectionHeading>{section.title || 'Eigene Sektion'}</SectionHeading>
+                {section.items.filter(i => i.trim()).map((item, idx) => (
+                  <div key={idx} style={{ fontSize: 11, marginBottom: 4, lineHeight: 1.6, color: '#718096' }}>{item}</div>
+                ))}
+              </div>
+            ))}
           </div>
 
           {/* Side */}

@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg } from './shared';
 
 export default function CorporateTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, certificates, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
@@ -129,7 +129,7 @@ export default function CorporateTemplate({ resume }: { resume: Resume }) {
         )}
 
         {certificates.length > 0 && (
-          <div>
+          <div style={{ marginBottom: 22 }}>
             <MainHeading>Zertifikate</MainHeading>
             {certificates.map(cert => (
               <div key={cert.id} style={{ marginBottom: 7, fontSize: 11 }}>
@@ -140,6 +140,15 @@ export default function CorporateTemplate({ resume }: { resume: Resume }) {
             ))}
           </div>
         )}
+
+        {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+          <div key={section.id} style={{ marginBottom: 22 }}>
+            <MainHeading>{section.title || 'Eigene Sektion'}</MainHeading>
+            {section.items.filter(i => i.trim()).map((item, idx) => (
+              <div key={idx} style={{ fontSize: 11, marginBottom: 4, lineHeight: 1.6, color: '#555' }}>{item}</div>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );

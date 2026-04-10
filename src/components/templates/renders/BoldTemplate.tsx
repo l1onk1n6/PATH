@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
 export default function BoldTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
