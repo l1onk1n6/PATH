@@ -13,6 +13,7 @@ function safeUrl(url: string) {
   return /^https?:\/\//i.test(url) ? url : `https://${url}`;
 }
 import { useResumeStore } from '../store/resumeStore';
+import { useTrackerStore } from '../store/trackerStore';
 import {
   APPLICATION_STATUS_LABELS, APPLICATION_STATUS_COLORS,
   type ApplicationStatus,
@@ -21,6 +22,7 @@ import { calcCompleteness, completenessColor } from '../lib/completeness';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { UpgradeModal } from '../components/ui/ProGate';
 import { usePlan } from '../lib/plan';
+import { getPdfExportCount } from '../lib/pdfExports';
 
 const ALL_STATUSES: ApplicationStatus[] = ['entwurf', 'gesendet', 'interview', 'abgelehnt', 'angenommen'];
 
@@ -279,11 +281,35 @@ export default function Dashboard() {
     setRenameValue('');
   }
 
+  const { applications } = useTrackerStore();
+
   const totalResumes = resumes.length;
   const totalSections = resumes.reduce((acc, r) => acc + r.workExperience.length + r.education.length + r.skills.length, 0);
   const avgCompleteness = resumes.length > 0
     ? Math.round(resumes.reduce((acc, r) => acc + calcCompleteness(r).score, 0) / resumes.length)
     : 0;
+
+  // Upcoming deadlines: resumes with deadline within next 21 days
+  const now = Date.now();
+  const upcomingDeadlines = resumes
+    .filter(r => {
+      if (!r.deadline) return false;
+      const diff = (new Date(r.deadline).getTime() - now) / 86400000;
+      return diff >= 0 && diff <= 21;
+    })
+    .map(r => {
+      const diff = (new Date(r.deadline!).getTime() - now) / 86400000;
+      const daysLeft = Math.ceil(diff);
+      const person = persons.find(p => p.resumeIds.includes(r.id));
+      return { resume: r, person, daysLeft };
+    })
+    .sort((a, b) => a.daysLeft - b.daysLeft);
+
+  // Bewerbungsstatus counts from resumes
+  const statusCounts = ALL_STATUSES.reduce<Record<ApplicationStatus, number>>((acc, s) => {
+    acc[s] = resumes.filter(r => (r.status ?? 'entwurf') === s).length;
+    return acc;
+  }, {} as Record<ApplicationStatus, number>);
 
 
   return (
@@ -410,7 +436,7 @@ export default function Dashboard() {
       {/* Stats Row */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(150px, 1fr))',
         gap: isMobile ? 10 : 16,
         marginBottom: isMobile ? 18 : 28,
       }}>
@@ -419,6 +445,12 @@ export default function Dashboard() {
           { icon: FileText,    label: 'Mappen',    value: totalResumes,          accent: '#34C759' },
           { icon: TrendingUp,  label: 'Einträge',  value: totalSections,         accent: '#FF9500' },
           { icon: CheckCircle, label: 'Ø Vollst.', value: `${avgCompleteness}%`, accent: avgCompleteness >= 80 ? '#34C759' : avgCompleteness >= 50 ? '#FF9F0A' : '#FF3B30' },
+          {
+            icon: Download,
+            label: 'PDF Exports',
+            value: `${getPdfExportCount()} / ${limits.pdfExportsPerMonth === Infinity ? '∞' : limits.pdfExportsPerMonth}`,
+            accent: '#5856D6',
+          },
         ].map(({ icon: Icon, label, value, accent }) => (
           <div key={label} className="glass-card" style={{ padding: isMobile ? '14px 16px' : '20px 22px', borderTop: `3px solid ${accent}` }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
@@ -437,6 +469,123 @@ export default function Dashboard() {
         ))}
       </div>
 
+
+      {/* Upcoming Deadlines widget */}
+      {upcomingDeadlines.length > 0 && (
+        <div className="glass-card" style={{ padding: isMobile ? '14px 16px' : '18px 20px', marginBottom: isMobile ? 18 : 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <Clock size={15} style={{ color: '#FF9F0A' }} />
+            <span style={{ fontWeight: 700, fontSize: 15 }}>Bevorstehende Fristen</span>
+            <span className="badge" style={{ marginLeft: 4, fontSize: 11, padding: '2px 8px' }}>{upcomingDeadlines.length}</span>
+          </div>
+          {upcomingDeadlines.length <= 3 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {upcomingDeadlines.map(({ resume: r, person, daysLeft }) => {
+                const urgencyColor = daysLeft <= 3 ? '#FF3B30' : daysLeft <= 7 ? '#FF9500' : daysLeft <= 14 ? '#FF9F0A' : 'var(--text-secondary)';
+                return (
+                  <div
+                    key={r.id}
+                    className="glass-card"
+                    style={{ padding: '10px 14px', borderRadius: 10, cursor: 'pointer', borderLeft: `3px solid ${urgencyColor}` }}
+                    onClick={() => {
+                      if (person) setActivePerson(person.id);
+                      setActiveResume(r.id);
+                      navigate('/editor');
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {r.name || 'Bewerbungsmappe'}
+                        </div>
+                        {person && (
+                          <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>{person.name}</div>
+                        )}
+                      </div>
+                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        <div style={{ fontSize: 12, color: urgencyColor, fontWeight: 600 }}>
+                          {daysLeft === 0 ? 'Heute' : `${daysLeft} Tag${daysLeft !== 1 ? 'e' : ''}`}
+                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
+                          {new Date(r.deadline!).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: '2-digit' })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 4 }}>
+              {upcomingDeadlines.map(({ resume: r, person, daysLeft }) => {
+                const urgencyColor = daysLeft <= 3 ? '#FF3B30' : daysLeft <= 7 ? '#FF9500' : daysLeft <= 14 ? '#FF9F0A' : 'var(--text-secondary)';
+                return (
+                  <div
+                    key={r.id}
+                    className="glass-card"
+                    style={{
+                      padding: '12px 14px', borderRadius: 12, cursor: 'pointer', flexShrink: 0,
+                      minWidth: 160, maxWidth: 200, borderTop: `3px solid ${urgencyColor}`,
+                    }}
+                    onClick={() => {
+                      if (person) setActivePerson(person.id);
+                      setActiveResume(r.id);
+                      navigate('/editor');
+                    }}
+                  >
+                    <div style={{ fontWeight: 600, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 4 }}>
+                      {r.name || 'Bewerbungsmappe'}
+                    </div>
+                    {person && (
+                      <div style={{ fontSize: 12, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 6 }}>
+                        {person.name}
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                        {new Date(r.deadline!).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: '2-digit' })}
+                      </div>
+                      <div style={{ fontSize: 12, color: urgencyColor, fontWeight: 700 }}>
+                        {daysLeft === 0 ? 'Heute' : `${daysLeft}T`}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Bewerbungsstatus summary */}
+      {resumes.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: isMobile ? 18 : 24, alignItems: 'center' }}>
+          {ALL_STATUSES.filter(s => statusCounts[s] > 0).map(s => (
+            <button
+              key={s}
+              className="btn-glass btn-sm"
+              style={{ gap: 6, cursor: 'pointer' }}
+              onClick={() => navigate('/tracker')}
+              title={`${statusCounts[s]} × ${APPLICATION_STATUS_LABELS[s]}`}
+            >
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: APPLICATION_STATUS_COLORS[s], flexShrink: 0 }} />
+              <span style={{ fontWeight: 600, fontSize: 12 }}>{statusCounts[s]}</span>
+              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{APPLICATION_STATUS_LABELS[s]}</span>
+            </button>
+          ))}
+          {applications.length > 0 && (
+            <button
+              className="btn-glass btn-sm"
+              style={{ gap: 6, cursor: 'pointer', opacity: 0.75 }}
+              onClick={() => navigate('/tracker')}
+              title={`${applications.length} Einträge im Bewerbungstracker`}
+            >
+              <BarChart2 size={12} style={{ opacity: 0.7 }} />
+              <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{applications.length} im Tracker</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Section header + controls */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, gap: 8, flexWrap: 'wrap' }}>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp, ClipboardList, Link } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp, ClipboardList, Link, LayoutGrid, List } from 'lucide-react';
 import { useTrackerStore, type Application, type ApplicationStatus, type ApplicationType } from '../store/trackerStore';
 import { useResumeStore } from '../store/resumeStore';
 import { useIsMobile } from '../hooks/useBreakpoint';
@@ -77,10 +77,420 @@ function sortApps(apps: Application[], sort: string) {
   return sorted;
 }
 
+// ─── Kanban card ──────────────────────────────────────────────────────────────
+
+interface KanbanCardProps {
+  app: Application;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
+  onStatusChange: (status: ApplicationStatus) => void;
+  onDelete: () => void;
+  resumes: ReturnType<typeof useResumeStore>['resumes'];
+  updateApplication: (id: string, patch: Partial<Omit<Application, 'id'>>) => void;
+  removeApplication: (id: string) => void;
+}
+
+function KanbanCard({
+  app,
+  isExpanded,
+  onToggleExpand,
+  onStatusChange,
+  resumes,
+  updateApplication,
+  removeApplication,
+}: KanbanCardProps) {
+  const [showStatusMenu, setShowStatusMenu] = useState(false);
+  const appType: ApplicationType = app.type ?? 'online';
+  const linkedResume = app.resumeId ? resumes.find((r) => r.id === app.resumeId) : null;
+
+  return (
+    <div
+      className="glass-card"
+      style={{ padding: 0, overflow: 'hidden', fontSize: 13 }}
+    >
+      {/* Compact summary */}
+      <div style={{ padding: '10px 12px' }}>
+        {/* Top row: company + actions */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 2 }}>
+          <div
+            style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}
+            onClick={onToggleExpand}
+          >
+            <div style={{ fontWeight: 700, fontSize: 13, lineHeight: 1.3, wordBreak: 'break-word' }}>
+              {app.company || <span style={{ opacity: 0.4 }}>Firma</span>}
+            </div>
+            {app.position && (
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2, lineHeight: 1.3 }}>
+                {app.position}
+              </div>
+            )}
+            {app.appliedDate && (
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+                {formatDate(app.appliedDate)}
+              </div>
+            )}
+          </div>
+
+          {/* Action buttons */}
+          <div style={{ display: 'flex', gap: 3, flexShrink: 0, alignItems: 'center' }}>
+            {/* Status picker */}
+            <div style={{ position: 'relative' }}>
+              <button
+                className="btn-glass btn-icon"
+                title="Status ändern"
+                onClick={(e) => { e.stopPropagation(); setShowStatusMenu((v) => !v); }}
+                style={{ padding: 5, fontSize: 10 }}
+              >
+                <ChevronDown size={11} />
+              </button>
+              {showStatusMenu && (
+                <>
+                  {/* Backdrop */}
+                  <div
+                    style={{ position: 'fixed', inset: 0, zIndex: 99 }}
+                    onClick={() => setShowStatusMenu(false)}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      right: 0,
+                      zIndex: 100,
+                      marginTop: 4,
+                      background: 'var(--glass-bg, rgba(30,30,40,0.97))',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      borderRadius: 8,
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                      minWidth: 150,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {ALL_STATUSES.map((s) => {
+                      const cfg = STATUS_CONFIG[s];
+                      const isActive = app.status === s;
+                      return (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onStatusChange(s);
+                            setShowStatusMenu(false);
+                          }}
+                          style={{
+                            display: 'block',
+                            width: '100%',
+                            padding: '8px 12px',
+                            textAlign: 'left',
+                            background: isActive ? cfg.bg : 'transparent',
+                            border: 'none',
+                            color: isActive ? cfg.color : 'var(--text-primary)',
+                            fontSize: 12,
+                            fontWeight: isActive ? 600 : 400,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {cfg.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+
+            <button
+              className="btn-glass btn-icon"
+              title="Details"
+              onClick={onToggleExpand}
+              style={{ padding: 5 }}
+            >
+              {isExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} style={{ opacity: 0 }} />}
+            </button>
+
+            <button
+              className="btn-glass btn-danger btn-icon"
+              title="Löschen"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (confirm('Bewerbung löschen?')) removeApplication(app.id);
+              }}
+              style={{ padding: 5 }}
+            >
+              <Trash2 size={11} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Expanded detail panel (inline, reuses existing editor structure) */}
+      {isExpanded && (
+        <div style={{ padding: '4px 12px 12px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 8, marginBottom: 8 }}>
+            <div>
+              <label className="section-label">Firma</label>
+              <input className="input-glass" placeholder="z.B. Google AG" value={app.company} maxLength={150}
+                onChange={(e) => updateApplication(app.id, { company: e.target.value })} />
+            </div>
+            <div>
+              <label className="section-label">Stelle</label>
+              <input className="input-glass" placeholder="z.B. Product Manager" value={app.position} maxLength={150}
+                onChange={(e) => updateApplication(app.id, { position: e.target.value })} />
+            </div>
+            <div>
+              <label className="section-label">Status</label>
+              <CustomSelect
+                value={app.status}
+                onChange={(v) => updateApplication(app.id, { status: v as ApplicationStatus })}
+                options={ALL_STATUSES.map((s) => ({ value: s, label: STATUS_CONFIG[s].label }))}
+              />
+            </div>
+            <div>
+              <label className="section-label">Stelleninserat URL</label>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <input className="input-glass" placeholder="https://..." value={app.url} maxLength={500}
+                  onChange={(e) => updateApplication(app.id, { url: e.target.value })}
+                  style={{ flex: 1 }} />
+                {app.url && (
+                  <a href={app.url} target="_blank" rel="noopener noreferrer"
+                    className="btn-glass btn-icon" style={{ padding: 8, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                    <ExternalLink size={13} />
+                  </a>
+                )}
+              </div>
+            </div>
+            <div>
+              <label className="section-label">Bewerbungsdatum</label>
+              <input className="input-glass" type="date" value={app.appliedDate}
+                onChange={(e) => updateApplication(app.id, { appliedDate: e.target.value })} />
+            </div>
+            <div>
+              <label className="section-label">Deadline (optional)</label>
+              <input className="input-glass" type="date" value={app.deadline}
+                onChange={(e) => updateApplication(app.id, { deadline: e.target.value })} />
+            </div>
+          </div>
+
+          {/* Bewerbungsart pill-toggle */}
+          <div style={{ marginBottom: 8 }}>
+            <label className="section-label">Bewerbungsart</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 4 }}>
+              {ALL_TYPES.map((t) => {
+                const isActive = appType === t;
+                const cfg = TYPE_CONFIG[t];
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => updateApplication(app.id, { type: t })}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 4,
+                      padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 500,
+                      cursor: 'pointer',
+                      border: isActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid rgba(255,255,255,0.1)',
+                      background: isActive ? 'rgba(0,122,255,0.2)' : 'rgba(255,255,255,0.06)',
+                      color: isActive ? '#fff' : 'var(--text-secondary)',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {cfg.icon} {cfg.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Notes */}
+          <div style={{ marginBottom: 8 }}>
+            <label className="section-label">Notizen</label>
+            <textarea className="input-glass"
+              placeholder="Kontaktperson, Gesprächsthemen, Eindrücke..."
+              value={app.notes} maxLength={1000} rows={2}
+              onChange={(e) => updateApplication(app.id, { notes: e.target.value })}
+              style={{ resize: 'vertical', fontSize: 12 }} />
+          </div>
+
+          {/* Mappe verknüpfen */}
+          <div>
+            <label className="section-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              Mappe verknüpfen
+              {linkedResume && (
+                <span style={{ fontSize: 11, fontWeight: 400, color: 'rgba(0,122,255,0.8)', marginLeft: 4 }}>
+                  · {linkedResume.name || 'Unbenannte Mappe'}
+                </span>
+              )}
+            </label>
+            <CustomSelect
+              value={app.resumeId ?? ''}
+              onChange={(v) => {
+                const patch: Partial<Omit<Application, 'id'>> = { resumeId: v };
+                if (v) {
+                  const resume = resumes.find((r) => r.id === v);
+                  if (resume) {
+                    if (!app.company) patch.company = resume.name || '';
+                    if (!app.position) patch.position = resume.personalInfo?.title || '';
+                    if (!app.deadline) patch.deadline = resume.deadline || '';
+                    if (!app.url) patch.url = resume.jobUrl || '';
+                  }
+                }
+                updateApplication(app.id, patch);
+              }}
+              options={[
+                { value: '', label: 'Keine Mappe verknüpft' },
+                ...resumes.map((r) => ({ value: r.id, label: r.name || 'Unbenannte Mappe' })),
+              ]}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Kanban board ─────────────────────────────────────────────────────────────
+
+interface KanbanBoardProps {
+  applications: Application[];
+  expanded: string | null;
+  setExpanded: (id: string | null) => void;
+  addApplication: () => void;
+  updateApplication: (id: string, patch: Partial<Omit<Application, 'id'>>) => void;
+  removeApplication: (id: string) => void;
+  resumes: ReturnType<typeof useResumeStore>['resumes'];
+}
+
+function KanbanBoard({
+  applications,
+  expanded,
+  setExpanded,
+  addApplication,
+  updateApplication,
+  removeApplication,
+  resumes,
+}: KanbanBoardProps) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        gap: 12,
+        overflowX: 'auto',
+        overflowY: 'visible',
+        paddingBottom: 12,
+        // Negative horizontal margin to allow flush scroll near edges
+        alignItems: 'flex-start',
+      }}
+    >
+      {ALL_STATUSES.map((status) => {
+        const cfg = STATUS_CONFIG[status];
+        const colApps = applications.filter((a) => a.status === status);
+
+        return (
+          <div
+            key={status}
+            style={{
+              minWidth: 200,
+              width: 220,
+              flexShrink: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 0,
+            }}
+          >
+            {/* Column header */}
+            <div
+              style={{
+                borderRadius: '10px 10px 0 0',
+                borderTop: `3px solid ${cfg.color}`,
+                background: cfg.bg,
+                border: `1px solid ${cfg.color}33`,
+                borderTopColor: cfg.color,
+                padding: '8px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 6,
+                borderBottomLeftRadius: 10,
+                borderBottomRightRadius: 10,
+              }}
+            >
+              <span style={{ fontSize: 12, fontWeight: 700, color: cfg.color }}>
+                {cfg.label}
+              </span>
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: cfg.color,
+                  background: `${cfg.color}22`,
+                  borderRadius: 20,
+                  padding: '1px 7px',
+                  minWidth: 20,
+                  textAlign: 'center',
+                }}
+              >
+                {colApps.length}
+              </span>
+            </div>
+
+            {/* "Neue Bewerbung" button only in Offen column */}
+            {status === 'offen' && (
+              <button
+                className="btn-glass"
+                onClick={addApplication}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                  fontSize: 12, padding: '7px 10px', marginBottom: 6, width: '100%',
+                  borderRadius: 8,
+                }}
+              >
+                <Plus size={13} /> Neue Bewerbung
+              </button>
+            )}
+
+            {/* Cards */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {colApps.map((app) => (
+                <KanbanCard
+                  key={app.id}
+                  app={app}
+                  isExpanded={expanded === app.id}
+                  onToggleExpand={() => setExpanded(expanded === app.id ? null : app.id)}
+                  onStatusChange={(s) => updateApplication(app.id, { status: s })}
+                  onDelete={() => removeApplication(app.id)}
+                  resumes={resumes}
+                  updateApplication={updateApplication}
+                  removeApplication={removeApplication}
+                />
+              ))}
+              {colApps.length === 0 && (
+                <div
+                  style={{
+                    padding: '16px 10px',
+                    textAlign: 'center',
+                    color: 'var(--text-muted)',
+                    fontSize: 11,
+                    border: '1px dashed rgba(255,255,255,0.1)',
+                    borderRadius: 8,
+                  }}
+                >
+                  Leer
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Main Tracker page ────────────────────────────────────────────────────────
+
 export default function Tracker() {
   const { applications, addApplication, updateApplication, removeApplication } = useTrackerStore();
   const { resumes, persons } = useResumeStore();
   const isMobile = useIsMobile();
+  const [viewMode, setViewMode] = useState<'list' | 'kanban'>('kanban');
   const [filter, setFilter] = useState<ApplicationStatus | 'all'>('all');
   const [sort, setSort] = useState('date-desc');
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -145,18 +555,53 @@ export default function Tracker() {
             {applications.length} Bewerbung{applications.length !== 1 ? 'en' : ''} total
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap', alignItems: 'center' }}>
+          {/* View mode toggle */}
+          <div style={{ display: 'flex', gap: 0, borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.12)' }}>
+            <button
+              onClick={() => setViewMode('kanban')}
+              title="Kanban-Ansicht"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '6px 12px', fontSize: 12, fontWeight: 600,
+                border: 'none', cursor: 'pointer',
+                background: viewMode === 'kanban' ? 'rgba(0,122,255,0.25)' : 'rgba(255,255,255,0.06)',
+                color: viewMode === 'kanban' ? '#007AFF' : 'var(--text-secondary)',
+                transition: 'all 0.15s',
+                borderRight: '1px solid rgba(255,255,255,0.08)',
+              }}
+            >
+              <LayoutGrid size={13} />
+              {!isMobile && 'Kanban'}
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              title="Listen-Ansicht"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '6px 12px', fontSize: 12, fontWeight: 600,
+                border: 'none', cursor: 'pointer',
+                background: viewMode === 'list' ? 'rgba(0,122,255,0.25)' : 'rgba(255,255,255,0.06)',
+                color: viewMode === 'list' ? '#007AFF' : 'var(--text-secondary)',
+                transition: 'all 0.15s',
+              }}
+            >
+              <List size={13} />
+              {!isMobile && 'Liste'}
+            </button>
+          </div>
+
           <button className="btn-glass" onClick={() => setShowImportModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <Link size={14} /> Aus Mappe
           </button>
           <button className="btn-glass btn-primary" onClick={addApplication} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Plus size={14} /> Bewerbung hinzufügen
+            <Plus size={14} /> {isMobile ? '' : 'Bewerbung hinzufügen'}
           </button>
         </div>
       </div>
 
-      {/* Stats row */}
-      {applications.length > 0 && (
+      {/* Stats row — shown in list mode only */}
+      {viewMode === 'list' && applications.length > 0 && (
         <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
           {(['beworben', 'interview', 'angebot', 'abgelehnt'] as ApplicationStatus[]).map((s) => {
             const cfg = STATUS_CONFIG[s];
@@ -174,8 +619,8 @@ export default function Tracker() {
         </div>
       )}
 
-      {/* Filter + Sort bar */}
-      {applications.length > 0 && (
+      {/* Filter + Sort bar — shown in list mode only */}
+      {viewMode === 'list' && applications.length > 0 && (
         <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ minWidth: 130, flex: 'none' }}>
             <CustomSelect
@@ -210,182 +655,199 @@ export default function Tracker() {
         </div>
       )}
 
-      {/* Application list */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {filtered.map((app) => {
-          const isOpen = expanded === app.id;
-          const appType: ApplicationType = app.type ?? 'online';
-          const linkedResume = app.resumeId ? resumes.find((r) => r.id === app.resumeId) : null;
+      {/* ── Kanban view ── */}
+      {viewMode === 'kanban' && applications.length > 0 && (
+        <KanbanBoard
+          applications={applications}
+          expanded={expanded}
+          setExpanded={setExpanded}
+          addApplication={addApplication}
+          updateApplication={updateApplication}
+          removeApplication={removeApplication}
+          resumes={resumes}
+        />
+      )}
 
-          return (
-            <div key={app.id} className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-              {/* Summary row */}
-              <div
-                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', cursor: 'pointer' }}
-                onClick={() => setExpanded(isOpen ? null : app.id)}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 600, fontSize: 14 }}>
-                      {app.company || <span style={{ opacity: 0.4 }}>Firma</span>}
-                    </span>
-                    {app.position && (
-                      <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>· {app.position}</span>
-                    )}
+      {/* ── List view ── */}
+      {viewMode === 'list' && (
+        <>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {filtered.map((app) => {
+              const isOpen = expanded === app.id;
+              const appType: ApplicationType = app.type ?? 'online';
+              const linkedResume = app.resumeId ? resumes.find((r) => r.id === app.resumeId) : null;
+
+              return (
+                <div key={app.id} className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
+                  {/* Summary row */}
+                  <div
+                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', cursor: 'pointer' }}
+                    onClick={() => setExpanded(isOpen ? null : app.id)}
+                  >
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <span style={{ fontWeight: 600, fontSize: 14 }}>
+                          {app.company || <span style={{ opacity: 0.4 }}>Firma</span>}
+                        </span>
+                        {app.position && (
+                          <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>· {app.position}</span>
+                        )}
+                      </div>
+                      {!isMobile && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3 }}>
+                          {app.appliedDate && (
+                            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                              Beworben: {formatDate(app.appliedDate)}
+                            </span>
+                          )}
+                          {app.deadline && (
+                            <span style={{ fontSize: 11, color: 'rgba(255,159,10,0.7)' }}>
+                              Deadline: {formatDate(app.deadline)}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, flexWrap: 'wrap' }}>
+                      <StatusBadge status={app.status} />
+                      <TypeBadge type={appType} />
+                    </div>
+                    <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                      <button
+                        className="btn-glass btn-danger btn-icon"
+                        onClick={(e) => { e.stopPropagation(); if (confirm('Bewerbung löschen?')) removeApplication(app.id); }}
+                        style={{ padding: 6 }}
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                      {isOpen ? <ChevronUp size={14} style={{ opacity: 0.4 }} /> : <ChevronDown size={14} style={{ opacity: 0.4 }} />}
+                    </div>
                   </div>
-                  {!isMobile && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3 }}>
-                      {app.appliedDate && (
-                        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                          Beworben: {formatDate(app.appliedDate)}
-                        </span>
-                      )}
-                      {app.deadline && (
-                        <span style={{ fontSize: 11, color: 'rgba(255,159,10,0.7)' }}>
-                          Deadline: {formatDate(app.deadline)}
-                        </span>
-                      )}
+
+                  {/* Expanded editor */}
+                  {isOpen && (
+                    <div style={{ padding: '4px 14px 14px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                        <div>
+                          <label className="section-label">Firma</label>
+                          <input className="input-glass" placeholder="z.B. Google AG" value={app.company} maxLength={150}
+                            onChange={(e) => updateApplication(app.id, { company: e.target.value })} />
+                        </div>
+                        <div>
+                          <label className="section-label">Stelle</label>
+                          <input className="input-glass" placeholder="z.B. Product Manager" value={app.position} maxLength={150}
+                            onChange={(e) => updateApplication(app.id, { position: e.target.value })} />
+                        </div>
+                        <div>
+                          <label className="section-label">Status</label>
+                          <CustomSelect
+                            value={app.status}
+                            onChange={(v) => updateApplication(app.id, { status: v as ApplicationStatus })}
+                            options={ALL_STATUSES.map((s) => ({ value: s, label: STATUS_CONFIG[s].label }))}
+                          />
+                        </div>
+                        <div>
+                          <label className="section-label">Stelleninserat URL</label>
+                          <div style={{ display: 'flex', gap: 6 }}>
+                            <input className="input-glass" placeholder="https://..." value={app.url} maxLength={500}
+                              onChange={(e) => updateApplication(app.id, { url: e.target.value })}
+                              style={{ flex: 1 }} />
+                            {app.url && (
+                              <a href={app.url} target="_blank" rel="noopener noreferrer"
+                                className="btn-glass btn-icon" style={{ padding: 8, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                                <ExternalLink size={13} />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="section-label">Bewerbungsdatum</label>
+                          <input className="input-glass" type="date" value={app.appliedDate}
+                            onChange={(e) => updateApplication(app.id, { appliedDate: e.target.value })} />
+                        </div>
+                        <div>
+                          <label className="section-label">Deadline (optional)</label>
+                          <input className="input-glass" type="date" value={app.deadline}
+                            onChange={(e) => updateApplication(app.id, { deadline: e.target.value })} />
+                        </div>
+                      </div>
+
+                      {/* Bewerbungsart pill-toggle */}
+                      <div style={{ marginBottom: 10 }}>
+                        <label className="section-label">Bewerbungsart</label>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+                          {ALL_TYPES.map((t) => {
+                            const isActive = appType === t;
+                            const cfg = TYPE_CONFIG[t];
+                            return (
+                              <button
+                                key={t}
+                                type="button"
+                                onClick={() => updateApplication(app.id, { type: t })}
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 5,
+                                  padding: '5px 12px',
+                                  borderRadius: 20,
+                                  fontSize: 12,
+                                  fontWeight: 500,
+                                  cursor: 'pointer',
+                                  border: isActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid rgba(255,255,255,0.1)',
+                                  background: isActive ? 'rgba(0,122,255,0.2)' : 'rgba(255,255,255,0.06)',
+                                  color: isActive ? '#fff' : 'var(--text-secondary)',
+                                  transition: 'all 0.15s',
+                                }}
+                              >
+                                {cfg.icon} {cfg.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Notes */}
+                      <div style={{ marginBottom: 10 }}>
+                        <label className="section-label">Notizen</label>
+                        <textarea className="input-glass"
+                          placeholder="Kontaktperson, Gesprächsthemen, Eindrücke..."
+                          value={app.notes} maxLength={1000} rows={3}
+                          onChange={(e) => updateApplication(app.id, { notes: e.target.value })}
+                          style={{ resize: 'vertical' }} />
+                      </div>
+
+                      {/* Mappe verknüpfen */}
+                      <div>
+                        <label className="section-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          Mappe verknüpfen
+                          {linkedResume && (
+                            <span style={{ fontSize: 11, fontWeight: 400, color: 'rgba(0,122,255,0.8)', marginLeft: 4 }}>
+                              · {linkedResume.name || 'Unbenannte Mappe'}
+                            </span>
+                          )}
+                        </label>
+                        <CustomSelect
+                          value={app.resumeId ?? ''}
+                          onChange={(v) => handleResumeLink(app.id, app, v)}
+                          options={[
+                            { value: '', label: 'Keine Mappe verknüpft' },
+                            ...resumes.map((r) => ({ value: r.id, label: r.name || 'Unbenannte Mappe' })),
+                          ]}
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, flexWrap: 'wrap' }}>
-                  <StatusBadge status={app.status} />
-                  <TypeBadge type={appType} />
-                </div>
-                <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-                  <button
-                    className="btn-glass btn-danger btn-icon"
-                    onClick={(e) => { e.stopPropagation(); if (confirm('Bewerbung löschen?')) removeApplication(app.id); }}
-                    style={{ padding: 6 }}
-                  >
-                    <Trash2 size={12} />
-                  </button>
-                  {isOpen ? <ChevronUp size={14} style={{ opacity: 0.4 }} /> : <ChevronDown size={14} style={{ opacity: 0.4 }} />}
-                </div>
-              </div>
+              );
+            })}
+          </div>
 
-              {/* Expanded editor */}
-              {isOpen && (
-                <div style={{ padding: '4px 14px 14px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10, marginBottom: 10 }}>
-                    <div>
-                      <label className="section-label">Firma</label>
-                      <input className="input-glass" placeholder="z.B. Google AG" value={app.company} maxLength={150}
-                        onChange={(e) => updateApplication(app.id, { company: e.target.value })} />
-                    </div>
-                    <div>
-                      <label className="section-label">Stelle</label>
-                      <input className="input-glass" placeholder="z.B. Product Manager" value={app.position} maxLength={150}
-                        onChange={(e) => updateApplication(app.id, { position: e.target.value })} />
-                    </div>
-                    <div>
-                      <label className="section-label">Status</label>
-                      <CustomSelect
-                        value={app.status}
-                        onChange={(v) => updateApplication(app.id, { status: v as ApplicationStatus })}
-                        options={ALL_STATUSES.map((s) => ({ value: s, label: STATUS_CONFIG[s].label }))}
-                      />
-                    </div>
-                    <div>
-                      <label className="section-label">Stelleninserat URL</label>
-                      <div style={{ display: 'flex', gap: 6 }}>
-                        <input className="input-glass" placeholder="https://..." value={app.url} maxLength={500}
-                          onChange={(e) => updateApplication(app.id, { url: e.target.value })}
-                          style={{ flex: 1 }} />
-                        {app.url && (
-                          <a href={app.url} target="_blank" rel="noopener noreferrer"
-                            className="btn-glass btn-icon" style={{ padding: 8, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-                            <ExternalLink size={13} />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      <label className="section-label">Bewerbungsdatum</label>
-                      <input className="input-glass" type="date" value={app.appliedDate}
-                        onChange={(e) => updateApplication(app.id, { appliedDate: e.target.value })} />
-                    </div>
-                    <div>
-                      <label className="section-label">Deadline (optional)</label>
-                      <input className="input-glass" type="date" value={app.deadline}
-                        onChange={(e) => updateApplication(app.id, { deadline: e.target.value })} />
-                    </div>
-                  </div>
-
-                  {/* Bewerbungsart pill-toggle */}
-                  <div style={{ marginBottom: 10 }}>
-                    <label className="section-label">Bewerbungsart</label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
-                      {ALL_TYPES.map((t) => {
-                        const isActive = appType === t;
-                        const cfg = TYPE_CONFIG[t];
-                        return (
-                          <button
-                            key={t}
-                            type="button"
-                            onClick={() => updateApplication(app.id, { type: t })}
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: 5,
-                              padding: '5px 12px',
-                              borderRadius: 20,
-                              fontSize: 12,
-                              fontWeight: 500,
-                              cursor: 'pointer',
-                              border: isActive ? '1px solid rgba(0,122,255,0.4)' : '1px solid rgba(255,255,255,0.1)',
-                              background: isActive ? 'rgba(0,122,255,0.2)' : 'rgba(255,255,255,0.06)',
-                              color: isActive ? '#fff' : 'var(--text-secondary)',
-                              transition: 'all 0.15s',
-                            }}
-                          >
-                            {cfg.icon} {cfg.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Notes */}
-                  <div style={{ marginBottom: 10 }}>
-                    <label className="section-label">Notizen</label>
-                    <textarea className="input-glass"
-                      placeholder="Kontaktperson, Gesprächsthemen, Eindrücke..."
-                      value={app.notes} maxLength={1000} rows={3}
-                      onChange={(e) => updateApplication(app.id, { notes: e.target.value })}
-                      style={{ resize: 'vertical' }} />
-                  </div>
-
-                  {/* Mappe verknüpfen */}
-                  <div>
-                    <label className="section-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      Mappe verknüpfen
-                      {linkedResume && (
-                        <span style={{ fontSize: 11, fontWeight: 400, color: 'rgba(0,122,255,0.8)', marginLeft: 4 }}>
-                          · {linkedResume.name || 'Unbenannte Mappe'}
-                        </span>
-                      )}
-                    </label>
-                    <CustomSelect
-                      value={app.resumeId ?? ''}
-                      onChange={(v) => handleResumeLink(app.id, app, v)}
-                      options={[
-                        { value: '', label: 'Keine Mappe verknüpft' },
-                        ...resumes.map((r) => ({ value: r.id, label: r.name || 'Unbenannte Mappe' })),
-                      ]}
-                    />
-                  </div>
-                </div>
-              )}
+          {filtered.length === 0 && applications.length > 0 && (
+            <div style={{ textAlign: 'center', padding: 32, color: 'var(--text-muted)', fontSize: 13 }}>
+              Keine Bewerbungen mit diesem Filter.
             </div>
-          );
-        })}
-      </div>
-
-      {filtered.length === 0 && applications.length > 0 && (
-        <div style={{ textAlign: 'center', padding: 32, color: 'var(--text-muted)', fontSize: 13 }}>
-          Keine Bewerbungen mit diesem Filter.
-        </div>
+          )}
+        </>
       )}
 
       {/* "Aus Mappe importieren" modal */}

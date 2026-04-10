@@ -4,7 +4,7 @@ import {
   User, Shield, Lock, Sparkles, Mail, ExternalLink,
   AlertTriangle, Download, Trash2, KeyRound,
   CreditCard, Loader2, CheckCircle, PlayCircle, LogOut,
-  Copy, Check, Gift,
+  Copy, Check, Gift, MessageCircle, X as XIcon, Trophy,
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useResumeStore } from '../store/resumeStore';
@@ -446,15 +446,82 @@ function ReferralSection() {
     setTimeout(() => setCopied(false), 2000);
   }
 
+  const BONUS_MILESTONE = 5;
+  const progressToBonus = stats ? Math.min(stats.total, BONUS_MILESTONE) : 0;
+
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`Ich nutze PATH für meine Bewerbungen — schau mal: ${refLink}`)}`;
+  const twitterUrl  = `https://twitter.com/intent/tweet?text=${encodeURIComponent('Ich nutze PATH für meine Bewerbungen — schau mal:')}&url=${encodeURIComponent(refLink)}`;
+  const mailUrl     = `mailto:?subject=${encodeURIComponent('PATH Bewerbungsassistent')}&body=${encodeURIComponent(`Hey,\n\nIch nutze PATH für meine Bewerbungen und kann es sehr empfehlen.\nSchau mal hier: ${refLink}\n\nViele Grüsse`)}`;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <div className="glass-card" style={{ padding: 20, background: 'rgba(0,122,255,0.06)', border: '1px solid rgba(0,122,255,0.2)' }}>
-        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>Freunde einladen, 1 Monat gratis</div>
-        <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.65, margin: 0 }}>
-          Teile deinen persönlichen Link. Wenn sich jemand über deinen Link registriert und ein Pro-Abo abschliesst, bekommst du automatisch CHF 5.00 auf dein Konto gutgeschrieben.
-        </p>
+
+      {/* ── Hero card ──────────────────────────────────── */}
+      <div className="glass-card" style={{
+        padding: '24px 20px',
+        background: 'rgba(255,159,10,0.08)',
+        border: '1px solid rgba(255,159,10,0.2)',
+      }}>
+        {/* Icon + headline */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 14 }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: 14, flexShrink: 0,
+            background: 'linear-gradient(135deg, rgba(255,159,10,0.35), rgba(255,55,95,0.25))',
+            border: '1px solid rgba(255,159,10,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <Gift size={22} style={{ color: '#FF9F0A' }} />
+          </div>
+          <div>
+            <div style={{ fontSize: 17, fontWeight: 800, lineHeight: 1.25, marginBottom: 5 }}>
+              Freunde einladen,<br />gemeinsam sparen
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              Für jede Person, die über deinen Link ein Pro-Abo abschliesst, bekommst du automatisch <strong style={{ color: '#FF9F0A' }}>CHF 5.00</strong> gutgeschrieben.
+            </div>
+          </div>
+        </div>
+
+        {/* Reward flow: A → link → B → CHF 5 */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          gap: 6, padding: '10px 14px', borderRadius: 10,
+          background: 'rgba(255,159,10,0.08)', border: '1px solid rgba(255,159,10,0.15)',
+          flexWrap: 'wrap',
+        }}>
+          {/* Person A */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+            <div style={{ fontSize: 18 }}>🙋</div>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>Du</div>
+          </div>
+          {/* Arrow + link */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, flex: 1, minWidth: 60 }}>
+            <div style={{ fontSize: 10, color: '#FF9F0A', fontWeight: 600, whiteSpace: 'nowrap' }}>Link teilen</div>
+            <div style={{ height: 2, width: '100%', background: 'linear-gradient(90deg, rgba(255,159,10,0.4), rgba(255,159,10,0.8))', borderRadius: 2, position: 'relative' }}>
+              <div style={{ position: 'absolute', right: -4, top: -4, width: 0, height: 0, borderTop: '5px solid transparent', borderBottom: '5px solid transparent', borderLeft: '7px solid rgba(255,159,10,0.8)' }} />
+            </div>
+          </div>
+          {/* Person B */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+            <div style={{ fontSize: 18 }}>🧑‍💼</div>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>Freund</div>
+          </div>
+          {/* Arrow + subscribes */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, flex: 1, minWidth: 60 }}>
+            <div style={{ fontSize: 10, color: 'var(--ios-green)', fontWeight: 600, whiteSpace: 'nowrap' }}>schliesst Pro ab</div>
+            <div style={{ height: 2, width: '100%', background: 'linear-gradient(90deg, rgba(52,199,89,0.4), rgba(52,199,89,0.8))', borderRadius: 2, position: 'relative' }}>
+              <div style={{ position: 'absolute', right: -4, top: -4, width: 0, height: 0, borderTop: '5px solid transparent', borderBottom: '5px solid transparent', borderLeft: '7px solid rgba(52,199,89,0.8)' }} />
+            </div>
+          </div>
+          {/* Reward */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+            <div style={{ fontSize: 18 }}>🎁</div>
+            <div style={{ fontSize: 10, color: '#FF9F0A', fontWeight: 700, whiteSpace: 'nowrap' }}>+CHF 5.00</div>
+          </div>
+        </div>
       </div>
 
+      {/* ── Link + share ──────────────────────────────── */}
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>DEIN EINLADUNGSLINK</div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -472,32 +539,162 @@ function ReferralSection() {
             {copied ? 'Kopiert!' : 'Kopieren'}
           </button>
         </div>
+
+        {/* Share buttons */}
+        <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-glass btn-sm"
+            style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              textDecoration: 'none', fontSize: 12, padding: '8px 10px',
+              background: 'rgba(37,211,102,0.1)', border: '1px solid rgba(37,211,102,0.25)',
+              color: '#25D366',
+            }}
+          >
+            <MessageCircle size={13} /> WhatsApp
+          </a>
+          <a
+            href={twitterUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-glass btn-sm"
+            style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              textDecoration: 'none', fontSize: 12, padding: '8px 10px',
+              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)',
+            }}
+          >
+            <XIcon size={13} /> Twitter / X
+          </a>
+          <a
+            href={mailUrl}
+            className="btn-glass btn-sm"
+            style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              textDecoration: 'none', fontSize: 12, padding: '8px 10px',
+              background: 'rgba(0,122,255,0.08)', border: '1px solid rgba(0,122,255,0.2)',
+              color: 'var(--ios-blue)',
+            }}
+          >
+            <Mail size={13} /> E-Mail
+          </a>
+        </div>
       </div>
 
+      {/* ── Stats ─────────────────────────────────────── */}
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>DEINE STATISTIK</div>
         {stats === null ? (
           <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Lädt…</div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-            {[
-              { label: 'Eingeladen', value: stats.total },
-              { label: 'Pro-Abos',   value: stats.subscribed },
-              { label: 'Gutschriften', value: stats.rewarded },
-            ].map(({ label, value }) => (
-              <div key={label} style={{
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 14 }}>
+              {/* Eingeladen */}
+              <div style={{
                 textAlign: 'center', padding: '14px 8px',
                 background: 'rgba(255,255,255,0.04)', borderRadius: 10,
                 border: '1px solid rgba(255,255,255,0.08)',
               }}>
-                <div style={{ fontSize: 26, fontWeight: 700, color: value > 0 ? 'var(--ios-green)' : 'var(--text-secondary)' }}>
-                  {value}
+                <div style={{ fontSize: 26, fontWeight: 700, color: stats.total > 0 ? 'var(--ios-blue)' : 'var(--text-secondary)' }}>
+                  {stats.total}
                 </div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>{label}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Eingeladen</div>
               </div>
-            ))}
-          </div>
+
+              {/* Pro-Abos */}
+              <div style={{
+                textAlign: 'center', padding: '14px 8px',
+                background: stats.subscribed > 0 ? 'rgba(52,199,89,0.06)' : 'rgba(255,255,255,0.04)',
+                borderRadius: 10,
+                border: stats.subscribed > 0 ? '1px solid rgba(52,199,89,0.2)' : '1px solid rgba(255,255,255,0.08)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+                  <span style={{ fontSize: 26, fontWeight: 700, color: stats.subscribed > 0 ? 'var(--ios-green)' : 'var(--text-secondary)' }}>
+                    {stats.subscribed}
+                  </span>
+                  {stats.subscribed > 0 && <CheckCircle size={15} style={{ color: 'var(--ios-green)', marginTop: 2 }} />}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Pro-Abos</div>
+              </div>
+
+              {/* CHF Gutschriften */}
+              <div style={{
+                textAlign: 'center', padding: '14px 8px',
+                background: stats.rewarded > 0 ? 'rgba(255,159,10,0.07)' : 'rgba(255,255,255,0.04)',
+                borderRadius: 10,
+                border: stats.rewarded > 0 ? '1px solid rgba(255,159,10,0.22)' : '1px solid rgba(255,255,255,0.08)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+                  {stats.rewarded > 0
+                    ? <Trophy size={20} style={{ color: '#FF9F0A' }} />
+                    : <span style={{ fontSize: 26, fontWeight: 700, color: 'var(--text-secondary)' }}>0</span>
+                  }
+                </div>
+                {stats.rewarded > 0 && (
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#FF9F0A', marginTop: 2 }}>
+                    CHF {(stats.rewarded * 5).toFixed(2)}
+                  </div>
+                )}
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: stats.rewarded > 0 ? 2 : 4 }}>CHF Gutschriften</div>
+              </div>
+            </div>
+
+            {/* Progress to next bonus */}
+            <div style={{ marginTop: 4 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>
+                <span>{progressToBonus}/{BONUS_MILESTONE} Einladungen bis zum nächsten Bonus</span>
+                <span style={{ color: '#FF9F0A', fontWeight: 600 }}>{Math.round(progressToBonus / BONUS_MILESTONE * 100)}%</span>
+              </div>
+              <div style={{ height: 4, borderRadius: 3, background: 'rgba(255,255,255,0.08)' }}>
+                <div style={{
+                  height: '100%', width: `${Math.min(100, progressToBonus / BONUS_MILESTONE * 100)}%`,
+                  borderRadius: 3,
+                  background: progressToBonus >= BONUS_MILESTONE
+                    ? 'var(--ios-green)'
+                    : 'linear-gradient(90deg, rgba(255,159,10,0.7), #FF9F0A)',
+                  transition: 'width 0.4s ease',
+                }} />
+              </div>
+            </div>
+          </>
         )}
+      </div>
+
+      {/* ── How it works ──────────────────────────────── */}
+      <div className="glass-card" style={{ padding: 20 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 14, opacity: 0.6 }}>WIE ES FUNKTIONIERT</div>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+          {[
+            { step: '1', label: 'Link teilen',                  sub: 'Deinen persönlichen Link an Freunde senden' },
+            { step: '2', label: 'Freund registriert sich',      sub: 'Über deinen Link anmelden & Pro abschliessen' },
+            { step: '3', label: 'Du erhältst CHF 5.00',         sub: 'Automatisch auf dein Konto gutgeschrieben' },
+          ].map(({ step, label, sub }, i) => (
+            <div key={step} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', position: 'relative' }}>
+              {/* Connector line between steps */}
+              {i < 2 && (
+                <div style={{
+                  position: 'absolute', top: 16, left: 'calc(50% + 20px)', right: 'calc(-50% + 20px)',
+                  height: 1, background: 'rgba(255,255,255,0.1)', zIndex: 0,
+                }} />
+              )}
+              {/* Number circle */}
+              <div style={{
+                width: 32, height: 32, borderRadius: '50%', flexShrink: 0, zIndex: 1,
+                background: 'linear-gradient(135deg, rgba(255,159,10,0.25), rgba(255,55,95,0.15))',
+                border: '1px solid rgba(255,159,10,0.35)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 13, fontWeight: 800, color: '#FF9F0A',
+              }}>
+                {step}
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 600, marginTop: 8, lineHeight: 1.3 }}>{label}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.4 }}>{sub}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

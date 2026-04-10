@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User, Briefcase, GraduationCap, Zap, FolderOpen,
-  Upload, Palette, AlertCircle, FileEdit, LayoutList, Lock, LayoutDashboard,
+  Upload, Palette, AlertCircle, FileEdit, LayoutList, Lock, LayoutDashboard, Eye,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import { usePlan } from '../lib/plan';
@@ -129,35 +129,74 @@ export default function Editor() {
   if (isMobile) {
     return (
       <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-        {/* Horizontal scrollable tab bar */}
+        {/* Sticky horizontal scrollable tab bar */}
         <div style={{
-          display: 'flex', overflowX: 'auto', gap: 6, paddingBottom: 8,
+          position: 'sticky', top: 0, zIndex: 10,
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          display: 'flex', overflowX: 'auto', gap: 6, padding: '8px 4px',
           flexShrink: 0, scrollbarWidth: 'none', msOverflowStyle: 'none',
+          scrollSnapType: 'x mandatory',
         }}>
           {SECTIONS.map(({ id, short, icon: Icon }) => {
             const isActive = activeSection === id;
             return (
-              <button key={id} className="btn-glass" onClick={() => setActiveSection(id)} style={{
-                flexShrink: 0, padding: '8px 12px', borderRadius: 'var(--radius-sm)', boxShadow: 'none',
-                background: isActive ? 'linear-gradient(135deg, rgba(0,122,255,0.3), rgba(88,86,214,0.25))' : 'rgba(255,255,255,0.07)',
-                border: isActive ? '1px solid rgba(0,122,255,0.45)' : '1px solid rgba(255,255,255,0.1)',
-                display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
-              }}>
-                <Icon size={13} style={{ opacity: isActive ? 1 : 0.55 }} />
-                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, opacity: isActive ? 1 : 0.65 }}>{short}</span>
+              <button
+                key={id}
+                className="btn-glass"
+                onClick={() => setActiveSection(id)}
+                style={{
+                  flexShrink: 0,
+                  padding: '10px 14px',
+                  minHeight: 44,
+                  borderRadius: 'var(--radius-sm)',
+                  boxShadow: 'none',
+                  background: isActive
+                    ? 'linear-gradient(135deg, rgba(0,122,255,0.45), rgba(88,86,214,0.4))'
+                    : 'rgba(255,255,255,0.07)',
+                  border: isActive ? '1px solid rgba(0,122,255,0.55)' : '1px solid rgba(255,255,255,0.1)',
+                  borderBottom: isActive ? '3px solid var(--ios-blue)' : '1px solid rgba(255,255,255,0.1)',
+                  display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
+                  scrollSnapAlign: 'start',
+                  color: isActive ? '#fff' : undefined,
+                }}
+              >
+                <Icon size={15} style={{ opacity: isActive ? 1 : 0.55 }} />
+                <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 400, opacity: isActive ? 1 : 0.65 }}>{short}</span>
               </button>
             );
           })}
         </div>
 
         {/* Editor content — also handles 'history' on mobile */}
-        <div style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: '16px 16px' }}>
+        <div
+          key={activeSection}
+          className="animate-fade-in"
+          style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: '16px 16px' }}
+        >
           {showTranslate && <TranslateDialog onClose={() => setShowTranslate(false)} />}
           {activeSection === 'history'
             ? <VersionHistoryPanel resumeId={resume.id} />
             : renderSection()
           }
         </div>
+
+        {/* Floating preview button */}
+        <button
+          className="btn-glass"
+          onClick={() => navigate('/preview')}
+          aria-label="Vorschau"
+          style={{
+            position: 'fixed', bottom: 20, right: 16, zIndex: 50,
+            width: 48, height: 48, borderRadius: '50%',
+            padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'linear-gradient(135deg, rgba(0,122,255,0.55), rgba(88,86,214,0.5))',
+            border: '1px solid rgba(0,122,255,0.6)',
+            boxShadow: '0 4px 16px rgba(0,122,255,0.35)',
+          }}
+        >
+          <Eye size={20} style={{ color: '#fff' }} />
+        </button>
       </div>
     );
   }
