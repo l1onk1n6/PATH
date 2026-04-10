@@ -23,6 +23,7 @@ interface SidebarProps {
 }
 
 const EDITOR_SECTIONS: { id: EditorSection; label: string; icon: React.ComponentType<{ size: number; style?: React.CSSProperties }> }[] = [
+  { id: 'overview',     label: 'Übersicht',            icon: LayoutDashboard },
   { id: 'cover-letter', label: 'Motivationsschreiben', icon: FileEdit },
   { id: 'experience',   label: 'Berufserfahrung',       icon: Briefcase },
   { id: 'education',    label: 'Ausbildung',            icon: GraduationCap },
