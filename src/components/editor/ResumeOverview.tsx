@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import {
   ExternalLink, Pencil, Check, X, Calendar, Link2,
-  CheckCircle2, Circle, Bell, Loader2, Sparkles, Mail, AlertCircle, Share2,
+  CheckCircle2, Circle, Bell, Loader2, Mail, AlertCircle, Share2,
 } from 'lucide-react';
 import ShareLinksPanel from './ShareLinksPanel';
 import ProGate from '../ui/ProGate';
