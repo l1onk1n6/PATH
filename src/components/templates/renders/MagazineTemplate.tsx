@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SkillBar, SafeImg, fullAddress } from './shared';
 
 export default function MagazineTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages, projects } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, projects, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
@@ -98,7 +98,7 @@ export default function MagazineTemplate({ resume }: { resume: Resume }) {
         )}
 
         {projects.length > 0 && (
-          <div>
+          <div style={{ marginBottom: 22 }}>
             <h2 style={{ fontSize: 13, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#1a1a1a', marginBottom: 14, borderLeft: `4px solid ${color}`, paddingLeft: 10 }}>Projekte</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               {projects.map(proj => (
@@ -110,6 +110,15 @@ export default function MagazineTemplate({ resume }: { resume: Resume }) {
             </div>
           </div>
         )}
+
+        {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+          <div key={section.id} style={{ marginBottom: 22 }}>
+            <h2 style={{ fontSize: 13, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#1a1a1a', marginBottom: 14, borderLeft: `4px solid ${color}`, paddingLeft: 10 }}>{section.title || 'Eigene Sektion'}</h2>
+            {section.items.filter(i => i.trim()).map((item, idx) => (
+              <div key={idx} style={{ fontSize: 11, marginBottom: 4, lineHeight: 1.6, color: '#555' }}>{item}</div>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );

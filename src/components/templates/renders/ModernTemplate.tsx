@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg } from './shared';
 
 export default function ModernTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, certificates, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
@@ -121,7 +121,7 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
         )}
 
         {education.length > 0 && (
-          <div>
+          <div style={{ marginBottom: 22 }}>
             <MainLabel>Ausbildung</MainLabel>
             {education.map(edu => (
               <div key={edu.id} style={{ marginBottom: 12, paddingLeft: 14, borderLeft: '2px solid #f0f0f5' }}>
@@ -140,6 +140,15 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
             ))}
           </div>
         )}
+
+        {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+          <div key={section.id} style={{ marginBottom: 22 }}>
+            <MainLabel>{section.title || 'Eigene Sektion'}</MainLabel>
+            {section.items.filter(i => i.trim()).map((item, idx) => (
+              <div key={idx} style={{ fontSize: 11, marginBottom: 4, lineHeight: 1.6, color: '#555' }}>{item}</div>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );

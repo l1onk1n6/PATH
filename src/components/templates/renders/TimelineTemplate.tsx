@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
 export default function TimelineTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
@@ -61,7 +61,7 @@ export default function TimelineTemplate({ resume }: { resume: Resume }) {
           )}
 
           {education.length > 0 && (
-            <div>
+            <div style={{ marginBottom: 22 }}>
               <h2 style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16, color: '#1a1a1a' }}>Ausbildung</h2>
               <div style={{ position: 'relative', paddingLeft: 20, borderLeft: `2px solid ${color}20` }}>
                 {education.map((edu, i) => (
@@ -80,6 +80,15 @@ export default function TimelineTemplate({ resume }: { resume: Resume }) {
               </div>
             </div>
           )}
+
+          {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+            <div key={section.id} style={{ marginBottom: 22 }}>
+              <h2 style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16, color: '#1a1a1a' }}>{section.title || 'Eigene Sektion'}</h2>
+              {section.items.filter(i => i.trim()).map((item, idx) => (
+                <div key={idx} style={{ fontSize: 11, marginBottom: 4, lineHeight: 1.6, color: '#666' }}>{item}</div>
+              ))}
+            </div>
+          ))}
         </div>
 
         <div>

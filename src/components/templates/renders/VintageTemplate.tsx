@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, fullAddress } from './shared';
 
 export default function VintageTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
@@ -45,6 +45,17 @@ export default function VintageTemplate({ resume }: { resume: Resume }) {
               ))}
             </div>
           )}
+
+          {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+            <div key={section.id} style={{ marginBottom: 20 }}>
+              <h2 style={{ fontSize: 13, fontWeight: 700, color, textAlign: 'center', borderBottom: `1px solid ${color}40`, paddingBottom: 6, marginBottom: 14, letterSpacing: '0.08em' }}>
+                ✦ {section.title || 'Eigene Sektion'} ✦
+              </h2>
+              {section.items.filter(i => i.trim()).map((item, idx) => (
+                <div key={idx} style={{ fontSize: 11, marginBottom: 4, lineHeight: 1.6, color: '#555' }}>{item}</div>
+              ))}
+            </div>
+          ))}
         </div>
 
         <div>

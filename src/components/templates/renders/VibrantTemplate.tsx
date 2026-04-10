@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
 export default function VibrantTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
@@ -62,7 +62,7 @@ export default function VibrantTemplate({ resume }: { resume: Resume }) {
             </div>
           )}
           {education.length > 0 && (
-            <div>
+            <div style={{ marginBottom: 20 }}>
               <h2 style={{ fontSize: 12, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14, paddingBottom: 6, borderBottom: `2px solid ${color}20` }}>Ausbildung</h2>
               {education.map(edu => (
                 <div key={edu.id} style={{ marginBottom: 10 }}>
@@ -73,6 +73,15 @@ export default function VibrantTemplate({ resume }: { resume: Resume }) {
               ))}
             </div>
           )}
+
+          {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+            <div key={section.id} style={{ marginBottom: 20 }}>
+              <h2 style={{ fontSize: 12, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14, paddingBottom: 6, borderBottom: `2px solid ${color}20` }}>{section.title || 'Eigene Sektion'}</h2>
+              {section.items.filter(i => i.trim()).map((item, idx) => (
+                <div key={idx} style={{ fontSize: 11, marginBottom: 4, lineHeight: 1.6, color: '#666' }}>{item}</div>
+              ))}
+            </div>
+          ))}
         </div>
 
         <div>

@@ -2,7 +2,7 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
 export default function StartupTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages, projects } = resume;
+  const { personalInfo: info, workExperience, education, skills, languages, projects, customSections } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
 
@@ -73,7 +73,7 @@ export default function StartupTemplate({ resume }: { resume: Resume }) {
             )}
 
             {projects.length > 0 && (
-              <div>
+              <div style={{ marginBottom: 18 }}>
                 <h2 style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#111', marginBottom: 12 }}>
                   Projekte <span style={{ color, marginLeft: 6 }}>→</span>
                 </h2>
@@ -92,6 +92,17 @@ export default function StartupTemplate({ resume }: { resume: Resume }) {
                 ))}
               </div>
             )}
+
+            {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+              <div key={section.id} style={{ marginBottom: 18 }}>
+                <h2 style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#111', marginBottom: 12 }}>
+                  {section.title || 'Eigene Sektion'} <span style={{ color, marginLeft: 6 }}>→</span>
+                </h2>
+                {section.items.filter(i => i.trim()).map((item, idx) => (
+                  <div key={idx} style={{ fontSize: 11, marginBottom: 4, lineHeight: 1.6, color: '#666' }}>{item}</div>
+                ))}
+              </div>
+            ))}
           </div>
 
           <div>

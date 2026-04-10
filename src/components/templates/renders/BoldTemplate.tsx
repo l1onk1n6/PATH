@@ -53,7 +53,7 @@ export default function BoldTemplate({ resume }: { resume: Resume }) {
           )}
 
           {education.length > 0 && (
-            <div>
+            <div style={{ marginBottom: 20 }}>
               <h2 style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 14 }}>Ausbildung</h2>
               {education.map(edu => (
                 <div key={edu.id} style={{ marginBottom: 10 }}>
@@ -64,6 +64,15 @@ export default function BoldTemplate({ resume }: { resume: Resume }) {
               ))}
             </div>
           )}
+
+          {(customSections ?? []).filter(s => s.items.some(i => i.trim())).map(section => (
+            <div key={section.id} style={{ marginBottom: 20 }}>
+              <h2 style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 14 }}>{section.title || 'Eigene Sektion'}</h2>
+              {section.items.filter(i => i.trim()).map((item, idx) => (
+                <div key={idx} style={{ fontSize: 11, marginBottom: 4, lineHeight: 1.6, color: 'rgba(255,255,255,0.6)' }}>{item}</div>
+              ))}
+            </div>
+          ))}
         </div>
 
         <div>
