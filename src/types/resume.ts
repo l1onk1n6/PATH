@@ -73,7 +73,10 @@ export interface UploadedDocument {
   name: string;
   type: string;
   size: number;
+  /** base64 data URL (legacy) or signed HTTPS URL resolved at load time from storagePath */
   dataUrl: string;
+  /** path within the Supabase Storage 'documents' bucket, e.g. "uid/docId.pdf" */
+  storagePath?: string;
   uploadedAt: string;
   category: 'certificate' | 'reference' | 'portfolio' | 'other';
 }

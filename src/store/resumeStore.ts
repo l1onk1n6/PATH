@@ -97,7 +97,7 @@ interface ResumeStore {
   updateCertificate: (resumeId: string, id: string, data: Partial<Certificate>) => void;
   removeCertificate: (resumeId: string, id: string) => void;
   reorderCertificates: (resumeId: string, from: number, to: number) => void;
-  addDocument: (resumeId: string, doc: Omit<UploadedDocument, 'id' | 'uploadedAt'>) => void;
+  addDocument: (resumeId: string, doc: Omit<UploadedDocument, 'uploadedAt'> & { id?: string }) => void;
   removeDocument: (resumeId: string, id: string) => void;
 
   // Custom sections
@@ -451,14 +451,15 @@ export const useResumeStore = create<ResumeStore>()(
       },
 
       addDocument: (resumeId, doc) => {
-        const item: UploadedDocument = { ...doc, id: uuidv4(), uploadedAt: new Date().toISOString() };
+        const item: UploadedDocument = { ...doc, id: doc.id ?? uuidv4(), uploadedAt: new Date().toISOString() };
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, documents: [...r.documents, item], updatedAt: new Date().toISOString() } : r) }));
         db.upsertDocument(resumeId, item);
       },
 
       removeDocument: (resumeId, id) => {
+        const doc = get().resumes.find(r => r.id === resumeId)?.documents.find(d => d.id === id);
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, documents: r.documents.filter(d => d.id !== id), updatedAt: new Date().toISOString() } : r) }));
-        db.deleteDocument(id);
+        db.deleteDocument(id, doc?.storagePath);
       },
 
       // ── Custom sections ──────────────────────────────────

@@ -2,6 +2,8 @@ import { useCallback, useState } from 'react';
 import { User, Mail, Phone, MapPin, Globe, Link2, FileText, Camera, AlertCircle } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { validatePhotoFile, sanitizePhotoUrl } from '../../lib/security';
+import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
+import { uploadAvatar } from '../../lib/storage';
 import { usePlan } from '../../lib/plan';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import LinkedInImportDialog from './LinkedInImport';
@@ -23,7 +25,7 @@ export default function PersonalInfoEditor() {
 
   const { personalInfo: info } = resume;
 
-  function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !resume) return;
     const { valid, error } = validatePhotoFile(file, limits.photoMb);
@@ -33,6 +35,24 @@ export default function PersonalInfoEditor() {
       return;
     }
     setPhotoError('');
+    e.target.value = '';
+
+    // Try Supabase Storage first (public avatars bucket → permanent HTTPS URL)
+    if (isSupabaseConfigured()) {
+      try {
+        const { data } = await getSupabase().auth.getUser();
+        const uid = data.user?.id;
+        if (uid) {
+          const publicUrl = await uploadAvatar(uid, resume.personId, file);
+          if (publicUrl) {
+            const safe = sanitizePhotoUrl(publicUrl);
+            if (safe) { updatePersonalInfo(resume.id, { photo: safe }); return; }
+          }
+        }
+      } catch { /* fall through to base64 */ }
+    }
+
+    // Fallback: base64 encoding (offline / storage upload failed)
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result as string;

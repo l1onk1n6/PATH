@@ -4,6 +4,7 @@
  * damit die App offline weiter funktioniert.
  */
 import { getSupabase, isSupabaseConfigured } from './supabase';
+import { getDocumentSignedUrl, deleteStorageFile, DOCUMENTS_BUCKET } from './storage';
 import type { Person, Resume, UploadedDocument, ApplicationStatus } from '../types/resume';
 
 function sb() {
@@ -118,7 +119,15 @@ export async function fetchDocuments(): Promise<(UploadedDocument & { resumeId: 
   try {
     const { data, error } = await sb().from('documents').select('*').order('uploaded_at');
     if (error) throw error;
-    return (data ?? []).map(rowToDocument);
+    const docs = (data ?? []).map(rowToDocument);
+    // Resolve signed URLs for documents stored in Supabase Storage
+    await Promise.all(docs.map(async (doc) => {
+      if (doc.storagePath) {
+        const url = await getDocumentSignedUrl(doc.storagePath);
+        if (url) doc.dataUrl = url;
+      }
+    }));
+    return docs;
   } catch (e) {
     console.warn('[db] fetchDocuments', e);
     return [];
@@ -139,16 +148,19 @@ export async function upsertDocument(resumeId: string, doc: UploadedDocument): P
       type: doc.type,
       size: doc.size,
       category: doc.category,
-      data_url: doc.dataUrl,
+      storage_path: doc.storagePath ?? null,
+      // Only persist data_url for legacy (base64) documents; new uploads use storage_path
+      data_url: doc.storagePath ? null : (doc.dataUrl || null),
     });
   } catch (e) {
     console.warn('[db] upsertDocument', e);
   }
 }
 
-export async function deleteDocument(id: string): Promise<void> {
+export async function deleteDocument(id: string, storagePath?: string): Promise<void> {
   if (!isSupabaseConfigured()) return;
   try {
+    if (storagePath) await deleteStorageFile(DOCUMENTS_BUCKET, storagePath);
     await sb().from('documents').delete().eq('id', id);
   } catch (e) {
     console.warn('[db] deleteDocument', e);
@@ -221,7 +233,8 @@ function rowToDocument(row: Record<string, unknown>): UploadedDocument & { resum
     type: row.type as string,
     size: row.size as number,
     category: row.category as UploadedDocument['category'],
-    dataUrl: row.data_url as string,
+    dataUrl: (row.data_url as string) ?? '',
+    storagePath: (row.storage_path as string) ?? undefined,
     uploadedAt: row.uploaded_at as string,
   };
 }

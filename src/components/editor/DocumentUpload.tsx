@@ -1,8 +1,10 @@
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, File, Trash2, FileText, Image, ExternalLink, AlertCircle } from 'lucide-react';
+import { Upload, File, Trash2, FileText, Image, Download, AlertCircle, Loader } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
+import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
+import { uploadDocument, getDocumentSignedUrl, downloadFile } from '../../lib/storage';
 import type { UploadedDocument } from '../../types/resume';
 
 const CATEGORIES: { value: UploadedDocument['category']; label: string }[] = [
@@ -31,13 +33,15 @@ export default function DocumentUpload() {
   const resume = getActiveResume();
   const { limits } = usePlan();
   const [sizeError, setSizeError] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   // Total used across ALL resumes (documents are per-user, not per-resume)
   const totalUsedBytes = resumes.reduce((sum, r) =>
     sum + r.documents.reduce((s, d) => s + d.size, 0), 0);
   const totalLimitBytes = limits.documentsMb * 1024 * 1024;
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (!resume) return;
     setSizeError('');
 
@@ -50,19 +54,48 @@ export default function DocumentUpload() {
       return;
     }
 
-    acceptedFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        addDocument(resume.id, {
-          name: file.name,
-          type: file.type,
-          size: file.size,
-          dataUrl: reader.result as string,
-          category: 'other',
+    setUploading(true);
+
+    // Resolve user ID for Supabase Storage paths
+    let uid: string | null = null;
+    if (isSupabaseConfigured()) {
+      try {
+        const { data } = await getSupabase().auth.getUser();
+        uid = data.user?.id ?? null;
+      } catch { /* offline */ }
+    }
+
+    for (const file of acceptedFiles) {
+      const docId = crypto.randomUUID();
+      let storagePath: string | undefined;
+      let dataUrl = '';
+
+      if (uid) {
+        const path = await uploadDocument(uid, docId, file);
+        if (path) storagePath = path;
+      }
+
+      if (!storagePath) {
+        // Fallback: base64 encoding (offline / Supabase not configured)
+        dataUrl = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(file);
         });
-      };
-      reader.readAsDataURL(file);
-    });
+      }
+
+      addDocument(resume.id, {
+        id: docId,
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        dataUrl,
+        storagePath,
+        category: 'other',
+      });
+    }
+
+    setUploading(false);
   }, [resume, addDocument, totalUsedBytes, totalLimitBytes, limits.documentsMb]);
 
   const onDropRejected = useCallback((rejections: { file: File }[]) => {
@@ -91,6 +124,20 @@ export default function DocumentUpload() {
     addDocument(resume.id, { ...doc, category });
   }
 
+  async function handleDownload(doc: UploadedDocument) {
+    setDownloadingId(doc.id);
+    try {
+      let url = doc.dataUrl;
+      // If we only have a storagePath but no cached URL (fresh upload before reload), fetch a signed URL
+      if (!url && doc.storagePath) {
+        url = await getDocumentSignedUrl(doc.storagePath) ?? '';
+      }
+      if (url) await downloadFile(url, doc.name);
+    } finally {
+      setDownloadingId(null);
+    }
+  }
+
   return (
     <div className="animate-fade-in">
       {/* Storage bar */}
@@ -115,19 +162,28 @@ export default function DocumentUpload() {
       {/* Dropzone */}
       <div
         {...getRootProps()}
-        className={`dropzone ${isDragActive ? 'active' : ''} ${storageFull ? 'disabled' : ''}`}
-        style={{ marginBottom: 20, opacity: storageFull ? 0.45 : 1, pointerEvents: storageFull ? 'none' : undefined }}
+        className={`dropzone ${isDragActive ? 'active' : ''} ${storageFull || uploading ? 'disabled' : ''}`}
+        style={{ marginBottom: 20, opacity: storageFull || uploading ? 0.45 : 1, pointerEvents: storageFull || uploading ? 'none' : undefined }}
       >
         <input {...getInputProps()} />
-        <Upload size={28} style={{ margin: '0 auto 10px', display: 'block', opacity: isDragActive ? 1 : 0.5 }} />
-        <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 4 }}>
-          {storageFull ? 'Speicher voll' : isDragActive ? 'Dateien hier ablegen...' : 'Dokumente hochladen'}
-        </div>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-          {storageFull
-            ? `Limit von ${limits.documentsMb} MB erreicht — Dateien löschen um Platz zu schaffen`
-            : `Dateien hierher ziehen oder klicken · PDF, Bilder, Word · max. ${MAX_FILE_MB} MB`}
-        </div>
+        {uploading ? (
+          <>
+            <Loader size={28} style={{ margin: '0 auto 10px', display: 'block', opacity: 0.7, animation: 'spin 1s linear infinite' }} />
+            <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 4 }}>Wird hochgeladen…</div>
+          </>
+        ) : (
+          <>
+            <Upload size={28} style={{ margin: '0 auto 10px', display: 'block', opacity: isDragActive ? 1 : 0.5 }} />
+            <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 4 }}>
+              {storageFull ? 'Speicher voll' : isDragActive ? 'Dateien hier ablegen...' : 'Dokumente hochladen'}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+              {storageFull
+                ? `Limit von ${limits.documentsMb} MB erreicht — Dateien löschen um Platz zu schaffen`
+                : `Dateien hierher ziehen oder klicken · PDF, Bilder, Word · max. ${MAX_FILE_MB} MB`}
+            </div>
+          </>
+        )}
       </div>
 
       {sizeError && (
@@ -177,15 +233,17 @@ export default function DocumentUpload() {
                 ))}
               </select>
 
-              <a
-                href={doc.dataUrl}
-                download={doc.name}
+              <button
                 className="btn-glass btn-sm btn-icon"
+                onClick={() => handleDownload(doc)}
+                disabled={downloadingId === doc.id}
                 style={{ padding: 7, color: '#fff', display: 'flex', alignItems: 'center' }}
                 title="Herunterladen"
               >
-                <ExternalLink size={13} />
-              </a>
+                {downloadingId === doc.id
+                  ? <Loader size={13} style={{ animation: 'spin 1s linear infinite' }} />
+                  : <Download size={13} />}
+              </button>
 
               <button
                 className="btn-glass btn-danger btn-icon"
