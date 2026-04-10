@@ -378,77 +378,161 @@ export default function Preview() {
   );
 
   const clAccent = resume.accentColor || '#333';
-  // Sans-serif templates → use a clean sans font for the letter too
-  const sansTemplates = new Set(['tech','bold','startup','modern','geometric','vibrant','nordic','freelancer','creative']);
-  const clFont = sansTemplates.has(resume.templateId)
-    ? '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif'
-    : 'Georgia, "Times New Roman", serif';
+  const clDate = (pi.location ? pi.location + ', ' : '') +
+    new Date().toLocaleDateString('de-CH', { day: '2-digit', month: 'long', year: 'numeric' });
 
-  const CoverLetterPage = () => (
-    <div style={{
-      width: 794, minHeight: 1123, background: '#fff', color: '#111',
-      fontFamily: clFont,
-      fontSize: 13, lineHeight: 1.7, padding: '80px 80px 60px',
-      boxSizing: 'border-box', position: 'relative',
+  // ── Cover letter visual variant ───────────────────────────
+  const boldTpl  = new Set(['bold','vibrant','creative','magazine']);
+  const techTpl  = new Set(['tech','freelancer']);
+  const modernTpl = new Set(['modern','nordic','geometric','startup','timeline','pastel']);
+  const clVariant: 'classic'|'modern'|'bold'|'tech' =
+    techTpl.has(resume.templateId)  ? 'tech'    :
+    boldTpl.has(resume.templateId)  ? 'bold'    :
+    modernTpl.has(resume.templateId)? 'modern'  : 'classic';
+
+  const sansFontFace = '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif';
+  const serifFontFace = 'Georgia, "Times New Roman", serif';
+  const clFont = clVariant === 'classic' ? serifFontFace : sansFontFace;
+
+  const PageBreakHint = () => (
+    <div data-html2canvas-ignore="true" style={{
+      position: 'absolute', top: 1123, left: 0, right: 0, pointerEvents: 'none',
+      borderTop: '1.5px dashed rgba(180,180,220,0.7)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
-      {/* Thin accent rule at top */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: clAccent }} />
+      <span style={{ fontSize: 9, color: 'rgba(100,100,180,0.7)', background: 'inherit', padding: '0 8px', letterSpacing: '0.05em', fontFamily: 'sans-serif' }}>— Seite 2 —</span>
+    </div>
+  );
 
-      {/* Page break indicator — visible in preview only, ignored by html2canvas */}
-      <div data-html2canvas-ignore="true" style={{
-        position: 'absolute', top: 1123, left: 0, right: 0, pointerEvents: 'none',
-        borderTop: '1.5px dashed rgba(180,180,220,0.7)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        <span style={{
-          fontSize: 9, color: 'rgba(100,100,180,0.7)', background: '#fff',
-          padding: '0 8px', letterSpacing: '0.05em', fontFamily: 'sans-serif',
-        }}>— Seite 2 —</span>
-      </div>
-
-      {/* Sender info top right */}
-      <div style={{ textAlign: 'right', marginBottom: 40, fontSize: 12, color: '#555' }}>
-        {senderName && <div style={{ fontWeight: 700, fontSize: 14, color: clAccent }}>{senderName}</div>}
-        {pi.title && <div>{pi.title}</div>}
-        {pi.location && <div>{pi.location}</div>}
-        {pi.email && <div>{pi.email}</div>}
-        {pi.phone && <div>{pi.phone}</div>}
-      </div>
-
-      {/* Recipient */}
+  // Shared body content (recipient → date → subject → body → closing)
+  const CLBody = ({ subjectStyle }: { subjectStyle?: React.CSSProperties }) => (
+    <>
       {cl.recipient && (
         <div style={{ marginBottom: 32, whiteSpace: 'pre-line', fontSize: 13 }}>
           {cl.recipient}
         </div>
       )}
-
-      {/* Date */}
-      <div style={{ textAlign: 'right', marginBottom: 28, color: '#555', fontSize: 12 }}>
-        {pi.location ? pi.location + ', ' : ''}{new Date().toLocaleDateString('de-CH', { day: '2-digit', month: 'long', year: 'numeric' })}
-      </div>
-
-      {/* Subject */}
+      <div style={{ textAlign: 'right', marginBottom: 28, color: '#777', fontSize: 12 }}>{clDate}</div>
       {cl.subject && (
-        <div style={{
-          fontWeight: 700, marginBottom: 24, fontSize: 14,
-          borderLeft: `3px solid ${clAccent}`, paddingLeft: 10,
-        }}>
+        <div style={{ fontWeight: 700, marginBottom: 24, fontSize: 14, ...subjectStyle }}>
           {cl.subject}
         </div>
       )}
-
-      {/* Body */}
       <div style={{ whiteSpace: 'pre-wrap', marginBottom: 40 }}>
         {cl.body || <span style={{ color: '#aaa' }}>Kein Anschreiben-Text vorhanden.</span>}
       </div>
-
-      {/* Closing */}
       <div>
         <div style={{ marginBottom: 48, whiteSpace: 'pre-wrap' }}>{cl.closing || 'Mit freundlichen Grüssen'}</div>
         {senderName && <div style={{ fontWeight: 700 }}>{senderName}</div>}
       </div>
-    </div>
+    </>
   );
+
+  const CoverLetterPage = () => {
+    // ── Classic ──────────────────────────────────────────────
+    if (clVariant === 'classic') {
+      return (
+        <div style={{ width: 794, minHeight: 1123, background: '#fff', color: '#222', fontFamily: clFont, fontSize: 13, lineHeight: 1.75, boxSizing: 'border-box', position: 'relative' }}>
+          <PageBreakHint />
+          {/* Double rule: thin black + accent */}
+          <div style={{ height: 2, background: '#111' }} />
+          <div style={{ height: 4, background: clAccent }} />
+
+          <div style={{ padding: '52px 80px 60px' }}>
+            {/* Sender block */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 36, paddingBottom: 20, borderBottom: '1px solid #e0e0e0' }}>
+              <div style={{ textAlign: 'right', fontSize: 12, color: '#555', lineHeight: 1.6 }}>
+                {senderName && <div style={{ fontWeight: 700, fontSize: 15, color: '#111', marginBottom: 2 }}>{senderName}</div>}
+                {pi.title && <div>{pi.title}</div>}
+                {pi.location && <div>{pi.location}</div>}
+                {pi.email && <div>{pi.email}</div>}
+                {pi.phone && <div>{pi.phone}</div>}
+              </div>
+            </div>
+            <CLBody subjectStyle={{ borderLeft: `3px solid ${clAccent}`, paddingLeft: 10 }} />
+          </div>
+        </div>
+      );
+    }
+
+    // ── Modern ───────────────────────────────────────────────
+    if (clVariant === 'modern') {
+      return (
+        <div style={{ width: 794, minHeight: 1123, background: '#fff', color: '#222', fontFamily: clFont, fontSize: 13, lineHeight: 1.75, boxSizing: 'border-box', position: 'relative' }}>
+          <PageBreakHint />
+          {/* Colored header band */}
+          <div style={{ background: clAccent, padding: '28px 80px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              {senderName && <div style={{ color: '#fff', fontWeight: 700, fontSize: 18, letterSpacing: '-0.3px' }}>{senderName}</div>}
+              {pi.title && <div style={{ color: 'rgba(255,255,255,0.75)', fontSize: 12, marginTop: 3 }}>{pi.title}</div>}
+            </div>
+            <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(255,255,255,0.8)', lineHeight: 1.7 }}>
+              {pi.location && <div>{pi.location}</div>}
+              {pi.email && <div>{pi.email}</div>}
+              {pi.phone && <div>{pi.phone}</div>}
+            </div>
+          </div>
+          {/* Thin accent underline */}
+          <div style={{ height: 3, background: clAccent, opacity: 0.35 }} />
+
+          <div style={{ padding: '44px 80px 60px' }}>
+            <CLBody subjectStyle={{ color: clAccent, letterSpacing: '0.01em' }} />
+          </div>
+        </div>
+      );
+    }
+
+    // ── Bold ─────────────────────────────────────────────────
+    if (clVariant === 'bold') {
+      return (
+        <div style={{ width: 794, minHeight: 1123, background: '#fff', color: '#222', fontFamily: clFont, fontSize: 13, lineHeight: 1.75, boxSizing: 'border-box', position: 'relative' }}>
+          <PageBreakHint />
+          {/* Large header */}
+          <div style={{ background: clAccent, padding: '36px 80px 32px' }}>
+            {senderName && <div style={{ color: '#fff', fontWeight: 800, fontSize: 24, letterSpacing: '-0.5px', marginBottom: 6 }}>{senderName}</div>}
+            <div style={{ display: 'flex', gap: 20, fontSize: 11, color: 'rgba(255,255,255,0.75)', flexWrap: 'wrap' }}>
+              {pi.title && <span>{pi.title}</span>}
+              {pi.location && <span>{pi.location}</span>}
+              {pi.email && <span>{pi.email}</span>}
+              {pi.phone && <span>{pi.phone}</span>}
+            </div>
+          </div>
+
+          <div style={{ padding: '44px 80px 60px' }}>
+            <CLBody subjectStyle={{
+              display: 'inline-block', background: `${clAccent}18`,
+              borderLeft: `4px solid ${clAccent}`, paddingLeft: 12, paddingRight: 12,
+              paddingTop: 6, paddingBottom: 6,
+            }} />
+          </div>
+        </div>
+      );
+    }
+
+    // ── Tech ─────────────────────────────────────────────────
+    return (
+      <div style={{ width: 794, minHeight: 1123, background: '#fff', color: '#222', fontFamily: clFont, fontSize: 13, lineHeight: 1.75, boxSizing: 'border-box', position: 'relative' }}>
+        <PageBreakHint />
+        {/* Dark header */}
+        <div style={{ background: '#0d1117', padding: '28px 80px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            {senderName && <div style={{ color: clAccent, fontWeight: 700, fontSize: 16, letterSpacing: '0.02em' }}>{senderName}</div>}
+            {pi.title && <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11, marginTop: 3 }}>{pi.title}</div>}
+          </div>
+          <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(255,255,255,0.4)', lineHeight: 1.7 }}>
+            {pi.location && <div>{pi.location}</div>}
+            {pi.email && <div>{pi.email}</div>}
+            {pi.phone && <div>{pi.phone}</div>}
+          </div>
+        </div>
+        <div style={{ height: 2, background: clAccent }} />
+
+        <div style={{ padding: '44px 80px 60px' }}>
+          <CLBody subjectStyle={{ color: clAccent, fontWeight: 700, borderBottom: `1px solid ${clAccent}33`, paddingBottom: 8, display: 'block' }} />
+        </div>
+      </div>
+    );
+  };
 
   const TemplatePicker = () => (
     <>
