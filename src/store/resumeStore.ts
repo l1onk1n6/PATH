@@ -454,7 +454,9 @@ export const useResumeStore = create<ResumeStore>()(
       addDocument: (resumeId, doc) => {
         const item: UploadedDocument = { ...doc, id: doc.id ?? uuidv4(), uploadedAt: new Date().toISOString() };
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, documents: [...r.documents, item], updatedAt: new Date().toISOString() } : r) }));
-        db.upsertDocument(resumeId, item);
+        db.upsertDocument(resumeId, item).then(err => {
+          if (err) set({ limitError: `Dokument konnte nicht gespeichert werden: ${err}` });
+        });
       },
 
       updateDocument: (resumeId, docId, patch) => {

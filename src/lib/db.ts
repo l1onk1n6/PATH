@@ -130,18 +130,21 @@ export async function fetchDocuments(): Promise<(UploadedDocument & { resumeId: 
     }));
     return docs;
   } catch (e) {
-    console.warn('[db] fetchDocuments', e);
+    console.error('[db] fetchDocuments Fehler:', e);
     return [];
   }
 }
 
-export async function upsertDocument(resumeId: string, doc: UploadedDocument): Promise<void> {
-  if (!isSupabaseConfigured()) return;
+export async function upsertDocument(resumeId: string, doc: UploadedDocument): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null;
   try {
     const uid = await userId();
-    if (!uid) return;
+    if (!uid) {
+      console.error('[db] upsertDocument: kein User gefunden');
+      return 'no-user';
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (sb().from('documents') as any).upsert({
+    const { error } = await (sb().from('documents') as any).upsert({
       id: doc.id,
       resume_id: resumeId,
       user_id: uid,
@@ -154,8 +157,14 @@ export async function upsertDocument(resumeId: string, doc: UploadedDocument): P
       data_url: doc.storagePath ? null : (doc.dataUrl || null),
       uploaded_at: doc.uploadedAt || new Date().toISOString(),
     });
+    if (error) {
+      console.error('[db] upsertDocument Fehler:', error.message, error.details, error.hint);
+      return error.message;
+    }
+    return null;
   } catch (e) {
-    console.warn('[db] upsertDocument', e);
+    console.error('[db] upsertDocument Exception:', e);
+    return String(e);
   }
 }
 
