@@ -4,6 +4,7 @@ import {
   CheckCircle2, Circle, Bell, Loader2, Sparkles, Mail, AlertCircle, Share2,
 } from 'lucide-react';
 import ShareLinksPanel from './ShareLinksPanel';
+import ProGate from '../ui/ProGate';
 
 function safeUrl(url: string) {
   if (!url) return url;
@@ -157,37 +158,47 @@ function ReminderSection({ resumeId, deadline, reminderDays, personEmail }: {
       )}
 
       {/* Pill toggles */}
-      <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
-        {REMINDER_OPTS.map(({ days, label }) => {
-          const active = selected.includes(days);
-          // Disable options beyond deadline
-          const disabled = !isPro || (daysLeft !== null && days > daysLeft);
-          return (
-            <button
-              key={days}
-              onClick={() => !disabled && toggle(days)}
-              disabled={disabled}
-              style={{
-                padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: active ? 600 : 400,
-                cursor: disabled ? 'not-allowed' : 'pointer',
-                transition: 'all 0.18s',
-                background: active
-                  ? 'linear-gradient(135deg, rgba(0,122,255,0.35), rgba(88,86,214,0.3))'
-                  : 'rgba(255,255,255,0.07)',
-                border: active
-                  ? '1px solid rgba(0,122,255,0.55)'
-                  : '1px solid rgba(255,255,255,0.12)',
-                color: active ? '#fff' : 'var(--text-secondary)',
-                opacity: disabled ? 0.35 : 1,
-                boxShadow: active ? '0 2px 8px rgba(0,122,255,0.25)' : 'none',
-              }}
-            >
-              {active && <Check size={10} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />}
-              {label} vorher
-            </button>
-          );
-        })}
-      </div>
+      {isPro ? (
+        <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+          {REMINDER_OPTS.map(({ days, label }) => {
+            const active = selected.includes(days);
+            const disabled = daysLeft !== null && days > daysLeft;
+            return (
+              <button
+                key={days}
+                onClick={() => !disabled && toggle(days)}
+                disabled={disabled}
+                style={{
+                  padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: active ? 600 : 400,
+                  cursor: disabled ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.18s',
+                  background: active ? 'linear-gradient(135deg, rgba(0,122,255,0.35), rgba(88,86,214,0.3))' : 'rgba(255,255,255,0.07)',
+                  border: active ? '1px solid rgba(0,122,255,0.55)' : '1px solid rgba(255,255,255,0.12)',
+                  color: active ? '#fff' : 'var(--text-secondary)',
+                  opacity: disabled ? 0.35 : 1,
+                  boxShadow: active ? '0 2px 8px rgba(0,122,255,0.25)' : 'none',
+                }}
+              >
+                {active && <Check size={10} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />}
+                {label} vorher
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <ProGate featureId="reminder">
+          <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+            {REMINDER_OPTS.map(({ days, label }) => (
+              <button
+                key={days}
+                style={{ padding: '6px 14px', borderRadius: 20, fontSize: 12, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', color: 'var(--text-secondary)', cursor: 'default' }}
+              >
+                {label} vorher
+              </button>
+            ))}
+          </div>
+        </ProGate>
+      )}
 
       {/* Email recipient info / warning */}
       {isPro && (
@@ -219,13 +230,6 @@ function ReminderSection({ resumeId, deadline, reminderDays, personEmail }: {
             Keine E-Mail-Adresse gefunden. Hinterlege eine Mail in den persönlichen Daten oder am Konto.
           </div>
         )
-      )}
-
-      {!isPro && (
-        <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--text-muted)' }}>
-          <Sparkles size={10} style={{ color: '#FF9F0A' }} />
-          E-Mail Erinnerungen sind ein Pro-Feature
-        </div>
       )}
       <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
     </div>

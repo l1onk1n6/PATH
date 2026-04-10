@@ -1,43 +1,18 @@
-import { Plus, Trash2, GripVertical, X, Lock } from 'lucide-react';
+import { Plus, Trash2, GripVertical, X } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
-import { UpgradeModal } from '../ui/ProGate';
-import { useState } from 'react';
+import ProGate from '../ui/ProGate';
 
 export default function CustomSectionEditor() {
   const { getActiveResume, addCustomSection, updateCustomSection, removeCustomSection, reorderCustomSections } = useResumeStore();
   const { limits } = usePlan();
-  const [showUpgrade, setShowUpgrade] = useState(false);
   const resume = getActiveResume();
   if (!resume) return null;
 
   const sections = resume.customSections ?? [];
+  const isLocked = limits.customSections === 0;
 
-  if (limits.customSections === 0) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '48px 24px', textAlign: 'center', gap: 16 }}>
-        {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} highlightId="custom" />}
-        <div style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(255,159,10,0.15)', border: '1px solid rgba(255,159,10,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Lock size={22} style={{ color: '#FF9F0A' }} />
-        </div>
-        <div>
-          <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Eigene Sektionen</div>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 280 }}>
-            Erstelle eigene Abschnitte wie Projekte, Publikationen oder Zertifikate — mit PATH Pro.
-          </div>
-        </div>
-        <button
-          className="btn-glass"
-          onClick={() => setShowUpgrade(true)}
-          style={{ padding: '10px 22px', fontWeight: 700, fontSize: 13, background: 'linear-gradient(135deg, rgba(255,159,10,0.3), rgba(255,55,95,0.2))', border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A' }}
-        >
-          Upgrade auf Pro
-        </button>
-      </div>
-    );
-  }
-
-  return (
+  const editor = (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {sections.length === 0 && (
         <div style={{ textAlign: 'center', padding: '28px 16px', color: 'var(--text-muted)', fontSize: 13 }}>
@@ -139,4 +114,7 @@ export default function CustomSectionEditor() {
       </button>
     </div>
   );
+
+  if (isLocked) return <ProGate featureId="sections">{editor}</ProGate>;
+  return editor;
 }

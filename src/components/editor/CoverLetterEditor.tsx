@@ -4,7 +4,7 @@ import { useIsMobile } from '../../hooks/useBreakpoint';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { generateCoverLetter, improveText } from '../../lib/ai';
-import { UpgradeModal } from '../ui/ProGate';
+import ProGate, { UpgradeModal } from '../ui/ProGate';
 import { useTrackerStore } from '../../store/trackerStore';
 
 // Parse multiline recipient string into structured address fields
@@ -277,90 +277,117 @@ export default function CoverLetterEditor() {
       </div>
 
       {/* AI panel — directly above body */}
-      <div className="glass-card" style={{
-        padding: 0, overflow: 'hidden',
-        border: showAiPanel ? '1px solid rgba(255,159,10,0.35)' : '1px solid rgba(255,255,255,0.1)',
-        background: showAiPanel ? 'rgba(255,159,10,0.04)' : 'rgba(255,255,255,0.04)',
-        marginBottom: -10,
-      }}>
-        <button
-          style={{
-            display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 14px',
-            background: 'none', border: 'none', cursor: 'pointer', color: 'inherit',
-          }}
-          onClick={() => isPro ? setShowAiPanel(v => !v) : setShowUpgrade(true)}
-        >
-          <Sparkles size={14} style={{ color: isPro ? '#FF9F0A' : 'var(--text-muted)' }} />
-          <span style={{ fontSize: 13, fontWeight: 600, flex: 1, textAlign: 'left', color: isPro ? '#FF9F0A' : 'var(--text-secondary)' }}>
-            KI-Assistent — Anschreiben generieren
-          </span>
-          {!isPro && (
-            <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 5px', borderRadius: 4, background: 'linear-gradient(135deg, #FF9F0A, #FF375F)', color: '#fff' }}>PRO</span>
+      {isPro ? (
+        <div className="glass-card" style={{
+          padding: 0, overflow: 'hidden',
+          border: showAiPanel ? '1px solid rgba(255,159,10,0.35)' : '1px solid rgba(255,255,255,0.1)',
+          background: showAiPanel ? 'rgba(255,159,10,0.04)' : 'rgba(255,255,255,0.04)',
+          marginBottom: -10,
+        }}>
+          <button
+            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
+            onClick={() => setShowAiPanel(v => !v)}
+          >
+            <Sparkles size={14} style={{ color: '#FF9F0A' }} />
+            <span style={{ fontSize: 13, fontWeight: 600, flex: 1, textAlign: 'left', color: '#FF9F0A' }}>
+              KI-Assistent — Anschreiben generieren
+            </span>
+            {showAiPanel ? <ChevronUp size={14} style={{ opacity: 0.5 }} /> : <ChevronDown size={14} style={{ opacity: 0.5 }} />}
+          </button>
+          {showAiPanel && (
+            <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {hasExistingBody && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, background: 'rgba(255,159,10,0.08)', border: '1px solid rgba(255,159,10,0.2)', fontSize: 12, color: '#FF9F0A' }}>
+                  <AlertTriangle size={12} style={{ flexShrink: 0 }} />
+                  Der bestehende Anschreiben-Text wird überschrieben.
+                </div>
+              )}
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8 }}>
+                <div>
+                  <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Stelle</label>
+                  <input className="input-glass" placeholder={resume.personalInfo.title || 'z.B. Software Engineer'} value={aiJobTitle}
+                    onChange={e => setAiJobTitle(e.target.value)} style={{ width: '100%', fontSize: 13 }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Unternehmen</label>
+                  <input className="input-glass" placeholder={addr.company || 'z.B. Acme AG'} value={aiCompany}
+                    onChange={e => setAiCompany(e.target.value)} style={{ width: '100%', fontSize: 13 }} />
+                </div>
+              </div>
+              <div>
+                <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>
+                  Stellenbeschreibung (optional, für bessere Ergebnisse)
+                </label>
+                <textarea className="input-glass" placeholder="Stellenbeschreibung hier einfügen…" value={aiJobDesc}
+                  onChange={e => setAiJobDesc(e.target.value)} rows={4}
+                  style={{ width: '100%', resize: 'vertical', fontSize: 13 }} />
+              </div>
+              <button
+                className="btn-glass"
+                onClick={handleGenerateCL}
+                disabled={generatingCL}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '10px 16px', background: generatingCL ? 'rgba(255,159,10,0.1)' : 'linear-gradient(135deg, rgba(255,159,10,0.3), rgba(255,55,95,0.2))', border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', fontWeight: 700, fontSize: 13 }}
+              >
+                {generatingCL
+                  ? <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> Wird generiert…</>
+                  : <><Sparkles size={14} /> Anschreiben generieren</>}
+              </button>
+            </div>
           )}
-          {isPro && (showAiPanel ? <ChevronUp size={14} style={{ opacity: 0.5 }} /> : <ChevronDown size={14} style={{ opacity: 0.5 }} />)}
-        </button>
-
-        {showAiPanel && (
-          <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {hasExistingBody && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, background: 'rgba(255,159,10,0.08)', border: '1px solid rgba(255,159,10,0.2)', fontSize: 12, color: '#FF9F0A' }}>
-                <AlertTriangle size={12} style={{ flexShrink: 0 }} />
-                Der bestehende Anschreiben-Text wird überschrieben.
+        </div>
+      ) : (
+        <ProGate featureId="ai">
+          <div className="glass-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', marginBottom: -10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px' }}>
+              <Sparkles size={14} style={{ color: '#FF9F0A' }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#FF9F0A' }}>KI-Assistent — Anschreiben generieren</span>
+              <ChevronDown size={14} style={{ opacity: 0.5, marginLeft: 'auto' }} />
+            </div>
+            <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8 }}>
+                <div>
+                  <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Stelle</label>
+                  <div className="input-glass" style={{ width: '100%', fontSize: 13, height: 36 }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Unternehmen</label>
+                  <div className="input-glass" style={{ width: '100%', fontSize: 13, height: 36 }} />
+                </div>
               </div>
-            )}
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8 }}>
               <div>
-                <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Stelle</label>
-                <input className="input-glass" placeholder={resume.personalInfo.title || 'z.B. Software Engineer'} value={aiJobTitle}
-                  onChange={e => setAiJobTitle(e.target.value)} style={{ width: '100%', fontSize: 13 }} />
+                <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Stellenbeschreibung</label>
+                <div className="input-glass" style={{ width: '100%', height: 80 }} />
               </div>
-              <div>
-                <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Unternehmen</label>
-                <input className="input-glass" placeholder={addr.company || 'z.B. Acme AG'} value={aiCompany}
-                  onChange={e => setAiCompany(e.target.value)} style={{ width: '100%', fontSize: 13 }} />
+              <div className="btn-glass" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '10px 16px', background: 'linear-gradient(135deg, rgba(255,159,10,0.3), rgba(255,55,95,0.2))', border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', fontWeight: 700, fontSize: 13 }}>
+                <Sparkles size={14} /> Anschreiben generieren
               </div>
             </div>
-            <div>
-              <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>
-                Stellenbeschreibung (optional, für bessere Ergebnisse)
-              </label>
-              <textarea className="input-glass" placeholder="Stellenbeschreibung hier einfügen…" value={aiJobDesc}
-                onChange={e => setAiJobDesc(e.target.value)} rows={4}
-                style={{ width: '100%', resize: 'vertical', fontSize: 13 }} />
-            </div>
-            <button
-              className="btn-glass"
-              onClick={handleGenerateCL}
-              disabled={generatingCL}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                padding: '10px 16px',
-                background: generatingCL ? 'rgba(255,159,10,0.1)' : 'linear-gradient(135deg, rgba(255,159,10,0.3), rgba(255,55,95,0.2))',
-                border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', fontWeight: 700, fontSize: 13,
-              }}
-            >
-              {generatingCL
-                ? <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> Wird generiert…</>
-                : <><Sparkles size={14} /> Anschreiben generieren</>}
-            </button>
           </div>
-        )}
-      </div>
+        </ProGate>
+      )}
 
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
           <label style={{ fontSize: 12, fontWeight: 600, opacity: 0.7 }}>Anschreiben-Text</label>
-          <button
-            className="btn-glass btn-sm"
-            style={{ fontSize: 11, gap: 5, opacity: !isPro || !cl.body.trim() ? 0.45 : 1 }}
-            onClick={handleImproveBody}
-            disabled={improvingBody || !cl.body.trim()}
-            title={!isPro ? 'Pro-Feature' : 'Text mit KI verbessern'}
-          >
-            {improvingBody
-              ? <><Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> Verbessert…</>
-              : <><Wand2 size={11} /> Verbessern{!isPro && ' ✦'}</>}
-          </button>
+          {isPro ? (
+            <button
+              className="btn-glass btn-sm"
+              style={{ fontSize: 11, gap: 5, opacity: !cl.body.trim() ? 0.45 : 1 }}
+              onClick={handleImproveBody}
+              disabled={improvingBody || !cl.body.trim()}
+              title="Text mit KI verbessern"
+            >
+              {improvingBody
+                ? <><Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> Verbessert…</>
+                : <><Wand2 size={11} /> Verbessern</>}
+            </button>
+          ) : (
+            <ProGate featureId="ai" badge>
+              <button className="btn-glass btn-sm" style={{ fontSize: 11, gap: 5 }}>
+                <Wand2 size={11} /> Verbessern
+              </button>
+            </ProGate>
+          )}
         </div>
         <textarea
           className="input-glass"

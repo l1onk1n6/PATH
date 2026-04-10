@@ -13,7 +13,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useUIStore, type AccountSection } from '../../store/uiStore';
 import { LogoFull, LogoIcon } from './Logo';
 import { usePlan } from '../../lib/plan';
-import { UpgradeModal } from '../ui/ProGate';
+import ProGate, { UpgradeModal } from '../ui/ProGate';
 import type { EditorSection } from '../../types/resume';
 
 interface SidebarProps {
@@ -194,10 +194,19 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
             <div style={{ height: 1, background: c.line, margin: '4px 0 6px' }} />
 
             {/* Übersetzen */}
-            <button style={subItem(false)} onClick={() => { setShowTranslate(true); onClose?.(); }}>
-              <Languages size={12} style={{ flexShrink: 0, opacity: 0.7 }} />
-              <span style={{ fontSize: 12 }}>Übersetzen</span>
-            </button>
+            {isPro ? (
+              <button style={subItem(false)} onClick={() => { setShowTranslate(true); onClose?.(); }}>
+                <Languages size={12} style={{ flexShrink: 0, opacity: 0.7 }} />
+                <span style={{ fontSize: 12 }}>Übersetzen</span>
+              </button>
+            ) : (
+              <ProGate featureId="translate" badge>
+                <button style={subItem(false)}>
+                  <Languages size={12} style={{ flexShrink: 0, opacity: 0.7 }} />
+                  <span style={{ fontSize: 12 }}>Übersetzen</span>
+                </button>
+              </ProGate>
+            )}
 
             {/* Versionen (Pro) */}
             {limits.versionHistory ? (
@@ -207,11 +216,12 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
                 <span style={{ fontSize: 12 }}>Versionen</span>
               </button>
             ) : (
-              <button style={{ ...subItem(false), opacity: 0.35, cursor: 'not-allowed' }} disabled>
-                <History size={12} style={{ flexShrink: 0 }} />
-                <span style={{ fontSize: 12, flex: 1 }}>Versionen</span>
-                <Lock size={10} />
-              </button>
+              <ProGate featureId="history" badge>
+                <button style={subItem(false)}>
+                  <History size={12} style={{ flexShrink: 0, opacity: 0.7 }} />
+                  <span style={{ fontSize: 12 }}>Versionen</span>
+                </button>
+              </ProGate>
             )}
           </div>
         )}

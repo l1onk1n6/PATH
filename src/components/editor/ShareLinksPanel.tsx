@@ -4,6 +4,7 @@ import type { ShareLink, ShareLinkView } from '../../types/resume';
 import { getShareLinks, createShareLink, deleteShareLink, updateShareLink, getShareLinkViews } from '../../lib/db';
 import { isSupabaseConfigured } from '../../lib/supabase';
 import { usePlan } from '../../lib/plan';
+import ProGate from '../ui/ProGate';
 
 const FLAG: Record<string, string> = {
   AT: '🇦🇹', CH: '🇨🇭', DE: '🇩🇪', US: '🇺🇸', GB: '🇬🇧', FR: '🇫🇷', IT: '🇮🇹',
@@ -239,9 +240,7 @@ export default function ShareLinksPanel({ resumeId, readOnly }: Props) {
           <ExternalLink size={10} style={{ display: 'inline', marginRight: 4 }} />
           {activeCount}/{limits.shareLinks} aktive Links
         </div>
-        {!readOnly && (!isPro ? (
-          <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 4, background: 'linear-gradient(135deg,#FF9F0A,#FF375F)', color: '#fff', fontWeight: 700 }}>PRO</span>
-        ) : (
+        {!readOnly && (isPro ? (
           <button
             className="btn-glass btn-primary btn-sm"
             onClick={() => setShowCreate(v => !v)}
@@ -250,6 +249,12 @@ export default function ShareLinksPanel({ resumeId, readOnly }: Props) {
           >
             <Plus size={11} /> Neuer Link
           </button>
+        ) : (
+          <ProGate featureId="share" badge>
+            <button className="btn-glass btn-primary btn-sm" style={{ fontSize: 11 }}>
+              <Plus size={11} /> Neuer Link
+            </button>
+          </ProGate>
         ))}
       </div>
 
