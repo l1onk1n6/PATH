@@ -320,13 +320,13 @@ function rowToApplication(row: Record<string, unknown>): Application {
 export async function getShareLinks(resumeId: string): Promise<ShareLink[]> {
   if (!isSupabaseConfigured()) return [];
   try {
-    const { data, error } = await sb()
+    const { data, error } = await (sb() as ReturnType<typeof getSupabase>)
       .from('share_links')
       .select('id, resume_id, token, label, is_active, created_at, resume_views(count)')
       .eq('resume_id', resumeId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false }) as unknown as { data: Record<string, unknown>[] | null; error: unknown };
     if (error || !data) return [];
-    return (data as Record<string, unknown>[]).map(row => ({
+    return data.map(row => ({
       id: row.id as string,
       resumeId: row.resume_id as string,
       token: row.token as string,
@@ -350,9 +350,9 @@ export async function createShareLink(resumeId: string, label: string): Promise<
       .from('share_links')
       .insert({ resume_id: resumeId, user_id: uid, label })
       .select('id, resume_id, token, label, is_active, created_at')
-      .single();
+      .single() as unknown as { data: Record<string, unknown> | null; error: unknown };
     if (error || !data) return null;
-    const row = data as Record<string, unknown>;
+    const row = data;
     return { id: row.id as string, resumeId: row.resume_id as string, token: row.token as string, label: (row.label as string) || '', isActive: row.is_active as boolean, createdAt: row.created_at as string, viewCount: 0 };
   } catch (e) {
     console.warn('[db] createShareLink', e);

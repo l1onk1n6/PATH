@@ -5,7 +5,7 @@ import type { Resume } from '../types/resume';
 import { fetchSharedResumeByToken } from '../lib/db';
 import ResumePreview from '../components/templates/ResumePreview';
 import { LogoFull } from '../components/layout/Logo';
-import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 const TRACK_URL = `${import.meta.env.VITE_SUPABASE_URL ?? ''}/functions/v1/track-view`;
 

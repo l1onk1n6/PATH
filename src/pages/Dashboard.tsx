@@ -19,7 +19,6 @@ import {
 } from '../types/resume';
 import { calcCompleteness, completenessColor } from '../lib/completeness';
 import { useIsMobile } from '../hooks/useBreakpoint';
-import { v4 as uuidv4 } from 'uuid';
 import { UpgradeModal } from '../components/ui/ProGate';
 import { usePlan } from '../lib/plan';
 
@@ -225,7 +224,7 @@ export default function Dashboard() {
   const { limits } = usePlan();
   const {
     persons, resumes, addPerson, deletePerson, setActivePerson, activePersonId,
-    addResume, deleteResume, setActiveResume, setActiveSection, renameResume, duplicateResume, setResumeStatus,
+    addResume, deleteResume, setActiveResume, renameResume, duplicateResume, setResumeStatus,
     exportGdprData, limitError, clearLimitError,
   } = useResumeStore();
 

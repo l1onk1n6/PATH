@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Trash2, Copy, CheckCircle, BarChart2, Eye, Globe, Monitor, Smartphone, ExternalLink, ChevronDown, ChevronUp, ToggleLeft, ToggleRight, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Copy, CheckCircle, BarChart2, Eye, Globe, Monitor, Smartphone, ExternalLink, ChevronUp, ToggleLeft, ToggleRight, Loader2 } from 'lucide-react';
 import type { ShareLink, ShareLinkView } from '../../types/resume';
 import { getShareLinks, createShareLink, deleteShareLink, updateShareLink, getShareLinkViews } from '../../lib/db';
 import { isSupabaseConfigured } from '../../lib/supabase';
