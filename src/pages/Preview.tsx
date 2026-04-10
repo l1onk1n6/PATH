@@ -377,13 +377,23 @@ export default function Preview() {
     </div>
   );
 
+  const clAccent = resume.accentColor || '#333';
+  // Sans-serif templates → use a clean sans font for the letter too
+  const sansTemplates = new Set(['tech','bold','startup','modern','geometric','vibrant','nordic','freelancer','creative']);
+  const clFont = sansTemplates.has(resume.templateId)
+    ? '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif'
+    : 'Georgia, "Times New Roman", serif';
+
   const CoverLetterPage = () => (
     <div style={{
       width: 794, minHeight: 1123, background: '#fff', color: '#111',
-      fontFamily: 'Georgia, "Times New Roman", serif',
+      fontFamily: clFont,
       fontSize: 13, lineHeight: 1.7, padding: '80px 80px 60px',
       boxSizing: 'border-box', position: 'relative',
     }}>
+      {/* Thin accent rule at top */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: clAccent }} />
+
       {/* Page break indicator — visible in preview only, ignored by html2canvas */}
       <div data-html2canvas-ignore="true" style={{
         position: 'absolute', top: 1123, left: 0, right: 0, pointerEvents: 'none',
@@ -395,9 +405,10 @@ export default function Preview() {
           padding: '0 8px', letterSpacing: '0.05em', fontFamily: 'sans-serif',
         }}>— Seite 2 —</span>
       </div>
+
       {/* Sender info top right */}
       <div style={{ textAlign: 'right', marginBottom: 40, fontSize: 12, color: '#555' }}>
-        {senderName && <div style={{ fontWeight: 700, fontSize: 14, color: '#111' }}>{senderName}</div>}
+        {senderName && <div style={{ fontWeight: 700, fontSize: 14, color: clAccent }}>{senderName}</div>}
         {pi.title && <div>{pi.title}</div>}
         {pi.location && <div>{pi.location}</div>}
         {pi.email && <div>{pi.email}</div>}
@@ -418,7 +429,10 @@ export default function Preview() {
 
       {/* Subject */}
       {cl.subject && (
-        <div style={{ fontWeight: 700, marginBottom: 24, fontSize: 14 }}>
+        <div style={{
+          fontWeight: 700, marginBottom: 24, fontSize: 14,
+          borderLeft: `3px solid ${clAccent}`, paddingLeft: 10,
+        }}>
           {cl.subject}
         </div>
       )}
