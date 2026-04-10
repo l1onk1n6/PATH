@@ -163,6 +163,7 @@ function TrackerView() {
   const { resumes, persons, setResumeStatus, setActiveResume, setActivePerson } = useResumeStore();
   const { limits } = usePlan();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const frozenPersonIds = new Set(
     limits.persons < Infinity ? persons.slice(limits.persons).map(p => p.id) : []
@@ -174,8 +175,8 @@ function TrackerView() {
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-      gap: 16,
+      gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(220px, 1fr))',
+      gap: isMobile ? 10 : 16,
       alignItems: 'start',
     }}>
       {ALL_STATUSES.map((status) => {

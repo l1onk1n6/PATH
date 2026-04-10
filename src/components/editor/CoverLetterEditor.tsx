@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Sparkles, Loader2, Wand2, ChevronDown, ChevronUp, AlertTriangle, Check, ClipboardList } from 'lucide-react';
+import { useIsMobile } from '../../hooks/useBreakpoint';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { generateCoverLetter, improveText } from '../../lib/ai';
@@ -42,6 +43,7 @@ const CL_TEMPLATES = [
 export default function CoverLetterEditor() {
   const { getActiveResume, updateCoverLetter } = useResumeStore();
   const { isPro } = usePlan();
+  const isMobile = useIsMobile();
   const resume = getActiveResume();
 
   const { addApplication, updateApplication } = useTrackerStore();
@@ -242,7 +244,7 @@ export default function CoverLetterEditor() {
             onChange={e => updateAddr('dept', e.target.value)}
             style={{ fontSize: 13 }}
           />
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: 6 }}>
             <input
               className="input-glass"
               placeholder="Strasse und Nr."
@@ -306,7 +308,7 @@ export default function CoverLetterEditor() {
                 Der bestehende Anschreiben-Text wird überschrieben.
               </div>
             )}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8 }}>
               <div>
                 <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Stelle</label>
                 <input className="input-glass" placeholder={resume.personalInfo.title || 'z.B. Software Engineer'} value={aiJobTitle}

@@ -7,6 +7,7 @@ import { useResumeStore } from '../../store/resumeStore';
 import { useAuthStore } from '../../store/authStore';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
 import { usePlan } from '../../lib/plan';
+import { useIsMobile } from '../../hooks/useBreakpoint';
 import { APPLICATION_STATUS_LABELS } from '../../types/resume';
 import type { EditorSection } from '../../types/resume';
 
@@ -219,6 +220,7 @@ export default function ResumeOverview() {
   const { getActiveResume, getActivePerson, renameResume, updateResume, setActiveSection } = useResumeStore();
   const resume = getActiveResume();
   const person = getActivePerson();
+  const isMobile = useIsMobile();
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState('');
 
@@ -306,7 +308,7 @@ export default function ResumeOverview() {
       </div>
 
       {/* ── Two-column grid ─────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 16 : 20, marginBottom: 24, alignItems: 'start' }}>
 
         {/* Left: Status + Job URL */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
