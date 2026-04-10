@@ -17,6 +17,50 @@ export default function TemplateSelector() {
 
   return (
     <div className="animate-fade-in">
+      {/* Accent Color */}
+      <div className="section-label" style={{ marginBottom: 10 }}>Akzentfarbe</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+        {ACCENT_COLORS.map((color) => (
+          <button
+            key={color}
+            onClick={() => setAccentColor(resume.id, color)}
+            title={color}
+            style={{
+              width: 28, height: 28, borderRadius: '50%',
+              background: color,
+              border: resume.accentColor === color
+                ? '3px solid #fff'
+                : '2px solid rgba(255,255,255,0.2)',
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+              transform: resume.accentColor === color ? 'scale(1.2)' : 'scale(1)',
+              boxShadow: resume.accentColor === color
+                ? `0 0 12px ${color}80`
+                : 'none',
+            }}
+          />
+        ))}
+
+        {/* Custom color */}
+        <label title="Eigene Farbe" style={{ position: 'relative', cursor: 'pointer' }}>
+          <div style={{
+            width: 28, height: 28, borderRadius: '50%',
+            background: 'conic-gradient(red, yellow, green, blue, red)',
+            border: '2px solid var(--text-muted)',
+            cursor: 'pointer',
+          }} />
+          <input
+            type="color"
+            value={resume.accentColor}
+            onChange={(e) => setAccentColor(resume.id, e.target.value)}
+            style={{
+              position: 'absolute', inset: 0, opacity: 0,
+              width: '100%', height: '100%', cursor: 'pointer',
+            }}
+          />
+        </label>
+      </div>
+
       {/* Template Grid */}
       <div className="section-label" style={{ marginBottom: 12 }}>
         <Palette size={10} style={{ display: 'inline', marginRight: 4 }} />
@@ -102,49 +146,6 @@ export default function TemplateSelector() {
         })}
       </div>
 
-      {/* Accent Color */}
-      <div className="section-label" style={{ marginBottom: 10 }}>Akzentfarbe</div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-        {ACCENT_COLORS.map((color) => (
-          <button
-            key={color}
-            onClick={() => setAccentColor(resume.id, color)}
-            title={color}
-            style={{
-              width: 28, height: 28, borderRadius: '50%',
-              background: color,
-              border: resume.accentColor === color
-                ? '3px solid #fff'
-                : '2px solid rgba(255,255,255,0.2)',
-              cursor: 'pointer',
-              transition: 'all 0.15s',
-              transform: resume.accentColor === color ? 'scale(1.2)' : 'scale(1)',
-              boxShadow: resume.accentColor === color
-                ? `0 0 12px ${color}80`
-                : 'none',
-            }}
-          />
-        ))}
-
-        {/* Custom color */}
-        <label title="Eigene Farbe" style={{ position: 'relative', cursor: 'pointer' }}>
-          <div style={{
-            width: 28, height: 28, borderRadius: '50%',
-            background: 'conic-gradient(red, yellow, green, blue, red)',
-            border: '2px solid var(--text-muted)',
-            cursor: 'pointer',
-          }} />
-          <input
-            type="color"
-            value={resume.accentColor}
-            onChange={(e) => setAccentColor(resume.id, e.target.value)}
-            style={{
-              position: 'absolute', inset: 0, opacity: 0,
-              width: '100%', height: '100%', cursor: 'pointer',
-            }}
-          />
-        </label>
-      </div>
     </div>
   );
 }
