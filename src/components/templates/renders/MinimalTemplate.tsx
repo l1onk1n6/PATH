@@ -42,6 +42,7 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
               {(info.street || info.location) && <span>{[info.street, info.location].filter(Boolean).join(', ')}</span>}
               {info.website && <span>{info.website}</span>}
               {info.linkedin && <span>{info.linkedin}</span>}
+              {info.birthDate && <span>{fmtDate(info.birthDate)}</span>}
             </div>
           </div>
         </div>

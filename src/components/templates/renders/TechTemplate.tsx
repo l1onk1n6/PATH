@@ -1,6 +1,8 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, fullAddress } from './shared';
 
+const fmtDate = (d?: string) => d ? new Date(d).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
 export default function TechTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, projects, customSections } = resume;
   const color = resume.accentColor;
@@ -20,7 +22,8 @@ export default function TechTemplate({ resume }: { resume: Resume }) {
             <div><span style={{ color: '#79c0ff' }}>"name"</span>: <span style={{ color: '#a5d6ff' }}>"{name}"</span>,</div>
             {info.title && <div><span style={{ color: '#79c0ff' }}>"role"</span>: <span style={{ color: '#a5d6ff' }}>"{info.title}"</span>,</div>}
             {info.email && <div><span style={{ color: '#79c0ff' }}>"email"</span>: <span style={{ color: '#a5d6ff' }}>"{info.email}"</span>,</div>}
-            {(info.street || info.location) && <div><span style={{ color: '#79c0ff' }}>"location"</span>: <span style={{ color: '#a5d6ff' }}>"{fullAddress(info)}"</span></div>}
+            {(info.street || info.location) && <div><span style={{ color: '#79c0ff' }}>"location"</span>: <span style={{ color: '#a5d6ff' }}>"{fullAddress(info)}"</span>,</div>}
+            {info.birthDate && <div><span style={{ color: '#79c0ff' }}>"birthDate"</span>: <span style={{ color: '#a5d6ff' }}>"{fmtDate(info.birthDate)}"</span></div>}
           </div>
           <span style={{ color: '#58a6ff' }}>{'}'}</span>
         </div>

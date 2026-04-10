@@ -1,6 +1,8 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg } from './shared';
 
+const fmtDate = (d?: string) => d ? new Date(d).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
 export default function NordicTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, certificates, customSections } = resume;
   const color = resume.accentColor;
@@ -44,6 +46,7 @@ export default function NordicTemplate({ resume }: { resume: Resume }) {
             {info.location && <div>{info.location}</div>}
             {info.website && <div>{info.website}</div>}
             {info.linkedin && <div>{info.linkedin}</div>}
+            {info.birthDate && <div>{fmtDate(info.birthDate)}</div>}
           </div>
         </div>
 

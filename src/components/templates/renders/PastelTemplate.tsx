@@ -1,6 +1,8 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
+const fmtDate = (d?: string) => d ? new Date(d).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
 export default function PastelTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, certificates, customSections } = resume;
   const color = resume.accentColor;
@@ -32,7 +34,7 @@ export default function PastelTemplate({ resume }: { resume: Resume }) {
           )}
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 14 }}>
-          {[info.email, info.phone, fullAddress(info), info.linkedin].filter(Boolean).map((v, i) => (
+          {[info.email, info.phone, fullAddress(info), info.linkedin, fmtDate(info.birthDate)].filter(Boolean).map((v, i) => (
             <span key={i} style={{ fontSize: 11, color: '#666', background: '#fff', padding: '3px 10px', borderRadius: 20, border: `1px solid ${pastelBorder}` }}>{v}</span>
           ))}
         </div>
