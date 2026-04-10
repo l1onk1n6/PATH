@@ -15,6 +15,7 @@ import AccountPage from './pages/AccountPage';
 import Tracker from './pages/Tracker';
 import { useAuthStore } from './store/authStore';
 import { useResumeStore } from './store/resumeStore';
+import { useTrackerStore } from './store/trackerStore';
 import { isSupabaseConfigured, getSupabase } from './lib/supabase';
 import { useIsMobile } from './hooks/useBreakpoint';
 import OnboardingModal, { isOnboardingDone } from './components/ui/OnboardingModal';
@@ -206,6 +207,7 @@ function getAuthTypeFromUrl() {
 export default function App() {
   const { user, loading, initialize, passwordRecovery } = useAuthStore();
   const { syncFromCloud } = useResumeStore();
+  const { syncFromCloud: syncTrackerFromCloud } = useTrackerStore();
   const [authType] = useState(() => getAuthTypeFromUrl());
 
   // Public shared CV route — accessible without login
@@ -216,8 +218,11 @@ export default function App() {
   }, [initialize]);
 
   useEffect(() => {
-    if (user && !passwordRecovery) syncFromCloud();
-  }, [user, passwordRecovery, syncFromCloud]);
+    if (user && !passwordRecovery) {
+      syncFromCloud();
+      syncTrackerFromCloud();
+    }
+  }, [user, passwordRecovery, syncFromCloud, syncTrackerFromCloud]);
 
   // Process pending referral after login/signup
   useEffect(() => {
