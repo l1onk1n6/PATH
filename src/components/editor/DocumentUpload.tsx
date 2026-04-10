@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import type { FileRejection } from 'react-dropzone';
 import { Upload, File, Trash2, FileText, Image, Download, AlertCircle, Loader } from 'lucide-react';
@@ -15,9 +15,26 @@ const CATEGORIES: { value: UploadedDocument['category']; label: string }[] = [
   { value: 'other', label: 'Sonstiges' },
 ];
 
-function FileIcon({ type }: { type: string }) {
-  if (type.startsWith('image/')) return <Image size={18} />;
-  return <FileText size={18} />;
+function FilePreview({ doc, thumbSrc }: { doc: UploadedDocument; thumbSrc: string }) {
+  if (doc.type.startsWith('image/') && thumbSrc) {
+    return (
+      <img
+        src={thumbSrc}
+        alt={doc.name}
+        style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }}
+      />
+    );
+  }
+  return (
+    <div style={{
+      width: 40, height: 40, borderRadius: 10,
+      background: 'rgba(0,122,255,0.2)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      flexShrink: 0, color: 'var(--ios-blue)',
+    }}>
+      {doc.type.startsWith('image/') ? <Image size={18} /> : <FileText size={18} />}
+    </div>
+  );
 }
 
 function formatBytes(bytes: number) {
@@ -38,6 +55,20 @@ export default function DocumentUpload() {
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [recovering, setRecovering] = useState(false);
   const [recoveredCount, setRecoveredCount] = useState<number | null>(null);
+  const [thumbnailUrls, setThumbnailUrls] = useState<Record<string, string>>({});
+
+  // Fetch signed URLs for image documents that don't have a dataUrl yet
+  useEffect(() => {
+    const docs = resume?.documents ?? [];
+    const missing = docs.filter(
+      d => d.type.startsWith('image/') && d.storagePath && !d.dataUrl && !thumbnailUrls[d.id]
+    );
+    if (missing.length === 0) return;
+    missing.forEach(async (doc) => {
+      const url = await getDocumentSignedUrl(doc.storagePath!);
+      if (url) setThumbnailUrls(prev => ({ ...prev, [doc.id]: url }));
+    });
+  }, [resume?.documents]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Total used across ALL resumes (documents are per-user, not per-resume)
   const totalUsedBytes = resumes.reduce((sum, r) =>
@@ -75,7 +106,17 @@ export default function DocumentUpload() {
 
       if (uid) {
         const path = await uploadDocument(uid, docId, file);
-        if (path) storagePath = path;
+        if (path) {
+          storagePath = path;
+          // Fetch signed URL immediately so the thumbnail shows without a reload
+          if (file.type.startsWith('image/')) {
+            const signedUrl = await getDocumentSignedUrl(path);
+            if (signedUrl) {
+              dataUrl = signedUrl;
+              setThumbnailUrls(prev => ({ ...prev, [docId]: signedUrl }));
+            }
+          }
+        }
       }
 
       if (!storagePath) {
@@ -251,14 +292,7 @@ export default function DocumentUpload() {
         {documents.map((doc) => (
           <div key={doc.id} className="glass-card animate-scale-in" style={{ padding: '12px 16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{
-                width: 40, height: 40, borderRadius: 10,
-                background: 'rgba(0,122,255,0.2)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0, color: 'var(--ios-blue)',
-              }}>
-                <FileIcon type={doc.type} />
-              </div>
+              <FilePreview doc={doc} thumbSrc={doc.dataUrl || thumbnailUrls[doc.id] || ''} />
 
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 500, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
