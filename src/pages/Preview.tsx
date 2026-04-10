@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FileEdit, FileText, FolderDown, Lock } from 'lucide-react';
+import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FolderDown, Lock } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ProGate from '../components/ui/ProGate';
@@ -292,8 +292,6 @@ export default function Preview() {
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
-  const [activeView, setActiveView] = useState<'resume' | 'cover-letter'>('resume');
-  const previewRef = useRef<HTMLDivElement>(null);
   const resumePageRef = useRef<HTMLDivElement>(null);
   const coverLetterRef = useRef<HTMLDivElement>(null);
 
@@ -307,9 +305,9 @@ export default function Preview() {
     );
   }
 
-  // Export current view only
+  // Export CV only
   const handleExport = async () => {
-    if (!previewRef.current || exporting) return;
+    if (!resumePageRef.current || exporting) return;
     if (!canExportPdf(limits.pdfExportsPerMonth)) {
       setExportError(`PDF-Export-Limit erreicht (${limits.pdfExportsPerMonth}/Monat). Upgrade auf Pro für mehr Exporte.`);
       return;
@@ -317,7 +315,7 @@ export default function Preview() {
     setExporting(true);
     setExportError(null);
     try {
-      const { pdfBytes } = await renderElementToPdfDoc(previewRef.current);
+      const { pdfBytes } = await renderElementToPdfDoc(resumePageRef.current);
       const blob = new Blob([pdfBytes as BlobPart], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url;
@@ -332,7 +330,7 @@ export default function Preview() {
 
   // Export full Bewerbungsmappe: cover letter + resume + documents
   const handleExportMappe = async () => {
-    if (!previewRef.current || exporting) return;
+    if (exporting) return;
     if (!canExportPdf(limits.pdfExportsPerMonth)) {
       setExportError(`PDF-Export-Limit erreicht (${limits.pdfExportsPerMonth}/Monat). Upgrade auf Pro für mehr Exporte.`);
       return;
@@ -343,8 +341,6 @@ export default function Preview() {
       const elements: HTMLElement[] = [];
 
       // 1. Cover letter (if content exists)
-      const cl = resume.coverLetter;
-      const hasContent = cl?.body || cl?.subject || cl?.recipient;
       if (hasContent && coverLetterRef.current) {
         elements.push(coverLetterRef.current);
       }
@@ -369,6 +365,17 @@ export default function Preview() {
   const cl = resume.coverLetter ?? { recipient: '', subject: '', body: '', closing: 'Mit freundlichen Grüssen' };
   const pi = resume.personalInfo;
   const senderName = [pi.firstName, pi.lastName].filter(Boolean).join(' ');
+  const hasContent = !!(cl?.body || cl?.subject || cl?.recipient);
+
+  const PageSeparator = ({ label }: { label: string }) => (
+    <div data-html2canvas-ignore="true" style={{
+      padding: '5px 12px', background: 'rgba(0,0,0,0.35)',
+      fontSize: 10, color: 'rgba(255,255,255,0.5)', fontFamily: 'sans-serif',
+      letterSpacing: '0.04em', textAlign: 'center',
+    }}>
+      {label}
+    </div>
+  );
 
   const CoverLetterPage = () => (
     <div style={{
@@ -492,34 +499,8 @@ export default function Preview() {
           borderBottom: '1px solid rgba(255,255,255,0.1)', flexShrink: 0, gap: 8,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {/* View tabs */}
-            <button
-              className="btn-glass btn-sm"
-              onClick={() => setActiveView('resume')}
-              style={{
-                padding: '5px 10px', gap: 5,
-                background: activeView === 'resume' ? 'rgba(0,122,255,0.2)' : undefined,
-                borderColor: activeView === 'resume' ? 'rgba(0,122,255,0.4)' : undefined,
-              }}
-            >
-              <FileText size={12} />{!isMobile && ' Lebenslauf'}
-            </button>
-            <button
-              className="btn-glass btn-sm"
-              onClick={() => setActiveView('cover-letter')}
-              style={{
-                padding: '5px 10px', gap: 5,
-                background: activeView === 'cover-letter' ? 'rgba(0,122,255,0.2)' : undefined,
-                borderColor: activeView === 'cover-letter' ? 'rgba(0,122,255,0.4)' : undefined,
-              }}
-            >
-              <FileEdit size={12} />{!isMobile && ' Anschreiben'}
-            </button>
-
-            <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.15)', margin: '0 2px' }} />
-
-            {/* Mobile: template picker toggle (only for resume view) */}
-            {isMobile && activeView === 'resume' && (
+            {/* Mobile: template picker toggle */}
+            {isMobile && (
               <button
                 className="btn-glass btn-sm btn-icon"
                 onClick={() => setTemplatePickerOpen(true)}
@@ -550,7 +531,7 @@ export default function Preview() {
               className="btn-glass btn-sm"
               onClick={handleExport}
               disabled={exporting}
-              title="Nur aktuelle Seite exportieren"
+              title="Nur Lebenslauf exportieren"
               style={{ opacity: exporting ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 5 }}
             >
               {exporting
@@ -589,38 +570,30 @@ export default function Preview() {
             transform: `scale(${zoom})`,
             marginBottom: `calc((${zoom} - 1) * -100%)`,
           }}>
-            <div ref={previewRef}>
-              {activeView === 'resume'
-                ? <div ref={resumePageRef}><ResumePreview resume={resume} /></div>
-                : <div ref={coverLetterRef}><CoverLetterPage /></div>
-              }
+            {/* 1. Cover letter — always visible if content exists */}
+            {hasContent && (
+              <>
+                <div ref={coverLetterRef}>
+                  <CoverLetterPage />
+                </div>
+                <PageSeparator label="Lebenslauf" />
+              </>
+            )}
+
+            {/* 2. CV — always visible */}
+            <div ref={resumePageRef}>
+              <ResumePreview resume={resume} />
             </div>
 
-            {/* Attached document previews — user sees full Mappe before downloading */}
+            {/* 3. Attached documents */}
             {resume.documents.map((doc) => (
               <div key={doc.id} data-html2canvas-ignore="true">
-                <div style={{
-                  padding: '6px 12px',
-                  background: 'rgba(0,0,0,0.35)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  fontSize: 10, color: 'rgba(255,255,255,0.55)', fontFamily: 'sans-serif',
-                  letterSpacing: '0.04em',
-                }}>
-                  <span>{doc.name}</span>
-                  <span style={{ opacity: 0.7 }}>{CATEGORY_LABELS[doc.category]}</span>
-                </div>
+                <PageSeparator label={`${doc.name} · ${CATEGORY_LABELS[doc.category]}`} />
                 <div style={{ background: '#fff', boxShadow: '0 4px 20px rgba(0,0,0,0.25)' }}>
                   <DocumentPreviewCard doc={doc} />
                 </div>
               </div>
             ))}
-
-            {/* Hidden off-screen renders for Mappe export */}
-            <div style={{ position: 'absolute', left: -9999, top: 0, pointerEvents: 'none' }}>
-              <div ref={activeView === 'resume' ? coverLetterRef : resumePageRef}>
-                {activeView === 'resume' ? <CoverLetterPage /> : <ResumePreview resume={resume} />}
-              </div>
-            </div>
           </div>
         </div>
       </div>
