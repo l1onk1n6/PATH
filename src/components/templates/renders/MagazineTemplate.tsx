@@ -1,6 +1,8 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SkillBar, SafeImg, fullAddress } from './shared';
 
+const fmtDate = (d?: string) => d ? new Date(d).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
 export default function MagazineTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, projects, customSections } = resume;
   const color = resume.accentColor;
@@ -27,6 +29,7 @@ export default function MagazineTemplate({ resume }: { resume: Resume }) {
             { label: 'Telefon', value: info.phone },
             { label: 'Adresse', value: fullAddress(info) },
             { label: 'Web', value: info.website },
+            { label: 'Geburtsdatum', value: fmtDate(info.birthDate) },
           ].filter(i => i.value).map(({ label, value }) => (
             <div key={label} style={{ marginBottom: 8 }}>
               <div style={{ fontSize: 9, color: '#666', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{label}</div>

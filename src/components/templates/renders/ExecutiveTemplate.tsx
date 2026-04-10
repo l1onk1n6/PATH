@@ -1,6 +1,8 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SkillDots, SafeImg, fullAddress } from './shared';
 
+const fmtDate = (d?: string) => d ? new Date(d).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
 export default function ExecutiveTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, customSections } = resume;
   const color = resume.accentColor;
@@ -19,7 +21,7 @@ export default function ExecutiveTemplate({ resume }: { resume: Resume }) {
         {info.title && <div style={{ fontSize: 12, color, fontWeight: 600, marginBottom: 16 }}>{info.title}</div>}
 
         <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', marginBottom: 20 }}>
-          {[info.email, info.phone, fullAddress(info), info.linkedin].filter(Boolean).map((v, i) => (
+          {[info.email, info.phone, fullAddress(info), info.linkedin, fmtDate(info.birthDate)].filter(Boolean).map((v, i) => (
             <div key={i} style={{ marginBottom: 4 }}>{v}</div>
           ))}
         </div>

@@ -1,6 +1,8 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
+const fmtDate = (d?: string) => d ? new Date(d).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
 export default function BoldTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, customSections } = resume;
   const color = resume.accentColor;
@@ -20,7 +22,7 @@ export default function BoldTemplate({ resume }: { resume: Resume }) {
             </div>
           </div>
           <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.8 }}>
-            {[info.email, info.phone, fullAddress(info)].filter(Boolean).map((v, i) => <div key={i}>{v}</div>)}
+            {[info.email, info.phone, fullAddress(info), fmtDate(info.birthDate)].filter(Boolean).map((v, i) => <div key={i}>{v}</div>)}
           </div>
         </div>
       </div>

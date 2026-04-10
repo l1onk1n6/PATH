@@ -1,6 +1,8 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
+const fmtDate = (d?: string) => d ? new Date(d).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
 export default function FreelancerTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, projects, certificates, customSections } = resume;
   const color = resume.accentColor;
@@ -23,7 +25,7 @@ export default function FreelancerTemplate({ resume }: { resume: Resume }) {
               <SafeImg src={info.photo} alt="" style={{ width: 70, height: 70, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${color}`, marginBottom: 8, display: 'block', marginLeft: 'auto' }} />
             )}
             <div style={{ fontSize: 11, color: '#666', lineHeight: 1.8 }}>
-              {[info.email, info.phone, fullAddress(info)].filter(Boolean).map((v, i) => <div key={i}>{v}</div>)}
+              {[info.email, info.phone, fullAddress(info), fmtDate(info.birthDate)].filter(Boolean).map((v, i) => <div key={i}>{v}</div>)}
             </div>
           </div>
         </div>

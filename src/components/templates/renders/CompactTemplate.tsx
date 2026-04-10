@@ -1,6 +1,8 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, fullAddress } from './shared';
 
+const fmtDate = (d?: string) => d ? new Date(d).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
 export default function CompactTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, certificates, customSections } = resume;
   const color = resume.accentColor;
@@ -22,7 +24,7 @@ export default function CompactTemplate({ resume }: { resume: Resume }) {
             {info.title && <div style={{ fontSize: 11, color, fontWeight: 600 }}>{info.title}</div>}
           </div>
           <div style={{ textAlign: 'right', fontSize: 10, color: '#555', lineHeight: 1.7 }}>
-            {[info.email, info.phone, fullAddress(info), info.linkedin, info.github].filter(Boolean).map((v, i) => (
+            {[info.email, info.phone, fullAddress(info), info.linkedin, info.github, fmtDate(info.birthDate)].filter(Boolean).map((v, i) => (
               <span key={i} style={{ marginLeft: 12 }}>{v}</span>
             ))}
           </div>

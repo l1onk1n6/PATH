@@ -1,6 +1,8 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, fullAddress } from './shared';
 
+const fmtDate = (d?: string) => d ? new Date(d).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
 export default function AcademicTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, certificates, projects, customSections } = resume;
   const color = resume.accentColor;
@@ -13,7 +15,7 @@ export default function AcademicTemplate({ resume }: { resume: Resume }) {
         <h1 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 4px', letterSpacing: '0.02em' }}>{name}</h1>
         {info.title && <div style={{ fontSize: 13, color: '#444', marginBottom: 8 }}>{info.title}</div>}
         <div style={{ fontSize: 11, color: '#555', display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
-          {[info.email, info.phone, fullAddress(info), info.linkedin, info.github].filter(Boolean).map((v, i) => (
+          {[info.email, info.phone, fullAddress(info), info.linkedin, info.github, fmtDate(info.birthDate)].filter(Boolean).map((v, i) => (
             <span key={i}>{v}</span>
           ))}
         </div>

@@ -1,6 +1,8 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, SafeImg, fullAddress } from './shared';
 
+const fmtDate = (d?: string) => d ? new Date(d).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
 export default function InternationalTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, certificates, customSections } = resume;
   const color = resume.accentColor;
@@ -20,6 +22,7 @@ export default function InternationalTemplate({ resume }: { resume: Resume }) {
               {(info.street || info.location) && <span>⌂ {fullAddress(info)}</span>}
               {info.linkedin && <span>in {info.linkedin}</span>}
               {info.website && <span>↗ {info.website}</span>}
+              {info.birthDate && <span>✦ {fmtDate(info.birthDate)}</span>}
             </div>
           </div>
           {info.photo && (

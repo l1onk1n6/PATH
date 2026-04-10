@@ -1,6 +1,8 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate, fullAddress } from './shared';
 
+const fmtDate = (d?: string) => d ? new Date(d).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
 export default function GeometricTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, projects, customSections } = resume;
   const color = resume.accentColor;
@@ -26,7 +28,7 @@ export default function GeometricTemplate({ resume }: { resume: Resume }) {
               {info.title && <div style={{ fontSize: 13, color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 4 }}>{info.title}</div>}
             </div>
             <div style={{ textAlign: 'right', fontSize: 11, color: '#666', lineHeight: 1.9 }}>
-              {[info.email, info.phone, fullAddress(info), info.linkedin].filter(Boolean).map((v, i) => (
+              {[info.email, info.phone, fullAddress(info), info.linkedin, fmtDate(info.birthDate)].filter(Boolean).map((v, i) => (
                 <div key={i}>{v}</div>
               ))}
             </div>
