@@ -5,7 +5,7 @@ import { Upload, File, Trash2, FileText, Image, Download, AlertCircle, Loader } 
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
-import { uploadDocument, getDocumentSignedUrl, downloadFile } from '../../lib/storage';
+import { uploadDocument, getDocumentSignedUrl, downloadFile, listUserDocuments } from '../../lib/storage';
 import type { UploadedDocument } from '../../types/resume';
 
 const CATEGORIES: { value: UploadedDocument['category']; label: string }[] = [
@@ -36,6 +36,8 @@ export default function DocumentUpload() {
   const [sizeError, setSizeError] = useState('');
   const [uploading, setUploading] = useState(false);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [recovering, setRecovering] = useState(false);
+  const [recoveredCount, setRecoveredCount] = useState<number | null>(null);
 
   // Total used across ALL resumes (documents are per-user, not per-resume)
   const totalUsedBytes = resumes.reduce((sum, r) =>
@@ -130,6 +132,43 @@ export default function DocumentUpload() {
   function updateCategory(docId: string, category: UploadedDocument['category']) {
     if (!resume) return;
     updateDocument(resume.id, docId, { category });
+  }
+
+  async function handleRecover() {
+    if (!resume) return;
+    setRecovering(true);
+    setRecoveredCount(null);
+    try {
+      let uid: string | null = null;
+      if (isSupabaseConfigured()) {
+        const { data } = await getSupabase().auth.getUser();
+        uid = data.user?.id ?? null;
+      }
+      if (!uid) return;
+
+      const storageFiles = await listUserDocuments(uid);
+      // Collect all known storagePaths across all resumes
+      const knownPaths = new Set(
+        resumes.flatMap(r => r.documents.map(d => d.storagePath).filter(Boolean))
+      );
+
+      const orphans = storageFiles.filter(f => !knownPaths.has(f.storagePath));
+      for (const file of orphans) {
+        const docId = file.name.replace(/\.[^.]+$/, ''); // strip extension → UUID
+        addDocument(resume.id, {
+          id: docId,
+          name: file.name,
+          type: file.mimeType,
+          size: file.size,
+          dataUrl: '',
+          storagePath: file.storagePath,
+          category: 'other',
+        });
+      }
+      setRecoveredCount(orphans.length);
+    } finally {
+      setRecovering(false);
+    }
   }
 
   async function handleDownload(doc: UploadedDocument) {
@@ -265,6 +304,29 @@ export default function DocumentUpload() {
           </div>
         ))}
       </div>
+
+      {/* Recover orphaned Storage files */}
+      {isSupabaseConfigured() && (
+        <div style={{ marginTop: 12, textAlign: 'center' }}>
+          <button
+            className="btn-glass btn-sm"
+            onClick={handleRecover}
+            disabled={recovering}
+            style={{ fontSize: 11, padding: '5px 12px', color: 'rgba(255,255,255,0.45)', display: 'inline-flex', alignItems: 'center', gap: 5 }}
+          >
+            {recovering
+              ? <><Loader size={11} style={{ animation: 'spin 1s linear infinite' }} /> Suche…</>
+              : 'Dateien aus Storage wiederherstellen'}
+          </button>
+          {recoveredCount !== null && (
+            <div style={{ marginTop: 5, fontSize: 11, color: recoveredCount > 0 ? 'var(--ios-green)' : 'var(--text-muted)' }}>
+              {recoveredCount > 0
+                ? `${recoveredCount} Datei${recoveredCount !== 1 ? 'en' : ''} wiederhergestellt`
+                : 'Keine verwaisten Dateien gefunden'}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Used MB info across all resumes */}
       {resumes.length > 1 && (

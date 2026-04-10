@@ -72,6 +72,42 @@ export async function uploadAvatar(
   }
 }
 
+export interface StorageFileEntry {
+  name: string;        // original filename, e.g. "some-uuid.pdf"
+  storagePath: string; // full bucket path, e.g. "uid/some-uuid.pdf"
+  size: number;
+  mimeType: string;
+}
+
+function mimeFromExt(filename: string): string {
+  const ext = filename.split('.').pop()?.toLowerCase() ?? '';
+  const map: Record<string, string> = {
+    pdf: 'application/pdf',
+    jpg: 'image/jpeg', jpeg: 'image/jpeg',
+    png: 'image/png', webp: 'image/webp', gif: 'image/gif',
+  };
+  return map[ext] ?? 'application/octet-stream';
+}
+
+/** List all document files for a user in Supabase Storage. */
+export async function listUserDocuments(userId: string): Promise<StorageFileEntry[]> {
+  try {
+    const { data, error } = await getSupabase().storage
+      .from(DOCUMENTS_BUCKET)
+      .list(userId);
+    if (error) throw error;
+    return (data ?? []).map(item => ({
+      name: item.name,
+      storagePath: `${userId}/${item.name}`,
+      size: (item.metadata?.size as number) ?? 0,
+      mimeType: (item.metadata?.mimetype as string) || mimeFromExt(item.name),
+    }));
+  } catch (e) {
+    console.warn('[storage] listUserDocuments', e);
+    return [];
+  }
+}
+
 /**
  * Download a file and trigger browser save dialog.
  * Handles both data: URIs (old base64) and HTTPS URLs (Supabase Storage).
