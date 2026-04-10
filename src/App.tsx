@@ -89,7 +89,7 @@ function AppShell() {
             className="glass"
             style={{
               borderRadius: 'var(--radius-xl)', overflow: 'hidden', flexShrink: 0,
-              width: sidebarCollapsed ? 60 : 240,
+              width: sidebarCollapsed ? 60 : 'clamp(240px, 16vw, 320px)',
               transition: 'width 0.28s cubic-bezier(0.34, 1.2, 0.64, 1)',
             }}
           >

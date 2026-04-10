@@ -118,7 +118,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
   // ── Collapsed (icon-only) sidebar ──────────────────────────
   if (collapsed) {
     return (
-      <aside style={{ width: 60, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 0', gap: 4 }}>
+      <aside style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 0', gap: 4 }}>
         <div style={{ marginBottom: 16, filter: 'drop-shadow(0 3px 8px rgba(52,199,89,0.4))' }}>
           <LogoIcon size={32} />
         </div>
@@ -150,7 +150,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
 
   // ── Full sidebar ────────────────────────────────────────────
   return (
-    <aside style={{ display: 'flex', flexDirection: 'column', height: '100%', width: 240, flexShrink: 0, padding: '16px 12px' }}>
+    <aside style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', flexShrink: 0, padding: '16px 12px' }}>
       {/* Logo + collapse */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, paddingLeft: 4 }}>
         <LogoFull size={32} />
