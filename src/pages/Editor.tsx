@@ -25,7 +25,8 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 
 // 'personal' is intentionally excluded — it lives at the Person level in the sidebar
 const SECTIONS: { id: EditorSection; label: string; short: string; icon: React.ComponentType<LucideProps> }[] = [
-  { id: 'cover-letter', label: 'Motivationsschreiben',  short: 'Anschreiben', icon: FileEdit },
+  { id: 'overview',     label: 'Übersicht',              short: 'Übersicht', icon: LayoutDashboard },
+  { id: 'cover-letter', label: 'Motivationsschreiben',   short: 'Anschreiben', icon: FileEdit },
   { id: 'experience',   label: 'Berufserfahrung',        short: 'Erfahrung', icon: Briefcase },
   { id: 'education',    label: 'Ausbildung',             short: 'Bildung',   icon: GraduationCap },
   { id: 'skills',       label: 'Fähigkeiten',            short: 'Skills',    icon: Zap },
