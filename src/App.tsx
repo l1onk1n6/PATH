@@ -19,7 +19,6 @@ import { isSupabaseConfigured, getSupabase } from './lib/supabase';
 import { useIsMobile } from './hooks/useBreakpoint';
 import OnboardingModal, { isOnboardingDone } from './components/ui/OnboardingModal';
 
-const APP_VERSION = '1.9.0';
 
 function AppShell() {
   const isMobile = useIsMobile();
@@ -172,7 +171,7 @@ function AppShell() {
         flexShrink: 0,
         userSelect: 'none',
       }}>
-        <span>by pixmatic · v{APP_VERSION}</span>
+        <span>by pixmatic · v{__APP_VERSION__}</span>
         {(savePending || syncing) ? (
           <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'rgba(255,255,255,0.35)' }}>
             <Loader size={11} style={{ animation: 'spin 1s linear infinite' }} />
