@@ -382,36 +382,12 @@ export default function Preview() {
   const clDate = (pi.location ? pi.location + ', ' : '') +
     new Date().toLocaleDateString('de-CH', { day: '2-digit', month: 'long', year: 'numeric' });
 
-  // ── Cover letter visual variant (one per template family) ──
-  type CLVariant = 'corporate'|'academic'|'elegant'|'minimal'|'nordic'|'startup'|'geometric'|'creative'|'magazine'|'tech';
-  const CL_VARIANT_MAP: Record<string, CLVariant> = {
-    corporate:     'corporate',
-    executive:     'corporate',
-    international: 'corporate',
-    academic:      'academic',
-    vintage:       'academic',
-    elegant:       'elegant',
-    minimal:       'minimal',
-    compact:       'minimal',
-    nordic:        'nordic',
-    pastel:        'nordic',
-    timeline:      'nordic',
-    startup:       'startup',
-    modern:        'startup',
-    geometric:     'geometric',
-    creative:      'creative',
-    vibrant:       'creative',
-    bold:          'magazine',
-    magazine:      'magazine',
-    tech:          'tech',
-    freelancer:    'tech',
-  };
-  const clVariant: CLVariant = CL_VARIANT_MAP[resume.templateId] ?? 'corporate';
+  // ── Cover letter: one unique design per template ─────────
 
   const sansFontFace = '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif';
   const serifFontFace = 'Georgia, "Times New Roman", serif';
-  const clFont = (clVariant === 'corporate' || clVariant === 'academic' || clVariant === 'elegant') ? serifFontFace : sansFontFace;
   const monoFontFace = '"SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace';
+  const tid = resume.templateId;
 
   const PageBreakHint = () => (
     <div data-html2canvas-ignore="true" style={{
@@ -423,11 +399,18 @@ export default function Preview() {
     </div>
   );
 
-  // Shared body content (recipient → date → subject → body → closing)
-  const CLBody = ({ subjectStyle, dateStyle }: { subjectStyle?: React.CSSProperties; dateStyle?: React.CSSProperties }) => (
+  // Shared letter body: recipient → date → subject → body → closing
+  const CLBody = ({
+    subjectStyle, dateStyle, recipientStyle, bodyColor,
+  }: {
+    subjectStyle?: React.CSSProperties;
+    dateStyle?: React.CSSProperties;
+    recipientStyle?: React.CSSProperties;
+    bodyColor?: string;
+  }) => (
     <>
       {cl.recipient && (
-        <div style={{ marginBottom: 32, whiteSpace: 'pre-line', fontSize: 13 }}>
+        <div style={{ marginBottom: 32, whiteSpace: 'pre-line', fontSize: 13, ...recipientStyle }}>
           {cl.recipient}
         </div>
       )}
@@ -437,8 +420,8 @@ export default function Preview() {
           {cl.subject}
         </div>
       )}
-      <div style={{ whiteSpace: 'pre-wrap', marginBottom: 40 }}>
-        {cl.body || <span style={{ color: '#aaa' }}>Kein Anschreiben-Text vorhanden.</span>}
+      <div style={{ whiteSpace: 'pre-wrap', marginBottom: 40, color: bodyColor }}>
+        {cl.body || <span style={{ opacity: 0.35 }}>Kein Anschreiben-Text vorhanden.</span>}
       </div>
       <div>
         <div style={{ marginBottom: 48, whiteSpace: 'pre-wrap' }}>{cl.closing || 'Mit freundlichen Grüssen'}</div>
@@ -448,253 +431,135 @@ export default function Preview() {
   );
 
   const CoverLetterPage = () => {
-    const baseStyle: React.CSSProperties = { width: 794, minHeight: 1123, background: '#fff', color: '#222', fontFamily: clFont, fontSize: 13, lineHeight: 1.75, boxSizing: 'border-box', position: 'relative' };
+    const W: React.CSSProperties = { width: 794, minHeight: 1123, background: '#fff', color: '#222', fontFamily: sansFontFace, fontSize: 13, lineHeight: 1.75, boxSizing: 'border-box', position: 'relative' };
+    const serif: React.CSSProperties = { fontFamily: serifFontFace };
+    const pad = '44px 80px 60px';
 
-    // ── Corporate (corporate, executive, international) ───────
-    // Formal serif: thin black + accent double-rule, right-aligned sender
-    if (clVariant === 'corporate') {
-      return (
-        <div style={baseStyle}>
-          <PageBreakHint />
-          <div style={{ height: 2, background: '#111' }} />
-          <div style={{ height: 5, background: clAccent }} />
-          <div style={{ padding: '52px 80px 60px' }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 36, paddingBottom: 20, borderBottom: '1px solid #ddd' }}>
-              <div style={{ textAlign: 'right', fontSize: 12, color: '#555', lineHeight: 1.65 }}>
-                {senderName && <div style={{ fontWeight: 700, fontSize: 15, color: '#111', marginBottom: 2 }}>{senderName}</div>}
-                {pi.title && <div style={{ fontStyle: 'italic' }}>{pi.title}</div>}
-                {pi.street && <div>{pi.street}</div>}
-                {pi.location && <div>{pi.location}</div>}
-                {pi.email && <div>{pi.email}</div>}
-                {pi.phone && <div>{pi.phone}</div>}
-              </div>
+    // ── 1. minimal ────────────────────────────────────────────
+    // Ultra-clean: text-only header, short accent rule, uppercase subject
+    if (tid === 'minimal') return (
+      <div style={W}>
+        <PageBreakHint />
+        <div style={{ padding: '60px 80px 60px' }}>
+          <div style={{ marginBottom: 10 }}>
+            {senderName && <div style={{ fontWeight: 700, fontSize: 16, letterSpacing: '-0.2px' }}>{senderName}</div>}
+            {pi.title && <div style={{ fontSize: 11, color: '#999', marginTop: 2 }}>{pi.title}</div>}
+            <div style={{ fontSize: 11, color: '#aaa', marginTop: 4 }}>
+              {[pi.email, pi.phone, pi.location].filter(Boolean).join(' · ')}
             </div>
-            <CLBody subjectStyle={{ borderLeft: `3px solid ${clAccent}`, paddingLeft: 10 }} />
+          </div>
+          <div style={{ width: 36, height: 2, background: clAccent, marginBottom: 44 }} />
+          <CLBody
+            subjectStyle={{ textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 11, fontWeight: 700, color: clAccent, display: 'block' }}
+            dateStyle={{ color: '#aaa' }}
+          />
+        </div>
+      </div>
+    );
+
+    // ── 2. executive ──────────────────────────────────────────
+    // Dark navy left sidebar with sender info, white right content
+    if (tid === 'executive') return (
+      <div style={{ ...W, display: 'flex', ...serif }}>
+        <PageBreakHint />
+        <div style={{ width: 220, background: '#1a1a2e', flexShrink: 0, padding: '52px 28px 60px', display: 'flex', flexDirection: 'column' }}>
+          {senderName && <div style={{ color: '#fff', fontWeight: 700, fontSize: 15, marginBottom: 6, lineHeight: 1.3 }}>{senderName}</div>}
+          {pi.title && <div style={{ color: `${clAccent}cc`, fontSize: 11, marginBottom: 16, fontStyle: 'italic' }}>{pi.title}</div>}
+          <div style={{ height: 2, background: clAccent, marginBottom: 16, width: 32 }} />
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.8 }}>
+            {pi.street && <div>{pi.street}</div>}
+            {pi.location && <div>{pi.location}</div>}
+            {pi.email && <div style={{ wordBreak: 'break-all' }}>{pi.email}</div>}
+            {pi.phone && <div>{pi.phone}</div>}
           </div>
         </div>
-      );
-    }
+        <div style={{ flex: 1, padding: pad }}>
+          <CLBody subjectStyle={{ color: clAccent, fontWeight: 700, borderLeft: `3px solid ${clAccent}`, paddingLeft: 10 }} />
+        </div>
+      </div>
+    );
 
-    // ── Academic (academic, vintage) ──────────────────────────
-    // Centered name between horizontal rules, ornate serif
-    if (clVariant === 'academic') {
-      return (
-        <div style={baseStyle}>
-          <PageBreakHint />
-          <div style={{ padding: '52px 80px 60px' }}>
-            <div style={{ textAlign: 'center', marginBottom: 36 }}>
-              <div style={{ height: 1, background: '#bbb', marginBottom: 18 }} />
-              {senderName && <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '0.06em', color: '#111', marginBottom: 5 }}>{senderName}</div>}
-              {pi.title && <div style={{ fontSize: 12, color: '#777', fontStyle: 'italic', marginBottom: 6 }}>{pi.title}</div>}
-              <div style={{ fontSize: 11, color: '#999', letterSpacing: '0.03em' }}>
-                {[pi.email, pi.phone, pi.location].filter(Boolean).join('  ·  ')}
-              </div>
-              <div style={{ height: 1, background: '#bbb', marginTop: 18 }} />
-            </div>
-            <CLBody subjectStyle={{ fontStyle: 'italic', fontSize: 14, color: clAccent, borderBottom: '1px solid #e0e0e0', paddingBottom: 10, display: 'block' }} />
+    // ── 3. creative ───────────────────────────────────────────
+    // Full diagonal gradient header, large bold name, vibrant
+    if (tid === 'creative') return (
+      <div style={W}>
+        <PageBreakHint />
+        <div style={{ background: `linear-gradient(135deg, ${clAccent} 0%, ${clAccent}aa 100%)`, padding: '40px 80px 36px' }}>
+          {senderName && <div style={{ color: '#fff', fontWeight: 800, fontSize: 26, letterSpacing: '-0.5px', marginBottom: 10 }}>{senderName}</div>}
+          <div style={{ display: 'flex', gap: 20, fontSize: 12, color: 'rgba(255,255,255,0.85)', flexWrap: 'wrap' }}>
+            {pi.title && <span>{pi.title}</span>}
+            {[pi.street, pi.location].filter(Boolean).join(', ') && <span>{[pi.street, pi.location].filter(Boolean).join(', ')}</span>}
+            {pi.email && <span>{pi.email}</span>}
+            {pi.phone && <span>{pi.phone}</span>}
           </div>
         </div>
-      );
-    }
+        <div style={{ height: 4, background: `linear-gradient(90deg, ${clAccent}, transparent)` }} />
+        <div style={{ padding: pad }}>
+          <CLBody subjectStyle={{ color: clAccent, fontWeight: 700, fontSize: 15 }} />
+        </div>
+      </div>
+    );
 
-    // ── Elegant (elegant) ─────────────────────────────────────
-    // Right-aligned sender with accent right-border, ornamental dots divider
-    if (clVariant === 'elegant') {
-      return (
-        <div style={baseStyle}>
-          <PageBreakHint />
-          <div style={{ height: 1, background: clAccent, opacity: 0.6 }} />
-          <div style={{ padding: '52px 80px 60px' }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 36 }}>
-              <div style={{ textAlign: 'right', paddingRight: 16, borderRight: `2px solid ${clAccent}`, fontSize: 12, color: '#555', lineHeight: 1.7 }}>
-                {senderName && <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '0.04em', color: '#111', marginBottom: 3 }}>{senderName}</div>}
-                {pi.title && <div style={{ fontStyle: 'italic', color: '#888' }}>{pi.title}</div>}
-                {pi.street && <div>{pi.street}</div>}
-                {pi.location && <div>{pi.location}</div>}
-                {pi.email && <div>{pi.email}</div>}
-                {pi.phone && <div>{pi.phone}</div>}
-              </div>
+    // ── 4. nordic ─────────────────────────────────────────────
+    // Pastel-tinted top strip, airy Scandinavian minimal
+    if (tid === 'nordic') return (
+      <div style={W}>
+        <PageBreakHint />
+        <div style={{ background: `${clAccent}14`, padding: '32px 80px', borderBottom: `1px solid ${clAccent}28` }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div>
+              {senderName && <div style={{ fontWeight: 600, fontSize: 18, color: '#111', letterSpacing: '-0.2px' }}>{senderName}</div>}
+              {pi.title && <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>{pi.title}</div>}
             </div>
-            <div style={{ textAlign: 'center', marginBottom: 32, color: clAccent, fontSize: 16, letterSpacing: 8, opacity: 0.7 }}>· · ·</div>
-            <CLBody subjectStyle={{ fontStyle: 'italic', fontSize: 15, color: clAccent }} />
+            <div style={{ textAlign: 'right', fontSize: 11, color: '#999', lineHeight: 1.7 }}>
+              {pi.street && <div>{pi.street}</div>}
+              {pi.location && <div>{pi.location}</div>}
+              {pi.email && <div>{pi.email}</div>}
+              {pi.phone && <div>{pi.phone}</div>}
+            </div>
           </div>
         </div>
-      );
-    }
-
-    // ── Minimal (minimal, compact) ────────────────────────────
-    // Pure text header, ultra-clean, short accent rule
-    if (clVariant === 'minimal') {
-      return (
-        <div style={{ ...baseStyle, fontFamily: sansFontFace }}>
-          <PageBreakHint />
-          <div style={{ padding: '60px 80px 60px' }}>
-            <div style={{ marginBottom: 10 }}>
-              {senderName && <div style={{ fontWeight: 700, fontSize: 16, letterSpacing: '-0.2px' }}>{senderName}</div>}
-              {pi.title && <div style={{ fontSize: 11, color: '#999', marginTop: 2 }}>{pi.title}</div>}
-              <div style={{ fontSize: 11, color: '#aaa', marginTop: 4 }}>
-                {[pi.email, pi.phone, pi.location].filter(Boolean).join(' · ')}
-              </div>
-            </div>
-            <div style={{ width: 36, height: 2, background: clAccent, marginBottom: 44 }} />
-            <CLBody
-              subjectStyle={{ textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 11, fontWeight: 700, color: clAccent, display: 'block', marginBottom: 28 }}
-              dateStyle={{ color: '#aaa' }}
-            />
-          </div>
+        <div style={{ padding: pad }}>
+          <CLBody subjectStyle={{ color: clAccent, fontWeight: 600, fontSize: 14 }} />
         </div>
-      );
-    }
+      </div>
+    );
 
-    // ── Nordic (nordic, pastel, timeline) ─────────────────────
-    // Soft pastel-tinted header strip, airy and light
-    if (clVariant === 'nordic') {
-      return (
-        <div style={{ ...baseStyle, fontFamily: sansFontFace }}>
-          <PageBreakHint />
-          <div style={{ background: `${clAccent}14`, padding: '32px 80px', borderBottom: `1px solid ${clAccent}28` }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-              <div>
-                {senderName && <div style={{ fontWeight: 600, fontSize: 18, color: '#111', letterSpacing: '-0.2px' }}>{senderName}</div>}
-                {pi.title && <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>{pi.title}</div>}
-              </div>
-              <div style={{ textAlign: 'right', fontSize: 11, color: '#999', lineHeight: 1.7 }}>
-                {pi.street && <div>{pi.street}</div>}
-                {pi.location && <div>{pi.location}</div>}
-                {pi.email && <div>{pi.email}</div>}
-                {pi.phone && <div>{pi.phone}</div>}
-              </div>
+    // ── 5. corporate ──────────────────────────────────────────
+    // Formal serif: black + accent double-rule, right-aligned sender block
+    if (tid === 'corporate') return (
+      <div style={{ ...W, ...serif }}>
+        <PageBreakHint />
+        <div style={{ height: 2, background: '#111' }} />
+        <div style={{ height: 5, background: clAccent }} />
+        <div style={{ padding: '52px 80px 60px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 36, paddingBottom: 20, borderBottom: '1px solid #ddd' }}>
+            <div style={{ textAlign: 'right', fontSize: 12, color: '#555', lineHeight: 1.65 }}>
+              {senderName && <div style={{ fontWeight: 700, fontSize: 15, color: '#111', marginBottom: 2 }}>{senderName}</div>}
+              {pi.title && <div style={{ fontStyle: 'italic' }}>{pi.title}</div>}
+              {pi.street && <div>{pi.street}</div>}
+              {pi.location && <div>{pi.location}</div>}
+              {pi.email && <div>{pi.email}</div>}
+              {pi.phone && <div>{pi.phone}</div>}
             </div>
           </div>
-          <div style={{ padding: '44px 80px 60px' }}>
-            <CLBody subjectStyle={{ color: clAccent, fontWeight: 600, fontSize: 14 }} />
-          </div>
+          <CLBody subjectStyle={{ borderLeft: `3px solid ${clAccent}`, paddingLeft: 10 }} />
         </div>
-      );
-    }
+      </div>
+    );
 
-    // ── Startup (startup, modern) ─────────────────────────────
-    // Solid accent header band, name + contact row, clean
-    if (clVariant === 'startup') {
-      return (
-        <div style={{ ...baseStyle, fontFamily: sansFontFace }}>
-          <PageBreakHint />
-          <div style={{ background: clAccent, padding: '28px 80px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                {senderName && <div style={{ color: '#fff', fontWeight: 700, fontSize: 19, letterSpacing: '-0.3px' }}>{senderName}</div>}
-                {pi.title && <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 4 }}>{pi.title}</div>}
-              </div>
-              <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(255,255,255,0.8)', lineHeight: 1.7 }}>
-                {pi.street && <div>{pi.street}</div>}
-                {pi.location && <div>{pi.location}</div>}
-                {pi.email && <div>{pi.email}</div>}
-                {pi.phone && <div>{pi.phone}</div>}
-              </div>
-            </div>
-          </div>
-          <div style={{ height: 3, background: clAccent, opacity: 0.3 }} />
-          <div style={{ padding: '44px 80px 60px' }}>
-            <CLBody subjectStyle={{ color: clAccent, fontWeight: 600, letterSpacing: '0.01em' }} />
-          </div>
-        </div>
-      );
-    }
-
-    // ── Geometric (geometric) ─────────────────────────────────
-    // Accent header with floating diamond accent element
-    if (clVariant === 'geometric') {
-      return (
-        <div style={{ ...baseStyle, fontFamily: sansFontFace }}>
-          <PageBreakHint />
-          <div style={{ background: clAccent, padding: '32px 80px 44px', position: 'relative', overflow: 'hidden' }}>
-            {/* Decorative geometric shape */}
-            <div style={{ position: 'absolute', right: 60, top: -20, width: 120, height: 120, background: 'rgba(255,255,255,0.08)', transform: 'rotate(45deg)', borderRadius: 8 }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
-              <div>
-                {senderName && <div style={{ color: '#fff', fontWeight: 800, fontSize: 20, letterSpacing: '-0.3px' }}>{senderName}</div>}
-                {pi.title && <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 11, marginTop: 5 }}>{pi.title}</div>}
-              </div>
-              <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7 }}>
-                {pi.location && <div>{pi.location}</div>}
-                {pi.email && <div>{pi.email}</div>}
-                {pi.phone && <div>{pi.phone}</div>}
-              </div>
-            </div>
-          </div>
-          {/* Diamond pointer */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: -10, marginBottom: 24 }}>
-            <div style={{ width: 20, height: 20, background: clAccent, transform: 'rotate(45deg)' }} />
-          </div>
-          <div style={{ padding: '0 80px 60px' }}>
-            <CLBody subjectStyle={{ background: `${clAccent}12`, padding: '8px 14px', borderRadius: 4, display: 'block', fontWeight: 600, marginBottom: 24 }} />
-          </div>
-        </div>
-      );
-    }
-
-    // ── Creative (creative, vibrant) ──────────────────────────
-    // Diagonal gradient header, large name, vibrant
-    if (clVariant === 'creative') {
-      return (
-        <div style={{ ...baseStyle, fontFamily: sansFontFace }}>
-          <PageBreakHint />
-          <div style={{ background: `linear-gradient(135deg, ${clAccent} 0%, ${clAccent}99 55%, ${clAccent}55 100%)`, padding: '40px 80px 36px' }}>
-            {senderName && <div style={{ color: '#fff', fontWeight: 800, fontSize: 26, letterSpacing: '-0.5px', marginBottom: 10 }}>{senderName}</div>}
-            <div style={{ display: 'flex', gap: 20, fontSize: 12, color: 'rgba(255,255,255,0.85)', flexWrap: 'wrap' }}>
-              {pi.title && <span>{pi.title}</span>}
-              {[pi.street, pi.location].filter(Boolean).length > 0 && <span>{[pi.street, pi.location].filter(Boolean).join(', ')}</span>}
-              {pi.email && <span>{pi.email}</span>}
-              {pi.phone && <span>{pi.phone}</span>}
-            </div>
-          </div>
-          <div style={{ height: 4, background: `linear-gradient(90deg, ${clAccent}, transparent)` }} />
-          <div style={{ padding: '44px 80px 60px' }}>
-            <CLBody subjectStyle={{ color: clAccent, fontWeight: 700, fontSize: 15 }} />
-          </div>
-        </div>
-      );
-    }
-
-    // ── Magazine (bold, magazine) ─────────────────────────────
-    // Split dark/accent header, magazine-style heavy typography
-    if (clVariant === 'magazine') {
-      return (
-        <div style={{ ...baseStyle, fontFamily: sansFontFace }}>
-          <PageBreakHint />
-          <div style={{ display: 'flex', height: 116 }}>
-            <div style={{ flex: 1.4, background: '#1a1a1a', padding: '24px 40px 24px 80px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              {senderName && <div style={{ color: '#fff', fontWeight: 900, fontSize: 19, letterSpacing: '-0.3px', lineHeight: 1.15 }}>{senderName}</div>}
-              {pi.title && <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, marginTop: 5, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{pi.title}</div>}
-            </div>
-            <div style={{ flex: 1, background: clAccent, padding: '24px 80px 24px 32px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.9)', lineHeight: 1.7, textAlign: 'right' }}>
-                {pi.street && <div>{pi.street}</div>}
-                {pi.location && <div>{pi.location}</div>}
-                {pi.email && <div>{pi.email}</div>}
-                {pi.phone && <div>{pi.phone}</div>}
-              </div>
-            </div>
-          </div>
-          <div style={{ padding: '44px 80px 60px' }}>
-            <CLBody subjectStyle={{ fontWeight: 900, fontSize: 14, color: '#1a1a1a', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `3px solid ${clAccent}`, paddingBottom: 8, display: 'block' }} />
-          </div>
-        </div>
-      );
-    }
-
-    // ── Tech (tech, freelancer) ───────────────────────────────
-    // Dark #0d1117 header, monospace-inspired, accent-colored name
-    return (
-      <div style={{ ...baseStyle, fontFamily: sansFontFace }}>
+    // ── 6. tech ───────────────────────────────────────────────
+    // GitHub-dark header #0d1117, monospace name, 2px accent underline
+    if (tid === 'tech') return (
+      <div style={W}>
         <PageBreakHint />
         <div style={{ background: '#0d1117', padding: '28px 80px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               {senderName && <div style={{ color: clAccent, fontWeight: 700, fontSize: 16, fontFamily: monoFontFace, letterSpacing: '0.04em' }}>{senderName}</div>}
-              {pi.title && <div style={{ color: 'rgba(255,255,255,0.38)', fontSize: 11, marginTop: 4, fontFamily: monoFontFace }}>{pi.title}</div>}
+              {pi.title && <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, marginTop: 4, fontFamily: monoFontFace }}>{pi.title}</div>}
             </div>
-            <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(255,255,255,0.38)', lineHeight: 1.8, fontFamily: monoFontFace }}>
+            <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(255,255,255,0.35)', lineHeight: 1.8, fontFamily: monoFontFace }}>
               {pi.location && <div>{pi.location}</div>}
               {pi.email && <div>{pi.email}</div>}
               {pi.phone && <div>{pi.phone}</div>}
@@ -702,8 +567,344 @@ export default function Preview() {
           </div>
         </div>
         <div style={{ height: 2, background: clAccent }} />
-        <div style={{ padding: '44px 80px 60px' }}>
+        <div style={{ padding: pad }}>
           <CLBody subjectStyle={{ color: clAccent, fontWeight: 700, fontFamily: monoFontFace, borderBottom: `1px solid ${clAccent}33`, paddingBottom: 8, display: 'block' }} />
+        </div>
+      </div>
+    );
+
+    // ── 7. elegant ────────────────────────────────────────────
+    // Cream bg, right-border sender block, ornamental ··· divider
+    if (tid === 'elegant') return (
+      <div style={{ ...W, background: '#fdfcf9', ...serif }}>
+        <PageBreakHint />
+        <div style={{ height: 1, background: clAccent, opacity: 0.6 }} />
+        <div style={{ padding: '52px 80px 60px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 32 }}>
+            <div style={{ textAlign: 'right', paddingRight: 16, borderRight: `2px solid ${clAccent}`, fontSize: 12, color: '#666', lineHeight: 1.7 }}>
+              {senderName && <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '0.04em', color: '#111', marginBottom: 3 }}>{senderName}</div>}
+              {pi.title && <div style={{ fontStyle: 'italic', color: '#888' }}>{pi.title}</div>}
+              {pi.street && <div>{pi.street}</div>}
+              {pi.location && <div>{pi.location}</div>}
+              {pi.email && <div>{pi.email}</div>}
+              {pi.phone && <div>{pi.phone}</div>}
+            </div>
+          </div>
+          <div style={{ textAlign: 'center', marginBottom: 32, color: clAccent, fontSize: 16, letterSpacing: 8, opacity: 0.65 }}>· · ·</div>
+          <CLBody subjectStyle={{ fontStyle: 'italic', fontSize: 15, color: clAccent }} />
+        </div>
+      </div>
+    );
+
+    // ── 8. bold ───────────────────────────────────────────────
+    // Full black page, white text, accent top stripe, uppercase headers
+    if (tid === 'bold') return (
+      <div style={{ ...W, background: '#000', color: '#fff' }}>
+        <PageBreakHint />
+        <div style={{ height: 6, background: clAccent }} />
+        <div style={{ padding: '52px 80px 60px' }}>
+          <div style={{ marginBottom: 36, paddingBottom: 24, borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
+            {senderName && <div style={{ fontWeight: 900, fontSize: 22, letterSpacing: '-0.3px', marginBottom: 4 }}>{senderName}</div>}
+            <div style={{ display: 'flex', gap: 20, fontSize: 11, color: 'rgba(255,255,255,0.45)', flexWrap: 'wrap' }}>
+              {pi.title && <span>{pi.title}</span>}
+              {pi.location && <span>{pi.location}</span>}
+              {pi.email && <span>{pi.email}</span>}
+              {pi.phone && <span>{pi.phone}</span>}
+            </div>
+          </div>
+          <CLBody
+            subjectStyle={{ textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 900, fontSize: 12, color: clAccent, display: 'block', marginBottom: 28 }}
+            dateStyle={{ color: 'rgba(255,255,255,0.35)' }}
+            recipientStyle={{ color: 'rgba(255,255,255,0.7)' }}
+            bodyColor='rgba(255,255,255,0.85)'
+          />
+        </div>
+      </div>
+    );
+
+    // ── 9. academic ───────────────────────────────────────────
+    // Times New Roman, centered name between two horizontal rules
+    if (tid === 'academic') return (
+      <div style={{ ...W, fontFamily: '"Times New Roman", Georgia, serif' }}>
+        <PageBreakHint />
+        <div style={{ padding: '52px 80px 60px' }}>
+          <div style={{ textAlign: 'center', marginBottom: 36 }}>
+            <div style={{ height: 1, background: '#999', marginBottom: 18 }} />
+            {senderName && <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '0.05em', color: '#111', marginBottom: 5 }}>{senderName}</div>}
+            {pi.title && <div style={{ fontSize: 12, color: '#777', fontStyle: 'italic', marginBottom: 6 }}>{pi.title}</div>}
+            <div style={{ fontSize: 11, color: '#aaa', letterSpacing: '0.03em' }}>
+              {[pi.email, pi.phone, pi.location].filter(Boolean).join('  ·  ')}
+            </div>
+            <div style={{ height: 1, background: '#999', marginTop: 18 }} />
+          </div>
+          <CLBody subjectStyle={{ fontStyle: 'italic', fontSize: 14, color: clAccent, borderBottom: '1px solid #ddd', paddingBottom: 10, display: 'block' }} />
+        </div>
+      </div>
+    );
+
+    // ── 10. startup ───────────────────────────────────────────
+    // Gradient top bar (accent → lighter), rounded contact pills, arrow subject
+    if (tid === 'startup') return (
+      <div style={W}>
+        <PageBreakHint />
+        <div style={{ background: `linear-gradient(135deg, ${clAccent}, ${clAccent}cc)`, padding: '28px 80px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              {senderName && <div style={{ color: '#fff', fontWeight: 700, fontSize: 19, letterSpacing: '-0.3px' }}>{senderName}</div>}
+              {pi.title && <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 4 }}>{pi.title}</div>}
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'flex-end', maxWidth: 260 }}>
+              {[pi.location, pi.email, pi.phone].filter(Boolean).map((v, i) => (
+                <span key={i} style={{ background: 'rgba(255,255,255,0.18)', borderRadius: 20, padding: '3px 10px', fontSize: 10, color: '#fff' }}>{v}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div style={{ padding: pad }}>
+          <CLBody subjectStyle={{ color: clAccent, fontWeight: 700 }} />
+        </div>
+      </div>
+    );
+
+    // ── 11. modern ────────────────────────────────────────────
+    // Dark #1a1a2e sidebar (33%), vertical bar section accents
+    if (tid === 'modern') return (
+      <div style={{ ...W, display: 'flex' }}>
+        <PageBreakHint />
+        <div style={{ width: 260, background: '#1a1a2e', flexShrink: 0, padding: '52px 28px 60px' }}>
+          {senderName && <div style={{ color: '#fff', fontWeight: 700, fontSize: 15, marginBottom: 6, lineHeight: 1.3, letterSpacing: '0.02em' }}>{senderName}</div>}
+          {pi.title && <div style={{ color: `${clAccent}bb`, fontSize: 11, marginBottom: 20, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{pi.title}</div>}
+          <div style={{ width: 3, height: 20, background: clAccent, marginBottom: 16 }} />
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', lineHeight: 1.9 }}>
+            {pi.street && <div>{pi.street}</div>}
+            {pi.location && <div>{pi.location}</div>}
+            {pi.email && <div style={{ wordBreak: 'break-all' }}>{pi.email}</div>}
+            {pi.phone && <div>{pi.phone}</div>}
+          </div>
+        </div>
+        <div style={{ flex: 1, padding: pad }}>
+          <CLBody subjectStyle={{ borderLeft: `3px solid ${clAccent}`, paddingLeft: 12, color: '#1a1a2e', fontWeight: 700 }} />
+        </div>
+      </div>
+    );
+
+    // ── 12. vibrant ───────────────────────────────────────────
+    // Diagonal clip-path accent header, badge-style contact row
+    if (tid === 'vibrant') return (
+      <div style={W}>
+        <PageBreakHint />
+        <div style={{ background: clAccent, clipPath: 'polygon(0 0, 100% 0, 100% 75%, 0 100%)', padding: '36px 80px 56px' }}>
+          {senderName && <div style={{ color: '#fff', fontWeight: 800, fontSize: 24, letterSpacing: '-0.4px', marginBottom: 10 }}>{senderName}</div>}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {[pi.title, pi.location, pi.email, pi.phone].filter(Boolean).map((v, i) => (
+              <span key={i} style={{ background: 'rgba(255,255,255,0.2)', borderRadius: 4, padding: '3px 10px', fontSize: 11, color: '#fff' }}>{v}</span>
+            ))}
+          </div>
+        </div>
+        <div style={{ padding: '8px 80px 60px' }}>
+          <CLBody subjectStyle={{ color: clAccent, fontWeight: 700, fontSize: 14 }} />
+        </div>
+      </div>
+    );
+
+    // ── 13. vintage ───────────────────────────────────────────
+    // Cream/tan bg #faf7f2, ornamental ✦ symbols, double borders
+    if (tid === 'vintage') return (
+      <div style={{ ...W, background: '#faf7f2', fontFamily: 'Georgia, "Palatino Linotype", serif' }}>
+        <PageBreakHint />
+        <div style={{ borderTop: `3px double #bbb`, borderBottom: `3px double #bbb`, padding: '20px 80px', textAlign: 'center', margin: '36px 40px 0' }}>
+          {senderName && <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '0.08em', color: '#333', marginBottom: 4 }}>
+            <span style={{ color: clAccent, marginRight: 10 }}>✦</span>{senderName}<span style={{ color: clAccent, marginLeft: 10 }}>✦</span>
+          </div>}
+          {pi.title && <div style={{ fontSize: 12, fontStyle: 'italic', color: '#888', marginBottom: 6 }}>{pi.title}</div>}
+          <div style={{ fontSize: 11, color: '#aaa', letterSpacing: '0.04em' }}>
+            {[pi.email, pi.phone, pi.location].filter(Boolean).join('   ·   ')}
+          </div>
+        </div>
+        <div style={{ padding: '36px 80px 60px' }}>
+          <CLBody subjectStyle={{ fontStyle: 'italic', fontSize: 14, color: clAccent }} dateStyle={{ color: '#999' }} />
+        </div>
+      </div>
+    );
+
+    // ── 14. magazine ──────────────────────────────────────────
+    // Split header: dark #1a1a1a left + accent right, bold typography
+    if (tid === 'magazine') return (
+      <div style={W}>
+        <PageBreakHint />
+        <div style={{ display: 'flex', height: 116 }}>
+          <div style={{ flex: 1.4, background: '#1a1a1a', padding: '24px 40px 24px 80px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            {senderName && <div style={{ color: '#fff', fontWeight: 900, fontSize: 19, letterSpacing: '-0.3px', lineHeight: 1.15 }}>{senderName}</div>}
+            {pi.title && <div style={{ color: 'rgba(255,255,255,0.38)', fontSize: 10, marginTop: 5, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{pi.title}</div>}
+          </div>
+          <div style={{ flex: 1, background: clAccent, padding: '24px 80px 24px 28px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end' }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.9)', lineHeight: 1.7, textAlign: 'right' }}>
+              {pi.street && <div>{pi.street}</div>}
+              {pi.location && <div>{pi.location}</div>}
+              {pi.email && <div>{pi.email}</div>}
+              {pi.phone && <div>{pi.phone}</div>}
+            </div>
+          </div>
+        </div>
+        <div style={{ padding: pad }}>
+          <CLBody subjectStyle={{ fontWeight: 900, fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#1a1a1a', borderBottom: `3px solid ${clAccent}`, paddingBottom: 8, display: 'block' }} />
+        </div>
+      </div>
+    );
+
+    // ── 15. timeline ──────────────────────────────────────────
+    // Vertical accent line on left, timeline dot at date marker
+    if (tid === 'timeline') return (
+      <div style={W}>
+        <PageBreakHint />
+        <div style={{ padding: '52px 80px 60px', paddingLeft: 110, position: 'relative' }}>
+          {/* Vertical timeline line */}
+          <div style={{ position: 'absolute', left: 72, top: 0, bottom: 0, width: 2, background: `${clAccent}30` }} />
+          {/* Sender block */}
+          <div style={{ position: 'relative', marginBottom: 36, paddingBottom: 24, borderBottom: `1px solid #eee` }}>
+            <div style={{ position: 'absolute', left: -46, top: 4, width: 12, height: 12, borderRadius: '50%', background: clAccent, border: '3px solid #fff', boxShadow: `0 0 0 2px ${clAccent}` }} />
+            {senderName && <div style={{ fontWeight: 700, fontSize: 16, color: '#111', marginBottom: 3 }}>{senderName}</div>}
+            {pi.title && <div style={{ fontSize: 12, color: '#888' }}>{pi.title}</div>}
+            <div style={{ fontSize: 11, color: '#aaa', marginTop: 4 }}>
+              {[pi.street, pi.location, pi.email, pi.phone].filter(Boolean).join(' · ')}
+            </div>
+          </div>
+          <CLBody subjectStyle={{ color: clAccent, fontWeight: 600 }} dateStyle={{ color: '#999' }} />
+        </div>
+      </div>
+    );
+
+    // ── 16. compact ───────────────────────────────────────────
+    // Arial Narrow condensed, dense inline header, tight spacing
+    if (tid === 'compact') return (
+      <div style={{ ...W, fontFamily: '"Arial Narrow", "Arial", sans-serif', fontSize: 12, lineHeight: 1.6 }}>
+        <PageBreakHint />
+        <div style={{ borderBottom: `2px solid ${clAccent}`, padding: '14px 80px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <div>
+              {senderName && <span style={{ fontWeight: 700, fontSize: 15 }}>{senderName}</span>}
+              {pi.title && <span style={{ fontSize: 11, color: '#777', marginLeft: 10 }}>{pi.title}</span>}
+            </div>
+            <div style={{ fontSize: 10, color: '#888', textAlign: 'right' }}>
+              {[pi.email, pi.phone, pi.location].filter(Boolean).join(' | ')}
+            </div>
+          </div>
+        </div>
+        <div style={{ padding: '28px 80px 48px' }}>
+          <CLBody
+            subjectStyle={{ fontWeight: 700, color: clAccent, borderBottom: `1px solid ${clAccent}44`, paddingBottom: 4, display: 'block', marginBottom: 16 }}
+            dateStyle={{ color: '#aaa' }}
+          />
+        </div>
+      </div>
+    );
+
+    // ── 17. pastel ────────────────────────────────────────────
+    // Soft #fdfcff bg, rounded-corner boxes, circle decorators
+    if (tid === 'pastel') return (
+      <div style={{ ...W, background: '#fdfcff' }}>
+        <PageBreakHint />
+        <div style={{ background: `${clAccent}14`, borderRadius: '0 0 20px 20px', padding: '32px 80px 28px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div>
+              {senderName && <div style={{ fontWeight: 700, fontSize: 18, color: '#111', marginBottom: 4 }}>{senderName}</div>}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {[pi.title, pi.location].filter(Boolean).map((v, i) => (
+                  <span key={i} style={{ fontSize: 11, color: '#888', background: `${clAccent}20`, borderRadius: 20, padding: '2px 10px' }}>{v}</span>
+                ))}
+              </div>
+            </div>
+            <div style={{ textAlign: 'right', fontSize: 11, color: '#aaa', lineHeight: 1.8 }}>
+              {pi.email && <div>{pi.email}</div>}
+              {pi.phone && <div>{pi.phone}</div>}
+            </div>
+          </div>
+        </div>
+        <div style={{ padding: pad }}>
+          <CLBody
+            subjectStyle={{ background: `${clAccent}14`, padding: '8px 16px', borderRadius: 10, display: 'block', fontWeight: 600, color: clAccent, marginBottom: 24 }}
+            dateStyle={{ color: '#bbb' }}
+          />
+        </div>
+      </div>
+    );
+
+    // ── 18. geometric ─────────────────────────────────────────
+    // Accent header with ghost rotated square, diamond pointer divider
+    if (tid === 'geometric') return (
+      <div style={W}>
+        <PageBreakHint />
+        <div style={{ background: clAccent, padding: '32px 80px 48px', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', right: 40, top: -30, width: 140, height: 140, background: 'rgba(255,255,255,0.07)', transform: 'rotate(45deg)', borderRadius: 10 }} />
+          <div style={{ position: 'absolute', right: 100, top: 10, width: 70, height: 70, background: 'rgba(255,255,255,0.05)', transform: 'rotate(30deg)', borderRadius: 6 }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
+            <div>
+              {senderName && <div style={{ color: '#fff', fontWeight: 800, fontSize: 20, letterSpacing: '-0.3px' }}>{senderName}</div>}
+              {pi.title && <div style={{ color: 'rgba(255,255,255,0.62)', fontSize: 11, marginTop: 5 }}>{pi.title}</div>}
+            </div>
+            <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(255,255,255,0.72)', lineHeight: 1.7 }}>
+              {pi.street && <div>{pi.street}</div>}
+              {pi.location && <div>{pi.location}</div>}
+              {pi.email && <div>{pi.email}</div>}
+              {pi.phone && <div>{pi.phone}</div>}
+            </div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: -10, marginBottom: 20 }}>
+          <div style={{ width: 20, height: 20, background: clAccent, transform: 'rotate(45deg)' }} />
+        </div>
+        <div style={{ padding: '0 80px 60px' }}>
+          <CLBody subjectStyle={{ background: `${clAccent}12`, padding: '8px 14px', borderRadius: 4, display: 'block', fontWeight: 600 }} />
+        </div>
+      </div>
+    );
+
+    // ── 19. freelancer ────────────────────────────────────────
+    // Dark #0f0f0f header, neon accent, vertical separator lines
+    if (tid === 'freelancer') return (
+      <div style={W}>
+        <PageBreakHint />
+        <div style={{ background: '#0f0f0f', padding: '32px 80px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+            <div style={{ flex: 1, paddingRight: 24, borderRight: `1px solid rgba(255,255,255,0.1)` }}>
+              {senderName && <div style={{ color: clAccent, fontWeight: 700, fontSize: 17, letterSpacing: '0.02em' }}>{senderName}</div>}
+              {pi.title && <div style={{ color: 'rgba(255,255,255,0.38)', fontSize: 11, marginTop: 4 }}>{pi.title}</div>}
+            </div>
+            <div style={{ display: 'flex', gap: 0, marginLeft: 0 }}>
+              {[pi.location, pi.email, pi.phone].filter(Boolean).map((v, i) => (
+                <div key={i} style={{ paddingLeft: 24, paddingRight: 24, borderRight: i < 2 ? '1px solid rgba(255,255,255,0.1)' : 'none', fontSize: 11, color: 'rgba(255,255,255,0.38)', lineHeight: 1.5 }}>{v}</div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div style={{ height: 2, background: `linear-gradient(90deg, ${clAccent}, transparent)` }} />
+        <div style={{ padding: pad }}>
+          <CLBody subjectStyle={{ color: clAccent, fontWeight: 700, borderBottom: `1px solid ${clAccent}33`, paddingBottom: 8, display: 'block' }} />
+        </div>
+      </div>
+    );
+
+    // ── 20. international ─────────────────────────────────────
+    // Georgia serif, light gradient header, symbol contact decorators
+    return (
+      <div style={{ ...W, ...serif }}>
+        <PageBreakHint />
+        <div style={{ background: `linear-gradient(to right, ${clAccent}18, transparent)`, padding: '36px 80px 24px', borderBottom: `2px solid ${clAccent}` }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              {senderName && <div style={{ fontWeight: 700, fontSize: 20, color: '#111', marginBottom: 4 }}>{senderName}</div>}
+              {pi.title && <div style={{ fontSize: 12, fontStyle: 'italic', color: '#777' }}>{pi.title}</div>}
+            </div>
+            <div style={{ textAlign: 'right', fontSize: 11, color: '#777', lineHeight: 1.9 }}>
+              {pi.street && <div>⌂ {pi.street}</div>}
+              {pi.location && <div>  {pi.location}</div>}
+              {pi.email && <div>✉ {pi.email}</div>}
+              {pi.phone && <div>✆ {pi.phone}</div>}
+            </div>
+          </div>
+        </div>
+        <div style={{ padding: pad }}>
+          <CLBody subjectStyle={{ borderLeft: `3px solid ${clAccent}`, paddingLeft: 10, fontWeight: 700 }} />
         </div>
       </div>
     );
