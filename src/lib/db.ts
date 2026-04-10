@@ -152,6 +152,7 @@ export async function upsertDocument(resumeId: string, doc: UploadedDocument): P
       storage_path: doc.storagePath ?? null,
       // Only persist data_url for legacy (base64) documents; new uploads use storage_path
       data_url: doc.storagePath ? null : (doc.dataUrl || null),
+      uploaded_at: doc.uploadedAt || new Date().toISOString(),
     });
   } catch (e) {
     console.warn('[db] upsertDocument', e);
