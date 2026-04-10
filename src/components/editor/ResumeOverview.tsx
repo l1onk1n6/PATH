@@ -1,4 +1,9 @@
 import { useState, useCallback } from 'react';
+
+function safeUrl(url: string) {
+  if (!url) return url;
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}
 import {
   ExternalLink, Pencil, Check, X, Calendar, Link2,
   CheckCircle2, Circle, Bell, Loader2, Sparkles, Mail, AlertCircle,
@@ -341,7 +346,7 @@ export default function ResumeOverview() {
               />
               {resume.jobUrl && (
                 <a
-                  href={resume.jobUrl}
+                  href={safeUrl(resume.jobUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-glass btn-sm"

@@ -698,7 +698,7 @@ export default function Dashboard() {
                                     </span>
                                   )}
                                   {r.jobUrl && (
-                                    <a href={r.jobUrl} target="_blank" rel="noopener noreferrer"
+                                    <a href={safeUrl(r.jobUrl)} target="_blank" rel="noopener noreferrer"
                                       style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, color: 'var(--text-muted)', textDecoration: 'none' }}
                                       onClick={(e) => e.stopPropagation()}>
                                       <ExternalLink size={11} /> Stelle
