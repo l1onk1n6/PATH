@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import {
   ExternalLink, Pencil, Check, X, Calendar, Link2,
-  CheckCircle2, Circle, Bell, Loader2, Sparkles,
+  CheckCircle2, Circle, Bell, Loader2, Sparkles, Mail, AlertCircle,
 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useAuthStore } from '../../store/authStore';
@@ -25,6 +25,7 @@ function ReminderSection({ resumeId, deadline, reminderDays }: {
   const { updateResume } = useResumeStore();
   const { session } = useAuthStore();
   const { isPro } = usePlan();
+  const recipientEmail: string = (session?.user?.email as string) ?? '';
   const [selected, setSelected] = useState<number[]>(reminderDays ?? []);
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<number | null>(null);
@@ -161,6 +162,28 @@ function ReminderSection({ resumeId, deadline, reminderDays }: {
           );
         })}
       </div>
+
+      {/* Email recipient info / warning */}
+      {isPro && (
+        recipientEmail ? (
+          <div style={{
+            marginTop: 10, display: 'flex', alignItems: 'center', gap: 6,
+            fontSize: 11, color: 'var(--text-muted)',
+          }}>
+            <Mail size={10} style={{ flexShrink: 0, opacity: 0.6 }} />
+            <span>Wird gesendet an <strong style={{ color: 'var(--text-secondary)' }}>{recipientEmail}</strong></span>
+          </div>
+        ) : (
+          <div style={{
+            marginTop: 10, display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px',
+            borderRadius: 8, background: 'rgba(255,59,48,0.1)', border: '1px solid rgba(255,59,48,0.25)',
+            fontSize: 11, color: '#FF3B30',
+          }}>
+            <AlertCircle size={12} style={{ flexShrink: 0 }} />
+            Keine E-Mail-Adresse für dein Konto gefunden. Erinnerungen können nicht gesendet werden.
+          </div>
+        )
+      )}
 
       {!isPro && (
         <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--text-muted)' }}>
