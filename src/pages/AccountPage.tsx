@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   User, Shield, Lock, Sparkles, Mail, ExternalLink,
   AlertTriangle, Download, Trash2, KeyRound,
   CreditCard, Loader2, CheckCircle, PlayCircle, LogOut,
-  Copy, Check, Gift, MessageCircle, X as XIcon, Trophy,
+  Copy, Check, Gift, MessageCircle, X as XIcon, Trophy, MessageSquare, Send,
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useResumeStore } from '../store/resumeStore';
@@ -17,7 +17,7 @@ import { resetOnboarding } from '../components/ui/OnboardingModal';
 import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../store/uiStore';
 
-type Section = 'plan' | 'account' | 'security' | 'referral' | 'privacy';
+type Section = 'plan' | 'account' | 'security' | 'referral' | 'privacy' | 'contact';
 
 const NAV: { id: Section; label: string; icon: React.ComponentType<{ size: number }> }[] = [
   { id: 'account',  label: 'Konto',               icon: User },
@@ -25,6 +25,7 @@ const NAV: { id: Section; label: string; icon: React.ComponentType<{ size: numbe
   { id: 'referral', label: 'Freunde einladen',     icon: Gift },
   { id: 'privacy',  label: 'Datenschutz',          icon: Shield },
   { id: 'plan',     label: 'Plan & Features',      icon: Sparkles },
+  { id: 'contact',  label: 'Kontakt',              icon: MessageSquare },
 ];
 
 // ── Section: Plan ──────────────────────────────────────────
@@ -731,6 +732,181 @@ function PrivacySection() {
   );
 }
 
+// ── Section: Contact ───────────────────────────────────────
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
+
+function ContactSection() {
+  const { user } = useAuthStore();
+  const isMobile = useIsMobile();
+  const [name, setName] = useState(user?.user_metadata?.full_name ?? '');
+  const [email, setEmail] = useState(user?.email ?? '');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = useState('');
+  const widgetRef = useRef<HTMLDivElement>(null);
+  const turnstileId = useRef<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState('');
+
+  // Load Turnstile script once
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY) return;
+    const existing = document.getElementById('cf-turnstile-script');
+    if (!existing) {
+      const s = document.createElement('script');
+      s.id = 'cf-turnstile-script';
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+      s.async = true;
+      s.defer = true;
+      document.head.appendChild(s);
+    }
+  }, []);
+
+  // Render widget once script is ready
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY || !widgetRef.current) return;
+    const tryRender = () => {
+      const w = (window as unknown as Record<string, unknown>).turnstile as {
+        render: (el: HTMLElement, opts: object) => string;
+        reset: (id: string) => void;
+      } | undefined;
+      if (!w) { setTimeout(tryRender, 300); return; }
+      if (turnstileId.current) return;
+      turnstileId.current = w.render(widgetRef.current!, {
+        sitekey: TURNSTILE_SITE_KEY,
+        theme: 'dark',
+        callback: (token: string) => setTurnstileToken(token),
+        'expired-callback': () => setTurnstileToken(''),
+      });
+    };
+    tryRender();
+  }, []);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!turnstileToken && TURNSTILE_SITE_KEY) {
+      setErrorMsg('Bitte warte auf die Sicherheitsprüfung.');
+      return;
+    }
+    setStatus('sending');
+    setErrorMsg('');
+    try {
+      const { getSupabase } = await import('../lib/supabase');
+      const session = (await getSupabase().auth.getSession()).data.session;
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/contact-form`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
+          },
+          body: JSON.stringify({ name, email, subject, message, token: turnstileToken || 'dev' }),
+        },
+      );
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(d.error ?? 'Unbekannter Fehler');
+      }
+      setStatus('sent');
+      setSubject('');
+      setMessage('');
+      setTurnstileToken('');
+      // Reset Turnstile widget
+      const w = (window as unknown as Record<string, unknown>).turnstile as { reset?: (id: string) => void } | undefined;
+      if (w?.reset && turnstileId.current) w.reset(turnstileId.current);
+    } catch (err: unknown) {
+      setStatus('error');
+      setErrorMsg(err instanceof Error ? err.message : 'Fehler beim Senden');
+    }
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div className="glass-card" style={{ padding: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(0,122,255,0.12)', border: '1px solid rgba(0,122,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <MessageSquare size={17} style={{ color: 'var(--ios-blue)' }} />
+          </div>
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 700 }}>Kontakt</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Wir antworten normalerweise innerhalb von 24 Stunden</div>
+          </div>
+        </div>
+
+        {status === 'sent' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '32px 0', textAlign: 'center' }}>
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(52,199,89,0.12)', border: '1px solid rgba(52,199,89,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CheckCircle size={22} style={{ color: 'var(--ios-green)' }} />
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Nachricht gesendet</div>
+              <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Wir melden uns bald bei dir.</div>
+            </div>
+            <button className="btn-glass btn-sm" onClick={() => setStatus('idle')}>Neue Nachricht</button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
+              <div>
+                <label className="section-label">Name</label>
+                <input className="input-glass" value={name} onChange={e => setName(e.target.value)} placeholder="Dein Name" required maxLength={100} />
+              </div>
+              <div>
+                <label className="section-label">E-Mail (für Antwort)</label>
+                <input className="input-glass" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="deine@email.com" maxLength={200} />
+              </div>
+            </div>
+            <div>
+              <label className="section-label">Betreff</label>
+              <input className="input-glass" value={subject} onChange={e => setSubject(e.target.value)} placeholder="Worum geht es?" maxLength={200} />
+            </div>
+            <div>
+              <label className="section-label">Nachricht *</label>
+              <textarea
+                className="input-glass"
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                placeholder="Beschreibe dein Anliegen…"
+                required
+                maxLength={2000}
+                rows={isMobile ? 5 : 7}
+                style={{ resize: 'vertical', minHeight: 100 }}
+              />
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, textAlign: 'right' }}>{message.length}/2000</div>
+            </div>
+
+            {/* Turnstile widget */}
+            {TURNSTILE_SITE_KEY ? (
+              <div ref={widgetRef} style={{ marginTop: 4 }} />
+            ) : (
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', padding: '8px 12px', background: 'rgba(255,159,10,0.08)', border: '1px solid rgba(255,159,10,0.2)', borderRadius: 8 }}>
+                ⚠️ VITE_TURNSTILE_SITE_KEY nicht gesetzt — Turnstile inaktiv
+              </div>
+            )}
+
+            {errorMsg && (
+              <div style={{ fontSize: 13, color: 'var(--ios-red)', padding: '8px 12px', background: 'rgba(255,59,48,0.08)', border: '1px solid rgba(255,59,48,0.2)', borderRadius: 8 }}>
+                {errorMsg}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="btn-glass btn-primary"
+              disabled={status === 'sending'}
+              style={{ alignSelf: 'flex-end', display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px' }}
+            >
+              {status === 'sending' ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <Send size={14} />}
+              {status === 'sending' ? 'Sendet…' : 'Senden'}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Main Account Page ──────────────────────────────────────
 export default function AccountPage() {
   const { accountSection: section, setAccountSection: setSection } = useUIStore();
@@ -743,6 +919,7 @@ export default function AccountPage() {
       case 'security': return <SecuritySection />;
       case 'referral': return <ReferralSection />;
       case 'privacy':  return <PrivacySection />;
+      case 'contact':  return <ContactSection />;
     }
   };
 

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type AccountSection = 'account' | 'security' | 'referral' | 'privacy' | 'plan';
+export type AccountSection = 'account' | 'security' | 'referral' | 'privacy' | 'plan' | 'contact';
 export type Theme = 'dark' | 'light';
 
 function initTheme(): Theme {
