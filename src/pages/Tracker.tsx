@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp, ClipboardList, Link, LayoutGrid, List } from 'lucide-react';
 import { useTrackerStore, type Application, type ApplicationStatus, type ApplicationType } from '../store/trackerStore';
 import { useResumeStore } from '../store/resumeStore';
@@ -100,9 +100,6 @@ function KanbanCard({
   updateApplication,
   removeApplication,
 }: KanbanCardProps) {
-  const [showStatusMenu, setShowStatusMenu] = useState(false);
-  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
-  const statusBtnRef = useRef<HTMLButtonElement>(null);
   const appType: ApplicationType = app.type ?? 'online';
   const linkedResume = app.resumeId ? resumes.find((r) => r.id === app.resumeId) : null;
 
@@ -136,77 +133,28 @@ function KanbanCard({
 
           {/* Action buttons */}
           <div style={{ display: 'flex', gap: 3, flexShrink: 0, alignItems: 'center' }}>
-            {/* Status picker */}
-            <div style={{ position: 'relative' }}>
-              <button
-                ref={statusBtnRef}
-                className="btn-glass btn-icon"
-                title="Status ändern"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (!showStatusMenu && statusBtnRef.current) {
-                    const r = statusBtnRef.current.getBoundingClientRect();
-                    setMenuPos({ top: r.bottom + 4, left: Math.max(4, r.right - 154) });
-                  }
-                  setShowStatusMenu((v) => !v);
-                }}
-                style={{ padding: 5, fontSize: 10 }}
-              >
-                <ChevronDown size={11} />
-              </button>
-              {showStatusMenu && (
-                <>
-                  {/* Backdrop */}
-                  <div
-                    style={{ position: 'fixed', inset: 0, zIndex: 99 }}
-                    onClick={() => setShowStatusMenu(false)}
-                  />
-                  <div
-                    style={{
-                      position: 'fixed',
-                      top: menuPos.top,
-                      left: menuPos.left,
-                      zIndex: 100,
-                      background: 'var(--glass-bg, rgba(30,30,40,0.97))',
-                      border: '1px solid rgba(255,255,255,0.12)',
-                      borderRadius: 8,
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                      minWidth: 150,
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {ALL_STATUSES.map((s) => {
-                      const cfg = STATUS_CONFIG[s];
-                      const isActive = app.status === s;
-                      return (
-                        <button
-                          key={s}
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onStatusChange(s);
-                            setShowStatusMenu(false);
-                          }}
-                          style={{
-                            display: 'block',
-                            width: '100%',
-                            padding: '8px 12px',
-                            textAlign: 'left',
-                            background: isActive ? cfg.bg : 'transparent',
-                            border: 'none',
-                            color: isActive ? cfg.color : 'var(--text-primary)',
-                            fontSize: 12,
-                            fontWeight: isActive ? 600 : 400,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {cfg.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
+            {/* Status picker — native select always positioned correctly */}
+            <select
+              value={app.status}
+              onClick={(e) => e.stopPropagation()}
+              onChange={(e) => { e.stopPropagation(); onStatusChange(e.target.value as ApplicationStatus); }}
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: 6,
+                color: STATUS_CONFIG[app.status].color,
+                fontSize: 11,
+                fontWeight: 600,
+                padding: '3px 4px',
+                cursor: 'pointer',
+                outline: 'none',
+                maxWidth: 90,
+              }}
+            >
+              {ALL_STATUSES.map((s) => (
+                <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
+              ))}
+            </select>
             </div>
 
             <button
