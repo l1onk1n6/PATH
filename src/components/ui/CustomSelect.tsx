@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type CSSProperties } from 'react';
+import { useState, useRef, useEffect, useCallback, type CSSProperties } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 
 interface SelectOption {
@@ -13,12 +13,22 @@ interface CustomSelectProps {
   style?: CSSProperties;
   placeholder?: string;
   className?: string;
+  /** Render dropdown with position:fixed to escape overflow-clipping parents */
+  useFixed?: boolean;
 }
 
-export function CustomSelect({ value, onChange, options, style, placeholder = 'Auswählen…', className }: CustomSelectProps) {
+export function CustomSelect({ value, onChange, options, style, placeholder = 'Auswählen…', className, useFixed }: CustomSelectProps) {
   const [open, setOpen] = useState(false);
   const [focused, setFocused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [fixedPos, setFixedPos] = useState<{ top: number; left: number; width: number } | null>(null);
+
+  const calcFixedPos = useCallback(() => {
+    if (useFixed && containerRef.current) {
+      const r = containerRef.current.getBoundingClientRect();
+      setFixedPos({ top: r.bottom + 4, left: r.left, width: r.width });
+    }
+  }, [useFixed]);
 
   const selectedOption = options.find((o) => o.value === value);
   const displayLabel = selectedOption ? selectedOption.label : placeholder;
@@ -32,7 +42,11 @@ export function CustomSelect({ value, onChange, options, style, placeholder = 'A
       }
     }
     document.addEventListener('mousedown', handleOutside);
-    return () => document.removeEventListener('mousedown', handleOutside);
+    window.addEventListener('scroll', () => setOpen(false), { passive: true, capture: true });
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      window.removeEventListener('scroll', () => setOpen(false), { capture: true });
+    };
   }, [open]);
 
   const triggerStyle: CSSProperties = {
@@ -59,7 +73,7 @@ export function CustomSelect({ value, onChange, options, style, placeholder = 'A
         type="button"
         className="input-glass"
         style={triggerStyle}
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => { calcFixedPos(); setOpen((v) => !v); }}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         aria-haspopup="listbox"
@@ -83,11 +97,12 @@ export function CustomSelect({ value, onChange, options, style, placeholder = 'A
         <div
           role="listbox"
           style={{
-            position: 'absolute',
-            top: 'calc(100% + 4px)',
-            left: 0,
-            right: 0,
-            zIndex: 999,
+            position: useFixed && fixedPos ? 'fixed' : 'absolute',
+            top: useFixed && fixedPos ? fixedPos.top : 'calc(100% + 4px)',
+            left: useFixed && fixedPos ? fixedPos.left : 0,
+            right: useFixed && fixedPos ? undefined : 0,
+            width: useFixed && fixedPos ? fixedPos.width : undefined,
+            zIndex: 9999,
             background: 'var(--modal-bg)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',

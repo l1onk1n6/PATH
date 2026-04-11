@@ -133,28 +133,23 @@ function KanbanCard({
 
           {/* Action buttons */}
           <div style={{ display: 'flex', gap: 3, flexShrink: 0, alignItems: 'center' }}>
-            {/* Status picker — native select always positioned correctly */}
-            <select
-              value={app.status}
-              onClick={(e) => e.stopPropagation()}
-              onChange={(e) => { e.stopPropagation(); onStatusChange(e.target.value as ApplicationStatus); }}
-              style={{
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: 6,
-                color: STATUS_CONFIG[app.status].color,
-                fontSize: 11,
-                fontWeight: 600,
-                padding: '3px 4px',
-                cursor: 'pointer',
-                outline: 'none',
-                maxWidth: 90,
-              }}
-            >
-              {ALL_STATUSES.map((s) => (
-                <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
-              ))}
-            </select>
+            {/* Status picker */}
+            <div onClick={(e) => e.stopPropagation()} style={{ width: 110 }}>
+              <CustomSelect
+                value={app.status}
+                onChange={(s) => onStatusChange(s as ApplicationStatus)}
+                options={ALL_STATUSES.map((s) => ({ value: s, label: STATUS_CONFIG[s].label }))}
+                useFixed
+                style={{
+                  fontSize: 11,
+                  padding: '3px 8px',
+                  color: STATUS_CONFIG[app.status].color,
+                  fontWeight: 600,
+                  minHeight: 'unset',
+                  height: 28,
+                }}
+              />
+            </div>
 
             <button
               className="btn-glass btn-icon"
@@ -325,15 +320,16 @@ function KanbanBoard({
   removeApplication,
   resumes,
 }: KanbanBoardProps) {
+  const isMobile = useIsMobile();
   return (
     <div
       style={{
         display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
         gap: 12,
-        overflowX: 'auto',
+        overflowX: isMobile ? 'visible' : 'auto',
         overflowY: 'visible',
         paddingBottom: 12,
-        // Negative horizontal margin to allow flush scroll near edges
         alignItems: 'flex-start',
       }}
     >
@@ -345,8 +341,9 @@ function KanbanBoard({
           <div
             key={status}
             style={{
-              flex: '1 1 160px',
-              minWidth: 160,
+              flex: isMobile ? '0 0 auto' : '1 1 160px',
+              width: isMobile ? '100%' : undefined,
+              minWidth: isMobile ? undefined : 160,
               display: 'flex',
               flexDirection: 'column',
               gap: 0,
