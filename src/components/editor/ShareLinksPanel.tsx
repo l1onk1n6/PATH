@@ -222,18 +222,20 @@ export default function ShareLinksPanel({ resumeId, readOnly }: Props) {
     if (atLimit || creating) return;
     setCreating(true);
     const link = await createShareLink(resumeId, newLabel.trim());
-    if (link) { setLinks(prev => [link, ...prev]); setNewLabel(''); setShowCreate(false); }
+    if (link) { setLinks(prev => [link, ...prev]); setNewLabel(''); setShowCreate(false); toast.success('linkCreated'); }
     setCreating(false);
   }
 
   async function toggle(link: ShareLink) {
     await updateShareLink(link.id, { isActive: !link.isActive });
     setLinks(prev => prev.map(l => l.id === link.id ? { ...l, isActive: !l.isActive } : l));
+    if (link.isActive) { toast.success('linkDisabled'); } else { toast.success('linkEnabled'); }
   }
 
   async function remove(linkId: string) {
     await deleteShareLink(linkId);
     setLinks(prev => prev.filter(l => l.id !== linkId));
+    toast.success('linkDeleted');
   }
 
   return (

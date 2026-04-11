@@ -5,6 +5,7 @@ import {
   saveVersion, listVersions, deleteVersion,
   relativeTime, type ResumeVersion,
 } from '../../lib/versions';
+import { toast } from '../ui/Toast';
 
 interface Props {
   resumeId: string;
@@ -44,10 +45,12 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
     const ok = await saveVersion(resume, labelInput.trim() || undefined);
     if (!ok) {
       setError('Version konnte nicht gespeichert werden. Bitte prüfe ob die Datenbanktabelle angelegt ist.');
+      toast.error('errorGeneric');
     } else {
       setLabelInput('');
       setShowLabel(false);
       await load();
+      toast.success('versionSaved');
     }
     setSaving(false);
   }
@@ -59,11 +62,13 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
     updateResume(resumeId, restorable);
     setRestoring(null);
     setConfirmId(null);
+    toast.success('versionRestored');
   }
 
   async function handleDelete(versionId: string) {
     await deleteVersion(versionId);
     setVersions(v => v.filter(x => x.id !== versionId));
+    toast.success('versionDeleted');
   }
 
   return (

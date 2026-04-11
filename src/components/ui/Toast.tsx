@@ -14,34 +14,74 @@ import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 // ─── Witty message pool ────────────────────────────────────────────────────────
 
 const POOL: Record<string, string[]> = {
-  // ── success keys ──
-  copied:       ['Kopiert! Ab in die Zwischenablage 📋', 'Erwischt! ✌️ Strg+V und los!', 'Sauber kopiert — du weißt was du tust 🎯'],
-  linkCopied:   ['Link kopiert! Ab damit in die Welt 🚀', 'Frischer Link, warm serviert 🍕', 'Bitteschön — dein persönlicher Bewerbungslink 🎉'],
-  saved:        ['Gespeichert, bevor der Strom weg ist 💾', 'Daten sicher vergraben — niemand findet sie 🐱', 'Alles picobello gesichert ✨'],
-  pdfExported:  ['PDF frisch aus dem digitalen Ofen 🔥', 'Druckbereit! Die Welt verdient diesen Lebenslauf 🚀', 'Boom — fertig gerendert! 📄', 'Das Recruiting-Team wird beeindruckt sein. Oder auch nicht. Aber gut sieht es aus! 😎'],
-  deleted:      ['Puff — weg damit! 💨', 'Ins digitale Nirwana befördert 🌈', 'Gelöscht. Keine Reue. Kein Pardon. 🗑️'],
-  linkCreated:  ['Frischer Link, direkt aus der Produktion 🔗', 'Teile ihn mit Headhuntern, Freunden, dem Hund 🎉', 'Dein Bewerbungslink ist lebendig und hungrig 🧟'],
-  linkDeleted:  ['Link vernichtet — spurlos verschwunden 💨', 'Dieser Link existiert nicht mehr. War er je da? 🤔'],
-  templateChanged: ['Neues Design aktiviert! Kleiderordnung eingehalten 👔', 'Stylish. Sehr stylish. 🎨', 'Der HR-Manager wird das sehen und denken: "Klasse!" 💅'],
-  personCreated:['Neue Person, neues Glück! 🎭', 'Willkommen an Bord, neue Bewerberpersönlichkeit! 🚀'],
-  resumeCreated:['Neue Mappe angelegt — der erste Schritt zur Traumstelle! 📁', 'Eine Mappe gebaut, der Job wartet schon! 🏆'],
-  emailSent:    ['Nachricht sicher angekommen! ✉️ Wir melden uns bald.', 'Abgeschickt! Die Bits sind unterwegs 📡'],
-  imported:     ['Daten eingelesen — LinkedIn hat sein Bestes gegeben 🤝', 'Importiert! Wie ein digitaler Umzug 📦'],
-  translating:  ['Übersetzer an Bord — gib dem KI einen Moment ✈️', 'Wörter werden in andere Wörter verwandelt ✨'],
-  translated:   ['Übersetzt! Jetzt klingt du wie ein Einheimischer 🌍', 'Fertig übersetzt — hoff mal, es klingt noch gut 😅'],
-  versionSaved: ['Version eingefroren wie ein Mammut 🦣', 'Snapshot gemacht — die Vergangenheit bleibt bewahrt 📸'],
-  versionRestored: ['Zurück in der Zeit! Willkommen in Version X ⏰', 'Wiederhergestellt — Rückwärtsgang eingelegt 🔄'],
+  // ── copy ──
+  copied:           ['Kopiert! Ab in die Zwischenablage 📋', 'Erwischt! ✌️ Strg+V und los!', 'Sauber kopiert — du weißt was du tust 🎯'],
+  linkCopied:       ['Link kopiert! Ab damit in die Welt 🚀', 'Frischer Link, warm serviert 🍕', 'Bitteschön — dein persönlicher Bewerbungslink 🎉'],
 
-  // ── error keys ──
-  errorGeneric: ['Hoppla! Da hat was geknirscht 🙈', 'Mist! Bitte nochmal versuchen 🔧', 'Der Server hatte kurz einen schlechten Tag 😬', 'Fehler aufgetaucht — wir machen das schon! 💪'],
-  errorNetwork: ['Netzwerk streikt gerade ✊ Kurz warten und nochmal?', 'Die Verbindung hat sich verabschiedet 🏃', 'Kein Internet? Oder der Server schläft 💤'],
-  errorPdf:     ['PDF wollte nicht. Manchmal sind Dateien einfach stur 😤', 'Export fehlgeschlagen — kurze Pause, dann nochmal! 🔄'],
-  errorLimit:   ['Limit erreicht! Upgrade = mehr Spaß 🚀', 'Da wäre mehr drin — mit Pro 💎', 'Hier endet die Free-Zone. Pro wartet! ⭐'],
-  errorRateLimit:['Immer mit der Ruhe, Freund! 🐢 Kurze Pause bitte.', 'So schnell? Atemübung, dann nochmal 🧘'],
+  // ── save ──
+  saved:            ['Gespeichert, bevor der Strom weg ist 💾', 'Daten sicher vergraben — niemand findet sie 🐱', 'Alles picobello gesichert ✨'],
 
-  // ── info keys ──
-  infoSyncing:  ['Synchronisiere mit der Cloud ☁️', 'Bits werden übertragen ⚡'],
-  infoCopied:   ['In die Zwischenablage gewandert 📋'],
+  // ── PDF export ──
+  pdfExported:      ['PDF frisch aus dem digitalen Ofen 🔥', 'Druckbereit! Die Welt verdient diesen Lebenslauf 🚀', 'Boom — fertig gerendert! 📄', 'Das Recruiting-Team wird beeindruckt sein. Oder auch nicht. Aber gut sieht es aus! 😎'],
+
+  // ── delete ──
+  deleted:          ['Puff — weg damit! 💨', 'Ins digitale Nirwana befördert 🌈', 'Gelöscht. Keine Reue. Kein Pardon. 🗑️'],
+  personDeleted:    ['Person gelöscht — wer war das nochmal? 🤷', 'Weg damit! Die Stelle ist jetzt vakant 👻', 'Persona non grata. Persona non mehr. 🫥'],
+  resumeDeleted:    ['Mappe vernichtet — kein Beweis zurückgelassen 🔥', 'Diese Bewerbung hat das Zeitliche gesegnet 💀', 'Weg ist weg. Neues Leben, neue Mappe! 🗑️'],
+  applicationDeleted: ['Bewerbung gecancelt — manchmal ist das die richtige Entscheidung 🙅', 'Aus den Augen, aus dem Sinn 💨', 'Adieu, Stelle! Die Welt hat mehr zu bieten 🌍'],
+  versionDeleted:   ['Version in Rente geschickt 🏖️', 'Snapshot gelöscht — die Vergangenheit vergisst du sowieso 😅', 'Weg damit — die aktuelle Version ist sowieso besser 💪'],
+  linkDeleted:      ['Link vernichtet — spurlos verschwunden 💨', 'Dieser Link existiert nicht mehr. War er je da? 🤔', 'Link gelöscht — Schrödinger würde nicken 🐱'],
+
+  // ── create ──
+  linkCreated:      ['Frischer Link, direkt aus der Produktion 🔗', 'Teile ihn mit Headhuntern, Freunden, dem Hund 🎉', 'Dein Bewerbungslink ist lebendig und hungrig 🧟'],
+  personCreated:    ['Neue Person, neues Glück! 🎭', 'Willkommen an Bord, neue Bewerberpersönlichkeit! 🚀', 'Alter Ego aktiviert — auf zur Traumstelle! 🦸'],
+  resumeCreated:    ['Neue Mappe angelegt — der erste Schritt zur Traumstelle! 📁', 'Eine Mappe gebaut, der Job wartet schon! 🏆', 'Frisch gepresst: deine neue Bewerbungsmappe ☕'],
+  applicationCreated: ['Neue Bewerbung eingetragen — Fingers crossed! 🤞', 'Jagdsaison eröffnet! 🏹', 'Ab in die Pipeline — Erfolg vorprogrammiert 📈'],
+
+  // ── template & design ──
+  templateChanged:  ['Neues Design aktiviert! Kleiderordnung eingehalten 👔', 'Stylish. Sehr stylish. 🎨', 'Der HR-Manager wird das sehen und denken: "Klasse!" 💅'],
+
+  // ── rename ──
+  renamed:          ['Umbenannt! Der neue Name klingt seriöser 🏷️', 'Name geändert — Rebranding abgeschlossen 🎯', 'Jetzt mit besserem Titel 👑'],
+
+  // ── share link toggle ──
+  linkEnabled:      ['Link ist jetzt live — bereit für die große Bühne 🎤', 'Vorhang auf! Dein CV ist öffentlich 🌐', 'Online und stolz darauf 🚀'],
+  linkDisabled:     ['Link deaktiviert — niemand schaut jetzt hin 🙈', 'Vorhang zu, Disco vorbei 🎭', 'Privat geschaltet — wie Area 51 🔒'],
+
+  // ── AI ──
+  aiGenerated:      ['KI hat getippt wie ein Verrückter 🤖', 'Anschreiben generiert — besser als du erwartet hättest 💌', 'Der Algorithmus hat Gefühle reingeschrieben ✨'],
+  aiImproved:       ['Text poliert bis er glänzt ✨', 'Upgraded! Jetzt klingt es nach echtem Profi 🎓', 'KI hat Hand angelegt — Ergebnis: deutlich besser 🔧'],
+  aiError:          ['KI hatte heute einen Hänger 🤖💤', 'Der Bot streikt — kurze Pause, dann nochmal 🛠️', 'GPT-Moment. Nochmal versuchen! 🎰'],
+
+  // ── translate ──
+  translating:      ['Übersetzer an Bord — gib dem KI einen Moment ✈️', 'Wörter werden in andere Wörter verwandelt ✨', 'Sprachbarriere wird gerade eingerissen 🔨'],
+  translated:       ['Übersetzt! Jetzt klingst du wie ein Einheimischer 🌍', 'Fertig übersetzt — hoff mal, es klingt noch gut 😅', 'Lingua franca: gefunden 🗺️'],
+
+  // ── versions ──
+  versionSaved:     ['Version eingefroren wie ein Mammut 🦣', 'Snapshot gemacht — die Vergangenheit bleibt bewahrt 📸', 'Checkpoint gesetzt! ☑️ Falls du es vermasselt hast, weißt du wo du zurück kannst'],
+  versionRestored:  ['Zurück in der Zeit! Willkommen in Version X ⏰', 'Wiederhergestellt — Rückwärtsgang eingelegt 🔄', 'DeLorean auf 88 mph — Vergangenheit erreicht 🚗⚡'],
+
+  // ── import / export ──
+  imported:         ['Daten eingelesen — LinkedIn hat sein Bestes gegeben 🤝', 'Importiert! Wie ein digitaler Umzug 📦', 'Profildaten geklaut — äh, importiert 🕵️'],
+  gdprExported:     ['Deine Daten, deine Macht 💪 Download läuft!', 'DSGVO-Export fertig — Orwell wäre stolz 📂', 'Alles raus: deine digitale Seele als JSON-Datei 🧬'],
+
+  // ── auth ──
+  signedOut:        ['Tschüss! Bis bald — die Bewerbungen warten 👋', 'Abgemeldet. Verdiente Pause! ☕', 'Logout erfolgreich — der Laptop darf jetzt auch schlafen 😴'],
+  passwordResetSent:['E-Mail unterwegs — check deinen Posteingang! 📬', 'Reset-Link abgeschossen 🚀 Landung im Postfach in Kürze', 'Passwort-Rettung ist eingeleitet 🛟'],
+  passwordUpdated:  ['Neues Passwort gesetzt — und diesmal aufschreiben! 📝', 'Passwort aktualisiert. "123456" war wirklich keine gute Wahl 😅', 'Sicherer als zuvor — gute Entscheidung! 🔐'],
+  emailChanged:     ['E-Mail geändert — Postfach-Wechsel vollzogen ✉️', 'Neue Adresse, gleicher Mensch 📮', 'Update erfolgreich — bitte neue Adresse bestätigen 🔔'],
+  emailSent:        ['Nachricht sicher angekommen! ✉️ Wir melden uns bald.', 'Abgeschickt! Die Bits sind unterwegs 📡', 'Gesendet — jetzt heißt es warten wie ein Profi 🕰️'],
+
+  // ── errors ──
+  errorGeneric:     ['Hoppla! Da hat was geknirscht 🙈', 'Mist! Bitte nochmal versuchen 🔧', 'Der Server hatte kurz einen schlechten Tag 😬', 'Fehler aufgetaucht — wir machen das schon! 💪'],
+  errorNetwork:     ['Netzwerk streikt gerade ✊ Kurz warten und nochmal?', 'Die Verbindung hat sich verabschiedet 🏃', 'Kein Internet? Oder der Server schläft 💤'],
+  errorPdf:         ['PDF wollte nicht. Manchmal sind Dateien einfach stur 😤', 'Export fehlgeschlagen — kurze Pause, dann nochmal! 🔄', 'Der PDF-Generator hat heute frei 🏖️'],
+  errorLimit:       ['Limit erreicht! Upgrade = mehr Spaß 🚀', 'Da wäre mehr drin — mit Pro 💎', 'Hier endet die Free-Zone. Pro wartet! ⭐'],
+  errorRateLimit:   ['Immer mit der Ruhe, Freund! 🐢 Kurze Pause bitte.', 'So schnell? Atemübung, dann nochmal 🧘', 'Du bist schneller als der Server — kurz warten 🏎️'],
+  errorAi:          ['KI hatte heute einen Hänger 🤖💤', 'Der Bot streikt — kurze Pause, dann nochmal 🛠️', 'GPT-Moment. Nochmal versuchen! 🎰'],
+
+  // ── info ──
+  infoSyncing:      ['Synchronisiere mit der Cloud ☁️', 'Bits werden übertragen ⚡', 'Cloud-Sync läuft — kurz Geduld 🌥️'],
 };
 
 function pick(key: string): string {

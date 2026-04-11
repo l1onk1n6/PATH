@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp, ClipboardList, Link, LayoutGrid, List } from 'lucide-react';
 import { useTrackerStore, type Application, type ApplicationStatus, type ApplicationType } from '../store/trackerStore';
 import { useResumeStore } from '../store/resumeStore';
+import { toast } from '../components/ui/Toast';
 import type { Resume } from '../types/resume';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { CustomSelect } from '../components/ui/CustomSelect';
@@ -165,7 +166,7 @@ function KanbanCard({
               title="Löschen"
               onClick={(e) => {
                 e.stopPropagation();
-                if (confirm('Bewerbung löschen?')) removeApplication(app.id);
+                if (confirm('Bewerbung löschen?')) { removeApplication(app.id); toast.success('applicationDeleted'); }
               }}
               style={{ padding: 5 }}
             >
@@ -668,7 +669,7 @@ export default function Tracker() {
                     <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
                       <button
                         className="btn-glass btn-danger btn-icon"
-                        onClick={(e) => { e.stopPropagation(); if (confirm('Bewerbung löschen?')) removeApplication(app.id); }}
+                        onClick={(e) => { e.stopPropagation(); if (confirm('Bewerbung löschen?')) { removeApplication(app.id); toast.success('applicationDeleted'); } }}
                         style={{ padding: 6 }}
                       >
                         <Trash2 size={12} />

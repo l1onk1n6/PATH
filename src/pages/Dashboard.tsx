@@ -282,7 +282,7 @@ export default function Dashboard() {
   }
 
   function handleRenameCommit(resumeId: string) {
-    if (renameValue.trim()) renameResume(resumeId, renameValue.trim());
+    if (renameValue.trim()) { renameResume(resumeId, renameValue.trim()); toast.success('renamed'); }
     setRenamingResumeId(null);
     setRenameValue('');
   }
@@ -404,7 +404,7 @@ export default function Dashboard() {
                   <button style={{ ...itemStyle, color: 'var(--ios-red)' }}
                     onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,59,48,0.1)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-                    onClick={() => { if (confirm(`"${mr.name || 'Bewerbungsmappe'}" löschen?`)) deleteResume(mr.id); setMenuOpenResumeId(null); }}>
+                    onClick={() => { if (confirm(`"${mr.name || 'Bewerbungsmappe'}" löschen?`)) { deleteResume(mr.id); toast.success('resumeDeleted'); } setMenuOpenResumeId(null); }}>
                     <Trash2 size={14} /> Löschen
                   </button>
                 </>
@@ -597,7 +597,7 @@ export default function Dashboard() {
           <AtsButton />
         </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          <button className="btn-glass btn-sm" onClick={exportGdprData} title="Alle Daten exportieren (DSGVO Art. 20)">
+          <button className="btn-glass btn-sm" onClick={() => { exportGdprData(); toast.success('gdprExported'); }} title="Alle Daten exportieren (DSGVO Art. 20)">
             <Download size={13} /> {!isMobile && 'Export'}
           </button>
           <button
@@ -884,7 +884,7 @@ export default function Dashboard() {
                       </button>
                     )}
                     <button className="btn-glass btn-danger btn-icon"
-                      onClick={(e) => { e.stopPropagation(); if (confirm(`"${person.name}" wirklich löschen?`)) deletePerson(person.id); }}
+                      onClick={(e) => { e.stopPropagation(); if (confirm(`"${person.name}" wirklich löschen?`)) { deletePerson(person.id); toast.success('personDeleted'); } }}
                       style={{ width: 34, height: 34, borderRadius: '50%', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <Trash2 size={14} />
                     </button>

@@ -354,7 +354,7 @@ function AccountSection() {
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>SITZUNG</div>
         <button
           className="btn-glass btn-sm btn-danger"
-          onClick={() => signOut()}
+          onClick={() => { signOut(); toast.info('signedOut'); }}
           style={{ gap: 6 }}
         >
           <LogOut size={13} /> Abmelden
@@ -373,6 +373,7 @@ function SecuritySection() {
     if (!user?.email) return;
     await sendPasswordReset(user.email);
     setSent(true);
+    toast.success('passwordResetSent');
   }
 
   return (

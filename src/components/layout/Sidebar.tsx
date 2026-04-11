@@ -9,6 +9,7 @@ import {
   Shield, Gift, ClipboardList, Pencil, Check, X,
 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
+import { toast } from '../ui/Toast';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore, type AccountSection } from '../../store/uiStore';
 import { LogoFull, LogoIcon } from './Logo';
@@ -93,13 +94,13 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
     if (!newName.trim()) return;
     const person = await addPerson(newName.trim());
     setNewName(''); setAddingPerson(false);
-    if (person) go('/editor');
+    if (person) { toast.success('personCreated'); go('/editor'); }
   }
 
   function handleSelectPerson(id: string) { setActivePerson(id); go('/editor'); }
   async function handleAddResume(personId: string) {
     const resume = await addResume(personId);
-    if (resume) go('/editor');
+    if (resume) { toast.success('resumeCreated'); go('/editor'); }
   }
 
   const isActive = (path: string) => location.pathname === path;
@@ -398,7 +399,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
                                 </button>
                               )}
                               {personResumes.length > 1 && (
-                                <button onClick={() => deleteResume(resume.id)}
+                                <button onClick={() => { deleteResume(resume.id); toast.success('resumeDeleted'); }}
                                   style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, opacity: 0.35, color: 'inherit', flexShrink: 0, display: 'flex' }}>
                                   <Trash2 size={10} />
                                 </button>

@@ -6,6 +6,7 @@ import { usePlan } from '../../lib/plan';
 import { generateCoverLetter, improveText } from '../../lib/ai';
 import ProGate, { UpgradeModal } from '../ui/ProGate';
 import { useTrackerStore } from '../../store/trackerStore';
+import { toast } from '../ui/Toast';
 
 // Parse multiline recipient string into structured address fields
 function parseRecipient(s: string) {
@@ -96,29 +97,39 @@ export default function CoverLetterEditor() {
   async function doGenerateCL() {
     setConfirmOverwrite(null);
     setGeneratingCL(true);
-    const summary = resume!.personalInfo.summary ?? '';
-    const experience = resume!.workExperience
-      .slice(0, 3)
-      .map(j => `${j.position} bei ${j.company}${j.description ? ': ' + j.description : ''}`)
-      .join('\n');
-    const result = await generateCoverLetter({
-      jobTitle:       aiJobTitle || resume!.personalInfo.title,
-      company:        aiCompany,
-      jobDescription: aiJobDesc,
-      summary,
-      experience,
-    });
-    if (result) update('body', result);
-    setGeneratingCL(false);
-    setShowAiPanel(false);
+    try {
+      const summary = resume!.personalInfo.summary ?? '';
+      const experience = resume!.workExperience
+        .slice(0, 3)
+        .map(j => `${j.position} bei ${j.company}${j.description ? ': ' + j.description : ''}`)
+        .join('\n');
+      const result = await generateCoverLetter({
+        jobTitle:       aiJobTitle || resume!.personalInfo.title,
+        company:        aiCompany,
+        jobDescription: aiJobDesc,
+        summary,
+        experience,
+      });
+      if (result) { update('body', result); toast.success('aiGenerated'); }
+    } catch {
+      toast.error('aiError');
+    } finally {
+      setGeneratingCL(false);
+      setShowAiPanel(false);
+    }
   }
 
   async function doImproveBody() {
     setConfirmOverwrite(null);
     setImprovingBody(true);
-    const result = await improveText(cl.body, `Bewerbung als ${resume!.personalInfo.title || 'Fachkraft'}`);
-    if (result) update('body', result);
-    setImprovingBody(false);
+    try {
+      const result = await improveText(cl.body, `Bewerbung als ${resume!.personalInfo.title || 'Fachkraft'}`);
+      if (result) { update('body', result); toast.success('aiImproved'); }
+    } catch {
+      toast.error('aiError');
+    } finally {
+      setImprovingBody(false);
+    }
   }
 
   function handleGenerateCL() {
