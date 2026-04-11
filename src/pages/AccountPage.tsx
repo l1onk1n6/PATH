@@ -663,39 +663,6 @@ function ReferralSection() {
         )}
       </div>
 
-      {/* ── How it works ──────────────────────────────── */}
-      <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 14, opacity: 0.6 }}>WIE ES FUNKTIONIERT</div>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-          {[
-            { step: '1', label: 'Link teilen',                  sub: 'Deinen persönlichen Link an Freunde senden' },
-            { step: '2', label: 'Freund registriert sich',      sub: 'Über deinen Link anmelden & Pro abschliessen' },
-            { step: '3', label: 'Du erhältst CHF 5.00',         sub: 'Automatisch auf dein Konto gutgeschrieben' },
-          ].map(({ step, label, sub }, i) => (
-            <div key={step} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', position: 'relative' }}>
-              {/* Connector line between steps */}
-              {i < 2 && (
-                <div style={{
-                  position: 'absolute', top: 16, left: 'calc(50% + 20px)', right: 'calc(-50% + 20px)',
-                  height: 1, background: 'rgba(255,255,255,0.1)', zIndex: 0,
-                }} />
-              )}
-              {/* Number circle */}
-              <div style={{
-                width: 32, height: 32, borderRadius: '50%', flexShrink: 0, zIndex: 1,
-                background: 'linear-gradient(135deg, rgba(255,159,10,0.25), rgba(255,55,95,0.15))',
-                border: '1px solid rgba(255,159,10,0.35)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 13, fontWeight: 800, color: '#FF9F0A',
-              }}>
-                {step}
-              </div>
-              <div style={{ fontSize: 12, fontWeight: 600, marginTop: 8, lineHeight: 1.3 }}>{label}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.4 }}>{sub}</div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
