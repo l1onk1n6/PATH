@@ -294,7 +294,6 @@ export default function Preview() {
   const resume = getActiveResume();
   const [zoom, setZoom] = useState(isMobile ? 0.42 : 1.0);
   const [exporting, setExporting] = useState(false);
-  const [exportError, setExportError] = useState<string | null>(null); // kept for compat
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const [showPasswordSoon, setShowPasswordSoon] = useState(false);
   const [showSharePanel, setShowSharePanel] = useState(false);
