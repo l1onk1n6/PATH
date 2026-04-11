@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp, ClipboardList, Link, LayoutGrid, List } from 'lucide-react';
 import { useTrackerStore, type Application, type ApplicationStatus, type ApplicationType } from '../store/trackerStore';
 import { useResumeStore } from '../store/resumeStore';
@@ -101,6 +101,8 @@ function KanbanCard({
   removeApplication,
 }: KanbanCardProps) {
   const [showStatusMenu, setShowStatusMenu] = useState(false);
+  const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
+  const statusBtnRef = useRef<HTMLButtonElement>(null);
   const appType: ApplicationType = app.type ?? 'online';
   const linkedResume = app.resumeId ? resumes.find((r) => r.id === app.resumeId) : null;
 
@@ -137,9 +139,17 @@ function KanbanCard({
             {/* Status picker */}
             <div style={{ position: 'relative' }}>
               <button
+                ref={statusBtnRef}
                 className="btn-glass btn-icon"
                 title="Status ändern"
-                onClick={(e) => { e.stopPropagation(); setShowStatusMenu((v) => !v); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!showStatusMenu && statusBtnRef.current) {
+                    const r = statusBtnRef.current.getBoundingClientRect();
+                    setMenuPos({ top: r.bottom + 4, right: window.innerWidth - r.right });
+                  }
+                  setShowStatusMenu((v) => !v);
+                }}
                 style={{ padding: 5, fontSize: 10 }}
               >
                 <ChevronDown size={11} />
@@ -153,11 +163,10 @@ function KanbanCard({
                   />
                   <div
                     style={{
-                      position: 'absolute',
-                      top: '100%',
-                      right: 0,
+                      position: 'fixed',
+                      top: menuPos.top,
+                      right: menuPos.right,
                       zIndex: 100,
-                      marginTop: 4,
                       background: 'var(--glass-bg, rgba(30,30,40,0.97))',
                       border: '1px solid rgba(255,255,255,0.12)',
                       borderRadius: 8,
