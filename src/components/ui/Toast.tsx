@@ -10,6 +10,7 @@
 import { useEffect } from 'react';
 import { create } from 'zustand';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
+import { useIsMobile } from '../../hooks/useBreakpoint';
 
 // ─── Witty message pool ────────────────────────────────────────────────────────
 
@@ -130,54 +131,62 @@ export const toast = {
 
 // ─── Toast item component ──────────────────────────────────────────────────────
 
-const TYPE_STYLE: Record<ToastType, { bg: string; border: string; icon: React.ReactNode }> = {
+const TYPE_STYLE: Record<ToastType, { accent: string; bg: string; icon: React.ReactNode }> = {
   success: {
-    bg:     'rgba(30,40,30,0.97)',
-    border: 'rgba(52,199,89,0.35)',
-    icon:   <CheckCircle size={15} style={{ color: '#34C759', flexShrink: 0 }} />,
+    accent: '#34C759',
+    bg:     'rgba(18,28,18,0.97)',
+    icon:   <CheckCircle size={16} style={{ color: '#34C759', flexShrink: 0 }} />,
   },
   error: {
-    bg:     'rgba(40,20,20,0.97)',
-    border: 'rgba(255,59,48,0.4)',
-    icon:   <AlertCircle size={15} style={{ color: '#FF3B30', flexShrink: 0 }} />,
+    accent: '#FF3B30',
+    bg:     'rgba(30,14,14,0.97)',
+    icon:   <AlertCircle size={16} style={{ color: '#FF3B30', flexShrink: 0 }} />,
   },
   warning: {
-    bg:     'rgba(40,35,15,0.97)',
-    border: 'rgba(255,159,10,0.4)',
-    icon:   <AlertTriangle size={15} style={{ color: '#FF9F0A', flexShrink: 0 }} />,
+    accent: '#FF9F0A',
+    bg:     'rgba(30,24,10,0.97)',
+    icon:   <AlertTriangle size={16} style={{ color: '#FF9F0A', flexShrink: 0 }} />,
   },
   info: {
-    bg:     'rgba(20,30,45,0.97)',
-    border: 'rgba(0,122,255,0.35)',
-    icon:   <Info size={15} style={{ color: '#007AFF', flexShrink: 0 }} />,
+    accent: '#007AFF',
+    bg:     'rgba(10,20,38,0.97)',
+    icon:   <Info size={16} style={{ color: '#007AFF', flexShrink: 0 }} />,
   },
 };
 
-function ToastItem({ item, onDismiss }: { item: ToastItem; onDismiss: () => void }) {
+function ToastItem({ item, onDismiss, mobile }: { item: ToastItem; onDismiss: () => void; mobile?: boolean }) {
   const s = TYPE_STYLE[item.type];
   return (
     <div
-      className="animate-fade-in"
       style={{
         display: 'flex', alignItems: 'center', gap: 10,
-        padding: '11px 14px',
+        padding: '12px 14px 12px 0',
         background: s.bg,
-        border: `1px solid ${s.border}`,
-        borderRadius: 12,
-        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+        border: `1px solid ${s.accent}33`,
+        borderLeft: `4px solid ${s.accent}`,
+        borderRadius: mobile ? 14 : 12,
+        boxShadow: `0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px ${s.accent}18`,
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        maxWidth: 360,
-        width: 'max-content',
+        width: mobile ? '100%' : undefined,
+        maxWidth: mobile ? undefined : 380,
+        minWidth: mobile ? undefined : 260,
+        overflow: 'hidden',
       }}
     >
-      {s.icon}
+      {/* Icon area with accent bg strip */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        width: 40, flexShrink: 0,
+      }}>
+        {s.icon}
+      </div>
       <span style={{ fontSize: 13, fontWeight: 500, color: '#fff', lineHeight: 1.4, flex: 1 }}>
         {item.message}
       </span>
       <button
         onClick={onDismiss}
-        style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', padding: 2, flexShrink: 0, lineHeight: 0 }}
+        style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', cursor: 'pointer', padding: '4px 10px', flexShrink: 0, lineHeight: 0 }}
       >
         <X size={13} />
       </button>
@@ -189,30 +198,50 @@ function ToastItem({ item, onDismiss }: { item: ToastItem; onDismiss: () => void
 
 export function ToastContainer() {
   const { items, dismiss } = useToastStore();
+  const isMobile = useIsMobile();
 
-  // Inject spin keyframe if missing
   useEffect(() => {
-    if (!document.getElementById('toast-spin-style')) {
+    if (!document.getElementById('toast-anim-style')) {
       const s = document.createElement('style');
-      s.id = 'toast-spin-style';
-      s.textContent = '@keyframes toast-slide-in { from { opacity:0; transform:translateY(12px) scale(0.95); } to { opacity:1; transform:translateY(0) scale(1); } }';
+      s.id = 'toast-anim-style';
+      s.textContent = `
+        @keyframes toast-up   { from { opacity:0; transform:translateY(14px)  scale(0.95); } to { opacity:1; transform:translateY(0) scale(1); } }
+        @keyframes toast-down { from { opacity:0; transform:translateY(-14px) scale(0.95); } to { opacity:1; transform:translateY(0) scale(1); } }
+      `;
       document.head.appendChild(s);
     }
   }, []);
 
   if (items.length === 0) return null;
 
-  return (
-    <div
-      style={{
-        position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+  // Mobile: top of screen, full width, max 2 toasts, slide down
+  if (isMobile) {
+    return (
+      <div style={{
+        position: 'fixed', top: 12, left: 12, right: 12,
         zIndex: 9999,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+        display: 'flex', flexDirection: 'column', gap: 8,
         pointerEvents: 'none',
-      }}
-    >
-      {items.map((item) => (
-        <div key={item.id} style={{ pointerEvents: 'auto', animation: 'toast-slide-in 0.22s ease' }}>
+      }}>
+        {items.slice(-2).map((item) => (
+          <div key={item.id} style={{ pointerEvents: 'auto', animation: 'toast-down 0.24s cubic-bezier(0.34,1.3,0.64,1)' }}>
+            <ToastItem item={item} onDismiss={() => dismiss(item.id)} mobile />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Desktop: bottom centre, max 4, slide up
+  return (
+    <div style={{
+      position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+      zIndex: 9999,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+      pointerEvents: 'none',
+    }}>
+      {items.slice(-4).map((item) => (
+        <div key={item.id} style={{ pointerEvents: 'auto', animation: 'toast-up 0.24s cubic-bezier(0.34,1.3,0.64,1)' }}>
           <ToastItem item={item} onDismiss={() => dismiss(item.id)} />
         </div>
       ))}
