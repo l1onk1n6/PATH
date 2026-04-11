@@ -2,6 +2,7 @@ import { Check, Palette } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { TEMPLATES } from './templateConfig';
 import type { TemplateId } from '../../types/resume';
+import { useIsMobile } from '../../hooks/useBreakpoint';
 
 export function TemplateThumbnail({ id, preview, accent }: { id: string; preview: string; accent: string }) {
   const SIDEBAR_IDS = ['modern', 'corporate', 'executive', 'tech', 'freelancer', 'international'];
@@ -207,6 +208,7 @@ const ACCENT_COLORS = [
 export default function TemplateSelector() {
   const { getActiveResume, setTemplate, setAccentColor } = useResumeStore();
   const resume = getActiveResume();
+  const isMobile = useIsMobile();
 
   if (!resume) return null;
 
@@ -264,7 +266,7 @@ export default function TemplateSelector() {
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
         gap: 10,
         marginBottom: 24,
         paddingRight: 2,

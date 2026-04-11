@@ -201,7 +201,7 @@ function TrackerView() {
                             key={s}
                             title={APPLICATION_STATUS_LABELS[s]}
                             className="btn-glass"
-                            style={{ padding: '4px 9px', fontSize: 11, borderRadius: 6 }}
+                            style={{ padding: isMobile ? '7px 12px' : '4px 9px', fontSize: 11, borderRadius: 6 }}
                             onClick={(e) => { e.stopPropagation(); setResumeStatus(r.id, s); }}
                           >
                             → {APPLICATION_STATUS_LABELS[s]}

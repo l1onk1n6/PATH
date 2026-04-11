@@ -4,6 +4,7 @@ import type { ShareLink, ShareLinkView } from '../../types/resume';
 import { getShareLinks, createShareLink, deleteShareLink, updateShareLink, getShareLinkViews } from '../../lib/db';
 import { isSupabaseConfigured } from '../../lib/supabase';
 import { usePlan } from '../../lib/plan';
+import { useIsMobile } from '../../hooks/useBreakpoint';
 import ProGate from '../ui/ProGate';
 
 const FLAG: Record<string, string> = {
@@ -57,6 +58,7 @@ function ViewSparkline({ views }: { views: ShareLinkView[] }) {
 function LinkAnalyticsPanel({ link }: { link: ShareLink }) {
   const [views, setViews] = useState<ShareLinkView[] | null>(null);
   const [open, setOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!open || views !== null) return;
@@ -125,7 +127,7 @@ function LinkAnalyticsPanel({ link }: { link: ShareLink }) {
           </div>
 
           {/* Country + device breakdown */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8, marginBottom: 12 }}>
             <div>
               <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>Land</div>
               {Object.entries(
@@ -312,7 +314,7 @@ export default function ShareLinksPanel({ resumeId, readOnly }: Props) {
               </div>
 
               {/* URL preview */}
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', background: 'rgba(255,255,255,0.04)', borderRadius: 6, padding: '4px 8px', marginBottom: 8, fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)', background: 'rgba(255,255,255,0.04)', borderRadius: 6, padding: '4px 8px', marginBottom: 8, fontFamily: 'monospace', wordBreak: 'break-all' }}>
                 {shareUrl(link.token)}
               </div>
 

@@ -410,7 +410,7 @@ export default function ResumeOverview() {
             background: percent === 100 ? 'var(--ios-green)' : 'var(--ios-blue)',
           }} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 2 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(260px, 1fr))', gap: 2 }}>
           {sections.map(({ label, section, done, hint }) => (
             <button
               key={section}

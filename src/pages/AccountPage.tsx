@@ -415,6 +415,7 @@ function SecuritySection() {
 // ── Section: Referral ──────────────────────────────────────
 function ReferralSection() {
   const { user } = useAuthStore();
+  const isMobile = useIsMobile();
   const [copied, setCopied] = useState(false);
   const [stats, setStats] = useState<{ total: number; subscribed: number; rewarded: number } | null>(null);
 
@@ -492,11 +493,11 @@ function ReferralSection() {
           {/* Person A */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
             <div style={{ fontSize: 18 }}>🙋</div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>Du</div>
+            <div style={{ fontSize: isMobile ? 12 : 10, color: 'var(--text-muted)', fontWeight: 600 }}>Du</div>
           </div>
           {/* Arrow + link */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, flex: 1, minWidth: 60 }}>
-            <div style={{ fontSize: 10, color: '#FF9F0A', fontWeight: 600, whiteSpace: 'nowrap' }}>Link teilen</div>
+            <div style={{ fontSize: isMobile ? 12 : 10, color: '#FF9F0A', fontWeight: 600, whiteSpace: 'nowrap' }}>Link teilen</div>
             <div style={{ height: 2, width: '100%', background: 'linear-gradient(90deg, rgba(255,159,10,0.4), rgba(255,159,10,0.8))', borderRadius: 2, position: 'relative' }}>
               <div style={{ position: 'absolute', right: -4, top: -4, width: 0, height: 0, borderTop: '5px solid transparent', borderBottom: '5px solid transparent', borderLeft: '7px solid rgba(255,159,10,0.8)' }} />
             </div>
@@ -504,11 +505,11 @@ function ReferralSection() {
           {/* Person B */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
             <div style={{ fontSize: 18 }}>🧑‍💼</div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>Freund</div>
+            <div style={{ fontSize: isMobile ? 12 : 10, color: 'var(--text-muted)', fontWeight: 600 }}>Freund</div>
           </div>
           {/* Arrow + subscribes */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, flex: 1, minWidth: 60 }}>
-            <div style={{ fontSize: 10, color: 'var(--ios-green)', fontWeight: 600, whiteSpace: 'nowrap' }}>schliesst Pro ab</div>
+            <div style={{ fontSize: isMobile ? 12 : 10, color: 'var(--ios-green)', fontWeight: 600, whiteSpace: 'nowrap' }}>schliesst Pro ab</div>
             <div style={{ height: 2, width: '100%', background: 'linear-gradient(90deg, rgba(52,199,89,0.4), rgba(52,199,89,0.8))', borderRadius: 2, position: 'relative' }}>
               <div style={{ position: 'absolute', right: -4, top: -4, width: 0, height: 0, borderTop: '5px solid transparent', borderBottom: '5px solid transparent', borderLeft: '7px solid rgba(52,199,89,0.8)' }} />
             </div>
@@ -516,7 +517,7 @@ function ReferralSection() {
           {/* Reward */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
             <div style={{ fontSize: 18 }}>🎁</div>
-            <div style={{ fontSize: 10, color: '#FF9F0A', fontWeight: 700, whiteSpace: 'nowrap' }}>+CHF 5.00</div>
+            <div style={{ fontSize: isMobile ? 12 : 10, color: '#FF9F0A', fontWeight: 700, whiteSpace: 'nowrap' }}>+CHF 5.00</div>
           </div>
         </div>
       </div>
@@ -591,7 +592,7 @@ function ReferralSection() {
           <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Lädt…</div>
         ) : (
           <>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 12, marginBottom: 14 }}>
               {/* Eingeladen */}
               <div style={{
                 textAlign: 'center', padding: '14px 8px',

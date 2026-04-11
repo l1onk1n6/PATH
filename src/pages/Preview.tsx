@@ -399,7 +399,7 @@ export default function Preview() {
       borderTop: '1.5px dashed rgba(180,180,220,0.7)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
-      <span style={{ fontSize: 9, color: 'rgba(100,100,180,0.7)', background: 'inherit', padding: '0 8px', letterSpacing: '0.05em', fontFamily: 'sans-serif' }}>— Seite 2 —</span>
+      <span style={{ fontSize: 11, color: 'rgba(100,100,180,0.7)', background: 'inherit', padding: '0 8px', letterSpacing: '0.05em', fontFamily: 'sans-serif' }}>— Seite 2 —</span>
     </div>
   );
 
@@ -1120,7 +1120,7 @@ export default function Preview() {
                   <X size={16} />
                 </button>
               </div>
-              <div style={{ overflowY: 'auto', padding: '12px 16px 24px', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: 8 }}>
+              <div style={{ overflowY: 'auto', padding: '12px 16px 24px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 8 }}>
                 <TemplatePicker />
               </div>
             </div>

@@ -4,6 +4,7 @@ import { ArrowRight, Check, FileText, Sparkles, Share2, Bell, Wand2 } from 'luci
 import { useResumeStore } from '../../store/resumeStore';
 import type { TemplateId } from '../../types/resume';
 import { LogoIcon } from '../layout/Logo';
+import { useIsMobile } from '../../hooks/useBreakpoint';
 
 const ONBOARDING_KEY = 'path_onboarding_done';
 
@@ -115,6 +116,7 @@ export default function OnboardingModal({ onClose }: Props) {
   const { addPerson, persons, updateResume } = useResumeStore();
   const navigate = useNavigate();
   const hasPersons = persons.length > 0;
+  const isMobile = useIsMobile();
 
   async function handleCreate() {
     if (!name.trim()) return;
@@ -175,7 +177,7 @@ export default function OnboardingModal({ onClose }: Props) {
       padding: '20px 16px',
     }}>
       <div className="glass-card animate-scale-in" style={{
-        width: '100%', maxWidth: 440, padding: '32px 28px',
+        width: '100%', maxWidth: 440, padding: isMobile ? '24px 16px' : '32px 28px',
         background: 'var(--modal-bg)',
         border: '1px solid rgba(255,255,255,0.12)',
         boxShadow: '0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)',
@@ -264,7 +266,7 @@ export default function OnboardingModal({ onClose }: Props) {
             </div>
 
             {/* Template grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 18 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: 8, marginBottom: 18 }}>
               {TEMPLATES.map(t => {
                 const isSelected = selectedTemplate === t.id;
                 return (
