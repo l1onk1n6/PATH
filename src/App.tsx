@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { Loader2, Cloud, Loader, ShieldAlert } from 'lucide-react';
 import { useSessionTimeout } from './hooks/useSessionTimeout';
@@ -227,6 +227,20 @@ export default function App() {
       syncTrackerFromCloud();
     }
   }, [user, passwordRecovery, syncFromCloud, syncTrackerFromCloud]);
+
+  // Always redirect to dashboard on fresh login (not on page-refresh with active session)
+  const wasLoggedOut = useRef(false);
+  useEffect(() => {
+    if (!loading && !user && !passwordRecovery) {
+      wasLoggedOut.current = true;
+    }
+    if (!loading && user && !passwordRecovery && wasLoggedOut.current) {
+      wasLoggedOut.current = false;
+      if (window.location.hash !== '#/') {
+        window.location.hash = '/';
+      }
+    }
+  }, [user, loading, passwordRecovery]);
 
   // Process pending referral after login/signup
   useEffect(() => {
