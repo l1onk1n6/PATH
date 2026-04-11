@@ -1,67 +1,122 @@
 // Edge Function: contact-form
-// JWT enforcement: OFF — anonymous submissions allowed (protected by Turnstile)
+// JWT enforcement: REQUIRED — only authenticated users may submit
+//
+// Security layers:
+//   1. JWT authentication  — anonymous calls rejected (401)
+//   2. Honeypot field      — bots filling hidden field rejected silently (200)
+//   3. Cloudflare Turnstile — token verified against Cloudflare API (403)
+//   4. Rate limiting       — max 3 messages per user per 24 h (429)
 //
 // Required Supabase secrets:
 //   TURNSTILE_SECRET_KEY   Cloudflare Turnstile secret key
 //   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM  (already set)
 
+import { createClient } from 'npm:@supabase/supabase-js@2'
 import nodemailer from 'npm:nodemailer@6'
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'content-type',
+  'Access-Control-Allow-Headers': 'authorization, content-type',
 }
 
-const RECIPIENT = 'info@pixmatic.ch'
+const RECIPIENT     = 'info@pixmatic.ch'
+const RATE_LIMIT    = 3          // max submissions
+const RATE_WINDOW_H = 24         // per N hours
+
+function json(body: object, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...CORS, 'Content-Type': 'application/json' },
+  })
+}
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: CORS })
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
+  if (req.method !== 'POST')   return json({ error: 'Method not allowed' }, 405)
+
+  // ── 1. JWT authentication ────────────────────────────────────────────────────
+  const authHeader = req.headers.get('Authorization') ?? ''
+  const token      = authHeader.replace('Bearer ', '').trim()
+
+  if (!token) {
+    return json({ error: 'Nicht angemeldet.', step: 'auth' }, 401)
   }
 
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405, headers: { ...CORS, 'Content-Type': 'application/json' },
-    })
-  }
-
-  let body: { name?: string; email?: string; subject?: string; message?: string; token?: string }
+  let userId: string
   try {
-    body = await req.json()
+    let part = token.split('.')[1]
+    while (part.length % 4 !== 0) part += '='
+    const payload = JSON.parse(atob(part))
+    userId = payload.sub
+    if (!userId) throw new Error('no sub')
   } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
-      status: 400, headers: { ...CORS, 'Content-Type': 'application/json' },
-    })
+    return json({ error: 'Ungültige Sitzung. Bitte neu anmelden.', step: 'auth' }, 401)
   }
 
-  const { name, email, subject, message, token } = body
+  // ── Parse body ───────────────────────────────────────────────────────────────
+  let body: {
+    name?: string; email?: string; subject?: string; message?: string
+    token?: string; _hp?: string
+  }
+  try { body = await req.json() }
+  catch { return json({ error: 'Ungültige Anfrage.', step: 'parse' }, 400) }
 
-  // ── Validate inputs ──────────────────────────────────────────────────────────
-  if (!name?.trim() || !message?.trim() || !token) {
-    return new Response(JSON.stringify({ error: 'Missing required fields' }), {
-      status: 400, headers: { ...CORS, 'Content-Type': 'application/json' },
-    })
+  const { name, email, subject, message, token: turnstileToken, _hp } = body
+
+  // ── 2. Honeypot — bots fill hidden fields, humans don't ─────────────────────
+  if (_hp) {
+    // Silently succeed so bots don't know they were caught
+    return json({ ok: true })
   }
 
-  // ── Verify Cloudflare Turnstile token ────────────────────────────────────────
+  // ── Basic input validation ───────────────────────────────────────────────────
+  if (!name?.trim() || !message?.trim()) {
+    return json({ error: 'Name und Nachricht sind erforderlich.', step: 'validation' }, 400)
+  }
+
+  // ── 3. Cloudflare Turnstile verification ─────────────────────────────────────
   const turnstileSecret = Deno.env.get('TURNSTILE_SECRET_KEY')
   if (!turnstileSecret) {
-    return new Response(JSON.stringify({ error: 'Server misconfigured' }), {
-      status: 500, headers: { ...CORS, 'Content-Type': 'application/json' },
+    // Secret not yet configured — allow in dev, log warning
+    console.warn('TURNSTILE_SECRET_KEY not set — skipping verification')
+  } else {
+    if (!turnstileToken) {
+      return json({ error: 'Sicherheitsprüfung nicht abgeschlossen.', step: 'turnstile' }, 403)
+    }
+    const verifyRes  = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body:    new URLSearchParams({ secret: turnstileSecret, response: turnstileToken }),
     })
+    const verifyData = await verifyRes.json() as { success: boolean; 'error-codes'?: string[] }
+    if (!verifyData.success) {
+      return json({ error: 'Sicherheitsprüfung fehlgeschlagen. Bitte Seite neu laden und erneut versuchen.', step: 'turnstile' }, 403)
+    }
   }
 
-  const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ secret: turnstileSecret, response: token }),
-  })
-  const verifyData = await verifyRes.json() as { success: boolean; 'error-codes'?: string[] }
+  // ── 4. Rate limiting ─────────────────────────────────────────────────────────
+  const admin = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+  )
 
-  if (!verifyData.success) {
-    return new Response(JSON.stringify({ error: 'Turnstile-Verifizierung fehlgeschlagen' }), {
-      status: 403, headers: { ...CORS, 'Content-Type': 'application/json' },
-    })
+  const since = new Date(Date.now() - RATE_WINDOW_H * 60 * 60 * 1000).toISOString()
+  const { count, error: countErr } = await admin
+    .from('contact_log')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .gte('sent_at', since)
+
+  if (countErr) {
+    console.error('rate-limit check failed:', countErr)
+    return json({ error: 'Interner Fehler. Bitte später erneut versuchen.', step: 'ratelimit' }, 500)
+  }
+
+  if ((count ?? 0) >= RATE_LIMIT) {
+    return json({
+      error: `Du hast in den letzten ${RATE_WINDOW_H} Stunden bereits ${RATE_LIMIT} Nachrichten gesendet. Bitte warte etwas.`,
+      step: 'ratelimit',
+    }, 429)
   }
 
   // ── Send email via SMTP ──────────────────────────────────────────────────────
@@ -75,7 +130,7 @@ Deno.serve(async (req) => {
     },
   })
 
-  const replyTo = email?.trim() ? email.trim() : undefined
+  const replyTo = email?.trim() || undefined
 
   await transporter.sendMail({
     from:    Deno.env.get('SMTP_FROM')!,
@@ -102,7 +157,8 @@ Deno.serve(async (req) => {
     `,
   })
 
-  return new Response(JSON.stringify({ ok: true }), {
-    status: 200, headers: { ...CORS, 'Content-Type': 'application/json' },
-  })
+  // ── Log submission for rate limiting ─────────────────────────────────────────
+  await admin.from('contact_log').insert({ user_id: userId })
+
+  return json({ ok: true })
 })

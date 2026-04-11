@@ -735,6 +735,15 @@ function PrivacySection() {
 // ── Section: Contact ───────────────────────────────────────
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
 
+type SendStep = 'idle' | 'sending' | 'sent' | 'error' | 'ratelimit';
+
+const STEP_LABELS: Record<string, string> = {
+  auth:       '🔐 Sitzung wird geprüft…',
+  turnstile:  '🛡️ Sicherheitsprüfung läuft…',
+  ratelimit:  '⏱️ Limit prüfen…',
+  sending:    '📨 Nachricht wird gesendet…',
+};
+
 function ContactSection() {
   const { user } = useAuthStore();
   const isMobile = useIsMobile();
@@ -742,11 +751,14 @@ function ContactSection() {
   const [email, setEmail] = useState(user?.email ?? '');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [hp, setHp] = useState(''); // honeypot — must stay empty
+  const [status, setStatus] = useState<SendStep>('idle');
+  const [stepLabel, setStepLabel] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const widgetRef = useRef<HTMLDivElement>(null);
   const turnstileId = useRef<string | null>(null);
   const [turnstileToken, setTurnstileToken] = useState('');
+  const [turnstileReady, setTurnstileReady] = useState(!TURNSTILE_SITE_KEY);
 
   // Load Turnstile script once
   useEffect(() => {
@@ -756,8 +768,7 @@ function ContactSection() {
       const s = document.createElement('script');
       s.id = 'cf-turnstile-script';
       s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-      s.async = true;
-      s.defer = true;
+      s.async = true; s.defer = true;
       document.head.appendChild(s);
     }
   }, []);
@@ -775,49 +786,68 @@ function ContactSection() {
       turnstileId.current = w.render(widgetRef.current!, {
         sitekey: TURNSTILE_SITE_KEY,
         theme: 'dark',
-        callback: (token: string) => setTurnstileToken(token),
-        'expired-callback': () => setTurnstileToken(''),
+        callback: (t: string) => { setTurnstileToken(t); setTurnstileReady(true); },
+        'expired-callback': () => { setTurnstileToken(''); setTurnstileReady(false); },
+        'error-callback':   () => { setTurnstileToken(''); setTurnstileReady(false); },
       });
     };
     tryRender();
   }, []);
 
+  function resetTurnstile() {
+    const w = (window as unknown as Record<string, unknown>).turnstile as { reset?: (id: string) => void } | undefined;
+    if (w?.reset && turnstileId.current) { w.reset(turnstileId.current); }
+    setTurnstileToken('');
+    setTurnstileReady(false);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!turnstileToken && TURNSTILE_SITE_KEY) {
+    if (TURNSTILE_SITE_KEY && !turnstileReady) {
       setErrorMsg('Bitte warte auf die Sicherheitsprüfung.');
       return;
     }
     setStatus('sending');
     setErrorMsg('');
+    setStepLabel(STEP_LABELS['auth']);
+
     try {
       const { getSupabase } = await import('../lib/supabase');
       const session = (await getSupabase().auth.getSession()).data.session;
+      setStepLabel(STEP_LABELS['turnstile']);
+
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/contact-form`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
-          },
-          body: JSON.stringify({ name, email, subject, message, token: turnstileToken || 'dev' }),
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token ?? ''}` },
+          body: JSON.stringify({ name, email, subject, message, token: turnstileToken || 'dev', _hp: hp }),
         },
       );
+
+      setStepLabel(STEP_LABELS['sending']);
+      const d = await res.json().catch(() => ({})) as { ok?: boolean; error?: string; step?: string };
+
       if (!res.ok) {
-        const d = await res.json().catch(() => ({})) as { error?: string };
-        throw new Error(d.error ?? 'Unbekannter Fehler');
+        if (res.status === 429) {
+          setStatus('ratelimit');
+          setErrorMsg(d.error ?? 'Zu viele Nachrichten. Bitte später erneut versuchen.');
+        } else {
+          setStatus('error');
+          setErrorMsg(d.error ?? 'Unbekannter Fehler. Bitte erneut versuchen.');
+        }
+        resetTurnstile();
+        return;
       }
+
       setStatus('sent');
       setSubject('');
       setMessage('');
-      setTurnstileToken('');
-      // Reset Turnstile widget
-      const w = (window as unknown as Record<string, unknown>).turnstile as { reset?: (id: string) => void } | undefined;
-      if (w?.reset && turnstileId.current) w.reset(turnstileId.current);
-    } catch (err: unknown) {
+      resetTurnstile();
+    } catch {
       setStatus('error');
-      setErrorMsg(err instanceof Error ? err.message : 'Fehler beim Senden');
+      setErrorMsg('Netzwerkfehler. Bitte Verbindung prüfen und erneut versuchen.');
+      resetTurnstile();
     }
   }
 
@@ -840,16 +870,33 @@ function ContactSection() {
               <CheckCircle size={22} style={{ color: 'var(--ios-green)' }} />
             </div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Nachricht gesendet</div>
-              <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Wir melden uns bald bei dir.</div>
+              <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>Nachricht gesendet ✓</div>
+              <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 4 }}>Wir melden uns bald bei dir.</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Eine Kopie wurde an info@pixmatic.ch weitergeleitet.</div>
             </div>
-            <button className="btn-glass btn-sm" onClick={() => setStatus('idle')}>Neue Nachricht</button>
+            <button className="btn-glass btn-sm" onClick={() => { setStatus('idle'); setStepLabel(''); }}>Neue Nachricht</button>
+          </div>
+        ) : status === 'ratelimit' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '24px 0', textAlign: 'center' }}>
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(255,159,10,0.1)', border: '1px solid rgba(255,159,10,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>⏱️</div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 6 }}>Limit erreicht</div>
+              <div style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 320 }}>{errorMsg}</div>
+            </div>
+            <button className="btn-glass btn-sm" onClick={() => { setStatus('idle'); setErrorMsg(''); setStepLabel(''); }}>Zurück</button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {/* Honeypot — hidden from real users, bots fill this */}
+            <input
+              type="text" value={hp} onChange={e => setHp(e.target.value)}
+              tabIndex={-1} aria-hidden="true" autoComplete="off"
+              style={{ position: 'absolute', left: -9999, width: 1, height: 1, opacity: 0 }}
+            />
+
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
               <div>
-                <label className="section-label">Name</label>
+                <label className="section-label">Name *</label>
                 <input className="input-glass" value={name} onChange={e => setName(e.target.value)} placeholder="Dein Name" required maxLength={100} />
               </div>
               <div>
@@ -868,26 +915,42 @@ function ContactSection() {
                 value={message}
                 onChange={e => setMessage(e.target.value)}
                 placeholder="Beschreibe dein Anliegen…"
-                required
-                maxLength={2000}
+                required maxLength={2000}
                 rows={isMobile ? 5 : 7}
                 style={{ resize: 'vertical', minHeight: 100 }}
               />
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, textAlign: 'right' }}>{message.length}/2000</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, textAlign: 'right' }}>
+                {message.length}/2000
+              </div>
             </div>
 
             {/* Turnstile widget */}
             {TURNSTILE_SITE_KEY ? (
-              <div ref={widgetRef} style={{ marginTop: 4 }} />
+              <div>
+                <div ref={widgetRef} />
+                {!turnstileReady && (
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6, display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> Sicherheitsprüfung wird geladen…
+                  </div>
+                )}
+              </div>
             ) : (
               <div style={{ fontSize: 11, color: 'var(--text-muted)', padding: '8px 12px', background: 'rgba(255,159,10,0.08)', border: '1px solid rgba(255,159,10,0.2)', borderRadius: 8 }}>
-                ⚠️ VITE_TURNSTILE_SITE_KEY nicht gesetzt — Turnstile inaktiv
+                ⚠️ VITE_TURNSTILE_SITE_KEY nicht gesetzt — Turnstile inaktiv (dev-Modus)
               </div>
             )}
 
-            {errorMsg && (
+            {/* Inline step feedback while sending */}
+            {status === 'sending' && stepLabel && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-secondary)', padding: '8px 12px', background: 'rgba(0,122,255,0.06)', border: '1px solid rgba(0,122,255,0.15)', borderRadius: 8 }}>
+                <Loader2 size={13} style={{ animation: 'spin 1s linear infinite', flexShrink: 0 }} />
+                {stepLabel}
+              </div>
+            )}
+
+            {status === 'error' && errorMsg && (
               <div style={{ fontSize: 13, color: 'var(--ios-red)', padding: '8px 12px', background: 'rgba(255,59,48,0.08)', border: '1px solid rgba(255,59,48,0.2)', borderRadius: 8 }}>
-                {errorMsg}
+                ⚠️ {errorMsg}
               </div>
             )}
 
