@@ -436,7 +436,7 @@ export default function Dashboard() {
       {/* Stats Row */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(150px, 1fr))',
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(140px, 1fr))',
         gap: isMobile ? 10 : 16,
         marginBottom: isMobile ? 18 : 28,
       }}>
