@@ -14,6 +14,7 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 import { getPdfExportCount } from '../lib/pdfExports';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 import { resetOnboarding } from '../components/ui/OnboardingModal';
+import { toast } from '../components/ui/Toast';
 import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../store/uiStore';
 
@@ -446,6 +447,7 @@ function ReferralSection() {
     navigator.clipboard.writeText(refLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    toast.success('linkCopied');
   }
 
   const BONUS_MILESTONE = 5;

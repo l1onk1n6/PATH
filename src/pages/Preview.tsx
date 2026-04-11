@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FolderDown, Lock, Share2 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useResumeStore } from '../store/resumeStore';
+import { toast } from '../components/ui/Toast';
 import ProGate from '../components/ui/ProGate';
 import ResumePreview from '../components/templates/ResumePreview';
 import ShareLinksPanel from '../components/editor/ShareLinksPanel';
@@ -293,7 +294,7 @@ export default function Preview() {
   const resume = getActiveResume();
   const [zoom, setZoom] = useState(isMobile ? 0.42 : 1.0);
   const [exporting, setExporting] = useState(false);
-  const [exportError, setExportError] = useState<string | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null); // kept for compat
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const [showPasswordSoon, setShowPasswordSoon] = useState(false);
   const [showSharePanel, setShowSharePanel] = useState(false);
@@ -314,11 +315,10 @@ export default function Preview() {
   const handleExport = async () => {
     if (!resumePageRef.current || exporting) return;
     if (!canExportPdf(limits.pdfExportsPerMonth)) {
-      setExportError(`PDF-Export-Limit erreicht (${limits.pdfExportsPerMonth}/Monat). Upgrade auf Pro für mehr Exporte.`);
+      toast.error('errorLimit');
       return;
     }
     setExporting(true);
-    setExportError(null);
     try {
       const { pdfBytes } = await renderElementToPdfDoc(resumePageRef.current);
       const blob = new Blob([pdfBytes as BlobPart], { type: 'application/pdf' });
@@ -329,7 +329,8 @@ export default function Preview() {
       a.download = `${first}${last}_CV.pdf`;
       a.click(); URL.revokeObjectURL(url);
       await incrementPdfExport();
-    } catch (err) { console.error('PDF export failed:', err); }
+      toast.success('pdfExported');
+    } catch (err) { console.error('PDF export failed:', err); toast.error('errorPdf'); }
     finally { setExporting(false); }
   };
 
@@ -337,11 +338,10 @@ export default function Preview() {
   const handleExportMappe = async () => {
     if (exporting) return;
     if (!canExportPdf(limits.pdfExportsPerMonth)) {
-      setExportError(`PDF-Export-Limit erreicht (${limits.pdfExportsPerMonth}/Monat). Upgrade auf Pro für mehr Exporte.`);
+      toast.error('errorLimit');
       return;
     }
     setExporting(true);
-    setExportError(null);
     try {
       const elements: HTMLElement[] = [];
 
@@ -363,7 +363,8 @@ export default function Preview() {
       a.download = buildFilename(resume);
       a.click(); URL.revokeObjectURL(url);
       await incrementPdfExport();
-    } catch (err) { console.error('Mappe export failed:', err); }
+      toast.success('pdfExported');
+    } catch (err) { console.error('Mappe export failed:', err); toast.error('errorPdf'); }
     finally { setExporting(false); }
   };
 
@@ -1159,22 +1160,6 @@ export default function Preview() {
         </>
       )}
 
-      {/* Export error toast */}
-      {exportError && (
-        <div style={{
-          position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
-          zIndex: 300, padding: '12px 20px', borderRadius: 12,
-          background: 'rgba(255,59,48,0.95)', backdropFilter: 'blur(12px)',
-          color: '#fff', fontSize: 13, fontWeight: 500,
-          display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-          maxWidth: '90vw',
-        }}>
-          <span>{exportError}</span>
-          <button onClick={() => setExportError(null)} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', opacity: 0.7, padding: 2 }}>
-            <X size={14} />
-          </button>
-        </div>
-      )}
 
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>

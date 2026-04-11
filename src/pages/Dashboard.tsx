@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -23,6 +23,7 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 import { UpgradeModal } from '../components/ui/ProGate';
 import { usePlan } from '../lib/plan';
 import { getPdfExportCount } from '../lib/pdfExports';
+import { toast } from '../components/ui/Toast';
 
 const ALL_STATUSES: ApplicationStatus[] = ['entwurf', 'gesendet', 'interview', 'abgelehnt', 'angenommen'];
 
@@ -237,6 +238,11 @@ export default function Dashboard() {
   const [addingResumeForPersonId, setAddingResumeForPersonId] = useState<string | null>(null);
   const [newResumeName, setNewResumeName] = useState('');
 
+  // Bubble store limit errors into global toast
+  useEffect(() => {
+    if (limitError) { toast.error('errorLimit'); clearLimitError(); }
+  }, [limitError, clearLimitError]);
+
   const [renamingResumeId, setRenamingResumeId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
 
@@ -315,22 +321,6 @@ export default function Dashboard() {
   return (
     <div className="animate-fade-in" style={{ height: '100%', overflow: 'auto', padding: isMobile ? '0 0 16px' : '0 2px 16px' }}>
 
-      {/* Limit error toast */}
-      {limitError && (
-        <div style={{
-          position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
-          zIndex: 300, padding: '12px 20px', borderRadius: 12,
-          background: 'rgba(255,59,48,0.95)', backdropFilter: 'blur(12px)',
-          color: '#fff', fontSize: 13, fontWeight: 500,
-          display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-          maxWidth: '90vw',
-        }}>
-          <span>{limitError}</span>
-          <button onClick={clearLimitError} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', opacity: 0.7, padding: 2 }}>
-            <X size={14} />
-          </button>
-        </div>
-      )}
 
       {/* Status menu overlay */}
       {statusMenuResumeId && (

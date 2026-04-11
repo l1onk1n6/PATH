@@ -19,6 +19,7 @@ import { useTrackerStore } from './store/trackerStore';
 import { isSupabaseConfigured, getSupabase } from './lib/supabase';
 import { useIsMobile } from './hooks/useBreakpoint';
 import OnboardingModal, { isOnboardingDone } from './components/ui/OnboardingModal';
+import { ToastContainer } from './components/ui/Toast';
 
 
 function AppShell() {
@@ -118,6 +119,9 @@ function AppShell() {
           </div>
         </div>
       </div>
+
+      {/* ── Global toasts ─────────────────────────────────── */}
+      <ToastContainer />
 
       {/* ── Onboarding ────────────────────────────────────── */}
       {showOnboarding && (

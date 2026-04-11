@@ -6,6 +6,7 @@ import { isSupabaseConfigured } from '../../lib/supabase';
 import { usePlan } from '../../lib/plan';
 import { useIsMobile } from '../../hooks/useBreakpoint';
 import ProGate from '../ui/ProGate';
+import { toast } from '../ui/Toast';
 
 const FLAG: Record<string, string> = {
   AT: '🇦🇹', CH: '🇨🇭', DE: '🇩🇪', US: '🇺🇸', GB: '🇬🇧', FR: '🇫🇷', IT: '🇮🇹',
@@ -214,6 +215,7 @@ export default function ShareLinksPanel({ resumeId, readOnly }: Props) {
     navigator.clipboard.writeText(shareUrl(token));
     setCopied(token);
     setTimeout(() => setCopied(null), 2000);
+    toast.success('linkCopied');
   }
 
   async function create() {
