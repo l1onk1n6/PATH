@@ -107,7 +107,7 @@ function KanbanCard({
   return (
     <div
       className="glass-card"
-      style={{ padding: 0, overflow: 'hidden', fontSize: 13 }}
+      style={{ padding: 0, overflow: 'visible', fontSize: 13 }}
     >
       {/* Compact summary */}
       <div style={{ padding: '10px 12px' }}>
@@ -389,9 +389,8 @@ function KanbanBoard({
           <div
             key={status}
             style={{
-              minWidth: 200,
-              width: 220,
-              flexShrink: 0,
+              flex: '1 1 160px',
+              minWidth: 160,
               display: 'flex',
               flexDirection: 'column',
               gap: 0,
