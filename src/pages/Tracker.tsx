@@ -101,7 +101,7 @@ function KanbanCard({
   removeApplication,
 }: KanbanCardProps) {
   const [showStatusMenu, setShowStatusMenu] = useState(false);
-  const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
   const statusBtnRef = useRef<HTMLButtonElement>(null);
   const appType: ApplicationType = app.type ?? 'online';
   const linkedResume = app.resumeId ? resumes.find((r) => r.id === app.resumeId) : null;
@@ -146,7 +146,7 @@ function KanbanCard({
                   e.stopPropagation();
                   if (!showStatusMenu && statusBtnRef.current) {
                     const r = statusBtnRef.current.getBoundingClientRect();
-                    setMenuPos({ top: r.bottom + 4, right: window.innerWidth - r.right });
+                    setMenuPos({ top: r.bottom + 4, left: Math.max(4, r.right - 154) });
                   }
                   setShowStatusMenu((v) => !v);
                 }}
@@ -165,7 +165,7 @@ function KanbanCard({
                     style={{
                       position: 'fixed',
                       top: menuPos.top,
-                      right: menuPos.right,
+                      left: menuPos.left,
                       zIndex: 100,
                       background: 'var(--glass-bg, rgba(30,30,40,0.97))',
                       border: '1px solid rgba(255,255,255,0.12)',
