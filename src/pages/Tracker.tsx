@@ -155,7 +155,6 @@ function KanbanCard({
                 <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
               ))}
             </select>
-            </div>
 
             <button
               className="btn-glass btn-icon"
