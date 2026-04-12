@@ -5,6 +5,7 @@ import { useSessionTimeout } from './hooks/useSessionTimeout';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 import ErrorBoundary from './components/ErrorBoundary';
+import ScrollToTop from './components/ScrollToTop';
 import { useAuthStore } from './store/authStore';
 import { useResumeStore } from './store/resumeStore';
 import { useTrackerStore } from './store/trackerStore';
@@ -39,9 +40,21 @@ function AppShell() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => !isOnboardingDone());
-  const { savePending, syncing } = useResumeStore();
+  const { savePending, syncing, flushSaves } = useResumeStore();
   const { signOut } = useAuthStore();
   const { countdown, stayLoggedIn } = useSessionTimeout(signOut);
+
+  // Cmd+S / Ctrl+S → flush any pending auto-saves immediately
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        flushSaves();
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [flushSaves]);
 
   // Close drawer on resize to desktop
   useEffect(() => {
@@ -122,6 +135,7 @@ function AppShell() {
           <div style={{ flex: 1, overflow: 'hidden' }}>
             <ErrorBoundary>
               <Suspense fallback={<PageSpinner />}>
+                <ScrollToTop />
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/editor" element={<Editor />} />

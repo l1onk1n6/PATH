@@ -41,7 +41,7 @@ async function getCurrentPlan() {
 }
 
 // ── Debounce helper with savePending tracking ─────────────
-const debounceMap = new Map<string, ReturnType<typeof setTimeout>>();
+const debounceMap = new Map<string, { timeout: ReturnType<typeof setTimeout>; fn: () => void }>();
 let pendingCount = 0;
 // Will be set after store creation to update savePending state
 let notifySaving: ((v: boolean) => void) | null = null;
@@ -49,17 +49,28 @@ let notifySaving: ((v: boolean) => void) | null = null;
 function queueSave(key: string, fn: () => void, ms = 1200) {
   const isNew = !debounceMap.has(key);
   const existing = debounceMap.get(key);
-  if (existing) clearTimeout(existing);
+  if (existing) clearTimeout(existing.timeout);
   if (isNew) {
     pendingCount++;
     notifySaving?.(true);
   }
-  debounceMap.set(key, setTimeout(() => {
-    fn();
-    debounceMap.delete(key);
-    pendingCount = Math.max(0, pendingCount - 1);
-    if (pendingCount === 0) notifySaving?.(false);
-  }, ms));
+  debounceMap.set(key, {
+    fn,
+    timeout: setTimeout(() => {
+      fn();
+      debounceMap.delete(key);
+      pendingCount = Math.max(0, pendingCount - 1);
+      if (pendingCount === 0) notifySaving?.(false);
+    }, ms),
+  });
+}
+
+/** Immediately execute all pending debounced saves (called on Cmd+S). */
+function flushAllSaves() {
+  debounceMap.forEach(({ timeout, fn }) => { clearTimeout(timeout); fn(); });
+  debounceMap.clear();
+  pendingCount = 0;
+  notifySaving?.(false);
 }
 
 // ── Types ─────────────────────────────────────────────────
@@ -75,6 +86,7 @@ interface ResumeStore {
 
   // Cloud sync
   syncFromCloud: () => Promise<void>;
+  flushSaves: () => void;
 
   // Person actions
   addPerson: (name: string) => Promise<Person | null>;
@@ -163,6 +175,8 @@ export const useResumeStore = create<ResumeStore>()(
       activeSection: 'personal', syncing: false, savePending: false, limitError: null,
 
       // ── Cloud sync ──────────────────────────────────────
+      flushSaves: () => { flushAllSaves(); },
+
       syncFromCloud: async () => {
         notifySaving = (v) => set({ savePending: v });
         set({ syncing: true });

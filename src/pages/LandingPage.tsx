@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { LogoIcon } from '../components/layout/Logo';
 import AuthPage from './AuthPage';
 import { useIsMobile } from '../hooks/useBreakpoint';
@@ -573,6 +573,9 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Comparison Table ────────────────────────────────── */}
+      <ComparisonTable isMobile={isMobile} />
+
       {/* ── Testimonials / Trust ────────────────────────────── */}
       <section aria-label="Kundenstimmen" style={{
         padding: isMobile ? '60px 24px' : '80px 48px',
@@ -752,6 +755,162 @@ function FaqSection({ isMobile }: { isMobile: boolean }) {
                   {a}
                 </div>
               )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const COMPARISON_ROWS = [
+  {
+    feature: 'Bewerbungsvorlagen (CV-optimiert)',
+    path: { ok: 'yes', label: '15+ Templates' },
+    word: { ok: 'partial', label: 'Wenige, generisch' },
+    canva: { ok: 'partial', label: 'Nicht CV-optimiert' },
+  },
+  {
+    feature: 'KI-Anschreiben generieren',
+    path: { ok: 'yes', label: 'Claude AI' },
+    word: { ok: 'no', label: 'Nicht vorhanden' },
+    canva: { ok: 'no', label: 'Nicht vorhanden' },
+  },
+  {
+    feature: '1-Klick PDF-Export',
+    path: { ok: 'yes', label: 'Pixelgenau' },
+    word: { ok: 'partial', label: 'Oft Layoutprobleme' },
+    canva: { ok: 'partial', label: 'Begrenzt' },
+  },
+  {
+    feature: 'Strukturierte Daten (kein Copy-Paste)',
+    path: { ok: 'yes', label: 'Intelligenter Editor' },
+    word: { ok: 'no', label: 'Nur freier Text' },
+    canva: { ok: 'no', label: 'Nur freier Text' },
+  },
+  {
+    feature: 'Bewerbungs-Tracker',
+    path: { ok: 'yes', label: 'Integriert' },
+    word: { ok: 'no', label: 'Nicht vorhanden' },
+    canva: { ok: 'no', label: 'Nicht vorhanden' },
+  },
+  {
+    feature: 'Online teilen (öffentlicher Link)',
+    path: { ok: 'yes', label: 'Direktlink' },
+    word: { ok: 'no', label: 'Nicht möglich' },
+    canva: { ok: 'partial', label: 'Nur mit Konto' },
+  },
+  {
+    feature: 'Kostenlos nutzbar',
+    path: { ok: 'yes', label: 'Free-Plan inklusive' },
+    word: { ok: 'partial', label: 'Microsoft 365 Abo' },
+    canva: { ok: 'partial', label: 'Free Plan, begrenzt' },
+  },
+  {
+    feature: 'DSGVO-konform (EU-Server)',
+    path: { ok: 'yes', label: 'AWS Frankfurt' },
+    word: { ok: 'partial', label: 'US-Cloud (Microsoft)' },
+    canva: { ok: 'partial', label: 'US-Cloud (Canva)' },
+  },
+];
+
+type OkStatus = 'yes' | 'partial' | 'no';
+
+function StatusIcon({ ok }: { ok: OkStatus }) {
+  if (ok === 'yes') return <span style={{ color: '#34C759', fontWeight: 700, fontSize: 16 }}>✓</span>;
+  if (ok === 'partial') return <span style={{ color: '#FF9F0A', fontWeight: 700, fontSize: 14 }}>~</span>;
+  return <span style={{ color: '#FF3B30', fontWeight: 700, fontSize: 16 }}>✕</span>;
+}
+
+function ComparisonTable({ isMobile }: { isMobile: boolean }) {
+  const colStyle = (highlight: boolean): React.CSSProperties => ({
+    flex: 1,
+    minWidth: 0,
+    textAlign: 'center',
+    padding: highlight ? '10px 12px' : '10px 8px',
+    background: highlight ? 'rgba(0,122,255,0.07)' : 'transparent',
+    borderLeft: highlight ? '1px solid rgba(0,122,255,0.2)' : '1px solid rgba(255,255,255,0.06)',
+  });
+
+  return (
+    <section style={{
+      padding: isMobile ? '80px 24px' : '100px 48px',
+      borderTop: '1px solid rgba(255,255,255,0.06)',
+    }}>
+      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 52 }}>
+          <h2 style={{ fontSize: isMobile ? 28 : 40, fontWeight: 800, margin: '0 0 14px', letterSpacing: '-0.7px' }}>
+            PATH vs. Word vs. Canva
+          </h2>
+          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.45)', margin: 0, lineHeight: 1.6 }}>
+            Warum PATH die bessere Wahl für deine Bewerbung ist.
+          </p>
+        </div>
+
+        <div style={{
+          borderRadius: 20, overflow: 'hidden',
+          border: '1px solid rgba(255,255,255,0.1)',
+          background: 'rgba(255,255,255,0.03)',
+        }}>
+          {/* Header row */}
+          <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ flex: isMobile ? 1.4 : 2, padding: '14px 16px', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>
+              FUNKTION
+            </div>
+            <div style={{ ...colStyle(true), borderLeft: '1px solid rgba(0,122,255,0.2)' }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>PATH</div>
+              <div style={{ fontSize: 10, color: 'rgba(0,122,255,0.8)', fontWeight: 600 }}>Empfohlen</div>
+            </div>
+            <div style={{ ...colStyle(false), borderLeft: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)' }}>Word</div>
+            </div>
+            <div style={{ ...colStyle(false) }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)' }}>Canva</div>
+            </div>
+          </div>
+
+          {/* Data rows */}
+          {COMPARISON_ROWS.map(({ feature, path, word, canva }, i) => (
+            <div key={feature} style={{
+              display: 'flex', alignItems: 'stretch',
+              borderBottom: i < COMPARISON_ROWS.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+              transition: 'background 0.15s',
+            }}
+              onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.025)'}
+              onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = 'transparent'}
+            >
+              <div style={{ flex: isMobile ? 1.4 : 2, padding: '14px 16px', fontSize: 13, color: 'rgba(255,255,255,0.75)', alignSelf: 'center', lineHeight: 1.4 }}>
+                {feature}
+              </div>
+              {/* PATH cell */}
+              <div style={{ ...colStyle(true), display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                <StatusIcon ok={path.ok as OkStatus} />
+                {!isMobile && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', lineHeight: 1.3 }}>{path.label}</div>}
+              </div>
+              {/* Word cell */}
+              <div style={{ ...colStyle(false), display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                <StatusIcon ok={word.ok as OkStatus} />
+                {!isMobile && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', lineHeight: 1.3 }}>{word.label}</div>}
+              </div>
+              {/* Canva cell */}
+              <div style={{ ...colStyle(false), display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                <StatusIcon ok={canva.ok as OkStatus} />
+                {!isMobile && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', lineHeight: 1.3 }}>{canva.label}</div>}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Legend */}
+        <div style={{ display: 'flex', gap: 20, justifyContent: 'center', marginTop: 20, flexWrap: 'wrap' }}>
+          {[
+            { icon: '✓', color: '#34C759', label: 'Vollständig vorhanden' },
+            { icon: '~', color: '#FF9F0A', label: 'Eingeschränkt' },
+            { icon: '✕', color: '#FF3B30', label: 'Nicht vorhanden' },
+          ].map(({ icon, color, label }) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+              <span style={{ color, fontWeight: 700 }}>{icon}</span>
+              {label}
             </div>
           ))}
         </div>

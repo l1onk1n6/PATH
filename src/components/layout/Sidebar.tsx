@@ -400,7 +400,12 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
                                 </button>
                               )}
                               {personResumes.length > 1 && (
-                                <button onClick={() => { deleteResume(resume.id); toast.success('resumeDeleted'); }}
+                                <button onClick={() => {
+                                  if (window.confirm(`"${resume.name || 'Bewerbungsmappe'}" wirklich löschen?`)) {
+                                    deleteResume(resume.id);
+                                    toast.success('resumeDeleted');
+                                  }
+                                }}
                                   style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, opacity: 0.35, color: 'inherit', flexShrink: 0, display: 'flex' }}>
                                   <Trash2 size={10} />
                                 </button>
