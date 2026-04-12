@@ -1,5 +1,5 @@
 // Edge Function: contact-form
-// JWT enforcement: REQUIRED — only authenticated users may submit
+// JWT enforcement: handled in code via admin.auth.getUser() — gateway runs with --no-verify-jwt
 //
 // Security layers:
 //   1. JWT authentication  — anonymous calls rejected (401)
@@ -34,6 +34,12 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
   if (req.method !== 'POST')   return json({ error: 'Method not allowed' }, 405)
 
+  // Admin client — used for JWT verification and rate limiting
+  const admin = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+  )
+
   // ── 1. JWT authentication ────────────────────────────────────────────────────
   const authHeader = req.headers.get('Authorization') ?? ''
   const token      = authHeader.replace('Bearer ', '').trim()
@@ -42,17 +48,13 @@ Deno.serve(async (req) => {
     return json({ error: 'Nicht angemeldet.', step: 'auth' }, 401)
   }
 
-  let userId: string
-  try {
-    let part = token.split('.')[1]
-    part = part.replace(/-/g, '+').replace(/_/g, '/') // base64url → base64
-    while (part.length % 4 !== 0) part += '='
-    const payload = JSON.parse(atob(part))
-    userId = payload.sub
-    if (!userId) throw new Error('no sub')
-  } catch {
+  // Use Supabase admin client to verify the token — authoritative and handles all JWT formats
+  const { data: { user: authUser }, error: authError } = await admin.auth.getUser(token)
+  if (authError || !authUser) {
+    console.error('JWT verification failed:', authError?.message)
     return json({ error: 'Ungültige Sitzung. Bitte neu anmelden.', step: 'auth' }, 401)
   }
+  const userId = authUser.id
 
   // ── Parse body ───────────────────────────────────────────────────────────────
   let body: {
@@ -96,11 +98,6 @@ Deno.serve(async (req) => {
   }
 
   // ── 4. Rate limiting ─────────────────────────────────────────────────────────
-  const admin = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-  )
-
   const since = new Date(Date.now() - RATE_WINDOW_H * 60 * 60 * 1000).toISOString()
   const { count, error: countErr } = await admin
     .from('contact_log')

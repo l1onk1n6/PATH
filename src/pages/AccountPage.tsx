@@ -810,7 +810,14 @@ function ContactSection() {
 
     try {
       const { getSupabase } = await import('../lib/supabase');
-      const session = (await getSupabase().auth.getSession()).data.session;
+      const supabase = getSupabase();
+      // getSession() auto-refreshes expired access tokens via the refresh token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        setStatus('error');
+        setErrorMsg('Sitzung abgelaufen. Bitte neu anmelden.');
+        return;
+      }
       setStepLabel(STEP_LABELS['turnstile']);
 
       const res = await fetch(
