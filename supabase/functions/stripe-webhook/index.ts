@@ -6,19 +6,40 @@ import Stripe from 'npm:stripe@14'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
 Deno.serve(async (req) => {
+  // ── Validate required secrets are configured ─────────────────────────────
+  const stripeKey     = Deno.env.get('STRIPE_SECRET_KEY')
+  const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
+
+  if (!stripeKey || !webhookSecret) {
+    console.error('stripe-webhook: missing required env vars', {
+      hasStripeKey: !!stripeKey,
+      hasWebhookSecret: !!webhookSecret,
+    })
+    return new Response('Webhook not configured', { status: 500 })
+  }
+
+  // ── Read raw body before anything else (required for signature check) ────
   const body = await req.text()
   const sig  = req.headers.get('stripe-signature') ?? ''
 
-  const stripe        = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!)
-  const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')!
+  if (!sig) {
+    console.warn('stripe-webhook: missing stripe-signature header')
+    return new Response('Missing signature', { status: 400 })
+  }
 
+  const stripe = new Stripe(stripeKey)
+
+  // ── Verify Stripe signature ───────────────────────────────────────────────
   let event: Stripe.Event
   try {
     event = await stripe.webhooks.constructEventAsync(body, sig, webhookSecret)
   } catch (err) {
-    console.error('Signature verification failed:', err)
-    return new Response(`Webhook Error: ${err}`, { status: 400 })
+    // Log the real error server-side but don't expose internals to caller
+    console.error('stripe-webhook: signature verification failed:', err)
+    return new Response('Webhook signature verification failed', { status: 400 })
   }
+
+  console.log(`stripe-webhook: received ${event.type} (${event.id})`)
 
   const admin = createClient(
     Deno.env.get('SUPABASE_URL')!,

@@ -296,7 +296,7 @@ export default function LandingPage() {
         </div>
 
         {/* Right: mock UI */}
-        {!isMobile && <MockAppPreview />}
+        {!isMobile && <TemplateShowcasePreview />}
       </section>
 
       {/* ── Stats bar ───────────────────────────────────────── */}
@@ -918,85 +918,132 @@ function ComparisonTable({ isMobile }: { isMobile: boolean }) {
   );
 }
 
-function MockAppPreview() {
+/** Three overlapping CV template cards — realistic layout previews */
+function TemplateShowcasePreview() {
+  // Sidebar card: corporate blue
+  const SidebarCard = ({ bg, sidebarBg, accent, widths, top, left, rotate, zIndex, animated }: {
+    bg: string; sidebarBg: string; accent: string; widths: number[];
+    top: number; left: number; rotate: number; zIndex: number; animated?: boolean;
+  }) => (
+    <div style={{
+      position: 'absolute', top, left, width: 220, height: 275,
+      borderRadius: 12, overflow: 'hidden',
+      boxShadow: animated
+        ? '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)'
+        : '0 12px 40px rgba(0,0,0,0.5)',
+      transform: `rotate(${rotate}deg)`,
+      zIndex,
+      animation: animated ? 'float 5s ease-in-out infinite' : undefined,
+    }}>
+      <div style={{ display: 'flex', height: '100%' }}>
+        {/* Sidebar */}
+        <div style={{ width: '36%', background: sidebarBg, padding: '14px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
+          <div style={{ width: 26, height: 26, borderRadius: '50%', background: accent, marginBottom: 6 }} />
+          <div style={{ height: 3, width: '85%', background: 'rgba(255,255,255,0.6)', borderRadius: 2 }} />
+          <div style={{ height: 2, width: '65%', background: 'rgba(255,255,255,0.35)', borderRadius: 2 }} />
+          <div style={{ height: 1, width: '80%', background: `${accent}88`, borderRadius: 2, marginTop: 3, marginBottom: 3 }} />
+          {[70, 55, 65, 50, 60].map((w, i) => (
+            <div key={i} style={{ height: 9, width: `${w}%`, background: `${accent}25`, borderRadius: 4 }} />
+          ))}
+        </div>
+        {/* Main area */}
+        <div style={{ flex: 1, background: bg, padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+          <div style={{ height: 5, width: '68%', background: '#444', borderRadius: 2 }} />
+          <div style={{ height: 3, width: '46%', background: accent, borderRadius: 2, opacity: 0.8, marginBottom: 3 }} />
+          <div style={{ height: 1.5, width: '38%', background: accent, borderRadius: 2, opacity: 0.5 }} />
+          <div style={{ height: 1, width: '100%', background: '#e0e0e0', borderRadius: 2 }} />
+          {widths.map((w, i) => (
+            <div key={i} style={{ height: 2.5, width: `${w}%`, background: i === 0 ? '#555' : '#ccc', borderRadius: 2 }} />
+          ))}
+          <div style={{ height: 1.5, width: '32%', background: accent, borderRadius: 2, opacity: 0.5, marginTop: 3 }} />
+          <div style={{ height: 1, width: '100%', background: '#e0e0e0', borderRadius: 2 }} />
+          {[82, 70, 60].map((w, i) => (
+            <div key={i} style={{ height: 2.5, width: `${w}%`, background: '#ccc', borderRadius: 2 }} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div style={{ flex: '0 0 auto', width: 340, position: 'relative' }}>
-      {/* Glow behind card */}
+    <div style={{ flex: '0 0 auto', width: 370, height: 330, position: 'relative' }}>
+      {/* Ambient glow */}
       <div style={{
         position: 'absolute', inset: -40,
-        background: 'radial-gradient(ellipse at center, rgba(0,122,255,0.2) 0%, transparent 70%)',
+        background: 'radial-gradient(ellipse at center, rgba(0,122,255,0.18) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
 
-      {/* Main card */}
+      {/* Back card — Corporate blue, rotated right */}
+      <SidebarCard
+        bg="#f8f9fa" sidebarBg="#1e3a5f" accent="#f0c040"
+        widths={[88, 78, 68, 80, 65]} top={30} left={10} rotate={7} zIndex={1}
+      />
+
+      {/* Middle card — Creative purple, slight tilt */}
+      <SidebarCard
+        bg="#fff" sidebarBg="#2d1b69" accent="#7209b7"
+        widths={[85, 75, 65, 76, 60]} top={18} left={55} rotate={-3} zIndex={2}
+      />
+
+      {/* Front card — Minimal light header, straight, animated */}
       <div style={{
-        background: 'rgba(255,255,255,0.07)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        border: '1px solid rgba(255,255,255,0.15)',
-        borderRadius: 24,
-        padding: 24,
-        boxShadow: '0 24px 80px rgba(0,0,0,0.4)',
+        position: 'absolute', top: 0, left: 95, width: 245, height: 305,
+        borderRadius: 14, overflow: 'hidden', zIndex: 3,
+        boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)',
         animation: 'float 5s ease-in-out infinite',
-        position: 'relative', zIndex: 1,
       }}>
-        {/* Top bar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #34C759, #00C7BE)', flexShrink: 0 }} />
+        {/* Gradient header */}
+        <div style={{
+          height: 58, background: 'linear-gradient(135deg,#007AFF,#5856D6)',
+          padding: '10px 14px', display: 'flex', alignItems: 'flex-end', gap: 10,
+        }}>
+          <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700 }}>Max Mustermann</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Softwareentwickler</div>
-          </div>
-          <div style={{ marginLeft: 'auto', fontSize: 10, padding: '3px 8px', borderRadius: 99, background: 'rgba(0,122,255,0.2)', border: '1px solid rgba(0,122,255,0.3)', color: 'var(--ios-blue)' }}>
-            Modern
+            <div style={{ height: 5, width: 88, background: 'rgba(255,255,255,0.92)', borderRadius: 2 }} />
+            <div style={{ height: 3, width: 58, background: 'rgba(255,255,255,0.55)', borderRadius: 2, marginTop: 4 }} />
           </div>
         </div>
-
-        {/* Progress/sections */}
-        {[
-          { label: 'Persönliche Daten', pct: 100, color: '#34C759' },
-          { label: 'Berufserfahrung', pct: 80, color: '#007AFF' },
-          { label: 'Ausbildung', pct: 100, color: '#34C759' },
-          { label: 'Fähigkeiten', pct: 60, color: '#FF9F0A' },
-          { label: 'Anschreiben', pct: 45, color: '#AF52DE' },
-        ].map(({ label, pct, color }) => (
-          <div key={label} style={{ marginBottom: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 5, color: 'rgba(255,255,255,0.6)' }}>
-              <span>{label}</span>
-              <span style={{ color }}>{pct}%</span>
-            </div>
-            <div style={{ height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 2, opacity: 0.8 }} />
-            </div>
+        {/* Contact strip */}
+        <div style={{ background: 'rgba(0,122,255,0.06)', padding: '5px 14px', display: 'flex', gap: 8 }}>
+          {[55, 40, 50].map((w, i) => (
+            <div key={i} style={{ height: 2, width: w, background: 'rgba(0,0,0,0.2)', borderRadius: 2 }} />
+          ))}
+        </div>
+        {/* Body */}
+        <div style={{ background: '#f8f9fa', padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+          <div style={{ height: 2.5, width: 68, background: '#007AFF', borderRadius: 2, opacity: 0.75 }} />
+          <div style={{ height: 1, width: '100%', background: '#ddd', borderRadius: 2, marginBottom: 2 }} />
+          <div style={{ height: 4, width: '65%', background: '#444', borderRadius: 2 }} />
+          <div style={{ height: 2.5, width: '45%', background: '#888', borderRadius: 2 }} />
+          {[88, 80, 72, 80].map((w, i) => (
+            <div key={i} style={{ height: 2, width: `${w}%`, background: '#ccc', borderRadius: 2 }} />
+          ))}
+          <div style={{ height: 2.5, width: 54, background: '#007AFF', borderRadius: 2, opacity: 0.75, marginTop: 4 }} />
+          <div style={{ height: 1, width: '100%', background: '#ddd', borderRadius: 2, marginBottom: 2 }} />
+          <div style={{ height: 4, width: '55%', background: '#444', borderRadius: 2 }} />
+          {[75, 65].map((w, i) => (
+            <div key={i} style={{ height: 2, width: `${w}%`, background: '#ccc', borderRadius: 2 }} />
+          ))}
+          {/* Skill pills */}
+          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 4 }}>
+            {[40, 52, 34, 44, 38].map((w, i) => (
+              <div key={i} style={{ height: 10, width: w, background: 'rgba(0,122,255,0.12)', borderRadius: 5, border: '1px solid rgba(0,122,255,0.2)' }} />
+            ))}
           </div>
-        ))}
-
-        {/* CTA in card */}
-        <div style={{
-          marginTop: 20, padding: '10px 14px', borderRadius: 12,
-          background: 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))',
-          border: '1px solid rgba(0,122,255,0.3)',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 12,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Download size={13} style={{ color: '#007AFF' }} />
-            <span>PDF exportieren</span>
-          </div>
-          <ArrowRight size={13} style={{ color: 'rgba(255,255,255,0.4)' }} />
         </div>
       </div>
 
       {/* Floating badge */}
       <div style={{
-        position: 'absolute', bottom: -16, right: -16,
+        position: 'absolute', bottom: -8, right: 4,
         background: 'linear-gradient(135deg, rgba(255,159,10,0.3), rgba(255,55,95,0.25))',
         border: '1px solid rgba(255,159,10,0.4)',
         borderRadius: 14, padding: '10px 16px',
         display: 'flex', alignItems: 'center', gap: 6,
         fontSize: 13, fontWeight: 600,
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        zIndex: 2,
+        backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+        zIndex: 4,
       }}>
         <Sparkles size={13} style={{ color: '#FF9F0A' }} />
         KI-Assistent aktiv
