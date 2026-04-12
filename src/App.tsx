@@ -283,6 +283,17 @@ export default function App() {
     }
   }, [user, loading, passwordRecovery]);
 
+  // Capture referral code from URL (must run at App level — unauthenticated
+  // users see LandingPage, not AuthPage, so AuthPage's capture never fires)
+  useEffect(() => {
+    const hash = window.location.hash;
+    const q = hash.includes('?') ? hash.slice(hash.indexOf('?')) : '';
+    const ref = new URLSearchParams(q).get('ref');
+    if (ref && ref.length >= 32 && !localStorage.getItem('path_ref')) {
+      localStorage.setItem('path_ref', ref);
+    }
+  }, []);
+
   // Process pending referral after login/signup
   useEffect(() => {
     if (!user || !isSupabaseConfigured()) return;

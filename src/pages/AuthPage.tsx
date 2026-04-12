@@ -29,15 +29,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
     if (passwordRecovery) setMode('reset');
   }, [passwordRecovery]);
 
-  // Capture referral code from URL hash (e.g. /#/?ref=<uuid>)
-  useEffect(() => {
-    const hash = window.location.hash;
-    const q = hash.includes('?') ? hash.slice(hash.indexOf('?')) : '';
-    const ref = new URLSearchParams(q).get('ref');
-    if (ref && ref.length >= 32) {
-      localStorage.setItem('path_ref', ref);
-    }
-  }, []);
+  // Referral capture is handled in App.tsx (runs before any page component)
 
   useEffect(() => {
     if (cooldown <= 0) return;
