@@ -36,6 +36,8 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
   if (req.method !== 'POST')   return json({ error: 'Method not allowed' }, 405)
 
+  try {
+
   // Admin client — used for JWT verification and rate limiting
   const admin = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -210,4 +212,12 @@ Deno.serve(async (req) => {
   })
 
   return json({ ok: true })
+
+  } catch (err) {
+    // Catch-all: ensures we always return a CORS-enabled response even on
+    // unexpected exceptions — prevents the browser from getting a bare 500
+    // without CORS headers (which causes fetch() to throw on the client).
+    console.error('Unhandled error in contact-form:', err)
+    return json({ error: 'Interner Fehler. Bitte direkt an info@pixmatic.ch schreiben.' }, 500)
+  }
 })
