@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
 
     <!-- ── Primary Meta ──────────────────────────────────── -->
-    <title>PATH – by pixmatic</title>
-    <meta name="description" content="Mit PATH erstellst du professionelle Bewerbungsunterlagen in Minuten. Lebenslauf, Anschreiben und PDF-Export – übersichtlich, modern und von überall erreichbar." />
-    <meta name="keywords" content="Bewerbung, Lebenslauf, CV, Anschreiben, Bewerbungsmappe, PDF, Vorlagen, Schweiz, Deutschland, Österreich" />
+    <title>PATH – Bewerbungsmappe erstellen | Lebenslauf & Anschreiben</title>
+    <meta name="description" content="Mit PATH erstellst du professionelle Bewerbungsunterlagen in Minuten. Lebenslauf, Anschreiben, 15+ Vorlagen und PDF-Export – kostenlos, modern und von überall erreichbar." />
+    <meta name="keywords" content="Bewerbung erstellen, Lebenslauf online, CV erstellen, Anschreiben schreiben, Bewerbungsmappe, Lebenslauf Vorlage, PDF Export, Bewerbung Schweiz, Bewerbung Deutschland, Jobsuche" />
     <meta name="author" content="pixmatic" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://path.pixmatic.ch/" />
@@ -15,20 +15,23 @@
     <!-- ── Open Graph (LinkedIn, Facebook, WhatsApp, iMessage) ── -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://path.pixmatic.ch/" />
-    <meta property="og:title" content="PATH – Bewerbungsmappe leicht gemacht" />
-    <meta property="og:description" content="Professionelle Bewerbungsunterlagen in Minuten erstellen. Lebenslauf, Anschreiben, 15+ Templates und PDF-Export mit einem Klick." />
+    <meta property="og:title" content="PATH – Bewerbungsmappe erstellen leicht gemacht" />
+    <meta property="og:description" content="Professionelle Bewerbungsunterlagen in Minuten erstellen. Lebenslauf, Anschreiben, 15+ Vorlagen und PDF-Export – kostenlos starten." />
     <meta property="og:image" content="https://path.pixmatic.ch/og-image.png" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="512" />
     <meta property="og:image:height" content="512" />
-    <meta property="og:image:alt" content="PATH – Bewerbungsmappe App" />
+    <meta property="og:image:alt" content="PATH – Lebenslauf und Anschreiben online erstellen" />
     <meta property="og:locale" content="de_CH" />
+    <meta property="og:locale:alternate" content="de_DE" />
+    <meta property="og:locale:alternate" content="de_AT" />
     <meta property="og:site_name" content="PATH by pixmatic" />
 
     <!-- ── Twitter / X Card ──────────────────────────────── -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="PATH – Bewerbungsmappe leicht gemacht" />
-    <meta name="twitter:description" content="Professionelle Bewerbungsunterlagen in Minuten erstellen. Lebenslauf, Anschreiben, 15+ Templates und PDF-Export." />
+    <!-- Note: use summary (square image) until og-image.png is replaced with 1200x630 -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="PATH – Bewerbungsmappe erstellen leicht gemacht" />
+    <meta name="twitter:description" content="Professionelle Bewerbungsunterlagen in Minuten erstellen. Lebenslauf, Anschreiben, 15+ Vorlagen und PDF-Export – kostenlos." />
     <meta name="twitter:image" content="https://path.pixmatic.ch/og-image.png" />
 
     <!-- ── App / PWA ──────────────────────────────────────── -->
@@ -44,20 +47,44 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "PATH",
-      "description": "Bewerbungsmappe leicht gemacht – Lebenslauf, Anschreiben und PDF-Export in einer App.",
+      "alternateName": "PATH by pixmatic",
+      "description": "Professionelle Bewerbungsunterlagen in Minuten erstellen. Lebenslauf, Anschreiben, 15+ Vorlagen und PDF-Export – kostenlos starten.",
       "url": "https://path.pixmatic.ch/",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web",
-      "inLanguage": "de",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "CHF"
-      },
+      "browserRequirements": "Requires JavaScript. Requires a modern browser.",
+      "inLanguage": ["de-CH", "de-DE", "de-AT"],
+      "featureList": [
+        "Lebenslauf online erstellen",
+        "Anschreiben verfassen",
+        "PDF-Export mit einem Klick",
+        "15+ professionelle Vorlagen",
+        "Mehrere Bewerbungen verwalten",
+        "Cloudbasiert – von überall erreichbar"
+      ],
+      "screenshot": "https://path.pixmatic.ch/og-image.png",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Free",
+          "price": "0",
+          "priceCurrency": "CHF",
+          "description": "Kostenlos starten – Lebenslauf und Anschreiben erstellen"
+        }
+      ],
       "author": {
         "@type": "Organization",
         "name": "pixmatic",
-        "url": "https://pixmatic.ch"
+        "url": "https://pixmatic.ch",
+        "email": "info@pixmatic.ch"
+      },
+      "audience": {
+        "@type": "Audience",
+        "geographicArea": {
+          "@type": "GeoShape",
+          "name": "DACH",
+          "description": "Schweiz, Deutschland, Österreich"
+        }
       }
     }
     </script>
