@@ -832,7 +832,7 @@ function FaqSection({ isMobile }: { isMobile: boolean }) {
 
 const COMPARISON_ROWS = [
   {
-    feature: 'Bewerbungsvorlagen (CV-optimiert)',
+    feature: 'Templates (CV-optimiert)',
     path: { ok: 'yes', label: '15+ Templates' },
     word: { ok: 'partial', label: 'Wenige, generisch' },
     canva: { ok: 'partial', label: 'Nicht CV-optimiert' },
