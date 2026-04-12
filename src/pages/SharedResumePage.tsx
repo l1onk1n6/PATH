@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Loader2, AlertCircle, Download, Printer, Mail, Phone, Send, FileText, Globe, Paperclip } from 'lucide-react';
+import { Loader2, AlertCircle, Download, Printer, Mail, Phone, Send, FileText, Globe, Paperclip, Sun, Moon } from 'lucide-react';
 import type { Resume, UploadedDocument } from '../types/resume';
 import { fetchSharedResumeByToken } from '../lib/db';
 import ResumePreview from '../components/templates/ResumePreview';
@@ -36,8 +36,7 @@ const CATEGORY_LABELS: Record<UploadedDocument['category'], string> = {
   certificate: 'Zertifikat', reference: 'Referenz', portfolio: 'Portfolio', other: 'Beilage',
 };
 
-// ── Attached document card ────────────────────────────────────────
-function DocCard({ doc }: { doc: UploadedDocument }) {
+function DocCard({ doc, light }: { doc: UploadedDocument; light: boolean }) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -53,34 +52,29 @@ function DocCard({ doc }: { doc: UploadedDocument }) {
   }, [doc.dataUrl, doc.type]);
 
   return (
-    <div style={{ borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 48px rgba(0,0,0,0.4)', marginBottom: 32 }}>
-      {/* Header */}
+    <div style={{ borderRadius: 12, overflow: 'hidden', boxShadow: light ? '0 4px 24px rgba(0,0,0,0.12)' : '0 8px 48px rgba(0,0,0,0.4)', marginBottom: 32 }}>
       <div style={{
-        background: 'rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.08)',
+        background: light ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)',
+        borderBottom: `1px solid ${light ? 'rgba(0,0,0,0.09)' : 'rgba(255,255,255,0.08)'}`,
         padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Paperclip size={13} style={{ opacity: 0.5 }} />
-          <span style={{ fontSize: 13, fontWeight: 600 }}>{doc.name}</span>
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.07)', padding: '2px 8px', borderRadius: 99 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: light ? '#111' : '#fff' }}>{doc.name}</span>
+          <span style={{ fontSize: 11, color: light ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.35)', background: light ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.07)', padding: '2px 8px', borderRadius: 99 }}>
             {CATEGORY_LABELS[doc.category] ?? doc.category}
           </span>
         </div>
         {doc.dataUrl && (
-          <a
-            href={doc.dataUrl}
-            download={doc.name}
-            style={{
-              fontSize: 12, display: 'flex', alignItems: 'center', gap: 5, textDecoration: 'none',
-              color: 'var(--ios-blue)', padding: '5px 10px', borderRadius: 7,
-              background: 'rgba(0,122,255,0.15)', border: '1px solid rgba(0,122,255,0.3)',
-            }}
-          >
+          <a href={doc.dataUrl} download={doc.name} style={{
+            fontSize: 12, display: 'flex', alignItems: 'center', gap: 5, textDecoration: 'none',
+            color: 'var(--ios-blue)', padding: '5px 10px', borderRadius: 7,
+            background: 'rgba(0,122,255,0.12)', border: '1px solid rgba(0,122,255,0.3)',
+          }}>
             <Download size={11} /> Herunterladen
           </a>
         )}
       </div>
-      {/* Preview */}
       {doc.type.startsWith('image/') && doc.dataUrl && (
         <img src={doc.dataUrl} alt={doc.name} style={{ width: '100%', display: 'block', background: '#fff' }} />
       )}
@@ -88,7 +82,7 @@ function DocCard({ doc }: { doc: UploadedDocument }) {
         <iframe src={pdfUrl} style={{ width: '100%', height: 1123, border: 'none', display: 'block' }} title={doc.name} />
       )}
       {doc.type === 'application/pdf' && !pdfUrl && doc.dataUrl && (
-        <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.03)', fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
+        <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', background: light ? '#f9f9f9' : 'rgba(255,255,255,0.03)', fontSize: 12, color: light ? '#aaa' : 'rgba(255,255,255,0.3)' }}>
           Vorschau wird geladen…
         </div>
       )}
@@ -96,20 +90,13 @@ function DocCard({ doc }: { doc: UploadedDocument }) {
   );
 }
 
-// ── Cover letter ──────────────────────────────────────────────────
 function CoverLetterView({ resume }: { resume: Resume }) {
   const cl = resume.coverLetter;
   const pi = resume.personalInfo;
   const name = [pi.firstName, pi.lastName].filter(Boolean).join(' ');
   const today = new Date().toLocaleDateString('de-CH', { day: '2-digit', month: 'long', year: 'numeric' });
-
   return (
-    <div style={{
-      background: '#fff', color: '#1a1a1a',
-      padding: '64px 72px',
-      fontFamily: 'Georgia, "Times New Roman", serif',
-      fontSize: 14, lineHeight: 1.75,
-    }}>
+    <div style={{ background: '#fff', color: '#1a1a1a', padding: '64px 72px', fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 14, lineHeight: 1.75 }}>
       <div style={{ marginBottom: 40, fontSize: 13, color: '#444', borderBottom: '1px solid #e5e5e5', paddingBottom: 20 }}>
         <div style={{ fontWeight: 700, fontSize: 16, color: '#111', marginBottom: 4 }}>{name}</div>
         {pi.title && <div style={{ color: '#555', marginBottom: 2 }}>{pi.title}</div>}
@@ -135,8 +122,9 @@ export default function SharedResumePage() {
   const [resume, setResume] = useState<Resume | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const [tab, setTab] = useState<'cl' | 'cv'>('cl');
+  const [tab, setTab] = useState<'cl' | 'cv' | 'docs'>('cl');
   const [downloading, setDownloading] = useState(false);
+  const [light, setLight] = useState(false);
   const resumeRef = useRef<HTMLDivElement>(null);
   const viewIdRef = useRef<string | null>(null);
   const loadTimeRef = useRef<number>(Date.now());
@@ -147,7 +135,6 @@ export default function SharedResumePage() {
     fetchSharedResumeByToken(token).then((r) => {
       if (r) {
         setResume(r);
-        // Default to CV if no cover letter
         if (!r.coverLetter?.body?.trim()) setTab('cv');
         trackView(token).then(id => { viewIdRef.current = id; });
       } else {
@@ -161,6 +148,29 @@ export default function SharedResumePage() {
     window.addEventListener('beforeunload', onUnload);
     return () => window.removeEventListener('beforeunload', onUnload);
   }, [token]);
+
+  // ── Theme ──────────────────────────────────────────────────────
+  const t = light ? {
+    bg: '#f0f2f5',
+    navBg: 'rgba(255,255,255,0.97)', navBorder: 'rgba(0,0,0,0.1)',
+    headerBg: '#fff', headerBorder: 'rgba(0,0,0,0.07)',
+    tabsBg: 'rgba(0,0,0,0.03)', tabsBorder: 'rgba(0,0,0,0.08)',
+    text: '#1a1a1a', textSub: 'rgba(0,0,0,0.5)', textMuted: 'rgba(0,0,0,0.35)',
+    btnBg: 'rgba(0,0,0,0.05)', btnBorder: 'rgba(0,0,0,0.12)', btnColor: '#333',
+    tabActive: '#1a1a1a', tabInactive: 'rgba(0,0,0,0.35)',
+    footerBorder: 'rgba(0,0,0,0.08)', footerText: 'rgba(0,0,0,0.35)',
+    shadow: '0 4px 24px rgba(0,0,0,0.12)',
+  } : {
+    bg: 'var(--bg)',
+    navBg: 'rgba(8,15,30,0.97)', navBorder: 'rgba(255,255,255,0.08)',
+    headerBg: 'rgba(255,255,255,0.03)', headerBorder: 'rgba(255,255,255,0.07)',
+    tabsBg: 'rgba(0,0,0,0.2)', tabsBorder: 'rgba(255,255,255,0.07)',
+    text: '#fff', textSub: 'rgba(255,255,255,0.5)', textMuted: 'rgba(255,255,255,0.4)',
+    btnBg: 'rgba(255,255,255,0.08)', btnBorder: 'rgba(255,255,255,0.15)', btnColor: 'rgba(255,255,255,0.85)',
+    tabActive: '#fff', tabInactive: 'rgba(255,255,255,0.4)',
+    footerBorder: 'rgba(255,255,255,0.06)', footerText: 'rgba(255,255,255,0.25)',
+    shadow: '0 8px 48px rgba(0,0,0,0.4)',
+  };
 
   if (loading) return (
     <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
@@ -194,118 +204,103 @@ export default function SharedResumePage() {
       const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
-      a.download = `${name.replace(/\s+/g, '_')}_Lebenslauf.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } finally {
-      setDownloading(false);
-    }
+      a.href = url; a.download = `${name.replace(/\s+/g, '_')}_Lebenslauf.pdf`;
+      a.click(); URL.revokeObjectURL(url);
+    } finally { setDownloading(false); }
   }
 
   const btn: React.CSSProperties = {
     display: 'flex', alignItems: 'center', gap: 6,
-    padding: isMobile ? '8px 12px' : '9px 16px',
-    borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)',
-    background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.85)',
+    padding: isMobile ? '8px 12px' : '9px 16px', borderRadius: 10,
+    border: `1px solid ${t.btnBorder}`, background: t.btnBg, color: t.btnColor,
     cursor: 'pointer', fontSize: isMobile ? 12 : 13, fontWeight: 500,
     whiteSpace: 'nowrap', fontFamily: 'inherit', textDecoration: 'none',
   };
 
   const tabBtn = (active: boolean): React.CSSProperties => ({
     padding: '10px 20px', cursor: 'pointer', fontSize: 13, fontWeight: active ? 700 : 500,
-    color: active ? '#fff' : 'rgba(255,255,255,0.45)',
+    color: active ? t.tabActive : t.tabInactive,
     background: 'none', border: 'none',
     borderBottom: active ? '2px solid var(--ios-blue)' : '2px solid transparent',
-    fontFamily: 'inherit',
+    fontFamily: 'inherit', transition: 'color 0.15s',
   });
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+    <div style={{ minHeight: '100vh', background: t.bg, transition: 'background 0.2s' }}>
 
-      {/* ── Top nav ── */}
+      {/* ── Nav ── */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 100,
-        background: 'rgba(8,15,30,0.97)', backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        background: t.navBg, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: `1px solid ${t.navBorder}`,
         padding: isMobile ? '10px 16px' : '10px 32px',
         display: 'flex', alignItems: 'center', gap: 12,
+        transition: 'background 0.2s, border-color 0.2s',
       }}>
-        <LogoFull size={22} />
-        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {/* Clickable logo → landing page */}
+        <a href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', flexShrink: 0, filter: light ? 'invert(1) brightness(0.2)' : 'none' }}>
+          <LogoFull size={22} />
+        </a>
+
+        <div style={{ fontSize: 13, color: t.textMuted, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {name}{pi.title ? ` · ${pi.title}` : ''}
         </div>
+
+        {/* Dark/Light toggle */}
+        <button
+          onClick={() => setLight(v => !v)}
+          title={light ? 'Dunkler Modus' : 'Heller Modus'}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 34, height: 34, borderRadius: 9, border: `1px solid ${t.btnBorder}`,
+            background: t.btnBg, color: t.btnColor, cursor: 'pointer', flexShrink: 0,
+            transition: 'background 0.2s',
+          }}
+        >
+          {light ? <Moon size={15} /> : <Sun size={15} />}
+        </button>
       </div>
 
       {/* ── Candidate header ── */}
-      <div style={{
-        background: 'rgba(255,255,255,0.03)',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
-        padding: isMobile ? '20px 16px' : '24px 32px',
-      }}>
+      <div style={{ background: t.headerBg, borderBottom: `1px solid ${t.headerBorder}`, padding: isMobile ? '20px 16px' : '24px 32px', transition: 'background 0.2s' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 14 : 0, justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', marginBottom: 16 }}>
             <div>
-              <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 24, fontWeight: 800, letterSpacing: '-0.4px' }}>{name}</h1>
-              {pi.title && <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', marginTop: 3 }}>{pi.title}</div>}
+              <h1 style={{ margin: 0, fontSize: isMobile ? 20 : 24, fontWeight: 800, letterSpacing: '-0.4px', color: t.text }}>{name}</h1>
+              {pi.title && <div style={{ fontSize: 14, color: t.textSub, marginTop: 3 }}>{pi.title}</div>}
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {pi.email && (
-                <a href={`mailto:${pi.email}`} style={{ ...btn }}>
-                  <Mail size={13} /> {isMobile ? 'E-Mail' : pi.email}
-                </a>
-              )}
-              {pi.phone && (
-                <a href={`tel:${pi.phone}`} style={{ ...btn }}>
-                  <Phone size={13} /> {isMobile ? 'Anrufen' : pi.phone}
-                </a>
-              )}
-              {pi.linkedin && (
-                <a href={pi.linkedin.startsWith('http') ? pi.linkedin : `https://${pi.linkedin}`} target="_blank" rel="noopener noreferrer" style={{ ...btn }}>
-                  <Globe size={13} /> LinkedIn
-                </a>
-              )}
-              {pi.website && (
-                <a href={pi.website.startsWith('http') ? pi.website : `https://${pi.website}`} target="_blank" rel="noopener noreferrer" style={{ ...btn }}>
-                  <Globe size={13} /> Website
-                </a>
-              )}
+              {pi.email && <a href={`mailto:${pi.email}`} style={{ ...btn }}><Mail size={13} />{isMobile ? 'E-Mail' : pi.email}</a>}
+              {pi.phone && <a href={`tel:${pi.phone}`} style={{ ...btn }}><Phone size={13} />{isMobile ? 'Anrufen' : pi.phone}</a>}
+              {pi.linkedin && <a href={pi.linkedin.startsWith('http') ? pi.linkedin : `https://${pi.linkedin}`} target="_blank" rel="noopener noreferrer" style={{ ...btn }}><Globe size={13} />LinkedIn</a>}
+              {pi.website && <a href={pi.website.startsWith('http') ? pi.website : `https://${pi.website}`} target="_blank" rel="noopener noreferrer" style={{ ...btn }}><Globe size={13} />Website</a>}
             </div>
           </div>
-
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <button onClick={handleDownload} disabled={downloading} style={{ ...btn, background: 'rgba(0,122,255,0.2)', border: '1px solid rgba(0,122,255,0.4)', color: downloading ? 'rgba(255,255,255,0.4)' : 'var(--ios-blue)', fontWeight: 600 }}>
+            <button onClick={handleDownload} disabled={downloading} style={{ ...btn, background: 'rgba(0,122,255,0.15)', border: '1px solid rgba(0,122,255,0.35)', color: downloading ? t.textMuted : 'var(--ios-blue)', fontWeight: 600 }}>
               {downloading
-                ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> PDF wird erstellt…</>
-                : <><Download size={13} /> Lebenslauf als PDF</>}
+                ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />PDF wird erstellt…</>
+                : <><Download size={13} />Lebenslauf als PDF</>}
             </button>
-            <a href={forwardHref} style={{ ...btn }}>
-              <Send size={13} /> Weiterleiten
-            </a>
-            <button onClick={() => window.print()} style={{ ...btn }}>
-              <Printer size={13} /> Drucken
-            </button>
+            <a href={forwardHref} style={{ ...btn }}><Send size={13} />Weiterleiten</a>
+            <button onClick={() => window.print()} style={{ ...btn }}><Printer size={13} />Drucken</button>
           </div>
         </div>
       </div>
 
       {/* ── Tabs ── */}
       {hasCoverLetter && (
-        <div style={{ background: 'rgba(0,0,0,0.2)', borderBottom: '1px solid rgba(255,255,255,0.07)', padding: `0 ${isMobile ? 16 : 32}px` }}>
+        <div style={{ background: t.tabsBg, borderBottom: `1px solid ${t.tabsBorder}`, padding: `0 ${isMobile ? 16 : 32}px`, transition: 'background 0.2s' }}>
           <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex' }}>
             <button style={tabBtn(tab === 'cl')} onClick={() => setTab('cl')}>
-              <Mail size={12} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />
-              Anschreiben
+              <Mail size={12} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />Anschreiben
             </button>
             <button style={tabBtn(tab === 'cv')} onClick={() => setTab('cv')}>
-              <FileText size={12} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />
-              Lebenslauf
+              <FileText size={12} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />Lebenslauf
             </button>
             {docs.length > 0 && (
-              <button style={tabBtn(tab === 'docs' as any)} onClick={() => setTab('docs' as any)}>
-                <Paperclip size={12} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />
-                Beilagen ({docs.length})
+              <button style={tabBtn(tab === 'docs')} onClick={() => setTab('docs')}>
+                <Paperclip size={12} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />Beilagen ({docs.length})
               </button>
             )}
           </div>
@@ -315,46 +310,36 @@ export default function SharedResumePage() {
       {/* ── Content ── */}
       <div style={{ padding: isMobile ? '24px 12px' : '32px 32px' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
-
           {tab === 'cl' && (
-            <div style={{ borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 48px rgba(0,0,0,0.4)' }}>
+            <div style={{ borderRadius: 12, overflow: 'hidden', boxShadow: t.shadow }}>
               <CoverLetterView resume={resume} />
             </div>
           )}
-
           {tab === 'cv' && (
-            <div ref={resumeRef} style={{ borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 48px rgba(0,0,0,0.4)' }}>
+            <div ref={resumeRef} style={{ borderRadius: 12, overflow: 'hidden', boxShadow: t.shadow }}>
               <ResumePreview resume={resume} />
             </div>
           )}
-
-          {(tab as string) === 'docs' && docs.length > 0 && (
-            <div>
-              {docs.map(doc => <DocCard key={doc.id} doc={doc} />)}
-            </div>
+          {tab === 'docs' && docs.length > 0 && (
+            <div>{docs.map(doc => <DocCard key={doc.id} doc={doc} light={light} />)}</div>
           )}
-
-          {/* When no cover letter: show docs below CV */}
+          {/* No cover letter → show docs below CV */}
           {!hasCoverLetter && tab === 'cv' && docs.length > 0 && (
             <div style={{ marginTop: 40 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Paperclip size={13} /> Beilagen ({docs.length})
+              <div style={{ fontSize: 13, fontWeight: 600, color: t.textSub, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Paperclip size={13} />Beilagen ({docs.length})
               </div>
-              {docs.map(doc => <DocCard key={doc.id} doc={doc} />)}
+              {docs.map(doc => <DocCard key={doc.id} doc={doc} light={light} />)}
             </div>
           )}
         </div>
       </div>
 
       {/* ── Footer ── */}
-      <footer style={{
-        padding: '12px 32px', borderTop: '1px solid rgba(255,255,255,0.06)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
-        fontSize: 12, color: 'rgba(255,255,255,0.25)',
-      }}>
+      <footer style={{ padding: '12px 32px', borderTop: `1px solid ${t.footerBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontSize: 12, color: t.footerText }}>
         <span>Erstellt mit PATH by pixmatic</span>
         <span>·</span>
-        <a href="/" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}>
+        <a href="/" style={{ color: light ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.4)', textDecoration: 'none' }}>
           Eigene Bewerbungsmappe erstellen →
         </a>
       </footer>
