@@ -45,6 +45,7 @@ Deno.serve(async (req) => {
   let userId: string
   try {
     let part = token.split('.')[1]
+    part = part.replace(/-/g, '+').replace(/_/g, '/') // base64url → base64
     while (part.length % 4 !== 0) part += '='
     const payload = JSON.parse(atob(part))
     userId = payload.sub
