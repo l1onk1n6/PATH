@@ -110,10 +110,10 @@
     <!-- ── Content Security Policy ───────────────────────── -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com;
+      script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com https://static.cloudflareinsights.com;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       img-src 'self' data: https: blob:;
-      connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://challenges.cloudflare.com;
+      connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://challenges.cloudflare.com https://cloudflareinsights.com;
       font-src 'self' data: https://fonts.gstatic.com;
       frame-src https://challenges.cloudflare.com;
       object-src 'none';
@@ -123,7 +123,10 @@
     " />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-    <!-- ── Google Analytics ─────────────────────────────── -->
+    <!-- ── Cloudflare Web Analytics ─────────────────────── -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "75a379c1c85f4301a81c360e815c17c7"}'></script>
+
+    <!-- ── Google Analytics (entfernen sobald CF bestätigt) ── -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-T5SJLKKZJQ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
