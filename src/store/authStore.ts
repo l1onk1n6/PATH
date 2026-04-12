@@ -95,12 +95,20 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   signInWithLinkedIn: async () => {
-    const supabase = getSupabase();
-    const redirectTo = window.location.origin + window.location.pathname;
-    await supabase.auth.signInWithOAuth({
-      provider: 'linkedin_oidc',
-      options: { redirectTo },
-    });
+    set({ error: null });
+    try {
+      const supabase = getSupabase();
+      // Use origin + '/' so the redirect always lands on the app root,
+      // regardless of any pathname the user may be on.
+      const redirectTo = window.location.origin + '/';
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'linkedin_oidc',
+        options: { redirectTo },
+      });
+      if (error) set({ error: toGermanError(error) });
+    } catch (e) {
+      set({ error: toGermanError(e) });
+    }
   },
 
   signOut: async () => {

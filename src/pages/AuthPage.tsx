@@ -94,25 +94,26 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
     <div style={{
       minHeight: '100dvh',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      padding: '20px 16px', boxSizing: 'border-box', overflow: 'auto',
+      padding: '20px 16px', boxSizing: 'border-box', overflow: 'auto', gap: 10,
     }}>
       {onBack && (
-        <button
-          onClick={onBack}
-          style={{
-            position: 'fixed', top: 20, left: 20,
-            display: 'flex', alignItems: 'center', gap: 6,
-            background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
-            borderRadius: 10, padding: '8px 14px',
-            color: 'var(--text-secondary)', fontSize: 14, cursor: 'pointer',
-            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-            zIndex: 10, transition: 'background 0.2s',
-          }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
-        >
-          <ArrowLeft size={15} /> Zurück
-        </button>
+        <div style={{ width: '100%', maxWidth: 380 }}>
+          <button
+            onClick={onBack}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: 10, padding: '8px 14px',
+              color: 'var(--text-secondary)', fontSize: 14, cursor: 'pointer',
+              backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+              transition: 'background 0.2s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+          >
+            <ArrowLeft size={15} /> Zurück
+          </button>
+        </div>
       )}
       <div className="glass-card no-hover animate-scale-in" style={{ width: '100%', maxWidth: 380, padding: '24px 22px' }}>
 
