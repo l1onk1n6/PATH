@@ -114,7 +114,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
           <ArrowLeft size={15} /> Zurück
         </button>
       )}
-      <div className="glass-card animate-scale-in" style={{ width: '100%', maxWidth: 380, padding: '24px 22px' }}>
+      <div className="glass-card no-hover animate-scale-in" style={{ width: '100%', maxWidth: 380, padding: '24px 22px' }}>
 
         {/* Logo */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 18 }}>

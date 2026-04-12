@@ -213,6 +213,15 @@ export default function App() {
   const { syncFromCloud } = useResumeStore();
   const { syncFromCloud: syncTrackerFromCloud } = useTrackerStore();
   const [authType] = useState(() => getAuthTypeFromUrl());
+  // Track if the initial auth check has completed at least once.
+  // We must NOT show the global spinner for subsequent loading states
+  // (e.g. signIn/signUp), otherwise the LandingPage unmounts and loses
+  // the open-modal state, dropping the user back to the landing page
+  // after a failed login attempt.
+  const [initialized, setInitialized] = useState(false);
+  useEffect(() => {
+    if (!loading) setInitialized(true);
+  }, [loading]);
 
   // Public shared CV route — accessible without login
   const isSharedRoute = window.location.hash.startsWith('#/shared');
@@ -273,7 +282,7 @@ export default function App() {
     );
   }
 
-  if (loading) {
+  if (!initialized && loading) {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
         <Loader2 size={28} style={{ animation: 'spin 1s linear infinite', color: 'var(--ios-blue)' }} />
