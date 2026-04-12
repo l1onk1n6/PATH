@@ -920,7 +920,7 @@ function ComparisonTable({ isMobile }: { isMobile: boolean }) {
           background: 'rgba(255,255,255,0.03)',
         }}>
           {/* Header row */}
-          <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
             <div style={{ flex: isMobile ? 1.4 : 2, padding: '14px 16px', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>
               FUNKTION
             </div>
