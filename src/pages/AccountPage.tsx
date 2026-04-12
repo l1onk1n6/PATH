@@ -853,9 +853,10 @@ function ContactSection() {
       setSubject('');
       setMessage('');
       resetTurnstile();
-    } catch {
+    } catch (err) {
       setStatus('error');
-      setErrorMsg('Netzwerkfehler. Bitte Verbindung prüfen und erneut versuchen.');
+      const detail = err instanceof Error ? err.message : String(err);
+      setErrorMsg(`Netzwerkfehler: ${detail}`);
       resetTurnstile();
     }
   }

@@ -16,7 +16,9 @@ import nodemailer from 'npm:nodemailer@6'
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, content-type',
+  'Access-Control-Max-Age': '86400',
 }
 
 const RECIPIENT     = 'info@pixmatic.ch'
