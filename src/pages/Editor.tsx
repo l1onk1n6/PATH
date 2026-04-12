@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User, Briefcase, GraduationCap, Zap, FolderOpen,
@@ -45,6 +45,18 @@ export default function Editor() {
   const { showTranslate, setShowTranslate } = useUIStore();
   const resume = getActiveResume();
   const person = getActivePerson();
+
+  // Track soft-keyboard height so the content area and floating button
+  // stay above the keyboard on iOS/Android.
+  const [kbHeight, setKbHeight] = useState(0);
+  useEffect(() => {
+    if (!isMobile) return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => setKbHeight(Math.max(0, window.innerHeight - vv.height));
+    vv.addEventListener('resize', update);
+    return () => vv.removeEventListener('resize', update);
+  }, [isMobile]);
 
   // Check if the active resume is frozen (beyond plan limit)
   const resumeIndex = resume ? resumes.findIndex(r => r.id === resume.id) : -1;
@@ -172,7 +184,7 @@ export default function Editor() {
         <div
           key={activeSection}
           className="animate-fade-in"
-          style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: '16px 16px' }}
+          style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: '16px 16px', paddingBottom: kbHeight > 0 ? kbHeight + 72 : 72 }}
         >
           {showTranslate && <TranslateDialog onClose={() => setShowTranslate(false)} />}
           {activeSection === 'history'
@@ -187,7 +199,7 @@ export default function Editor() {
           onClick={() => navigate('/preview')}
           aria-label="Vorschau"
           style={{
-            position: 'fixed', bottom: 20, right: 16, zIndex: 50,
+            position: 'fixed', bottom: kbHeight > 0 ? kbHeight + 20 : 20, right: 16, zIndex: 50,
             width: 48, height: 48, borderRadius: '50%',
             padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: 'linear-gradient(135deg, rgba(0,122,255,0.55), rgba(88,86,214,0.5))',

@@ -1,16 +1,3 @@
-import { useState, useEffect } from 'react';
-
-export function useIsMobile(): boolean {
-  const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
-  );
-
-  useEffect(() => {
-    const mq = window.matchMedia('(pointer: coarse)');
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-
-  return isMobile;
-}
+// Re-export from the canonical breakpoint hook so all editor components
+// use the same width-based (< 768px) detection as the page-level layouts.
+export { useIsMobile } from './useBreakpoint';
