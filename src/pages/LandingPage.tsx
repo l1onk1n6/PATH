@@ -166,7 +166,7 @@ export default function LandingPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} onClick={() => containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}>
           <LogoIcon size={30} />
           <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: '-0.3px' }}>PATH</span>
-          <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 99, background: 'rgba(0,122,255,0.2)', border: '1px solid rgba(0,122,255,0.35)', color: 'var(--ios-blue)', marginLeft: 2, whiteSpace: 'nowrap' }}>by pixmatic</span>
+          {!isMobile && <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 99, background: 'rgba(0,122,255,0.2)', border: '1px solid rgba(0,122,255,0.35)', color: 'var(--ios-blue)', marginLeft: 2, whiteSpace: 'nowrap' }}>by pixmatic</span>}
         </div>
 
         {/* Nav links – desktop only */}
@@ -183,25 +183,28 @@ export default function LandingPage() {
         )}
 
         {/* Auth buttons */}
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <button onClick={() => setShowAuth('login')} style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            color: 'rgba(255,255,255,0.65)', fontSize: 14, padding: '8px 14px',
-            borderRadius: 10, transition: 'color 0.2s',
-          }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.65)')}>
-            Anmelden
-          </button>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          {!isMobile && (
+            <button onClick={() => setShowAuth('login')} style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: 'rgba(255,255,255,0.65)', fontSize: 14, padding: '8px 14px',
+              borderRadius: 10, transition: 'color 0.2s',
+            }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.65)')}>
+              Anmelden
+            </button>
+          )}
           <button onClick={() => setShowAuth('register')} style={{
             background: 'rgba(0,122,255,0.9)', border: 'none', cursor: 'pointer',
-            color: '#fff', fontSize: 14, fontWeight: 600,
-            padding: '9px 18px', borderRadius: 10,
+            color: '#fff', fontSize: isMobile ? 13 : 14, fontWeight: 600,
+            padding: isMobile ? '8px 14px' : '9px 18px', borderRadius: 10,
+            whiteSpace: 'nowrap',
             transition: 'background 0.2s, transform 0.15s',
           }}
             onMouseEnter={e => { e.currentTarget.style.background = '#007AFF'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,122,255,0.9)'; e.currentTarget.style.transform = 'none'; }}>
-            Kostenlos starten
+            {isMobile ? 'Starten' : 'Kostenlos starten'}
           </button>
         </div>
       </nav>
