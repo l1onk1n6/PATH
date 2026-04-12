@@ -5,7 +5,7 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 import {
   FileText, Sparkles, Globe, Clock, Share2, Download,
   Check, ChevronRight, ArrowRight, Star, ClipboardList,
-  Brain, PenLine, Wand2, Languages,
+  Brain, PenLine, Wand2, Languages, ChevronDown,
 } from 'lucide-react';
 import { Import } from 'lucide-react';
 
@@ -171,9 +171,9 @@ export default function LandingPage() {
 
         {/* Nav links – desktop only */}
         {!isMobile && (
-          <div style={{ display: 'flex', gap: 32, fontSize: 14, color: 'rgba(255,255,255,0.65)' }}>
+          <div role="navigation" aria-label="Seitennavigation" style={{ display: 'flex', gap: 32, fontSize: 14, color: 'rgba(255,255,255,0.65)' }}>
             {[['features', 'Features'], ['how', 'So funktioniert\'s'], ['pricing', 'Preise']].map(([id, label]) => (
-              <button key={id} onClick={() => scrollTo(id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: 'inherit', padding: 0, transition: 'color 0.2s' }}
+              <button key={id} onClick={() => scrollTo(id)} aria-label={`Zum Abschnitt ${label} springen`} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: 'inherit', padding: 0, transition: 'color 0.2s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.65)')}>
                 {label}
@@ -571,21 +571,45 @@ export default function LandingPage() {
       </section>
 
       {/* ── Testimonials / Trust ────────────────────────────── */}
-      <section style={{
+      <section aria-label="Kundenstimmen" style={{
         padding: isMobile ? '60px 24px' : '80px 48px',
         background: 'rgba(255,255,255,0.02)',
         borderTop: '1px solid rgba(255,255,255,0.06)',
       }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 3, marginBottom: 20 }}>
-            {[...Array(5)].map((_, i) => <Star key={i} size={18} style={{ color: '#FF9F0A', fill: '#FF9F0A' }} />)}
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 3, marginBottom: 12 }}>
+              {[...Array(5)].map((_, i) => <Star key={i} size={16} style={{ color: '#FF9F0A', fill: '#FF9F0A' }} />)}
+            </div>
+            <h2 style={{ fontSize: isMobile ? 26 : 36, fontWeight: 800, margin: '0 0 8px', letterSpacing: '-0.6px' }}>
+              Was Nutzer sagen
+            </h2>
           </div>
-          <blockquote style={{ fontSize: isMobile ? 20 : 26, fontWeight: 600, margin: '0 0 20px', lineHeight: 1.4, letterSpacing: '-0.3px' }}>
-            "Endlich eine Bewerbungs-App die nicht aussieht wie aus den 90ern — und trotzdem in der Schweiz funktioniert."
-          </blockquote>
-          <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)' }}>Zufriedener Nutzer aus Zürich</div>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 20 }}>
+            {[
+              { quote: 'Endlich eine Bewerbungs-App die nicht aussieht wie aus den 90ern — und trotzdem in der Schweiz funktioniert.', author: 'Software Engineer, Zürich' },
+              { quote: 'Das KI-Anschreiben hat mir enorm viel Zeit gespart. Erste Bewerbung raus, zwei Tage später Einladung zum Gespräch.', author: 'Marketing Managerin, Bern' },
+              { quote: 'Ich habe Word-Vorlagen gehasst. PATH macht das so einfach — ausfüllen, Template wählen, PDF runterladen. Fertig.', author: 'Grafiker, Hamburg' },
+            ].map(({ quote, author }) => (
+              <div key={author} style={{
+                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)',
+                borderRadius: 20, padding: 28,
+              }}>
+                <div style={{ display: 'flex', gap: 2, marginBottom: 16 }}>
+                  {[...Array(5)].map((_, i) => <Star key={i} size={13} style={{ color: '#FF9F0A', fill: '#FF9F0A' }} />)}
+                </div>
+                <blockquote style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '0 0 16px', lineHeight: 1.7, fontStyle: 'italic' }}>
+                  "{quote}"
+                </blockquote>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)' }}>{author}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
+
+      {/* ── FAQ ─────────────────────────────────────────────── */}
+      <FaqSection isMobile={isMobile} />
 
       {/* ── CTA Banner ──────────────────────────────────────── */}
       <section style={{
@@ -666,6 +690,70 @@ export default function LandingPage() {
         html { scroll-behavior: smooth; }
       `}</style>
     </div>
+  );
+}
+
+const FAQ_ITEMS = [
+  { q: 'Ist PATH kostenlos?', a: 'Ja. Du kannst PATH kostenlos nutzen — ohne Kreditkarte. Der Free-Plan beinhaltet 3 Bewerbungsmappen, 6 Templates und 5 PDF-Exporte pro Monat. Mit PATH Pro erhältst du alle Features ohne Einschränkungen.' },
+  { q: 'Kann ich meinen Lebenslauf als PDF herunterladen?', a: 'Ja, mit einem Klick. PATH exportiert deinen Lebenslauf als druckfertiges PDF direkt aus dem Browser — pixelgenau und für Online-Bewerbungen optimiert.' },
+  { q: 'Für welche Länder ist PATH geeignet?', a: 'PATH ist für den deutschsprachigen Raum optimiert — Schweiz, Deutschland und Österreich. Die Vorlagen und Texte entsprechen den jeweiligen Bewerbungsstandards.' },
+  { q: 'Brauche ich technische Kenntnisse?', a: 'Nein. PATH ist so einfach wie ein Online-Formular. Ausfüllen, Vorlage wählen, PDF herunterladen. Keine Installation, keine Vorkenntnisse nötig.' },
+  { q: 'Wie hilft die KI beim Anschreiben?', a: 'Du gibst Stelle, Unternehmen und Ton an — Claude AI (eines der leistungsfähigsten Sprachmodelle weltweit) schreibt daraus ein vollständiges, individuelles Anschreiben in Sekunden. Du kannst es danach beliebig anpassen.' },
+  { q: 'Ist PATH DSGVO-konform?', a: 'Ja. Alle Daten werden sicher in der EU gespeichert (Supabase / AWS Frankfurt). Wir verkaufen keine Daten an Dritte. Datenschutzerklärung auf pixmatic.ch.' },
+  { q: 'Kann ich PATH auf dem Handy nutzen?', a: 'Ja. PATH ist vollständig für Smartphones und Tablets optimiert. Du kannst die App auch auf deinem Homescreen installieren (PWA) — ohne App Store.' },
+  { q: 'Was ist der Unterschied zu Word oder Canva?', a: 'Word-Vorlagen verrutschen beim Bearbeiten, Canva speichert keine strukturierten Daten. PATH kombiniert einen intelligenten Editor mit professionellen Templates, PDF-Export und KI-Unterstützung — alles an einem Ort, speziell für Bewerbungen.' },
+];
+
+function FaqSection({ isMobile }: { isMobile: boolean }) {
+  const [open, setOpen] = useState<number | null>(null);
+  return (
+    <section id="faq" aria-label="Häufige Fragen" style={{
+      padding: isMobile ? '80px 24px' : '100px 48px',
+      borderTop: '1px solid rgba(255,255,255,0.06)',
+    }}>
+      <div style={{ maxWidth: 760, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 56 }}>
+          <h2 style={{ fontSize: isMobile ? 28 : 40, fontWeight: 800, margin: '0 0 12px', letterSpacing: '-0.7px' }}>
+            Häufige Fragen
+          </h2>
+          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.45)', margin: 0, lineHeight: 1.6 }}>
+            Alles was du wissen möchtest, bevor du startest.
+          </p>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {FAQ_ITEMS.map(({ q, a }, i) => (
+            <div key={i} style={{
+              background: open === i ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)',
+              border: `1px solid ${open === i ? 'rgba(0,122,255,0.3)' : 'rgba(255,255,255,0.08)'}`,
+              borderRadius: 16, overflow: 'hidden',
+              transition: 'background 0.2s, border-color 0.2s',
+            }}>
+              <button
+                onClick={() => setOpen(open === i ? null : i)}
+                aria-expanded={open === i}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '18px 22px', background: 'none', border: 'none', cursor: 'pointer',
+                  color: '#fff', fontSize: 15, fontWeight: 600, textAlign: 'left', gap: 12,
+                }}
+              >
+                <span>{q}</span>
+                <ChevronDown size={16} style={{
+                  flexShrink: 0, color: 'rgba(255,255,255,0.4)',
+                  transform: open === i ? 'rotate(180deg)' : 'none',
+                  transition: 'transform 0.2s',
+                }} />
+              </button>
+              {open === i && (
+                <div style={{ padding: '0 22px 18px', fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.75 }}>
+                  {a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 

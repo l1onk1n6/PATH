@@ -169,6 +169,40 @@ Deno.serve(async (req) => {
     return json({ error: 'E-Mail konnte nicht gesendet werden. Bitte direkt an info@pixmatic.ch schreiben.', step: 'sending' }, 500)
   }
 
+  // ── Auto-reply to sender ─────────────────────────────────────────────────────
+  // Best-effort — don't fail the request if the auto-reply fails
+  if (replyTo) {
+    transporter.sendMail({
+      from:    smtpFrom,
+      to:      replyTo,
+      subject: 'Wir haben deine Nachricht erhalten – PATH',
+      text: [
+        `Hallo ${name.trim()},`,
+        '',
+        'vielen Dank für deine Nachricht! Wir haben sie erhalten und melden uns in der Regel innerhalb von 24 Stunden.',
+        '',
+        `Deine Nachricht:`,
+        `"${message.trim()}"`,
+        '',
+        'Liebe Grüsse',
+        'Das PATH-Team',
+        'info@pixmatic.ch',
+      ].join('\n'),
+      html: `
+        <div style="font-family:sans-serif;max-width:560px;color:#1a1a1a">
+          <h2 style="margin-bottom:4px;color:#0f1923">Wir haben deine Nachricht erhalten</h2>
+          <p style="color:#555;margin:0 0 16px">Hallo ${name.trim()},</p>
+          <p style="color:#555;margin:0 0 16px">vielen Dank für deine Nachricht! Wir haben sie erhalten und melden uns in der Regel innerhalb von <strong>24 Stunden</strong>.</p>
+          <div style="background:#f5f5f5;border-radius:8px;padding:16px;margin-bottom:20px;color:#555;white-space:pre-wrap;font-size:14px">${message.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+          <p style="color:#555;margin:0 0 4px">Liebe Grüsse</p>
+          <p style="color:#555;margin:0"><strong>Das PATH-Team</strong><br><a href="mailto:info@pixmatic.ch" style="color:#007aff">info@pixmatic.ch</a></p>
+        </div>
+      `,
+    }).catch((e: unknown) => {
+      console.error('auto-reply failed:', e)
+    })
+  }
+
   // ── Log submission for rate limiting ─────────────────────────────────────────
   // Best-effort — don't fail the request if the log insert fails
   await admin.from('contact_log').insert({ user_id: userId }).catch((e: unknown) => {

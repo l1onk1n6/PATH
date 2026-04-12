@@ -1,18 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { Loader2, Cloud, Loader, ShieldAlert } from 'lucide-react';
 import { useSessionTimeout } from './hooks/useSessionTimeout';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
-import Dashboard from './pages/Dashboard';
-import Editor from './pages/Editor';
-import Preview from './pages/Preview';
-import AuthPage from './pages/AuthPage';
-import LandingPage from './pages/LandingPage';
-import AuthCallbackPage from './pages/AuthCallbackPage';
-import SharedResumePage from './pages/SharedResumePage';
-import AccountPage from './pages/AccountPage';
-import Tracker from './pages/Tracker';
+import ErrorBoundary from './components/ErrorBoundary';
 import { useAuthStore } from './store/authStore';
 import { useResumeStore } from './store/resumeStore';
 import { useTrackerStore } from './store/trackerStore';
@@ -20,6 +12,26 @@ import { isSupabaseConfigured, getSupabase } from './lib/supabase';
 import { useIsMobile } from './hooks/useBreakpoint';
 import OnboardingModal, { isOnboardingDone } from './components/ui/OnboardingModal';
 import { ToastContainer } from './components/ui/Toast';
+
+// Lazy-loaded pages — each page is split into its own JS chunk
+const Dashboard        = lazy(() => import('./pages/Dashboard'));
+const Editor           = lazy(() => import('./pages/Editor'));
+const Preview          = lazy(() => import('./pages/Preview'));
+const AuthPage         = lazy(() => import('./pages/AuthPage'));
+const LandingPage      = lazy(() => import('./pages/LandingPage'));
+const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage'));
+const SharedResumePage = lazy(() => import('./pages/SharedResumePage'));
+const AccountPage      = lazy(() => import('./pages/AccountPage'));
+const Tracker          = lazy(() => import('./pages/Tracker'));
+const NotFoundPage     = lazy(() => import('./pages/NotFoundPage'));
+
+function PageSpinner() {
+  return (
+    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Loader2 size={24} style={{ animation: 'spin 1s linear infinite', color: 'var(--ios-blue)' }} />
+    </div>
+  );
+}
 
 
 function AppShell() {
@@ -77,7 +89,7 @@ function AppShell() {
       )}
 
       {/* ── Main area ──────────────────────────────────────── */}
-      <div style={{
+      <div role="main" style={{
         flex: 1,
         display: 'flex',
         overflow: 'hidden',
@@ -108,14 +120,19 @@ function AppShell() {
             onMenuToggle={() => setDrawerOpen(v => !v)}
           />
           <div style={{ flex: 1, overflow: 'hidden' }}>
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/editor" element={<Editor />} />
-              <Route path="/preview" element={<Preview />} />
-              <Route path="/account" element={<AccountPage />} />
-              <Route path="/tracker" element={<Tracker />} />
-              <Route path="/shared" element={<SharedResumePage />} />
-            </Routes>
+            <ErrorBoundary>
+              <Suspense fallback={<PageSpinner />}>
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/editor" element={<Editor />} />
+                  <Route path="/preview" element={<Preview />} />
+                  <Route path="/account" element={<AccountPage />} />
+                  <Route path="/tracker" element={<Tracker />} />
+                  <Route path="/shared" element={<SharedResumePage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Suspense>
+            </ErrorBoundary>
           </div>
         </div>
       </div>
@@ -268,7 +285,15 @@ export default function App() {
   }, [user]);
 
   if (isSharedRoute) {
-    return <HashRouter><Routes><Route path="/shared" element={<SharedResumePage />} /></Routes></HashRouter>;
+    return (
+      <ErrorBoundary>
+        <HashRouter>
+          <Suspense fallback={<PageSpinner />}>
+            <Routes><Route path="/shared" element={<SharedResumePage />} /></Routes>
+          </Suspense>
+        </HashRouter>
+      </ErrorBoundary>
+    );
   }
 
   if (!isSupabaseConfigured()) {
@@ -294,21 +319,47 @@ export default function App() {
 
   // Show callback landing page while processing email link tokens
   if (authType && (loading || !user || passwordRecovery)) {
-    return <HashRouter><AuthCallbackPage authType={authType} /></HashRouter>;
+    return (
+      <ErrorBoundary>
+        <HashRouter>
+          <Suspense fallback={<PageSpinner />}>
+            <AuthCallbackPage authType={authType} />
+          </Suspense>
+        </HashRouter>
+      </ErrorBoundary>
+    );
   }
 
   // Show reset form after PASSWORD_RECOVERY event
   if (passwordRecovery) {
-    return <HashRouter><AuthPage /></HashRouter>;
+    return (
+      <ErrorBoundary>
+        <HashRouter>
+          <Suspense fallback={<PageSpinner />}>
+            <AuthPage />
+          </Suspense>
+        </HashRouter>
+      </ErrorBoundary>
+    );
   }
 
   if (!user) {
-    return <HashRouter><LandingPage /></HashRouter>;
+    return (
+      <ErrorBoundary>
+        <HashRouter>
+          <Suspense fallback={<PageSpinner />}>
+            <LandingPage />
+          </Suspense>
+        </HashRouter>
+      </ErrorBoundary>
+    );
   }
 
   return (
-    <HashRouter>
-      <AppShell />
-    </HashRouter>
+    <ErrorBoundary>
+      <HashRouter>
+        <AppShell />
+      </HashRouter>
+    </ErrorBoundary>
   );
 }

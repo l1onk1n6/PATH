@@ -40,6 +40,8 @@
     <meta name="apple-mobile-web-app-title" content="PATH" />
     <meta name="theme-color" content="#0f1923" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/logo-512.png" />
 
     <!-- ── Structured Data (JSON-LD) ─────────────────────── -->
     <script type="application/ld+json">
@@ -86,6 +88,22 @@
           "description": "Schweiz, Deutschland, Österreich"
         }
       }
+    }
+    </script>
+
+    <!-- ── FAQ Structured Data ──────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type":"Question","name":"Ist PATH kostenlos?","acceptedAnswer":{"@type":"Answer","text":"Ja. Du kannst PATH kostenlos nutzen ohne Kreditkarte. Der Free-Plan beinhaltet 3 Bewerbungsmappen, 6 Templates und 5 PDF-Exporte pro Monat."}},
+        {"@type":"Question","name":"Kann ich meinen Lebenslauf als PDF herunterladen?","acceptedAnswer":{"@type":"Answer","text":"Ja, mit einem Klick. PATH exportiert deinen Lebenslauf als druckfertiges PDF direkt aus dem Browser."}},
+        {"@type":"Question","name":"Für welche Länder ist PATH geeignet?","acceptedAnswer":{"@type":"Answer","text":"PATH ist für den deutschsprachigen Raum optimiert: Schweiz, Deutschland und Österreich."}},
+        {"@type":"Question","name":"Brauche ich technische Kenntnisse?","acceptedAnswer":{"@type":"Answer","text":"Nein. PATH ist so einfach wie ein Online-Formular. Ausfüllen, Vorlage wählen, PDF herunterladen."}},
+        {"@type":"Question","name":"Ist PATH DSGVO-konform?","acceptedAnswer":{"@type":"Answer","text":"Ja. Alle Daten werden sicher in der EU gespeichert. Wir verkaufen keine Daten an Dritte."}},
+        {"@type":"Question","name":"Kann ich PATH auf dem Handy nutzen?","acceptedAnswer":{"@type":"Answer","text":"Ja. PATH ist vollständig für Smartphones optimiert und kann als PWA auf dem Homescreen installiert werden."}}
+      ]
     }
     </script>
 
