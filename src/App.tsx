@@ -380,7 +380,10 @@ export default function App() {
       <ErrorBoundary>
         <HashRouter>
           <Suspense fallback={<PageSpinner />}>
-            <LandingPage />
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
           </Suspense>
         </HashRouter>
       </ErrorBoundary>
