@@ -413,6 +413,8 @@ export async function getShareLinkViews(linkId: string, limit = 50): Promise<Sha
 export async function fetchSharedResumeByToken(token: string): Promise<Resume | null> {
   if (!isSupabaseConfigured()) return null;
   try {
+    let resume: Resume | null = null;
+
     // New path: share_links table
     const { data: link } = await sb()
       .from('share_links')
@@ -422,12 +424,28 @@ export async function fetchSharedResumeByToken(token: string): Promise<Resume | 
       .maybeSingle();
     if (link) {
       const { data } = await sb().from('resumes').select('*').eq('id', (link as Record<string, unknown>).resume_id as string).maybeSingle();
-      if (data) return rowToResume(data as Record<string, unknown>);
+      if (data) resume = rowToResume(data as Record<string, unknown>);
     }
     // Legacy path: resumes.share_token
-    const { data } = await sb().from('resumes').select('*').eq('share_token', token).not('share_token', 'is', null).maybeSingle();
-    if (data) return rowToResume(data as Record<string, unknown>);
-    return null;
+    if (!resume) {
+      const { data } = await sb().from('resumes').select('*').eq('share_token', token).not('share_token', 'is', null).maybeSingle();
+      if (data) resume = rowToResume(data as Record<string, unknown>);
+    }
+    if (!resume) return null;
+
+    // Fetch documents via public edge function (bypasses RLS using service role)
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || localStorage.getItem('aicv-supabase-url') || '';
+      if (supabaseUrl) {
+        const res = await fetch(`${supabaseUrl}/functions/v1/get-shared-docs?token=${encodeURIComponent(token)}`);
+        if (res.ok) {
+          const { documents } = await res.json() as { documents?: Resume['documents'] };
+          if (Array.isArray(documents)) resume.documents = documents;
+        }
+      }
+    } catch { /* ignore — documents stays [] */ }
+
+    return resume;
   } catch (e) {
     console.warn('[db] fetchSharedResumeByToken', e);
     return null;

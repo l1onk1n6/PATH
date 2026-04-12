@@ -41,8 +41,12 @@ Deno.serve(async (req: Request) => {
   )
 
   try {
+    // sendBeacon always uses POST; it passes ?method=PATCH to signal a duration update
+    const methodOverride = new URL(req.url).searchParams.get('method')?.toUpperCase()
+    const method = methodOverride ?? req.method
+
     // ── PATCH: update duration of an existing view ─────────
-    if (req.method === 'PATCH') {
+    if (method === 'PATCH') {
       const { view_id, duration_s } = await req.json()
       if (!view_id || typeof duration_s !== 'number') return json({ error: 'bad request' }, 400)
       await sb.from('resume_views').update({ duration_s }).eq('id', view_id)
@@ -50,7 +54,7 @@ Deno.serve(async (req: Request) => {
     }
 
     // ── POST: log new view ─────────────────────────────────
-    if (req.method !== 'POST') return json({ error: 'method not allowed' }, 405)
+    if (method !== 'POST') return json({ error: 'method not allowed' }, 405)
 
     const { token } = await req.json()
     if (!token) return json({ error: 'token required' }, 400)

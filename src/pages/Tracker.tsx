@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp, ClipboardList, Link, LayoutGrid, List } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp, ClipboardList, Link, LayoutGrid, List, Copy, Eye } from 'lucide-react';
 import { useTrackerStore, type Application, type ApplicationStatus, type ApplicationType } from '../store/trackerStore';
 import { useResumeStore } from '../store/resumeStore';
 import { toast } from '../components/ui/Toast';
-import type { Resume } from '../types/resume';
+import type { Resume, ShareLink } from '../types/resume';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { CustomSelect } from '../components/ui/CustomSelect';
+import { getShareLinks } from '../lib/db';
 
 const STATUS_CONFIG: Record<ApplicationStatus, { label: string; color: string; bg: string }> = {
   offen:          { label: 'Offen',           color: 'var(--text-secondary)', bg: 'rgba(255,255,255,0.08)' },
@@ -68,6 +69,64 @@ function formatDate(d: string) {
   if (!d) return '—';
   const [y, m, day] = d.split('-');
   return `${day}.${m}.${y}`;
+}
+
+// ─── Share links section ──────────────────────────────────────────────────────
+
+function ShareLinksSection({ resumeId }: { resumeId: string }) {
+  const [links, setLinks] = useState<ShareLink[] | null>(null);
+
+  useEffect(() => {
+    getShareLinks(resumeId).then(setLinks);
+  }, [resumeId]);
+
+  const activeLinks = (links ?? []).filter((l) => l.isActive);
+
+  if (links === null) return null; // loading
+  if (activeLinks.length === 0) return (
+    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, padding: '8px 0' }}>
+      Noch kein geteilter Link vorhanden. Link im Editor erstellen.
+    </div>
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+      {activeLinks.map((link) => {
+        const url = `${window.location.origin}${window.location.pathname}#/shared?t=${link.token}`;
+        return (
+          <div key={link.id} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <input
+              className="input-glass"
+              value={url}
+              readOnly
+              style={{ flex: 1, fontSize: 10, padding: '5px 8px', cursor: 'default' }}
+            />
+            <button
+              className="btn-glass btn-icon"
+              title="Link kopieren"
+              style={{ padding: 6, flexShrink: 0 }}
+              onClick={() => { navigator.clipboard.writeText(url); toast.success('Link kopiert!'); }}
+            >
+              <Copy size={11} />
+            </button>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-glass btn-icon"
+              title="Link öffnen"
+              style={{ padding: 6, flexShrink: 0, display: 'flex', alignItems: 'center' }}
+            >
+              <ExternalLink size={11} />
+            </a>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 3 }}>
+              <Eye size={10} /> {link.viewCount}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 function sortApps(apps: Application[], sort: string) {
@@ -294,6 +353,14 @@ function KanbanCard({
               ]}
             />
           </div>
+
+          {/* Geteilte Links der verknüpften Mappe */}
+          {linkedResume && (
+            <div style={{ marginTop: 8 }}>
+              <label className="section-label">Geteilte Links</label>
+              <ShareLinksSection resumeId={linkedResume.id} />
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -789,6 +856,14 @@ export default function Tracker() {
                           ]}
                         />
                       </div>
+
+                      {/* Geteilte Links der verknüpften Mappe */}
+                      {linkedResume && (
+                        <div style={{ marginTop: 10 }}>
+                          <label className="section-label">Geteilte Links</label>
+                          <ShareLinksSection resumeId={linkedResume.id} />
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
