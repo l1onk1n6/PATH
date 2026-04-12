@@ -22,6 +22,7 @@ const AuthPage         = lazy(() => import('./pages/AuthPage'));
 const LandingPage      = lazy(() => import('./pages/LandingPage'));
 const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage'));
 const SharedResumePage = lazy(() => import('./pages/SharedResumePage'));
+const ScreenshotPage   = lazy(() => import('./pages/ScreenshotPage'));
 const AccountPage      = lazy(() => import('./pages/AccountPage'));
 const Tracker          = lazy(() => import('./pages/Tracker'));
 const NotFoundPage     = lazy(() => import('./pages/NotFoundPage'));
@@ -298,12 +299,16 @@ export default function App() {
     });
   }, [user]);
 
-  if (isSharedRoute) {
+  const isScreenshotRoute = window.location.hash.startsWith('#/screenshot');
+  if (isSharedRoute || isScreenshotRoute) {
     return (
       <ErrorBoundary>
         <HashRouter>
           <Suspense fallback={<PageSpinner />}>
-            <Routes><Route path="/shared" element={<SharedResumePage />} /></Routes>
+            <Routes>
+              <Route path="/shared"     element={<SharedResumePage />} />
+              <Route path="/screenshot" element={<ScreenshotPage />} />
+            </Routes>
           </Suspense>
         </HashRouter>
       </ErrorBoundary>

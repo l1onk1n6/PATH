@@ -918,52 +918,13 @@ function ComparisonTable({ isMobile }: { isMobile: boolean }) {
   );
 }
 
-/** Three overlapping CV template cards — realistic layout previews */
+/** Three overlapping real CV screenshots */
 function TemplateShowcasePreview() {
-  // Sidebar card: corporate blue
-  const SidebarCard = ({ bg, sidebarBg, accent, widths, top, left, rotate, zIndex, animated }: {
-    bg: string; sidebarBg: string; accent: string; widths: number[];
-    top: number; left: number; rotate: number; zIndex: number; animated?: boolean;
-  }) => (
-    <div style={{
-      position: 'absolute', top, left, width: 220, height: 275,
-      borderRadius: 12, overflow: 'hidden',
-      boxShadow: animated
-        ? '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)'
-        : '0 12px 40px rgba(0,0,0,0.5)',
-      transform: `rotate(${rotate}deg)`,
-      zIndex,
-      animation: animated ? 'float 5s ease-in-out infinite' : undefined,
-    }}>
-      <div style={{ display: 'flex', height: '100%' }}>
-        {/* Sidebar */}
-        <div style={{ width: '36%', background: sidebarBg, padding: '14px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
-          <div style={{ width: 26, height: 26, borderRadius: '50%', background: accent, marginBottom: 6 }} />
-          <div style={{ height: 3, width: '85%', background: 'rgba(255,255,255,0.6)', borderRadius: 2 }} />
-          <div style={{ height: 2, width: '65%', background: 'rgba(255,255,255,0.35)', borderRadius: 2 }} />
-          <div style={{ height: 1, width: '80%', background: `${accent}88`, borderRadius: 2, marginTop: 3, marginBottom: 3 }} />
-          {[70, 55, 65, 50, 60].map((w, i) => (
-            <div key={i} style={{ height: 9, width: `${w}%`, background: `${accent}25`, borderRadius: 4 }} />
-          ))}
-        </div>
-        {/* Main area */}
-        <div style={{ flex: 1, background: bg, padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
-          <div style={{ height: 5, width: '68%', background: '#444', borderRadius: 2 }} />
-          <div style={{ height: 3, width: '46%', background: accent, borderRadius: 2, opacity: 0.8, marginBottom: 3 }} />
-          <div style={{ height: 1.5, width: '38%', background: accent, borderRadius: 2, opacity: 0.5 }} />
-          <div style={{ height: 1, width: '100%', background: '#e0e0e0', borderRadius: 2 }} />
-          {widths.map((w, i) => (
-            <div key={i} style={{ height: 2.5, width: `${w}%`, background: i === 0 ? '#555' : '#ccc', borderRadius: 2 }} />
-          ))}
-          <div style={{ height: 1.5, width: '32%', background: accent, borderRadius: 2, opacity: 0.5, marginTop: 3 }} />
-          <div style={{ height: 1, width: '100%', background: '#e0e0e0', borderRadius: 2 }} />
-          {[82, 70, 60].map((w, i) => (
-            <div key={i} style={{ height: 2.5, width: `${w}%`, background: '#ccc', borderRadius: 2 }} />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  const SHOTS = [
+    { file: 'minimal',   rotate: 7,  top: 30, left: 10, zIndex: 1 },
+    { file: 'corporate', rotate: -3, top: 18, left: 55, zIndex: 2 },
+    { file: 'modern',    rotate: 0,  top: 0,  left: 95, zIndex: 3, animated: true },
+  ];
 
   return (
     <div style={{ flex: '0 0 auto', width: 370, height: 330, position: 'relative' }}>
@@ -974,65 +935,26 @@ function TemplateShowcasePreview() {
         pointerEvents: 'none',
       }} />
 
-      {/* Back card — Corporate blue, rotated right */}
-      <SidebarCard
-        bg="#f8f9fa" sidebarBg="#1e3a5f" accent="#f0c040"
-        widths={[88, 78, 68, 80, 65]} top={30} left={10} rotate={7} zIndex={1}
-      />
-
-      {/* Middle card — Creative purple, slight tilt */}
-      <SidebarCard
-        bg="#fff" sidebarBg="#2d1b69" accent="#7209b7"
-        widths={[85, 75, 65, 76, 60]} top={18} left={55} rotate={-3} zIndex={2}
-      />
-
-      {/* Front card — Minimal light header, straight, animated */}
-      <div style={{
-        position: 'absolute', top: 0, left: 95, width: 245, height: 305,
-        borderRadius: 14, overflow: 'hidden', zIndex: 3,
-        boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)',
-        animation: 'float 5s ease-in-out infinite',
-      }}>
-        {/* Gradient header */}
-        <div style={{
-          height: 58, background: 'linear-gradient(135deg,#007AFF,#5856D6)',
-          padding: '10px 14px', display: 'flex', alignItems: 'flex-end', gap: 10,
+      {SHOTS.map(({ file, rotate, top, left, zIndex, animated }) => (
+        <div key={file} style={{
+          position: 'absolute', top, left,
+          width: zIndex === 3 ? 245 : 220,
+          height: zIndex === 3 ? 305 : 275,
+          borderRadius: 12, overflow: 'hidden',
+          boxShadow: animated
+            ? '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)'
+            : '0 12px 40px rgba(0,0,0,0.5)',
+          transform: `rotate(${rotate}deg)`,
+          zIndex,
+          animation: animated ? 'float 5s ease-in-out infinite' : undefined,
         }}>
-          <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
-          <div>
-            <div style={{ height: 5, width: 88, background: 'rgba(255,255,255,0.92)', borderRadius: 2 }} />
-            <div style={{ height: 3, width: 58, background: 'rgba(255,255,255,0.55)', borderRadius: 2, marginTop: 4 }} />
-          </div>
+          <img
+            src={`./screenshots/${file}.png`}
+            alt={`${file} template`}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
+          />
         </div>
-        {/* Contact strip */}
-        <div style={{ background: 'rgba(0,122,255,0.06)', padding: '5px 14px', display: 'flex', gap: 8 }}>
-          {[55, 40, 50].map((w, i) => (
-            <div key={i} style={{ height: 2, width: w, background: 'rgba(0,0,0,0.2)', borderRadius: 2 }} />
-          ))}
-        </div>
-        {/* Body */}
-        <div style={{ background: '#f8f9fa', padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 5 }}>
-          <div style={{ height: 2.5, width: 68, background: '#007AFF', borderRadius: 2, opacity: 0.75 }} />
-          <div style={{ height: 1, width: '100%', background: '#ddd', borderRadius: 2, marginBottom: 2 }} />
-          <div style={{ height: 4, width: '65%', background: '#444', borderRadius: 2 }} />
-          <div style={{ height: 2.5, width: '45%', background: '#888', borderRadius: 2 }} />
-          {[88, 80, 72, 80].map((w, i) => (
-            <div key={i} style={{ height: 2, width: `${w}%`, background: '#ccc', borderRadius: 2 }} />
-          ))}
-          <div style={{ height: 2.5, width: 54, background: '#007AFF', borderRadius: 2, opacity: 0.75, marginTop: 4 }} />
-          <div style={{ height: 1, width: '100%', background: '#ddd', borderRadius: 2, marginBottom: 2 }} />
-          <div style={{ height: 4, width: '55%', background: '#444', borderRadius: 2 }} />
-          {[75, 65].map((w, i) => (
-            <div key={i} style={{ height: 2, width: `${w}%`, background: '#ccc', borderRadius: 2 }} />
-          ))}
-          {/* Skill pills */}
-          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 4 }}>
-            {[40, 52, 34, 44, 38].map((w, i) => (
-              <div key={i} style={{ height: 10, width: w, background: 'rgba(0,122,255,0.12)', borderRadius: 5, border: '1px solid rgba(0,122,255,0.2)' }} />
-            ))}
-          </div>
-        </div>
-      </div>
+      ))}
 
       {/* Floating badge */}
       <div style={{
@@ -1051,3 +973,4 @@ function TemplateShowcasePreview() {
     </div>
   );
 }
+
