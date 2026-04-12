@@ -229,7 +229,7 @@ export default function SharedResumePage() {
     <div style={{ minHeight: '100vh', background: t.bg, transition: 'background 0.2s' }}>
 
       {/* ── Nav ── */}
-      <div style={{
+      <div id="shared-nav" style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: t.navBg, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
         borderBottom: `1px solid ${t.navBorder}`,
@@ -262,7 +262,7 @@ export default function SharedResumePage() {
       </div>
 
       {/* ── Candidate header ── */}
-      <div style={{ background: t.headerBg, borderBottom: `1px solid ${t.headerBorder}`, padding: isMobile ? '20px 16px' : '24px 32px', transition: 'background 0.2s' }}>
+      <div id="shared-header" style={{ background: t.headerBg, borderBottom: `1px solid ${t.headerBorder}`, padding: isMobile ? '20px 16px' : '24px 32px', transition: 'background 0.2s' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 14 : 0, justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', marginBottom: 16 }}>
             <div>
@@ -290,7 +290,7 @@ export default function SharedResumePage() {
 
       {/* ── Tabs ── */}
       {hasCoverLetter && (
-        <div style={{ background: t.tabsBg, borderBottom: `1px solid ${t.tabsBorder}`, padding: `0 ${isMobile ? 16 : 32}px`, transition: 'background 0.2s' }}>
+        <div id="shared-tabs" style={{ background: t.tabsBg, borderBottom: `1px solid ${t.tabsBorder}`, padding: `0 ${isMobile ? 16 : 32}px`, transition: 'background 0.2s' }}>
           <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex' }}>
             <button style={tabBtn(tab === 'cl')} onClick={() => setTab('cl')}>
               <Mail size={12} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />Anschreiben
@@ -308,7 +308,7 @@ export default function SharedResumePage() {
       )}
 
       {/* ── Content ── */}
-      <div style={{ padding: isMobile ? '24px 12px' : '32px 32px' }}>
+      <div id="shared-content" style={{ padding: isMobile ? '24px 12px' : '32px 32px' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
           {tab === 'cl' && (
             <div style={{ borderRadius: 12, overflow: 'hidden', boxShadow: t.shadow }}>
@@ -336,7 +336,7 @@ export default function SharedResumePage() {
       </div>
 
       {/* ── Footer ── */}
-      <footer style={{ padding: '12px 32px', borderTop: `1px solid ${t.footerBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontSize: 12, color: t.footerText }}>
+      <footer id="shared-footer" style={{ padding: '12px 32px', borderTop: `1px solid ${t.footerBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontSize: 12, color: t.footerText }}>
         <span>Erstellt mit PATH by pixmatic</span>
         <span>·</span>
         <a href="/" style={{ color: light ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.4)', textDecoration: 'none' }}>
@@ -344,7 +344,31 @@ export default function SharedResumePage() {
         </a>
       </footer>
 
-      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
+      <style>{`
+        @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+        @media print {
+          #shared-nav,
+          #shared-header,
+          #shared-tabs,
+          #shared-footer { display: none !important; }
+
+          body, html { background: #fff !important; }
+
+          #shared-content {
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+          #shared-content > div {
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          #shared-content > div > div {
+            border-radius: 0 !important;
+            box-shadow: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
