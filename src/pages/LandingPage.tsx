@@ -409,6 +409,74 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── App Screenshots ─────────────────────────────────── */}
+      <section style={{
+        padding: isMobile ? '80px 24px' : '100px 48px',
+        maxWidth: 1200, margin: '0 auto',
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: isMobile ? 40 : 56 }}>
+          <span style={{
+            display: 'inline-block', padding: '6px 16px', borderRadius: 99,
+            background: 'rgba(0,122,255,0.15)', border: '1px solid rgba(0,122,255,0.3)',
+            fontSize: 12, fontWeight: 600, color: '#4DA3FF', letterSpacing: 0.5,
+            textTransform: 'uppercase', marginBottom: 16,
+          }}>Live-Einblick</span>
+          <h2 style={{ fontSize: isMobile ? 26 : 36, fontWeight: 800, margin: '0 0 14px', letterSpacing: -0.5 }}>
+            So sieht PATH aus
+          </h2>
+          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', maxWidth: 480, margin: '0 auto' }}>
+            Übersichtliches Dashboard und intuitiver Editor — alles an einem Ort.
+          </p>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : '1.1fr 1fr',
+          gap: 24,
+          alignItems: 'start',
+        }}>
+          {/* Dashboard screenshot */}
+          <div style={{ position: 'relative' }}>
+            <img
+              src="./screenshots/app-dashboard.png"
+              alt="PATH Dashboard – Bewerbungsübersicht"
+              style={{
+                width: '100%', borderRadius: 16,
+                boxShadow: '0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08)',
+                display: 'block',
+              }}
+            />
+            <div style={{
+              position: 'absolute', bottom: -12, left: 20,
+              background: 'rgba(15,15,30,0.9)', backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10,
+              padding: '8px 14px', fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)',
+            }}>📋 Dashboard — alle Bewerbungen</div>
+          </div>
+
+          {/* Editor screenshot */}
+          <div style={{ position: 'relative', paddingTop: isMobile ? 32 : 40 }}>
+            <img
+              src="./screenshots/app-editor.png"
+              alt="PATH Editor – Bewerbung bearbeiten"
+              style={{
+                width: '100%', borderRadius: 16,
+                boxShadow: '0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08)',
+                display: 'block',
+              }}
+            />
+            <div style={{
+              position: 'absolute', bottom: -12, left: 20,
+              background: 'rgba(15,15,30,0.9)', backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10,
+              padding: '8px 14px', fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)',
+            }}>✏️ Editor — Bewerbung ausfüllen</div>
+          </div>
+        </div>
+      </section>
+
       {/* ── How it works ────────────────────────────────────── */}
       <section id="how" style={{
         padding: isMobile ? '80px 24px' : '100px 48px',

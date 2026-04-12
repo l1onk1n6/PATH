@@ -315,6 +315,19 @@ export default function App() {
     );
   }
 
+  // App-preview: bypass auth, render full shell with pre-seeded localStorage data
+  // Detected via ?preview=1 so HashRouter sees no hash → routes to / (Dashboard)
+  const isAppPreview = new URLSearchParams(window.location.search).get('preview') === '1';
+  if (isAppPreview) {
+    return (
+      <ErrorBoundary>
+        <HashRouter>
+          <AppShell />
+        </HashRouter>
+      </ErrorBoundary>
+    );
+  }
+
   if (!isSupabaseConfigured()) {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, padding: 24, textAlign: 'center' }}>
