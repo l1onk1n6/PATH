@@ -823,15 +823,20 @@ function ContactSection() {
       );
 
       setStepLabel(STEP_LABELS['sending']);
-      const d = await res.json().catch(() => ({})) as { ok?: boolean; error?: string; step?: string };
+      const rawText = await res.text().catch(() => '');
+      let d: { ok?: boolean; error?: string; step?: string } = {};
+      try { d = JSON.parse(rawText); } catch { /* non-JSON response */ }
 
       if (!res.ok) {
         if (res.status === 429) {
           setStatus('ratelimit');
           setErrorMsg(d.error ?? 'Zu viele Nachrichten. Bitte später erneut versuchen.');
+        } else if (res.status === 404) {
+          setStatus('error');
+          setErrorMsg('Kontaktformular-Service nicht erreichbar (404). Bitte direkt an info@pixmatic.ch schreiben.');
         } else {
           setStatus('error');
-          setErrorMsg(d.error ?? 'Unbekannter Fehler. Bitte erneut versuchen.');
+          setErrorMsg(d.error ?? `Serverfehler (${res.status}). Bitte direkt an info@pixmatic.ch schreiben.`);
         }
         resetTurnstile();
         return;
