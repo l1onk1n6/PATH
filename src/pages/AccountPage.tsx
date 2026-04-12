@@ -756,6 +756,7 @@ function ContactSection() {
   const turnstileId = useRef<string | null>(null);
   const [turnstileToken, setTurnstileToken] = useState('');
   const [turnstileReady, setTurnstileReady] = useState(!TURNSTILE_SITE_KEY);
+  const [turnstileError, setTurnstileError] = useState(false);
 
   // Load Turnstile script once
   useEffect(() => {
@@ -783,9 +784,9 @@ function ContactSection() {
       turnstileId.current = w.render(widgetRef.current!, {
         sitekey: TURNSTILE_SITE_KEY,
         theme: 'dark',
-        callback: (t: string) => { setTurnstileToken(t); setTurnstileReady(true); },
-        'expired-callback': () => { setTurnstileToken(''); setTurnstileReady(false); },
-        'error-callback':   () => { setTurnstileToken(''); setTurnstileReady(false); },
+        callback: (t: string) => { setTurnstileToken(t); setTurnstileReady(true); setTurnstileError(false); },
+        'expired-callback': () => { setTurnstileToken(''); setTurnstileReady(false); setTurnstileError(false); },
+        'error-callback':   () => { setTurnstileToken(''); setTurnstileReady(false); setTurnstileError(true); },
       });
     };
     tryRender();
@@ -796,12 +797,16 @@ function ContactSection() {
     if (w?.reset && turnstileId.current) { w.reset(turnstileId.current); }
     setTurnstileToken('');
     setTurnstileReady(false);
+    setTurnstileError(false);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (TURNSTILE_SITE_KEY && !turnstileReady) {
-      setErrorMsg('Bitte warte auf die Sicherheitsprüfung.');
+      setStatus('error');
+      setErrorMsg(turnstileError
+        ? 'Sicherheitsprüfung fehlgeschlagen. Bitte "Neu versuchen" klicken oder die Seite neu laden.'
+        : 'Bitte warte, bis die Sicherheitsprüfung abgeschlossen ist.');
       return;
     }
     setStatus('sending');
@@ -937,8 +942,22 @@ function ContactSection() {
             {/* Turnstile widget */}
             {TURNSTILE_SITE_KEY ? (
               <div>
-                <div ref={widgetRef} />
-                {!turnstileReady && (
+                <div ref={widgetRef} style={{ display: turnstileError ? 'none' : undefined }} />
+                {turnstileError ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '10px 14px', background: 'rgba(255,59,48,0.08)', border: '1px solid rgba(255,59,48,0.25)', borderRadius: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--ios-red)' }}>
+                      <AlertTriangle size={14} style={{ flexShrink: 0 }} />
+                      Sicherheitsprüfung fehlgeschlagen
+                    </div>
+                    <button
+                      type="button"
+                      onClick={resetTurnstile}
+                      style={{ fontSize: 12, fontWeight: 600, padding: '5px 12px', borderRadius: 8, border: '1px solid rgba(255,59,48,0.35)', background: 'rgba(255,59,48,0.1)', color: 'var(--ios-red)', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                    >
+                      Neu versuchen
+                    </button>
+                  </div>
+                ) : !turnstileReady && (
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6, display: 'flex', alignItems: 'center', gap: 5 }}>
                     <Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> Sicherheitsprüfung wird geladen…
                   </div>
