@@ -3,7 +3,7 @@ import { Home, ArrowLeft } from 'lucide-react';
 export default function NotFoundPage() {
   return (
     <div style={{
-      height: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
       flexDirection: 'column', gap: 20, padding: 32, textAlign: 'center',
     }}>
       {/* Big emoji */}
