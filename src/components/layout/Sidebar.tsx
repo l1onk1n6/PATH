@@ -6,7 +6,7 @@ import {
   PanelLeftClose, PanelLeftOpen, Sparkles, UserCircle, Lock,
   User, Briefcase, GraduationCap, Zap, FolderOpen,
   Upload, Palette, LayoutList, FileEdit, Languages, History,
-  Shield, Gift, ClipboardList, Pencil, Check, X,
+  Shield, Gift, ClipboardList, Pencil, Check, X, MessageSquare,
 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { toast } from '../ui/Toast';
@@ -41,6 +41,7 @@ const ACCOUNT_SECTIONS: { id: AccountSection; label: string; icon: React.Compone
   { id: 'referral', label: 'Freunde einladen',    icon: Gift },
   { id: 'privacy',  label: 'Datenschutz',         icon: Shield },
   { id: 'plan',     label: 'Plan & Features',     icon: Sparkles },
+  { id: 'contact',  label: 'Kontakt',             icon: MessageSquare },
 ];
 
 export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }: SidebarProps) {

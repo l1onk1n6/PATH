@@ -343,14 +343,8 @@ function AccountSection() {
         </button>
       </div>
 
-      <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>SUPPORT</div>
-        <a href="mailto:info@pixmatic.ch" className="btn-glass" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, textDecoration: 'none', fontSize: 13, padding: '8px 14px' }}>
-          <Mail size={13} /> info@pixmatic.ch
-        </a>
-      </div>
 
-      <div className="glass-card" style={{ padding: 20 }}>
+<div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>SITZUNG</div>
         <button
           className="btn-glass btn-sm btn-danger"
