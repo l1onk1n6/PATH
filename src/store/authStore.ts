@@ -14,6 +14,7 @@ interface AuthStore {
   initialize: () => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
+  signInWithLinkedIn: () => Promise<void>;
   signOut: () => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
   updatePassword: (newPassword: string) => Promise<void>;
@@ -91,6 +92,15 @@ export const useAuthStore = create<AuthStore>((set) => ({
     } catch (e) {
       set({ error: toGermanError(e), loading: false });
     }
+  },
+
+  signInWithLinkedIn: async () => {
+    const supabase = getSupabase();
+    const redirectTo = window.location.origin + window.location.pathname;
+    await supabase.auth.signInWithOAuth({
+      provider: 'linkedin_oidc',
+      options: { redirectTo },
+    });
   },
 
   signOut: async () => {
