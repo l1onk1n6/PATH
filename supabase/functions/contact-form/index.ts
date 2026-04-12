@@ -120,45 +120,60 @@ Deno.serve(async (req) => {
   }
 
   // ── Send email via SMTP ──────────────────────────────────────────────────────
+  const smtpHost = Deno.env.get('SMTP_HOST')
+  const smtpUser = Deno.env.get('SMTP_USER')
+  const smtpPass = Deno.env.get('SMTP_PASS')
+  const smtpFrom = Deno.env.get('SMTP_FROM')
+
+  if (!smtpHost || !smtpUser || !smtpPass || !smtpFrom) {
+    console.error('SMTP not configured:', { smtpHost: !!smtpHost, smtpUser: !!smtpUser, smtpPass: !!smtpPass, smtpFrom: !!smtpFrom })
+    return json({ error: 'E-Mail-Versand nicht konfiguriert. Bitte direkt an info@pixmatic.ch schreiben.', step: 'sending' }, 500)
+  }
+
   const transporter = nodemailer.createTransport({
-    host:   Deno.env.get('SMTP_HOST')!,
+    host:   smtpHost,
     port:   parseInt(Deno.env.get('SMTP_PORT') ?? '587'),
     secure: Deno.env.get('SMTP_PORT') === '465',
-    auth: {
-      user: Deno.env.get('SMTP_USER')!,
-      pass: Deno.env.get('SMTP_PASS')!,
-    },
+    auth: { user: smtpUser, pass: smtpPass },
   })
 
   const replyTo = email?.trim() || undefined
 
-  await transporter.sendMail({
-    from:    Deno.env.get('SMTP_FROM')!,
-    to:      RECIPIENT,
-    replyTo,
-    subject: `[PATH Kontakt] ${subject?.trim() || 'Neue Nachricht'} – ${name.trim()}`,
-    text: [
-      `Name:    ${name.trim()}`,
-      replyTo ? `E-Mail:  ${replyTo}` : '',
-      `Betreff: ${subject?.trim() || '—'}`,
-      '',
-      message.trim(),
-    ].filter(Boolean).join('\n'),
-    html: `
-      <div style="font-family:sans-serif;max-width:600px">
-        <h2 style="margin-bottom:4px">Neue Kontaktanfrage – PATH</h2>
-        <table style="border-collapse:collapse;width:100%;margin-bottom:16px">
-          <tr><td style="padding:6px 12px 6px 0;color:#666;width:80px">Name</td><td style="padding:6px 0"><strong>${name.trim()}</strong></td></tr>
-          ${replyTo ? `<tr><td style="padding:6px 12px 6px 0;color:#666">E-Mail</td><td style="padding:6px 0"><a href="mailto:${replyTo}">${replyTo}</a></td></tr>` : ''}
-          <tr><td style="padding:6px 12px 6px 0;color:#666">Betreff</td><td style="padding:6px 0">${subject?.trim() || '—'}</td></tr>
-        </table>
-        <div style="background:#f5f5f5;border-radius:8px;padding:16px;white-space:pre-wrap">${message.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
-      </div>
-    `,
-  })
+  try {
+    await transporter.sendMail({
+      from:    smtpFrom,
+      to:      RECIPIENT,
+      replyTo,
+      subject: `[PATH Kontakt] ${subject?.trim() || 'Neue Nachricht'} – ${name.trim()}`,
+      text: [
+        `Name:    ${name.trim()}`,
+        replyTo ? `E-Mail:  ${replyTo}` : '',
+        `Betreff: ${subject?.trim() || '—'}`,
+        '',
+        message.trim(),
+      ].filter(Boolean).join('\n'),
+      html: `
+        <div style="font-family:sans-serif;max-width:600px">
+          <h2 style="margin-bottom:4px">Neue Kontaktanfrage – PATH</h2>
+          <table style="border-collapse:collapse;width:100%;margin-bottom:16px">
+            <tr><td style="padding:6px 12px 6px 0;color:#666;width:80px">Name</td><td style="padding:6px 0"><strong>${name.trim()}</strong></td></tr>
+            ${replyTo ? `<tr><td style="padding:6px 12px 6px 0;color:#666">E-Mail</td><td style="padding:6px 0"><a href="mailto:${replyTo}">${replyTo}</a></td></tr>` : ''}
+            <tr><td style="padding:6px 12px 6px 0;color:#666">Betreff</td><td style="padding:6px 0">${subject?.trim() || '—'}</td></tr>
+          </table>
+          <div style="background:#f5f5f5;border-radius:8px;padding:16px;white-space:pre-wrap">${message.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+        </div>
+      `,
+    })
+  } catch (smtpErr) {
+    console.error('SMTP send failed:', smtpErr)
+    return json({ error: 'E-Mail konnte nicht gesendet werden. Bitte direkt an info@pixmatic.ch schreiben.', step: 'sending' }, 500)
+  }
 
   // ── Log submission for rate limiting ─────────────────────────────────────────
-  await admin.from('contact_log').insert({ user_id: userId })
+  // Best-effort — don't fail the request if the log insert fails
+  await admin.from('contact_log').insert({ user_id: userId }).catch((e: unknown) => {
+    console.error('contact_log insert failed:', e)
+  })
 
   return json({ ok: true })
 })
