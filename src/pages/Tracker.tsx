@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp, ClipboardList, Link, LayoutGrid, List, Copy, Eye } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp, ClipboardList, Link, LayoutGrid, List, Copy } from 'lucide-react';
 import { useTrackerStore, type Application, type ApplicationStatus, type ApplicationType } from '../store/trackerStore';
 import { useResumeStore } from '../store/resumeStore';
 import { toast } from '../components/ui/Toast';
@@ -119,9 +119,6 @@ function ShareLinksSection({ resumeId }: { resumeId: string }) {
             >
               <ExternalLink size={11} />
             </a>
-            <span style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 3 }}>
-              <Eye size={10} /> {link.viewCount}
-            </span>
           </div>
         );
       })}
