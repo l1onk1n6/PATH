@@ -12,10 +12,11 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 const TRACK_URL = `${import.meta.env.VITE_SUPABASE_URL ?? ''}/functions/v1/track-view`;
 const ANON_KEY  = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
 
-function authHeaders() {
+function authHeaders(): Record<string, string> {
   const key = ANON_KEY || localStorage.getItem('aicv-supabase-key') || '';
-  return key ? { 'Content-Type': 'application/json', apikey: key, Authorization: `Bearer ${key}` }
-             : { 'Content-Type': 'application/json' };
+  const h: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (key) { h['apikey'] = key; h['Authorization'] = `Bearer ${key}`; }
+  return h;
 }
 
 async function trackView(token: string): Promise<string | null> {
