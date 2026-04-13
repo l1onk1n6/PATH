@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Loader2, Cloud, Loader, ShieldAlert } from 'lucide-react';
 import { useSessionTimeout } from './hooks/useSessionTimeout';
 import Sidebar from './components/layout/Sidebar';
@@ -393,7 +393,7 @@ export default function App() {
           <Suspense fallback={<PageSpinner />}>
             <Routes>
               <Route path="/" element={<LandingPage />} />
-              <Route path="*" element={<NotFoundPage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
         </HashRouter>
