@@ -276,10 +276,10 @@ export default function SharedResumePage() {
               {pi.title && <div style={{ fontSize: 14, color: t.textSub, marginTop: 3 }}>{pi.title}</div>}
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {pi.email && <a href={`mailto:${pi.email}`} style={{ ...btn }}><Mail size={13} />{isMobile ? 'E-Mail' : pi.email}</a>}
-              {pi.phone && <a href={`tel:${pi.phone}`} style={{ ...btn }}><Phone size={13} />{isMobile ? 'Anrufen' : pi.phone}</a>}
-              {pi.linkedin && <a href={pi.linkedin.startsWith('http') ? pi.linkedin : `https://${pi.linkedin}`} target="_blank" rel="noopener noreferrer" style={{ ...btn }}><Globe size={13} />LinkedIn</a>}
-              {pi.website && <a href={pi.website.startsWith('http') ? pi.website : `https://${pi.website}`} target="_blank" rel="noopener noreferrer" style={{ ...btn }}><Globe size={13} />Website</a>}
+              {pi.email?.trim() && <a href={`mailto:${pi.email}`} style={{ ...btn }}><Mail size={13} />{isMobile ? 'E-Mail' : pi.email}</a>}
+              {pi.phone?.trim() && <a href={`tel:${pi.phone}`} style={{ ...btn }}><Phone size={13} />{isMobile ? 'Anrufen' : pi.phone}</a>}
+              {pi.linkedin?.trim() && <a href={pi.linkedin.startsWith('http') ? pi.linkedin : `https://${pi.linkedin}`} target="_blank" rel="noopener noreferrer" style={{ ...btn }}><Globe size={13} />LinkedIn</a>}
+              {pi.website?.trim() && <a href={pi.website.startsWith('http') ? pi.website : `https://${pi.website}`} target="_blank" rel="noopener noreferrer" style={{ ...btn }}><Globe size={13} />Website</a>}
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
