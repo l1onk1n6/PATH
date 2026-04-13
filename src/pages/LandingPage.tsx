@@ -116,12 +116,16 @@ export default function LandingPage() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Allow page to scroll (body has overflow:hidden normally)
+  // Also force dark theme — landing page is always dark regardless of user setting
   useEffect(() => {
     document.body.style.overflow = 'auto';
     document.documentElement.style.overflow = 'auto';
+    const prevTheme = document.documentElement.getAttribute('data-theme');
+    document.documentElement.setAttribute('data-theme', 'dark');
     return () => {
       document.body.style.overflow = 'hidden';
       document.documentElement.style.overflow = '';
+      if (prevTheme) document.documentElement.setAttribute('data-theme', prevTheme);
     };
   }, []);
 
