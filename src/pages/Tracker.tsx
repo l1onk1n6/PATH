@@ -390,12 +390,16 @@ function KanbanBoard({
     <div
       style={{
         display: 'flex',
-        flexDirection: isMobile ? 'column' : 'row',
+        flexDirection: 'row',
         gap: 12,
-        overflowX: isMobile ? 'visible' : 'auto',
+        overflowX: 'auto',
         overflowY: 'visible',
-        paddingBottom: 12,
+        paddingBottom: isMobile ? 20 : 12,
+        paddingLeft: isMobile ? 2 : 0,
+        paddingRight: isMobile ? 16 : 0,
         alignItems: 'flex-start',
+        scrollSnapType: isMobile ? 'x mandatory' : 'none',
+        WebkitOverflowScrolling: 'touch',
       }}
     >
       {ALL_STATUSES.map((status) => {
@@ -406,9 +410,9 @@ function KanbanBoard({
           <div
             key={status}
             style={{
-              flex: isMobile ? '0 0 auto' : '1 1 160px',
-              width: isMobile ? '100%' : undefined,
+              flex: isMobile ? `0 0 calc(85vw)` : '1 1 160px',
               minWidth: isMobile ? undefined : 160,
+              scrollSnapAlign: isMobile ? 'start' : undefined,
               display: 'flex',
               flexDirection: 'column',
               gap: 0,

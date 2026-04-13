@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Plus, Trash2, Copy, CheckCircle, Globe, ExternalLink, ToggleLeft, ToggleRight, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Copy, CheckCircle, Globe, ExternalLink, ToggleLeft, ToggleRight, Loader2, Sparkles } from 'lucide-react';
 import type { ShareLink } from '../../types/resume';
 import { getShareLinks, createShareLink, deleteShareLink, updateShareLink } from '../../lib/db';
 import { isSupabaseConfigured } from '../../lib/supabase';
@@ -21,6 +21,7 @@ export default function ShareLinksPanel({ resumeId, readOnly }: Props) {
   const [creating, setCreating] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
+  const [firstLinkId, setFirstLinkId] = useState<string | null>(null);
 
   const load = useCallback(() => {
     getShareLinks(resumeId).then(l => { setLinks(l); setLoading(false); });
@@ -47,8 +48,22 @@ export default function ShareLinksPanel({ resumeId, readOnly }: Props) {
   async function create() {
     if (atLimit || creating) return;
     setCreating(true);
+    const isFirst = links.length === 0;
     const link = await createShareLink(resumeId, newLabel.trim());
-    if (link) { setLinks(prev => [link, ...prev]); setNewLabel(''); setShowCreate(false); toast.success('linkCreated'); }
+    if (link) {
+      setLinks(prev => [link, ...prev]);
+      setNewLabel('');
+      setShowCreate(false);
+      toast.success('linkCreated');
+      if (isFirst) {
+        // Auto-copy and show first-link hint
+        const url = `${window.location.origin}${window.location.pathname}#/shared?t=${link.token}`;
+        navigator.clipboard.writeText(url).catch(() => {});
+        setCopied(link.token);
+        setFirstLinkId(link.id);
+        setTimeout(() => setCopied(null), 3000);
+      }
+    }
     setCreating(false);
   }
 
@@ -144,10 +159,24 @@ export default function ShareLinksPanel({ resumeId, readOnly }: Props) {
               </div>
 
               {/* URL preview */}
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', background: 'rgba(255,255,255,0.04)', borderRadius: 6, padding: '4px 8px', marginBottom: 8, fontFamily: 'monospace', wordBreak: 'break-all' }}>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)', background: 'rgba(255,255,255,0.04)', borderRadius: 6, padding: '4px 8px', marginBottom: firstLinkId === link.id ? 10 : 0, fontFamily: 'monospace', wordBreak: 'break-all' }}>
                 {shareUrl(link.token)}
               </div>
 
+              {/* First-link hint */}
+              {firstLinkId === link.id && (
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, background: 'rgba(52,199,89,0.1)', border: '1px solid rgba(52,199,89,0.25)', borderRadius: 8, padding: '8px 10px', fontSize: 11, color: '#30D158' }}>
+                  <Sparkles size={13} style={{ flexShrink: 0, marginTop: 1 }} />
+                  <div>
+                    <div style={{ fontWeight: 700, marginBottom: 2 }}>Link kopiert!</div>
+                    <div style={{ opacity: 0.8 }}>Schicke den Link direkt per E-Mail an HR — der Lebenslauf öffnet sich ohne Login.</div>
+                  </div>
+                  <button
+                    onClick={() => setFirstLinkId(null)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#30D158', opacity: 0.5, padding: 0, flexShrink: 0, fontSize: 14, lineHeight: 1 }}
+                  >✕</button>
+                </div>
+              )}
             </div>
           ))}
         </div>

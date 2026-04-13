@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Loader2, AlertCircle, Download, Printer, Mail, Phone, Send, FileText, Globe, Paperclip, Sun, Moon } from 'lucide-react';
+import { AlertCircle, Download, Loader2, Printer, Mail, Phone, Send, FileText, Globe, Paperclip, Sun, Moon } from 'lucide-react';
 import type { Resume, UploadedDocument } from '../types/resume';
 import { fetchSharedResumeByToken } from '../lib/db';
 import ResumePreview from '../components/templates/ResumePreview';
@@ -8,6 +8,49 @@ import { LogoFull } from '../components/layout/Logo';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { renderElementToPdfDoc } from '../lib/pdfExport';
 import { useIsMobile } from '../hooks/useBreakpoint';
+
+const SKELETON_CSS = `
+  @keyframes shimmer { 0% { background-position: -600px 0 } 100% { background-position: 600px 0 } }
+  .sk { background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.11) 50%, rgba(255,255,255,0.05) 75%);
+        background-size: 1200px 100%; animation: shimmer 1.5s infinite; border-radius: 6px; }
+`;
+
+function SharedPageSkeleton({ isMobile }: { isMobile: boolean }) {
+  const p = isMobile ? '10px 16px' : '10px 32px';
+  const hp = isMobile ? '20px 16px' : '24px 32px';
+  return (
+    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+      <style>{SKELETON_CSS + `@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
+      {/* Nav */}
+      <div style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', padding: p, display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div className="sk" style={{ width: 90, height: 22 }} />
+        <div style={{ flex: 1 }} />
+        <div className="sk" style={{ width: 34, height: 34, borderRadius: 9 }} />
+        <div className="sk" style={{ width: 34, height: 34, borderRadius: 9 }} />
+      </div>
+      {/* Header */}
+      <div style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', padding: hp }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div className="sk" style={{ width: isMobile ? '60%' : 260, height: 28, marginBottom: 8 }} />
+          <div className="sk" style={{ width: isMobile ? '40%' : 160, height: 15, marginBottom: 20 }} />
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {[140, 110, 95].map((w, i) => <div key={i} className="sk" style={{ width: w, height: 36, borderRadius: 10 }} />)}
+          </div>
+        </div>
+      </div>
+      {/* Tabs */}
+      <div style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', padding: `0 ${isMobile ? 16 : 32}px`, display: 'flex', gap: 2 }}>
+        {[88, 72].map((w, i) => <div key={i} className="sk" style={{ width: w, height: 42, borderRadius: 0, opacity: i === 0 ? 1 : 0.4 }} />)}
+      </div>
+      {/* Content */}
+      <div style={{ padding: isMobile ? '24px 12px' : '32px 32px' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div className="sk" style={{ width: '100%', height: isMobile ? 600 : 1100, borderRadius: 12 }} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const TRACK_URL = `${import.meta.env.VITE_SUPABASE_URL ?? ''}/functions/v1/track-view`;
 
@@ -239,13 +282,7 @@ export default function SharedResumePage() {
     shadow: '0 8px 48px rgba(0,0,0,0.4)',
   };
 
-  if (loading) return (
-    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
-      <Loader2 size={28} style={{ animation: 'spin 1s linear infinite', color: 'var(--ios-blue)' }} />
-      <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>{STRINGS.de.loading}</span>
-      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
-    </div>
-  );
+  if (loading) return <SharedPageSkeleton isMobile={isMobile} />;
 
   if (notFound || !resume) return (
     <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, padding: 24, textAlign: 'center' }}>
