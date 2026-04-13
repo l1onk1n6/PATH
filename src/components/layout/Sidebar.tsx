@@ -155,7 +155,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
     <aside style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', flexShrink: 0, padding: '16px 12px' }}>
       {/* Logo + collapse */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, paddingLeft: 4 }}>
-        <LogoFull size={32} />
+        <LogoFull size={32} light={theme === 'light'} />
         {onToggleCollapse && (
           <button className="btn-glass btn-icon btn-sm" onClick={onToggleCollapse} title="Seitenleiste einklappen"
             style={{ padding: 6, boxShadow: 'none', opacity: 0.6, background: 'transparent', border: 'none', flexShrink: 0 }}>

@@ -88,10 +88,10 @@ function ShareModal({ resumeId, onClose }: { resumeId: string; onClose: () => vo
           </button>
         </div>
         <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 16 }}>
-          Erstelle benannte Links pro Stelle und verfolge Aufrufe, Herkunft und Gerät in der Übersicht.
+          Erstelle benannte Links pro Stelle und teile deine Bewerbungsunterlagen direkt mit HR.
         </p>
         <button className="btn-glass btn-primary" style={{ width: '100%' }} onClick={goToOverview}>
-          <Share2 size={14} /> Zu Links & Analytics
+          <Share2 size={14} /> Zu Share-Links
         </button>
       </div>
     </div>
