@@ -32,11 +32,67 @@ function sendDuration(viewId: string, durationS: number) {
   }
 }
 
-const CATEGORY_LABELS: Record<UploadedDocument['category'], string> = {
-  certificate: 'Zertifikat', reference: 'Referenz', portfolio: 'Portfolio', other: 'Beilage',
-};
+// ── i18n ──────────────────────────────────────────────────────────────────────
+type Lang = 'de' | 'en';
 
-function DocCard({ doc, light }: { doc: UploadedDocument; light: boolean }) {
+const STRINGS = {
+  de: {
+    loading: 'Bewerbungsunterlagen werden geladen…',
+    notFound: 'Unterlagen nicht gefunden',
+    notFoundSub: 'Dieser Link ist ungültig oder wurde deaktiviert.',
+    emailLabel: 'E-Mail',
+    callLabel: 'Anrufen',
+    downloadingPdf: 'PDF wird erstellt…',
+    downloadPdf: 'Lebenslauf als PDF',
+    forward: 'Weiterleiten',
+    print: 'Drucken',
+    coverLetterTab: 'Anschreiben',
+    cvTab: 'Lebenslauf',
+    attachmentsTab: 'Anlagen',
+    download: 'Herunterladen',
+    previewLoading: 'Vorschau wird geladen…',
+    footerCreated: 'Erstellt mit PATH by pixmatic',
+    footerCta: 'Eigene Bewerbungsmappe erstellen →',
+    lightMode: 'Heller Modus',
+    darkMode: 'Dunkler Modus',
+    forwardSubject: (name: string, title: string) =>
+      `Bewerbung: ${name}${title ? ` – ${title}` : ''}`,
+    forwardBody: (name: string, url: string) =>
+      `Guten Tag,\n\nanbei finden Sie die Bewerbungsunterlagen von ${name}:\n\n${url}\n\nFreundliche Grüsse`,
+    categories: { certificate: 'Zertifikat', reference: 'Referenz', portfolio: 'Portfolio', other: 'Anlage' },
+    dateLocale: 'de-CH' as const,
+  },
+  en: {
+    loading: 'Loading application documents…',
+    notFound: 'Documents not found',
+    notFoundSub: 'This link is invalid or has been deactivated.',
+    emailLabel: 'Email',
+    callLabel: 'Call',
+    downloadingPdf: 'Creating PDF…',
+    downloadPdf: 'Download CV as PDF',
+    forward: 'Forward',
+    print: 'Print',
+    coverLetterTab: 'Cover Letter',
+    cvTab: 'CV',
+    attachmentsTab: 'Attachments',
+    download: 'Download',
+    previewLoading: 'Loading preview…',
+    footerCreated: 'Created with PATH by pixmatic',
+    footerCta: 'Create your own application →',
+    lightMode: 'Light mode',
+    darkMode: 'Dark mode',
+    forwardSubject: (name: string, title: string) =>
+      `Application: ${name}${title ? ` – ${title}` : ''}`,
+    forwardBody: (name: string, url: string) =>
+      `Dear Sir or Madam,\n\nplease find the application documents of ${name}:\n\n${url}\n\nBest regards`,
+    categories: { certificate: 'Certificate', reference: 'Reference', portfolio: 'Portfolio', other: 'Attachment' },
+    dateLocale: 'en-GB' as const,
+  },
+} as const;
+
+// ── DocCard ───────────────────────────────────────────────────────────────────
+function DocCard({ doc, light, lang }: { doc: UploadedDocument; light: boolean; lang: Lang }) {
+  const s = STRINGS[lang];
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -62,7 +118,7 @@ function DocCard({ doc, light }: { doc: UploadedDocument; light: boolean }) {
           <Paperclip size={13} style={{ opacity: 0.5 }} />
           <span style={{ fontSize: 13, fontWeight: 600, color: light ? '#111' : '#fff' }}>{doc.name}</span>
           <span style={{ fontSize: 11, color: light ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.35)', background: light ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.07)', padding: '2px 8px', borderRadius: 99 }}>
-            {CATEGORY_LABELS[doc.category] ?? doc.category}
+            {s.categories[doc.category] ?? doc.category}
           </span>
         </div>
         {doc.dataUrl && (
@@ -71,7 +127,7 @@ function DocCard({ doc, light }: { doc: UploadedDocument; light: boolean }) {
             color: 'var(--ios-blue)', padding: '5px 10px', borderRadius: 7,
             background: 'rgba(0,122,255,0.12)', border: '1px solid rgba(0,122,255,0.3)',
           }}>
-            <Download size={11} /> Herunterladen
+            <Download size={11} /> {s.download}
           </a>
         )}
       </div>
@@ -83,18 +139,19 @@ function DocCard({ doc, light }: { doc: UploadedDocument; light: boolean }) {
       )}
       {doc.type === 'application/pdf' && !pdfUrl && doc.dataUrl && (
         <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', background: light ? '#f9f9f9' : 'rgba(255,255,255,0.03)', fontSize: 12, color: light ? '#aaa' : 'rgba(255,255,255,0.3)' }}>
-          Vorschau wird geladen…
+          {s.previewLoading}
         </div>
       )}
     </div>
   );
 }
 
-function CoverLetterView({ resume }: { resume: Resume }) {
+// ── CoverLetterView ───────────────────────────────────────────────────────────
+function CoverLetterView({ resume, lang }: { resume: Resume; lang: Lang }) {
   const cl = resume.coverLetter;
   const pi = resume.personalInfo;
   const name = [pi.firstName, pi.lastName].filter(Boolean).join(' ');
-  const today = new Date().toLocaleDateString('de-CH', { day: '2-digit', month: 'long', year: 'numeric' });
+  const today = new Date().toLocaleDateString(STRINGS[lang].dateLocale, { day: '2-digit', month: 'long', year: 'numeric' });
   return (
     <div style={{ background: '#fff', color: '#1a1a1a', padding: '64px 72px', fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 14, lineHeight: 1.75 }}>
       <div style={{ marginBottom: 40, fontSize: 13, color: '#444', borderBottom: '1px solid #e5e5e5', paddingBottom: 20 }}>
@@ -115,7 +172,7 @@ function CoverLetterView({ resume }: { resume: Resume }) {
   );
 }
 
-// ── Main ──────────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────────
 export default function SharedResumePage() {
   const [params] = useSearchParams();
   const token = params.get('t');
@@ -125,6 +182,7 @@ export default function SharedResumePage() {
   const [tab, setTab] = useState<'cl' | 'cv' | 'docs'>('cl');
   const [downloading, setDownloading] = useState(false);
   const [light, setLight] = useState(false);
+  const [lang, setLang] = useState<Lang>('de');
   const resumeRef = useRef<HTMLDivElement>(null);
   const viewIdRef = useRef<string | null>(null);
   const loadTimeRef = useRef<number>(Date.now());
@@ -155,6 +213,8 @@ export default function SharedResumePage() {
     return () => window.removeEventListener('beforeunload', onUnload);
   }, [token]);
 
+  const s = STRINGS[lang];
+
   // ── Theme ──────────────────────────────────────────────────────
   const t = light ? {
     bg: '#f0f2f5',
@@ -181,7 +241,7 @@ export default function SharedResumePage() {
   if (loading) return (
     <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
       <Loader2 size={28} style={{ animation: 'spin 1s linear infinite', color: 'var(--ios-blue)' }} />
-      <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>Bewerbungsunterlagen werden geladen…</span>
+      <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>{STRINGS.de.loading}</span>
       <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
     </div>
   );
@@ -189,8 +249,8 @@ export default function SharedResumePage() {
   if (notFound || !resume) return (
     <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, padding: 24, textAlign: 'center' }}>
       <AlertCircle size={40} style={{ opacity: 0.4 }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>Unterlagen nicht gefunden</h2>
-      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, maxWidth: 320 }}>Dieser Link ist ungültig oder wurde deaktiviert.</p>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>{STRINGS.de.notFound}</h2>
+      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, maxWidth: 320 }}>{STRINGS.de.notFoundSub}</p>
     </div>
   );
 
@@ -200,7 +260,7 @@ export default function SharedResumePage() {
   const docs = resume.documents ?? [];
   const shareUrl = window.location.href;
 
-  const forwardHref = `mailto:?subject=${encodeURIComponent(`Bewerbung: ${name}${pi.title ? ` – ${pi.title}` : ''}`)}&body=${encodeURIComponent(`Guten Tag,\n\nanbei finden Sie die Bewerbungsunterlagen von ${name}:\n\n${shareUrl}\n\nFreundliche Grüsse`)}`;
+  const forwardHref = `mailto:?subject=${encodeURIComponent(s.forwardSubject(name, pi.title))}&body=${encodeURIComponent(s.forwardBody(name, shareUrl))}`;
 
   async function handleDownload() {
     if (!resumeRef.current || downloading) return;
@@ -210,7 +270,7 @@ export default function SharedResumePage() {
       const blob = new Blob([pdfBytes as unknown as ArrayBuffer], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = `${name.replace(/\s+/g, '_')}_Lebenslauf.pdf`;
+      a.href = url; a.download = `${name.replace(/\s+/g, '_')}_CV.pdf`;
       a.click(); URL.revokeObjectURL(url);
     } finally { setDownloading(false); }
   }
@@ -231,6 +291,13 @@ export default function SharedResumePage() {
     fontFamily: 'inherit', transition: 'color 0.15s',
   });
 
+  const iconBtn: React.CSSProperties = {
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    height: 34, borderRadius: 9, border: `1px solid ${t.btnBorder}`,
+    background: t.btnBg, color: t.btnColor, cursor: 'pointer', flexShrink: 0,
+    transition: 'background 0.2s', fontFamily: 'inherit',
+  };
+
   return (
     <div style={{ minHeight: '100vh', background: t.bg, transition: 'background 0.2s' }}>
 
@@ -240,10 +307,9 @@ export default function SharedResumePage() {
         background: t.navBg, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
         borderBottom: `1px solid ${t.navBorder}`,
         padding: isMobile ? '10px 16px' : '10px 32px',
-        display: 'flex', alignItems: 'center', gap: 12,
+        display: 'flex', alignItems: 'center', gap: 10,
         transition: 'background 0.2s, border-color 0.2s',
       }}>
-        {/* Clickable logo → landing page */}
         <a href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', flexShrink: 0 }}>
           <LogoFull size={22} light={light} />
         </a>
@@ -252,16 +318,20 @@ export default function SharedResumePage() {
           {name}{pi.title ? ` · ${pi.title}` : ''}
         </div>
 
+        {/* Language toggle */}
+        <button
+          onClick={() => setLang(l => l === 'de' ? 'en' : 'de')}
+          title={lang === 'de' ? 'Switch to English' : 'Auf Deutsch wechseln'}
+          style={{ ...iconBtn, width: 'auto', padding: '0 10px', fontSize: 12, fontWeight: 700, letterSpacing: '0.03em' }}
+        >
+          {lang === 'de' ? 'EN' : 'DE'}
+        </button>
+
         {/* Dark/Light toggle */}
         <button
           onClick={() => setLight(v => !v)}
-          title={light ? 'Dunkler Modus' : 'Heller Modus'}
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            width: 34, height: 34, borderRadius: 9, border: `1px solid ${t.btnBorder}`,
-            background: t.btnBg, color: t.btnColor, cursor: 'pointer', flexShrink: 0,
-            transition: 'background 0.2s',
-          }}
+          title={light ? s.darkMode : s.lightMode}
+          style={{ ...iconBtn, width: 34 }}
         >
           {light ? <Moon size={15} /> : <Sun size={15} />}
         </button>
@@ -276,8 +346,8 @@ export default function SharedResumePage() {
               {pi.title && <div style={{ fontSize: 14, color: t.textSub, marginTop: 3 }}>{pi.title}</div>}
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {pi.email?.trim() && <a href={`mailto:${pi.email}`} style={{ ...btn }}><Mail size={13} />{isMobile ? 'E-Mail' : pi.email}</a>}
-              {pi.phone?.trim() && <a href={`tel:${pi.phone}`} style={{ ...btn }}><Phone size={13} />{isMobile ? 'Anrufen' : pi.phone}</a>}
+              {pi.email?.trim() && <a href={`mailto:${pi.email}`} style={{ ...btn }}><Mail size={13} />{isMobile ? s.emailLabel : pi.email}</a>}
+              {pi.phone?.trim() && <a href={`tel:${pi.phone}`} style={{ ...btn }}><Phone size={13} />{isMobile ? s.callLabel : pi.phone}</a>}
               {pi.linkedin?.trim() && <a href={pi.linkedin.startsWith('http') ? pi.linkedin : `https://${pi.linkedin}`} target="_blank" rel="noopener noreferrer" style={{ ...btn }}><Globe size={13} />LinkedIn</a>}
               {pi.website?.trim() && <a href={pi.website.startsWith('http') ? pi.website : `https://${pi.website}`} target="_blank" rel="noopener noreferrer" style={{ ...btn }}><Globe size={13} />Website</a>}
             </div>
@@ -285,28 +355,30 @@ export default function SharedResumePage() {
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <button onClick={handleDownload} disabled={downloading} style={{ ...btn, background: 'rgba(0,122,255,0.15)', border: '1px solid rgba(0,122,255,0.35)', color: downloading ? t.textMuted : 'var(--ios-blue)', fontWeight: 600 }}>
               {downloading
-                ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />PDF wird erstellt…</>
-                : <><Download size={13} />Lebenslauf als PDF</>}
+                ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />{s.downloadingPdf}</>
+                : <><Download size={13} />{s.downloadPdf}</>}
             </button>
-            <a href={forwardHref} style={{ ...btn }}><Send size={13} />Weiterleiten</a>
-            <button onClick={() => window.print()} style={{ ...btn }}><Printer size={13} />Drucken</button>
+            <a href={forwardHref} style={{ ...btn }}><Send size={13} />{s.forward}</a>
+            <button onClick={() => window.print()} style={{ ...btn }}><Printer size={13} />{s.print}</button>
           </div>
         </div>
       </div>
 
       {/* ── Tabs ── */}
-      {hasCoverLetter && (
+      {(hasCoverLetter || docs.length > 0) && (
         <div id="shared-tabs" style={{ background: t.tabsBg, borderBottom: `1px solid ${t.tabsBorder}`, padding: `0 ${isMobile ? 16 : 32}px`, transition: 'background 0.2s' }}>
           <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex' }}>
-            <button style={tabBtn(tab === 'cl')} onClick={() => setTab('cl')}>
-              <Mail size={12} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />Anschreiben
-            </button>
+            {hasCoverLetter && (
+              <button style={tabBtn(tab === 'cl')} onClick={() => setTab('cl')}>
+                <Mail size={12} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />{s.coverLetterTab}
+              </button>
+            )}
             <button style={tabBtn(tab === 'cv')} onClick={() => setTab('cv')}>
-              <FileText size={12} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />Lebenslauf
+              <FileText size={12} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />{s.cvTab}
             </button>
             {docs.length > 0 && (
               <button style={tabBtn(tab === 'docs')} onClick={() => setTab('docs')}>
-                <Paperclip size={12} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />Beilagen ({docs.length})
+                <Paperclip size={12} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />{s.attachmentsTab} ({docs.length})
               </button>
             )}
           </div>
@@ -316,9 +388,9 @@ export default function SharedResumePage() {
       {/* ── Content ── */}
       <div id="shared-content" style={{ padding: isMobile ? '24px 12px' : '32px 32px' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          {tab === 'cl' && (
+          {tab === 'cl' && hasCoverLetter && (
             <div style={{ borderRadius: 12, overflow: 'hidden', boxShadow: t.shadow }}>
-              <CoverLetterView resume={resume} />
+              <CoverLetterView resume={resume} lang={lang} />
             </div>
           )}
           {tab === 'cv' && (
@@ -327,26 +399,17 @@ export default function SharedResumePage() {
             </div>
           )}
           {tab === 'docs' && docs.length > 0 && (
-            <div>{docs.map(doc => <DocCard key={doc.id} doc={doc} light={light} />)}</div>
-          )}
-          {/* No cover letter → show docs below CV */}
-          {!hasCoverLetter && tab === 'cv' && docs.length > 0 && (
-            <div style={{ marginTop: 40 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: t.textSub, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Paperclip size={13} />Beilagen ({docs.length})
-              </div>
-              {docs.map(doc => <DocCard key={doc.id} doc={doc} light={light} />)}
-            </div>
+            <div>{docs.map(doc => <DocCard key={doc.id} doc={doc} light={light} lang={lang} />)}</div>
           )}
         </div>
       </div>
 
       {/* ── Footer ── */}
       <footer id="shared-footer" style={{ padding: '12px 32px', borderTop: `1px solid ${t.footerBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontSize: 12, color: t.footerText }}>
-        <span>Erstellt mit PATH by pixmatic</span>
+        <span>{s.footerCreated}</span>
         <span>·</span>
         <a href="/" style={{ color: light ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.4)', textDecoration: 'none' }}>
-          Eigene Bewerbungsmappe erstellen →
+          {s.footerCta}
         </a>
       </footer>
 
