@@ -130,6 +130,12 @@ export default function SharedResumePage() {
   const loadTimeRef = useRef<number>(Date.now());
   const isMobile = useIsMobile();
 
+  // Global CSS sets body { overflow: hidden } for the app shell — override it here
+  useEffect(() => {
+    document.body.style.overflow = 'auto';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
   useEffect(() => {
     if (!token) { setLoading(false); setNotFound(true); return; }
     fetchSharedResumeByToken(token).then((r) => {

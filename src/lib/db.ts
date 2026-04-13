@@ -436,8 +436,11 @@ export async function fetchSharedResumeByToken(token: string): Promise<Resume | 
     // Fetch documents via public edge function (bypasses RLS using service role)
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || localStorage.getItem('aicv-supabase-url') || '';
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || localStorage.getItem('aicv-supabase-key') || '';
       if (supabaseUrl) {
-        const res = await fetch(`${supabaseUrl}/functions/v1/get-shared-docs?token=${encodeURIComponent(token)}`);
+        const res = await fetch(`${supabaseUrl}/functions/v1/get-shared-docs?token=${encodeURIComponent(token)}`, {
+          headers: { 'apikey': anonKey, 'Authorization': `Bearer ${anonKey}` },
+        });
         if (res.ok) {
           const { documents } = await res.json() as { documents?: Resume['documents'] };
           if (Array.isArray(documents)) resume.documents = documents;
