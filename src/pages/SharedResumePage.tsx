@@ -244,8 +244,8 @@ export default function SharedResumePage() {
         transition: 'background 0.2s, border-color 0.2s',
       }}>
         {/* Clickable logo → landing page */}
-        <a href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', flexShrink: 0, filter: light ? 'invert(1) brightness(0.2)' : 'none' }}>
-          <LogoFull size={22} />
+        <a href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', flexShrink: 0 }}>
+          <LogoFull size={22} light={light} />
         </a>
 
         <div style={{ fontSize: 13, color: t.textMuted, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

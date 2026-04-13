@@ -36,17 +36,21 @@ export function LogoIcon({ size = 36 }: LogoProps) {
   );
 }
 
-export function LogoFull({ size = 36 }: LogoProps) {
+interface LogoFullProps extends LogoProps {
+  light?: boolean;
+}
+
+export function LogoFull({ size = 36, light = false }: LogoFullProps) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
       <div style={{ flexShrink: 0 }}>
         <LogoIcon size={size} />
       </div>
       <div>
-        <div style={{ fontWeight: 800, fontSize: size * 0.44, letterSpacing: '-0.4px', lineHeight: 1, color: '#fff' }}>
+        <div style={{ fontWeight: 800, fontSize: size * 0.44, letterSpacing: '-0.4px', lineHeight: 1, color: light ? '#1a1a1a' : '#fff' }}>
           Path
         </div>
-        <div style={{ fontSize: size * 0.27, color: 'rgba(255,255,255,0.38)', marginTop: 2, fontWeight: 400, letterSpacing: '0.02em' }}>
+        <div style={{ fontSize: size * 0.27, color: light ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.38)', marginTop: 2, fontWeight: 400, letterSpacing: '0.02em' }}>
           by pixmatic
         </div>
       </div>
