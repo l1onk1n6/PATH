@@ -10,20 +10,13 @@ import { renderElementToPdfDoc } from '../lib/pdfExport';
 import { useIsMobile } from '../hooks/useBreakpoint';
 
 const TRACK_URL = `${import.meta.env.VITE_SUPABASE_URL ?? ''}/functions/v1/track-view`;
-const ANON_KEY  = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
-
-function authHeaders(): Record<string, string> {
-  const key = ANON_KEY || localStorage.getItem('aicv-supabase-key') || '';
-  const h: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (key) { h['apikey'] = key; h['Authorization'] = `Bearer ${key}`; }
-  return h;
-}
 
 async function trackView(token: string): Promise<string | null> {
   if (!isSupabaseConfigured()) return null;
   try {
     const res = await fetch(TRACK_URL, {
-      method: 'POST', headers: authHeaders(),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token }),
     });
     return (await res.json()).view_id ?? null;
@@ -36,7 +29,7 @@ function sendDuration(viewId: string, durationS: number) {
   if (navigator.sendBeacon) {
     navigator.sendBeacon(TRACK_URL + '?method=PATCH', new Blob([body], { type: 'application/json' }));
   } else {
-    fetch(TRACK_URL, { method: 'PATCH', headers: authHeaders(), body, keepalive: true }).catch(() => {});
+    fetch(TRACK_URL, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {});
   }
 }
 
