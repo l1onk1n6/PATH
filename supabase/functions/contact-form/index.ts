@@ -206,7 +206,7 @@ Deno.serve(async (req) => {
       await transporter.sendMail({
         from:    smtpFrom,
         to:      customerEmail,
-        subject: 'Wir haben deine Nachricht erhalten – PATH',
+        subject: 'Wir haben deine Nachricht erhalten – PATH ✓',
         text: [
           `Hallo ${name.trim()},`,
           '',
