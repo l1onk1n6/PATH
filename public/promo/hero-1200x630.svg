@@ -1,0 +1,166 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="PATH – Bewerbungsmappe in Minuten erstellen">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1923"/>
+      <stop offset="100%" stop-color="#0a1620"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34C759"/>
+      <stop offset="100%" stop-color="#00C7BE"/>
+    </linearGradient>
+    <linearGradient id="brandSoft" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34C759" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#00C7BE" stop-opacity="0.18"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#34C759" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#34C759" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#00C7BE" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#00C7BE" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="14"/>
+      <feOffset dx="0" dy="10" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative glows -->
+  <circle cx="1020" cy="120" r="280" fill="url(#glow1)"/>
+  <circle cx="180" cy="540" r="300" fill="url(#glow2)"/>
+
+  <!-- Grid dots -->
+  <g fill="#ffffff" opacity="0.05">
+    <circle cx="60" cy="60" r="2"/>
+    <circle cx="120" cy="60" r="2"/>
+    <circle cx="180" cy="60" r="2"/>
+    <circle cx="60" cy="120" r="2"/>
+    <circle cx="120" cy="120" r="2"/>
+    <circle cx="60" cy="180" r="2"/>
+  </g>
+
+  <!-- Brand pill: logo + wordmark -->
+  <g transform="translate(72,68)">
+    <rect x="0" y="0" width="52" height="52" rx="14" fill="url(#brand)"/>
+    <path d="M15 38 L37 16" stroke="white" stroke-width="4" stroke-linecap="round"/>
+    <path d="M23 16 H37 V30" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="68" y="35" font-family="Inter, 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="30" fill="#ffffff" letter-spacing="6">PATH</text>
+    <text x="68" y="54" font-family="Inter, 'Helvetica Neue', Arial, sans-serif" font-weight="500" font-size="13" fill="#9fb3b9" letter-spacing="2">by pixmatic</text>
+  </g>
+
+  <!-- KOSTENLOS starter badge -->
+  <g transform="translate(1020,84)">
+    <rect x="-8" y="-26" width="112" height="44" rx="22" fill="url(#brand)"/>
+    <text x="48" y="3" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="14" fill="#0f1923" letter-spacing="2">KOSTENLOS</text>
+  </g>
+
+  <!-- Headline -->
+  <g transform="translate(72,210)">
+    <text font-family="Inter, 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="72" fill="#ffffff" letter-spacing="-1.5">
+      <tspan x="0" dy="0">Bewerbung.</tspan>
+      <tspan x="0" dy="78">In Minuten </tspan>
+      <tspan x="0" dy="78" fill="url(#brand)">perfekt.</tspan>
+    </text>
+  </g>
+
+  <!-- Sub-headline -->
+  <text x="72" y="498" font-family="Inter, Arial, sans-serif" font-weight="500" font-size="22" fill="#c8d6db">
+    Lebenslauf · Anschreiben · 15+ Vorlagen · PDF-Export
+  </text>
+
+  <!-- USP chips row -->
+  <g transform="translate(72,540)" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="14" fill="#e6f6f2">
+    <g>
+      <rect x="0" y="0" width="150" height="40" rx="20" fill="url(#brandSoft)" stroke="#34C759" stroke-opacity="0.6"/>
+      <text x="75" y="26" text-anchor="middle">✓ 15+ Templates</text>
+    </g>
+    <g transform="translate(162,0)">
+      <rect x="0" y="0" width="142" height="40" rx="20" fill="url(#brandSoft)" stroke="#00C7BE" stroke-opacity="0.6"/>
+      <text x="71" y="26" text-anchor="middle">✓ PDF-Export</text>
+    </g>
+    <g transform="translate(314,0)">
+      <rect x="0" y="0" width="150" height="40" rx="20" fill="url(#brandSoft)" stroke="#34C759" stroke-opacity="0.6"/>
+      <text x="75" y="26" text-anchor="middle">✓ Cloud-Sync</text>
+    </g>
+    <g transform="translate(474,0)">
+      <rect x="0" y="0" width="160" height="40" rx="20" fill="url(#brandSoft)" stroke="#00C7BE" stroke-opacity="0.6"/>
+      <text x="80" y="26" text-anchor="middle">✓ DSGVO-konform</text>
+    </g>
+  </g>
+
+  <!-- CV Mockup card -->
+  <g transform="translate(720,150)" filter="url(#softShadow)">
+    <!-- Back card (template variant) -->
+    <g transform="translate(32,26) rotate(6 200 260)">
+      <rect width="400" height="520" rx="18" fill="#16242e" stroke="#2a3a46"/>
+      <rect x="24" y="24" width="120" height="16" rx="4" fill="#2d3f4b"/>
+      <rect x="24" y="50" width="80" height="10" rx="3" fill="#2d3f4b"/>
+      <rect x="24" y="90" width="352" height="2" fill="#2d3f4b"/>
+      <rect x="24" y="108" width="160" height="10" rx="3" fill="#3a5461"/>
+      <rect x="24" y="126" width="300" height="8" rx="3" fill="#273844"/>
+      <rect x="24" y="140" width="260" height="8" rx="3" fill="#273844"/>
+      <rect x="24" y="170" width="160" height="10" rx="3" fill="#3a5461"/>
+      <rect x="24" y="188" width="300" height="8" rx="3" fill="#273844"/>
+      <rect x="24" y="202" width="260" height="8" rx="3" fill="#273844"/>
+    </g>
+
+    <!-- Front card -->
+    <g>
+      <rect width="400" height="520" rx="18" fill="#ffffff"/>
+      <!-- Accent stripe -->
+      <rect x="0" y="0" width="400" height="110" rx="18" fill="url(#brand)"/>
+      <rect x="0" y="92" width="400" height="18" fill="url(#brand)"/>
+      <!-- Avatar -->
+      <circle cx="72" cy="80" r="38" fill="#ffffff"/>
+      <circle cx="72" cy="80" r="34" fill="#e4f7ef"/>
+      <circle cx="72" cy="72" r="12" fill="#34C759"/>
+      <path d="M52 96 Q72 80 92 96 L92 106 L52 106 Z" fill="#34C759"/>
+      <!-- Name -->
+      <text x="128" y="70" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="22" fill="#0f1923">Anna Muster</text>
+      <text x="128" y="94" font-family="Inter, Arial, sans-serif" font-weight="500" font-size="13" fill="#ffffff" opacity="0.9">Senior UX Designerin</text>
+
+      <!-- Section 1 -->
+      <text x="24" y="156" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="12" fill="#00897B" letter-spacing="2">BERUFSERFAHRUNG</text>
+      <rect x="24" y="166" width="352" height="2" fill="#e2efeb"/>
+      <rect x="24" y="182" width="200" height="10" rx="3" fill="#0f1923"/>
+      <rect x="24" y="200" width="260" height="8" rx="3" fill="#cfd6db"/>
+      <rect x="24" y="214" width="230" height="8" rx="3" fill="#cfd6db"/>
+      <rect x="24" y="236" width="180" height="10" rx="3" fill="#0f1923"/>
+      <rect x="24" y="254" width="250" height="8" rx="3" fill="#cfd6db"/>
+      <rect x="24" y="268" width="210" height="8" rx="3" fill="#cfd6db"/>
+
+      <!-- Section 2 -->
+      <text x="24" y="308" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="12" fill="#00897B" letter-spacing="2">FÄHIGKEITEN</text>
+      <rect x="24" y="318" width="352" height="2" fill="#e2efeb"/>
+      <g transform="translate(24,334)">
+        <rect x="0" y="0" width="86" height="26" rx="13" fill="#eefbf2"/>
+        <text x="43" y="17" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="600" font-size="11" fill="#00897B">Figma</text>
+        <rect x="94" y="0" width="96" height="26" rx="13" fill="#eefbf2"/>
+        <text x="142" y="17" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="600" font-size="11" fill="#00897B">Research</text>
+        <rect x="198" y="0" width="76" height="26" rx="13" fill="#eefbf2"/>
+        <text x="236" y="17" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="600" font-size="11" fill="#00897B">React</text>
+      </g>
+
+      <!-- Section 3 -->
+      <text x="24" y="400" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="12" fill="#00897B" letter-spacing="2">AUSBILDUNG</text>
+      <rect x="24" y="410" width="352" height="2" fill="#e2efeb"/>
+      <rect x="24" y="424" width="220" height="10" rx="3" fill="#0f1923"/>
+      <rect x="24" y="442" width="260" height="8" rx="3" fill="#cfd6db"/>
+
+      <!-- Download badge -->
+      <g transform="translate(260,468)">
+        <rect width="116" height="34" rx="17" fill="url(#brand)"/>
+        <text x="58" y="22" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="12" fill="#0f1923">⬇ PDF Export</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Bottom URL -->
+  <text x="1128" y="600" text-anchor="end" font-family="Inter, Arial, sans-serif" font-weight="600" font-size="14" fill="#7f9198">path.pixmatic.ch</text>
+</svg>

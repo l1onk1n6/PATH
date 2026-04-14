@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>PATH · Promo-Visuals</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #0f1923;
+        --bg-2: #0a1620;
+        --card: #16242e;
+        --border: #233541;
+        --text: #e6f0f2;
+        --muted: #9fb3b9;
+        --brand-start: #34C759;
+        --brand-end: #00C7BE;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; background: radial-gradient(circle at 80% -10%, rgba(52,199,89,0.15), transparent 60%), radial-gradient(circle at 0% 100%, rgba(0,199,190,0.15), transparent 60%), var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+      header { padding: 56px 40px 24px; max-width: 1280px; margin: 0 auto; }
+      .brand { display: inline-flex; align-items: center; gap: 12px; }
+      .logo { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--brand-start), var(--brand-end)); position: relative; }
+      .logo::before, .logo::after { content: ''; position: absolute; background: white; border-radius: 2px; }
+      .logo::before { width: 30px; height: 3.2px; left: 7px; top: 28px; transform: rotate(-45deg); transform-origin: left center; }
+      .logo::after { width: 16px; height: 3.2px; left: 20px; top: 14px; box-shadow: 12.8px 3.2px 0 0 white, 12.8px 6.4px 0 0 transparent; }
+      .logo svg { position: absolute; inset: 0; }
+      h1 { font-size: 42px; font-weight: 800; letter-spacing: -1.2px; margin: 24px 0 8px; }
+      .sub { color: var(--muted); font-size: 17px; max-width: 720px; line-height: 1.6; }
+      .kicker { display: inline-block; padding: 6px 14px; border-radius: 999px; background: linear-gradient(135deg, rgba(52,199,89,0.18), rgba(0,199,190,0.18)); color: var(--brand-start); font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(52,199,89,0.35); }
+      main { max-width: 1280px; margin: 0 auto; padding: 16px 40px 120px; }
+      section { margin-top: 48px; }
+      h2 { font-size: 22px; font-weight: 700; margin: 0 0 16px; display: flex; align-items: center; gap: 10px; }
+      h2 .tag { font-size: 11px; font-weight: 700; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; letter-spacing: 1px; text-transform: uppercase; }
+      .grid { display: grid; gap: 24px; }
+      .grid.hero { grid-template-columns: 1fr; }
+      .grid.social { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid.features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      @media (min-width: 1100px) { .grid.social { grid-template-columns: 1.5fr 1fr; } .grid.features { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+      .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; transition: transform .2s ease, border-color .2s ease; }
+      .card:hover { transform: translateY(-2px); border-color: rgba(52,199,89,0.4); }
+      .card .preview { background: #0b151d; aspect-ratio: var(--ratio, 1 / 1); display: flex; align-items: center; justify-content: center; padding: 18px; position: relative; overflow: hidden; }
+      .card .preview img { max-width: 100%; max-height: 100%; display: block; box-shadow: 0 18px 48px rgba(0,0,0,0.45); border-radius: 8px; }
+      .card .meta { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; gap: 12px; border-top: 1px solid var(--border); }
+      .card .meta .title { font-weight: 700; font-size: 15px; }
+      .card .meta .dim { color: var(--muted); font-size: 12px; font-weight: 500; }
+      .card .meta .dl { display: inline-flex; align-items: center; gap: 6px; color: var(--bg); text-decoration: none; background: linear-gradient(135deg, var(--brand-start), var(--brand-end)); padding: 8px 14px; border-radius: 999px; font-weight: 700; font-size: 12px; letter-spacing: .5px; }
+      .card .meta .dl:hover { filter: brightness(1.08); }
+      footer { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 0 20px; }
+      footer a { color: var(--brand-start); text-decoration: none; }
+      .legend { margin-top: 8px; color: var(--muted); font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <span class="logo">
+          <svg viewBox="0 0 36 36"><path d="M10.5 26L25.5 11" stroke="white" stroke-width="2.8" stroke-linecap="round"/><path d="M16 11H25.5V20.5" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <strong style="font-size: 20px; letter-spacing: 6px;">PATH</strong>
+      </div>
+      <div style="margin-top: 22px;"><span class="kicker">Promo-Kit · v1</span></div>
+      <h1>Peppige Visuals für PATH.</h1>
+      <p class="sub">Fertiges Social-Kit im Markenlook (Grün → Türkis, dunkler Hintergrund) – skalierbare SVGs mit rasch erfassbaren USPs. Einfach herunterladen und auf LinkedIn, Instagram, Twitter/X oder in Präsentationen verwenden.</p>
+    </header>
+
+    <main>
+      <section>
+        <h2>Hero / Open Graph <span class="tag">1200 × 630</span></h2>
+        <div class="grid hero">
+          <div class="card" style="--ratio: 1200 / 630;">
+            <div class="preview"><img src="hero-1200x630.svg" alt="PATH Hero Banner"/></div>
+            <div class="meta"><div><div class="title">Hero Banner</div><div class="dim">LinkedIn · Twitter/X · WhatsApp · OG-Image · Blog-Header</div></div><a class="dl" href="hero-1200x630.svg" download>↓ SVG</a></div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Social Posts <span class="tag">Square &amp; Story</span></h2>
+        <div class="grid social">
+          <div class="card" style="--ratio: 1 / 1;">
+            <div class="preview"><img src="square-1080x1080.svg" alt="PATH Square Post"/></div>
+            <div class="meta"><div><div class="title">Square Post</div><div class="dim">Instagram Feed · LinkedIn · 1080 × 1080</div></div><a class="dl" href="square-1080x1080.svg" download>↓ SVG</a></div>
+          </div>
+          <div class="card" style="--ratio: 9 / 16;">
+            <div class="preview"><img src="story-1080x1920.svg" alt="PATH Story"/></div>
+            <div class="meta"><div><div class="title">Story / Reel Cover</div><div class="dim">Instagram / LinkedIn Story · 1080 × 1920</div></div><a class="dl" href="story-1080x1920.svg" download>↓ SVG</a></div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>USP-Karten <span class="tag">1080 × 1080 · für Carousel</span></h2>
+        <p class="legend">Vier einzelne Slides – perfekt für einen LinkedIn-/Instagram-Karussell-Post.</p>
+        <div class="grid features">
+          <div class="card" style="--ratio: 1 / 1;">
+            <div class="preview"><img src="feature-speed.svg" alt="In Minuten fertig"/></div>
+            <div class="meta"><div><div class="title">In Minuten fertig</div><div class="dim">Slide 1 / 4</div></div><a class="dl" href="feature-speed.svg" download>↓ SVG</a></div>
+          </div>
+          <div class="card" style="--ratio: 1 / 1;">
+            <div class="preview"><img src="feature-templates.svg" alt="15+ Templates"/></div>
+            <div class="meta"><div><div class="title">15+ Templates</div><div class="dim">Slide 2 / 4</div></div><a class="dl" href="feature-templates.svg" download>↓ SVG</a></div>
+          </div>
+          <div class="card" style="--ratio: 1 / 1;">
+            <div class="preview"><img src="feature-pdf.svg" alt="PDF-Export mit 1 Klick"/></div>
+            <div class="meta"><div><div class="title">1-Klick-Export</div><div class="dim">Slide 3 / 4</div></div><a class="dl" href="feature-pdf.svg" download>↓ SVG</a></div>
+          </div>
+          <div class="card" style="--ratio: 1 / 1;">
+            <div class="preview"><img src="feature-cloud.svg" alt="Cloud-Sync"/></div>
+            <div class="meta"><div><div class="title">Von überall</div><div class="dim">Slide 4 / 4</div></div><a class="dl" href="feature-cloud.svg" download>↓ SVG</a></div>
+          </div>
+        </div>
+
+        <h2 style="margin-top: 40px;">Bonus <span class="tag">Kostenlos-Badge</span></h2>
+        <div class="grid features" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+          <div class="card" style="--ratio: 1 / 1;">
+            <div class="preview"><img src="feature-free.svg" alt="0 € – Kostenlos starten"/></div>
+            <div class="meta"><div><div class="title">Kostenlos starten</div><div class="dim">Für Aktionen &amp; Newsletter-Banner</div></div><a class="dl" href="feature-free.svg" download>↓ SVG</a></div>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        Alle Grafiken als <strong>SVG</strong> — verlustfrei skalierbar. Für PNG einfach im Browser öffnen und über <em>„Bild speichern als…“</em> oder mit <code>sharp</code> / <code>resvg</code> in beliebiger Auflösung exportieren.
+        <br/>© pixmatic · <a href="https://path.pixmatic.ch">path.pixmatic.ch</a>
+      </footer>
+    </main>
+  </body>
+</html>

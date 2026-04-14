@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080" role="img" aria-label="15+ professionelle Vorlagen">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1923"/>
+      <stop offset="100%" stop-color="#0a1821"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34C759"/>
+      <stop offset="100%" stop-color="#00C7BE"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#00C7BE" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#00C7BE" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="12"/>
+      <feOffset dy="8" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1080" fill="url(#bg)"/>
+  <circle cx="540" cy="420" r="500" fill="url(#spot)"/>
+
+  <!-- Three template mini-cards fanned -->
+  <g transform="translate(540,420)" filter="url(#sh)">
+    <!-- left -->
+    <g transform="translate(-260,20) rotate(-10)">
+      <rect x="-120" y="-170" width="240" height="320" rx="16" fill="#ffffff"/>
+      <rect x="-120" y="-170" width="240" height="72" rx="16" fill="#0f1923"/>
+      <rect x="-120" y="-112" width="240" height="14" fill="#0f1923"/>
+      <circle cx="-78" cy="-132" r="20" fill="#34C759"/>
+      <rect x="-100" y="-78" width="140" height="10" rx="3" fill="#0f1923"/>
+      <rect x="-100" y="-60" width="180" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-100" y="-48" width="160" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-100" y="-20" width="100" height="8" rx="3" fill="#34C759"/>
+      <rect x="-100" y="-4" width="180" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-100" y="8" width="170" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-100" y="34" width="100" height="8" rx="3" fill="#34C759"/>
+      <rect x="-100" y="50" width="180" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-100" y="62" width="150" height="6" rx="2" fill="#cfd6db"/>
+    </g>
+    <!-- center -->
+    <g transform="translate(0,-20)">
+      <rect x="-140" y="-200" width="280" height="380" rx="18" fill="#ffffff"/>
+      <rect x="-140" y="-200" width="90" height="380" rx="18" fill="url(#brand)"/>
+      <rect x="-60" y="-200" width="10" height="380" fill="url(#brand)"/>
+      <circle cx="-95" cy="-140" r="28" fill="#ffffff"/>
+      <rect x="-30" y="-180" width="150" height="12" rx="3" fill="#0f1923"/>
+      <rect x="-30" y="-162" width="120" height="8" rx="3" fill="#57707b"/>
+      <rect x="-30" y="-120" width="90" height="8" rx="3" fill="#00897B"/>
+      <rect x="-30" y="-106" width="150" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-30" y="-94" width="130" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-30" y="-66" width="90" height="8" rx="3" fill="#00897B"/>
+      <rect x="-30" y="-52" width="150" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-30" y="-40" width="140" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-30" y="-12" width="90" height="8" rx="3" fill="#00897B"/>
+      <rect x="-30" y="2" width="150" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-30" y="14" width="120" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-30" y="42" width="90" height="8" rx="3" fill="#00897B"/>
+      <rect x="-30" y="56" width="150" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-30" y="68" width="100" height="6" rx="2" fill="#cfd6db"/>
+    </g>
+    <!-- right -->
+    <g transform="translate(260,20) rotate(10)">
+      <rect x="-120" y="-170" width="240" height="320" rx="16" fill="#ffffff"/>
+      <rect x="-120" y="-170" width="240" height="72" fill="#8B5E3C" opacity="0.12"/>
+      <rect x="-100" y="-146" width="140" height="12" rx="3" fill="#0f1923"/>
+      <rect x="-100" y="-128" width="100" height="8" rx="3" fill="#57707b"/>
+      <line x1="-100" y1="-86" x2="100" y2="-86" stroke="#cfd6db" stroke-width="1"/>
+      <rect x="-100" y="-70" width="80" height="8" rx="3" fill="#C67C4E"/>
+      <rect x="-100" y="-52" width="180" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-100" y="-40" width="140" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-100" y="-14" width="80" height="8" rx="3" fill="#C67C4E"/>
+      <rect x="-100" y="4" width="180" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-100" y="16" width="160" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-100" y="42" width="80" height="8" rx="3" fill="#C67C4E"/>
+      <rect x="-100" y="58" width="180" height="6" rx="2" fill="#cfd6db"/>
+      <rect x="-100" y="70" width="140" height="6" rx="2" fill="#cfd6db"/>
+    </g>
+  </g>
+
+  <!-- Big number -->
+  <g transform="translate(540,760)" text-anchor="middle" font-family="Inter, Arial, sans-serif">
+    <text font-weight="800" font-size="180" fill="url(#brand)" letter-spacing="-5">15+</text>
+    <text y="70" font-weight="800" font-size="72" fill="#ffffff" letter-spacing="-1">Profi-Vorlagen</text>
+  </g>
+
+  <text x="540" y="960" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="500" font-size="26" fill="#9fb3b9">Minimal · Modern · Elegant · Corporate · Nordic …</text>
+
+  <!-- Brand corner -->
+  <g transform="translate(60,60)">
+    <rect width="46" height="46" rx="12" fill="url(#brand)"/>
+    <path d="M14 34 L32 16" stroke="white" stroke-width="3.6" stroke-linecap="round"/>
+    <path d="M20 16 H32 V28" stroke="white" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="62" y="30" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="24" fill="#ffffff" letter-spacing="5">PATH</text>
+  </g>
+</svg>

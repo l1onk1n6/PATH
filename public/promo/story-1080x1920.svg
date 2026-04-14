@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-label="PATH – Bewerbung in Minuten. Story Format.">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f1923"/>
+      <stop offset="100%" stop-color="#081218"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34C759"/>
+      <stop offset="100%" stop-color="#00C7BE"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#34C759" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#34C759" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="spot2" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#00C7BE" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#00C7BE" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="22"/>
+      <feOffset dy="14" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1920" fill="url(#bg)"/>
+  <circle cx="980" cy="180" r="500" fill="url(#spot)"/>
+  <circle cx="120" cy="1700" r="520" fill="url(#spot2)"/>
+
+  <!-- Logo -->
+  <g transform="translate(80,100)">
+    <rect width="76" height="76" rx="20" fill="url(#brand)"/>
+    <path d="M22 56 L54 24" stroke="white" stroke-width="6" stroke-linecap="round"/>
+    <path d="M32 24 H54 V46" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="96" y="52" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="42" fill="#ffffff" letter-spacing="10">PATH</text>
+  </g>
+
+  <!-- Huge headline -->
+  <g transform="translate(80,320)">
+    <text font-family="Inter, Arial, sans-serif" font-weight="800" font-size="140" fill="#ffffff" letter-spacing="-4">
+      <tspan x="0" dy="0">In Minuten</tspan>
+      <tspan x="0" dy="145">zur fertigen</tspan>
+      <tspan x="0" dy="145" fill="url(#brand)">Bewerbung.</tspan>
+    </text>
+  </g>
+
+  <!-- USP list -->
+  <g transform="translate(80,900)" font-family="Inter, Arial, sans-serif">
+    <g>
+      <circle cx="36" cy="36" r="36" fill="url(#brand)"/>
+      <text x="36" y="48" text-anchor="middle" font-weight="800" font-size="34" fill="#0f1923">✓</text>
+      <text x="100" y="32" font-weight="800" font-size="38" fill="#ffffff">Lebenslauf &amp; Anschreiben</text>
+      <text x="100" y="66" font-weight="500" font-size="24" fill="#9fb3b9">Alles in einer App – integriert</text>
+    </g>
+    <g transform="translate(0,130)">
+      <circle cx="36" cy="36" r="36" fill="url(#brand)"/>
+      <text x="36" y="48" text-anchor="middle" font-weight="800" font-size="34" fill="#0f1923">✓</text>
+      <text x="100" y="32" font-weight="800" font-size="38" fill="#ffffff">15+ Profi-Vorlagen</text>
+      <text x="100" y="66" font-weight="500" font-size="24" fill="#9fb3b9">Minimal · Modern · Elegant · Nordic</text>
+    </g>
+    <g transform="translate(0,260)">
+      <circle cx="36" cy="36" r="36" fill="url(#brand)"/>
+      <text x="36" y="48" text-anchor="middle" font-weight="800" font-size="34" fill="#0f1923">✓</text>
+      <text x="100" y="32" font-weight="800" font-size="38" fill="#ffffff">PDF-Export mit 1 Klick</text>
+      <text x="100" y="66" font-weight="500" font-size="24" fill="#9fb3b9">Ganze Mappe in einer Datei, ≤ 5 MB</text>
+    </g>
+    <g transform="translate(0,390)">
+      <circle cx="36" cy="36" r="36" fill="url(#brand)"/>
+      <text x="36" y="48" text-anchor="middle" font-weight="800" font-size="34" fill="#0f1923">✓</text>
+      <text x="100" y="32" font-weight="800" font-size="38" fill="#ffffff">Cloud-Sync &amp; Mobile</text>
+      <text x="100" y="66" font-weight="500" font-size="24" fill="#9fb3b9">Weiterarbeiten von jedem Gerät</text>
+    </g>
+    <g transform="translate(0,520)">
+      <circle cx="36" cy="36" r="36" fill="url(#brand)"/>
+      <text x="36" y="48" text-anchor="middle" font-weight="800" font-size="34" fill="#0f1923">✓</text>
+      <text x="100" y="32" font-weight="800" font-size="38" fill="#ffffff">DSGVO-konform</text>
+      <text x="100" y="66" font-weight="500" font-size="24" fill="#9fb3b9">Daten sicher in der EU gespeichert</text>
+    </g>
+  </g>
+
+  <!-- CTA pill -->
+  <g transform="translate(540,1720)" text-anchor="middle" filter="url(#cardShadow)">
+    <rect x="-420" y="-50" width="840" height="100" rx="50" fill="url(#brand)"/>
+    <text x="0" y="15" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="36" fill="#0f1923" letter-spacing="2">JETZT KOSTENLOS STARTEN</text>
+  </g>
+  <text x="540" y="1830" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="600" font-size="28" fill="#9fb3b9">path.pixmatic.ch</text>
+</svg>

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080" role="img" aria-label="In Minuten fertig">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1923"/>
+      <stop offset="100%" stop-color="#0a1821"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34C759"/>
+      <stop offset="100%" stop-color="#00C7BE"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#34C759" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#34C759" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1080" height="1080" fill="url(#bg)"/>
+  <circle cx="540" cy="380" r="480" fill="url(#spot)"/>
+
+  <!-- Bolt icon -->
+  <g transform="translate(540,420)">
+    <circle r="190" fill="url(#brand)" opacity="0.15"/>
+    <circle r="150" fill="url(#brand)" opacity="0.25"/>
+    <circle r="110" fill="url(#brand)"/>
+    <path d="M-18 -58 L18 -58 L0 -10 L34 -10 L-14 68 L2 8 L-28 8 Z" fill="#0f1923"/>
+  </g>
+
+  <!-- Headline -->
+  <g transform="translate(540,720)" text-anchor="middle" font-family="Inter, Arial, sans-serif">
+    <text font-weight="800" font-size="110" fill="#ffffff" letter-spacing="-2">In Minuten</text>
+    <text y="115" font-weight="800" font-size="110" fill="url(#brand)" letter-spacing="-2">fertig.</text>
+  </g>
+
+  <text x="540" y="960" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="500" font-size="30" fill="#9fb3b9">Daten rein, Vorlage wählen, PDF raus.</text>
+
+  <!-- Brand corner -->
+  <g transform="translate(60,60)">
+    <rect width="46" height="46" rx="12" fill="url(#brand)"/>
+    <path d="M14 34 L32 16" stroke="white" stroke-width="3.6" stroke-linecap="round"/>
+    <path d="M20 16 H32 V28" stroke="white" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="62" y="30" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="24" fill="#ffffff" letter-spacing="5">PATH</text>
+  </g>
+</svg>

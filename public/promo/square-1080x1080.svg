@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080" role="img" aria-label="PATH – Deine Bewerbung. Kostenlos. In Minuten.">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1923"/>
+      <stop offset="100%" stop-color="#0a1821"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34C759"/>
+      <stop offset="100%" stop-color="#00C7BE"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#34C759" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#34C759" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="spot2" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#00C7BE" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#00C7BE" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1080" height="1080" fill="url(#bg)"/>
+  <circle cx="900" cy="180" r="380" fill="url(#spot)"/>
+  <circle cx="180" cy="920" r="420" fill="url(#spot2)"/>
+
+  <!-- Burst rays -->
+  <g transform="translate(540,540)" opacity="0.12" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="-460" x2="0" y2="-520"/>
+    <line x1="160" y1="-430" x2="182" y2="-490"/>
+    <line x1="310" y1="-340" x2="355" y2="-388"/>
+    <line x1="430" y1="-160" x2="490" y2="-183"/>
+    <line x1="460" y1="0" x2="520" y2="0"/>
+    <line x1="430" y1="160" x2="490" y2="183"/>
+    <line x1="310" y1="340" x2="355" y2="388"/>
+    <line x1="160" y1="430" x2="182" y2="490"/>
+    <line x1="0" y1="460" x2="0" y2="520"/>
+    <line x1="-160" y1="430" x2="-182" y2="490"/>
+    <line x1="-310" y1="340" x2="-355" y2="388"/>
+    <line x1="-430" y1="160" x2="-490" y2="183"/>
+    <line x1="-460" y1="0" x2="-520" y2="0"/>
+    <line x1="-430" y1="-160" x2="-490" y2="-183"/>
+    <line x1="-310" y1="-340" x2="-355" y2="-388"/>
+    <line x1="-160" y1="-430" x2="-182" y2="-490"/>
+  </g>
+
+  <!-- Top brand row -->
+  <g transform="translate(80,80)">
+    <rect x="0" y="0" width="68" height="68" rx="18" fill="url(#brand)"/>
+    <path d="M20 50 L48 22" stroke="white" stroke-width="5" stroke-linecap="round"/>
+    <path d="M30 22 H48 V40" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="86" y="44" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="38" fill="#ffffff" letter-spacing="8">PATH</text>
+  </g>
+
+  <!-- Huge "NEU" badge -->
+  <g transform="translate(920,110) rotate(12)">
+    <circle r="70" fill="url(#brand)"/>
+    <text y="-8" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="28" fill="#0f1923">NEU</text>
+    <text y="22" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="14" fill="#0f1923">v1.4</text>
+  </g>
+
+  <!-- Central headline -->
+  <g transform="translate(540,420)" text-anchor="middle">
+    <text font-family="Inter, Arial, sans-serif" font-weight="800" font-size="110" fill="#ffffff" letter-spacing="-3">
+      <tspan x="0" dy="0">Deine</tspan>
+      <tspan x="0" dy="115">Bewerbung.</tspan>
+    </text>
+    <text y="295" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="120" fill="url(#brand)" letter-spacing="-3">In Minuten.</text>
+  </g>
+
+  <!-- USP grid -->
+  <g transform="translate(540,830)" text-anchor="middle" font-family="Inter, Arial, sans-serif">
+    <g>
+      <rect x="-440" y="0" width="210" height="70" rx="18" fill="#16242e" stroke="#34C759" stroke-opacity="0.5"/>
+      <text x="-335" y="32" font-weight="800" font-size="22" fill="#34C759">15+</text>
+      <text x="-335" y="56" font-weight="600" font-size="15" fill="#c8d6db">Templates</text>
+    </g>
+    <g>
+      <rect x="-220" y="0" width="210" height="70" rx="18" fill="#16242e" stroke="#00C7BE" stroke-opacity="0.5"/>
+      <text x="-115" y="32" font-weight="800" font-size="22" fill="#00C7BE">PDF</text>
+      <text x="-115" y="56" font-weight="600" font-size="15" fill="#c8d6db">1-Klick-Export</text>
+    </g>
+    <g>
+      <rect x="10" y="0" width="210" height="70" rx="18" fill="#16242e" stroke="#34C759" stroke-opacity="0.5"/>
+      <text x="115" y="32" font-weight="800" font-size="22" fill="#34C759">☁</text>
+      <text x="115" y="56" font-weight="600" font-size="15" fill="#c8d6db">Cloud-Sync</text>
+    </g>
+    <g>
+      <rect x="230" y="0" width="210" height="70" rx="18" fill="#16242e" stroke="#00C7BE" stroke-opacity="0.5"/>
+      <text x="335" y="32" font-weight="800" font-size="22" fill="#00C7BE">0 €</text>
+      <text x="335" y="56" font-weight="600" font-size="15" fill="#c8d6db">Kostenlos starten</text>
+    </g>
+  </g>
+
+  <!-- CTA pill -->
+  <g transform="translate(540,960)" text-anchor="middle">
+    <rect x="-200" y="0" width="400" height="72" rx="36" fill="url(#brand)"/>
+    <text x="0" y="47" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="22" fill="#0f1923" letter-spacing="1">path.pixmatic.ch →</text>
+  </g>
+</svg>

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080" role="img" aria-label="Kostenlos starten – ohne Kreditkarte">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1923"/>
+      <stop offset="100%" stop-color="#0a1821"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34C759"/>
+      <stop offset="100%" stop-color="#00C7BE"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#34C759" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#34C759" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1080" height="1080" fill="url(#bg)"/>
+  <circle cx="540" cy="460" r="500" fill="url(#spot)"/>
+
+  <!-- Big star-burst with 0€ -->
+  <g transform="translate(540,440)">
+    <g>
+      <polygon fill="url(#brand)" points="
+        0,-260 44,-150 165,-180 120,-70 248,-50 135,20 220,110 100,102
+        80,225 0,140 -80,225 -100,102 -220,110 -135,20 -248,-50 -120,-70
+        -165,-180 -44,-150"/>
+    </g>
+    <circle r="170" fill="#0f1923"/>
+    <text y="-6" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="150" fill="url(#brand)" letter-spacing="-5">0 €</text>
+    <text y="60" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="26" fill="#ffffff" letter-spacing="4">OHNE KREDITKARTE</text>
+  </g>
+
+  <!-- Headline -->
+  <g transform="translate(540,800)" text-anchor="middle" font-family="Inter, Arial, sans-serif">
+    <text font-weight="800" font-size="100" fill="#ffffff" letter-spacing="-2">Kostenlos starten.</text>
+    <text y="72" font-weight="700" font-size="30" fill="#9fb3b9">3 Mappen · 6 Templates · 5 PDFs / Monat inklusive</text>
+  </g>
+
+  <!-- Brand corner -->
+  <g transform="translate(60,60)">
+    <rect width="46" height="46" rx="12" fill="url(#brand)"/>
+    <path d="M14 34 L32 16" stroke="white" stroke-width="3.6" stroke-linecap="round"/>
+    <path d="M20 16 H32 V28" stroke="white" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="62" y="30" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="24" fill="#ffffff" letter-spacing="5">PATH</text>
+  </g>
+</svg>

@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080" role="img" aria-label="Cloud-Sync – von jedem Gerät">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1923"/>
+      <stop offset="100%" stop-color="#0a1821"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34C759"/>
+      <stop offset="100%" stop-color="#00C7BE"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#00C7BE" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#00C7BE" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1080" height="1080" fill="url(#bg)"/>
+  <circle cx="540" cy="420" r="500" fill="url(#spot)"/>
+
+  <!-- Devices: phone + laptop connected by arc -->
+  <g transform="translate(540,420)">
+    <!-- Orbit arc -->
+    <path d="M-320 40 Q 0 -240 320 40" stroke="url(#brand)" stroke-width="6" fill="none" stroke-dasharray="12 10" opacity="0.7"/>
+    <!-- Cloud -->
+    <g transform="translate(0,-170)">
+      <ellipse cx="-30" cy="10" rx="56" ry="40" fill="#ffffff"/>
+      <ellipse cx="30" cy="20" rx="48" ry="34" fill="#ffffff"/>
+      <ellipse cx="0" cy="-14" rx="58" ry="40" fill="#ffffff"/>
+      <path d="M-78 28 Q-88 50 -60 52 H60 Q88 50 78 28 Z" fill="#ffffff"/>
+      <g transform="translate(0,10)" opacity="0.9">
+        <path d="M-14 2 L-2 14 L18 -8" stroke="#34C759" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </g>
+    </g>
+    <!-- Laptop -->
+    <g transform="translate(-280,90)">
+      <rect x="-110" y="-80" width="220" height="140" rx="10" fill="#16242e" stroke="#2a3a46"/>
+      <rect x="-96" y="-66" width="192" height="112" rx="4" fill="#0f1923"/>
+      <rect x="-80" y="-50" width="120" height="8" rx="3" fill="#34C759"/>
+      <rect x="-80" y="-34" width="160" height="5" rx="2" fill="#2d3f4b"/>
+      <rect x="-80" y="-24" width="140" height="5" rx="2" fill="#2d3f4b"/>
+      <rect x="-80" y="-10" width="80" height="8" rx="3" fill="#00C7BE"/>
+      <rect x="-80" y="4" width="160" height="5" rx="2" fill="#2d3f4b"/>
+      <rect x="-80" y="14" width="140" height="5" rx="2" fill="#2d3f4b"/>
+      <path d="M-130 60 H130 L120 76 H-120 Z" fill="#16242e" stroke="#2a3a46"/>
+    </g>
+    <!-- Phone -->
+    <g transform="translate(280,80)">
+      <rect x="-52" y="-110" width="104" height="200" rx="18" fill="#16242e" stroke="#2a3a46"/>
+      <rect x="-44" y="-100" width="88" height="180" rx="10" fill="#0f1923"/>
+      <circle cx="0" cy="-106" r="3" fill="#2a3a46"/>
+      <rect x="-36" y="-82" width="60" height="7" rx="3" fill="#34C759"/>
+      <rect x="-36" y="-68" width="72" height="4" rx="2" fill="#2d3f4b"/>
+      <rect x="-36" y="-60" width="60" height="4" rx="2" fill="#2d3f4b"/>
+      <rect x="-36" y="-44" width="48" height="6" rx="3" fill="#00C7BE"/>
+      <rect x="-36" y="-32" width="72" height="4" rx="2" fill="#2d3f4b"/>
+      <rect x="-36" y="-24" width="56" height="4" rx="2" fill="#2d3f4b"/>
+      <rect x="-36" y="-8" width="48" height="6" rx="3" fill="#34C759"/>
+      <rect x="-36" y="4" width="72" height="4" rx="2" fill="#2d3f4b"/>
+      <rect x="-36" y="12" width="64" height="4" rx="2" fill="#2d3f4b"/>
+    </g>
+  </g>
+
+  <!-- Headline -->
+  <g transform="translate(540,760)" text-anchor="middle" font-family="Inter, Arial, sans-serif">
+    <text font-weight="800" font-size="100" fill="#ffffff" letter-spacing="-2">Von überall</text>
+    <text y="110" font-weight="800" font-size="100" fill="url(#brand)" letter-spacing="-2">weiterarbeiten.</text>
+  </g>
+
+  <text x="540" y="970" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="500" font-size="26" fill="#9fb3b9">Desktop · Tablet · Smartphone – automatische Cloud-Sync</text>
+
+  <!-- Brand corner -->
+  <g transform="translate(60,60)">
+    <rect width="46" height="46" rx="12" fill="url(#brand)"/>
+    <path d="M14 34 L32 16" stroke="white" stroke-width="3.6" stroke-linecap="round"/>
+    <path d="M20 16 H32 V28" stroke="white" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="62" y="30" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="24" fill="#ffffff" letter-spacing="5">PATH</text>
+  </g>
+</svg>
