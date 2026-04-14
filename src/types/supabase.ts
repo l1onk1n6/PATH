@@ -8,7 +8,7 @@
 
 export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       persons: {
@@ -36,6 +36,7 @@ export interface Database {
           active_resume_id?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       resumes: {
         Row: {
@@ -109,6 +110,7 @@ export interface Database {
           reminder_days?: number[];
           updated_at?: string;
         };
+        Relationships: [];
       };
       documents: {
         Row: {
@@ -147,6 +149,7 @@ export interface Database {
           data_url?: string | null;
           uploaded_at?: string;
         };
+        Relationships: [];
       };
       applications: {
         Row: {
@@ -190,6 +193,7 @@ export interface Database {
           url?: string | null;
           resume_id?: string | null;
         };
+        Relationships: [];
       };
       share_links: {
         Row: {
@@ -218,6 +222,7 @@ export interface Database {
           label?: string | null;
           is_active?: boolean;
         };
+        Relationships: [];
       };
       resume_views: {
         Row: {
@@ -247,6 +252,7 @@ export interface Database {
         Update: {
           duration_s?: number | null;
         };
+        Relationships: [];
       };
       contact_log: {
         Row: {
@@ -259,7 +265,12 @@ export interface Database {
           user_id: string;
           sent_at?: string;
         };
-        Update: never;
+        Update: {
+          id?: string;
+          user_id?: string;
+          sent_at?: string;
+        };
+        Relationships: [];
       };
       contact_log_public: {
         Row: {
@@ -272,11 +283,71 @@ export interface Database {
           ip_hash: string;
           sent_at?: string;
         };
-        Update: never;
+        Update: {
+          id?: string;
+          ip_hash?: string;
+          sent_at?: string;
+        };
+        Relationships: [];
+      };
+      resume_versions: {
+        Row: {
+          id: string;
+          resume_id: string;
+          user_id: string;
+          snapshot: Json;
+          label: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          resume_id: string;
+          user_id: string;
+          snapshot: Json;
+          label?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          resume_id?: string;
+          user_id?: string;
+          snapshot?: Json;
+          label?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      referrals: {
+        Row: {
+          id: string;
+          referrer_id: string;
+          referee_id: string;
+          subscribed: boolean;
+          rewarded: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          referrer_id: string;
+          referee_id: string;
+          subscribed?: boolean;
+          rewarded?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          referrer_id?: string;
+          referee_id?: string;
+          subscribed?: boolean;
+          rewarded?: boolean;
+          created_at?: string;
+        };
+        Relationships: [];
       };
     };
-    Views: Record<string, never>;
-    Functions: Record<string, never>;
-    Enums: Record<string, never>;
+    Views: { [_ in never]: never };
+    Functions: { [_ in never]: never };
+    Enums: { [_ in never]: never };
+    CompositeTypes: { [_ in never]: never };
   };
-}
+};

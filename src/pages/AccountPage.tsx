@@ -439,7 +439,7 @@ function ReferralSection() {
       .eq('referrer_id', user.id)
       .then(({ data }) => {
         if (data) {
-          const rows = data as { subscribed: boolean; rewarded: boolean }[];
+          const rows = data as unknown as { subscribed: boolean; rewarded: boolean }[];
           setStats({
             total:      rows.length,
             subscribed: rows.filter(r => r.subscribed).length,
