@@ -23,7 +23,7 @@ const CORS = {
   'Access-Control-Max-Age': '86400',
 }
 
-const ZAMMAD_GROUP  = 'Kunden::PATH'
+const ZAMMAD_GROUP  = 'Kunden'
 const RATE_LIMIT    = 3         // max submissions
 const RATE_WINDOW_H = 24        // per N hours
 
