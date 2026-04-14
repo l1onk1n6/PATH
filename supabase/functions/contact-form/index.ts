@@ -344,9 +344,8 @@ Deno.serve(async (req) => {
 
   // ── 7. Log submission for rate limiting ──────────────────────────────────────
   _step = 'log'
-  await admin.from('contact_log').insert({ user_id: userId }).catch((e: unknown) => {
-    console.error('contact_log insert failed:', e)
-  })
+  const { error: logErr } = await admin.from('contact_log').insert({ user_id: userId })
+  if (logErr) console.error('contact_log insert failed:', logErr)
 
   return json({ ok: true })
 

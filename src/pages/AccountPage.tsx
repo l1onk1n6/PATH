@@ -848,8 +848,7 @@ function ContactSection() {
           setErrorMsg('Kontaktformular-Service nicht erreichbar (404). Bitte direkt an info@pixmatic.ch schreiben.');
         } else {
           setStatus('error');
-          const stepInfo = d.step ? ` [step: ${d.step}]` : '';
-          setErrorMsg((d.error ?? `Serverfehler (${res.status}). Bitte direkt an info@pixmatic.ch schreiben.`) + stepInfo);
+          setErrorMsg(d.error ?? `Serverfehler (${res.status}). Bitte direkt an info@pixmatic.ch schreiben.`);
         }
         resetTurnstile();
         return;
