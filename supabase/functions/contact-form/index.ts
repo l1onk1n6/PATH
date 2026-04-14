@@ -138,26 +138,32 @@ Deno.serve(async (req) => {
     message.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>'),
   ].filter(Boolean).join('<br>')
 
-  const zammadRes = await fetch(`${zammadUrl}/api/v1/tickets`, {
-    method: 'POST',
-    headers: {
-      'Content-Type':  'application/json',
-      'Authorization': `Token token=${zammadToken}`,
-    },
-    body: JSON.stringify({
-      title:    ticketTitle,
-      group:    ZAMMAD_GROUP,
-      customer: customerEmail || 'unknown',
-      article: {
-        subject:      ticketTitle,
-        body:         articleBody,
-        type:         'note',
-        internal:     false,
-        content_type: 'text/html',
+  let zammadRes: Response
+  try {
+    zammadRes = await fetch(`${zammadUrl}/api/v1/tickets`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Token token=${zammadToken}`,
       },
-      tags: 'PATH,Kontaktformular',
-    }),
-  })
+      body: JSON.stringify({
+        title:    ticketTitle,
+        group:    ZAMMAD_GROUP,
+        customer: customerEmail || 'unknown',
+        article: {
+          subject:      ticketTitle,
+          body:         articleBody,
+          type:         'note',
+          internal:     false,
+          content_type: 'text/html',
+        },
+        tags: 'PATH,Kontaktformular',
+      }),
+    })
+  } catch (fetchErr) {
+    console.error('Zammad fetch error:', fetchErr)
+    return json({ error: `Zammad nicht erreichbar: ${String(fetchErr)}`, step: 'sending' }, 500)
+  }
 
   if (!zammadRes.ok) {
     const errText = await zammadRes.text().catch(() => '')
