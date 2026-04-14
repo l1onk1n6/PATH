@@ -148,6 +148,49 @@ Deno.serve(async (req) => {
     results.invoiceNinja = { ok: false, note: 'not configured' }
   }
 
+  // ── LinkedIn Conversions API ────────────────────────────────
+  const liToken      = Deno.env.get('LINKEDIN_ACCESS_TOKEN')
+  const liConversion = Deno.env.get('LINKEDIN_CONVERSION_ID')
+
+  if (liToken && liConversion) {
+    try {
+      const hashBuf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email.toLowerCase()))
+      const emailHash = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('')
+
+      const res = await fetch('https://api.linkedin.com/rest/conversionEvents', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${liToken}`,
+          'Content-Type': 'application/json',
+          'LinkedIn-Version': '202406',
+          'X-Restli-Protocol-Version': '2.0.0',
+        },
+        body: JSON.stringify({
+          conversion: `urn:lla:llaPartnerConversion:${liConversion}`,
+          conversionHappenedAt: Date.now(),
+          eventId: `signup-${userId}`,
+          user: {
+            userIds: [{ idType: 'SHA256_EMAIL', idValue: emailHash }],
+          },
+        }),
+      })
+
+      if (res.ok || res.status === 201) {
+        results.linkedin = { ok: true }
+        console.log(`[on-user-signup] ✓ LinkedIn SIGN_UP conversion sent for ${email}`)
+      } else {
+        const body = await res.text()
+        results.linkedin = { ok: false, status: res.status, body }
+        console.error(`[on-user-signup] LinkedIn error ${res.status}: ${body}`)
+      }
+    } catch (err) {
+      results.linkedin = { ok: false, error: String(err) }
+      console.error('[on-user-signup] LinkedIn exception:', err)
+    }
+  } else {
+    results.linkedin = { ok: false, note: 'not configured' }
+  }
+
   return new Response(JSON.stringify({ userId, email, results }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },

@@ -88,6 +88,48 @@ Deno.serve(async (req) => {
         }
         await setPlan(userId, 'pro', periodEnd ? { subscription_period_end: periodEnd } : {})
 
+        // ── LinkedIn PURCHASE conversion ──────────────────────
+        const liToken      = Deno.env.get('LINKEDIN_ACCESS_TOKEN')
+        const liConversion = Deno.env.get('LINKEDIN_CONVERSION_ID')
+        if (liToken && liConversion) {
+          try {
+            // Fetch user email for hashing
+            const { data: userData } = await admin.auth.admin.getUserById(userId)
+            const email = userData?.user?.email
+            if (email) {
+              const hashBuf   = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email.toLowerCase()))
+              const emailHash = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('')
+
+              const liRes = await fetch('https://api.linkedin.com/rest/conversionEvents', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${liToken}`,
+                  'Content-Type': 'application/json',
+                  'LinkedIn-Version': '202406',
+                  'X-Restli-Protocol-Version': '2.0.0',
+                },
+                body: JSON.stringify({
+                  conversion: `urn:lla:llaPartnerConversion:${liConversion}`,
+                  conversionHappenedAt: Date.now(),
+                  eventId: `purchase-${session.id}`,
+                  user: {
+                    userIds: [{ idType: 'SHA256_EMAIL', idValue: emailHash }],
+                  },
+                }),
+              })
+
+              if (liRes.ok || liRes.status === 201) {
+                console.log(`✓ LinkedIn PURCHASE conversion sent for ${email}`)
+              } else {
+                const body = await liRes.text()
+                console.error(`LinkedIn PURCHASE error ${liRes.status}: ${body}`)
+              }
+            }
+          } catch (e) {
+            console.error('LinkedIn PURCHASE exception:', e)
+          }
+        }
+
         // ── Referral reward ──────────────────────────────────
         // If this user was referred and hasn't been rewarded yet, credit the referrer 1 month
         if (session.mode === 'subscription') {
