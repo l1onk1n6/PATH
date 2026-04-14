@@ -3,6 +3,7 @@ import { LogoIcon } from '../components/layout/Logo';
 import AuthPage from './AuthPage';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import EarlyBirdBanner from '../components/ui/EarlyBirdBanner';
+import { ContactModal } from '../components/ContactModal';
 import {
   FileText, Sparkles, Globe, Clock, Share2, Download,
   Check, ChevronRight, ArrowRight, Star, ClipboardList,
@@ -112,6 +113,7 @@ const PRO_FEATURES = [
 
 export default function LandingPage() {
   const [showAuth, setShowAuth] = useState<false | 'login' | 'register'>(false);
+  const [showContact, setShowContact] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const isMobile = useIsMobile();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -742,19 +744,25 @@ export default function LandingPage() {
             <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>by pixmatic</span>
           </div>
 
-          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'center' }}>
             {[
               ['https://pixmatic.ch/datenschutz', 'Datenschutz'],
               ['https://pixmatic.ch/agb', 'AGB'],
-              ['mailto:info@pixmatic.ch', 'Kontakt'],
             ].map(([href, label]) => (
-              <a key={label} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer"
+              <a key={label} href={href} target="_blank" rel="noopener noreferrer"
                 style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', transition: 'color 0.2s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.8)')}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
                 {label}
               </a>
             ))}
+            <button
+              onClick={() => setShowContact(true)}
+              style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', transition: 'color 0.2s', fontFamily: 'inherit' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.8)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
+              Kontakt
+            </button>
           </div>
 
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>
@@ -770,6 +778,8 @@ export default function LandingPage() {
         }
         html { scroll-behavior: smooth; }
       `}</style>
+
+      {showContact && <ContactModal onClose={() => setShowContact(false)} />}
     </div>
   );
 }
