@@ -4,8 +4,8 @@
 
 export const EARLY_BIRD = {
   active:   true,
-  code:     'EARLYBIRD30',
-  discount: '30% Rabatt',
+  code:     'START25',
+  discount: '50% Rabatt — einmalig',
   label:    'Early Bird',
   endsAt:   new Date('2026-05-31T23:59:59'),
 } as const;
