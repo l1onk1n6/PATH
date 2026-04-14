@@ -23,7 +23,7 @@ const CORS = {
   'Access-Control-Max-Age': '86400',
 }
 
-const ZAMMAD_GROUP  = 'Kunden::PATH'
+const ZAMMAD_GROUP  = 'Kunden > PATH'
 const RATE_LIMIT    = 3         // max submissions
 const RATE_WINDOW_H = 24        // per N hours
 
@@ -154,7 +154,6 @@ Deno.serve(async (req) => {
         type:         'note',
         internal:     false,
         content_type: 'text/html',
-        sender:       'Customer',
       },
       tags: 'PATH,Kontaktformular',
     }),
@@ -163,7 +162,7 @@ Deno.serve(async (req) => {
   if (!zammadRes.ok) {
     const errText = await zammadRes.text().catch(() => '')
     console.error('Zammad API error:', zammadRes.status, errText)
-    return json({ error: 'Ticket konnte nicht erstellt werden. Bitte direkt an info@pixmatic.ch schreiben.', step: 'sending' }, 500)
+    return json({ error: `Zammad ${zammadRes.status}: ${errText}`, step: 'sending' }, 500)
   }
 
   // ── 6. Auto-reply to sender via SMTP (best-effort) ───────────────────────────
