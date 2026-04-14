@@ -38,6 +38,7 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
   if (req.method !== 'POST')   return json({ error: 'Method not allowed' }, 405)
 
+  let _step = 'init'
   try {
 
   // Admin client — used for JWT verification and rate limiting
@@ -47,6 +48,7 @@ Deno.serve(async (req) => {
   )
 
   // ── 1. JWT authentication ────────────────────────────────────────────────────
+  _step = 'auth'
   const authHeader = req.headers.get('Authorization') ?? ''
   const token      = authHeader.replace('Bearer ', '').trim()
 
@@ -62,6 +64,7 @@ Deno.serve(async (req) => {
   const userId = authUser.id
 
   // ── Parse body ───────────────────────────────────────────────────────────────
+  _step = 'parse'
   let body: {
     name?: string; email?: string; subject?: string; message?: string
     token?: string; _hp?: string
@@ -80,6 +83,7 @@ Deno.serve(async (req) => {
   }
 
   // ── 3. Cloudflare Turnstile verification ─────────────────────────────────────
+  _step = 'turnstile'
   const turnstileSecret = Deno.env.get('TURNSTILE_SECRET_KEY')
   if (!turnstileSecret) {
     console.warn('TURNSTILE_SECRET_KEY not set — skipping verification')
@@ -105,6 +109,7 @@ Deno.serve(async (req) => {
   }
 
   // ── 4. Rate limiting ─────────────────────────────────────────────────────────
+  _step = 'ratelimit'
   const since = new Date(Date.now() - RATE_WINDOW_H * 60 * 60 * 1000).toISOString()
   const { count, error: countErr } = await admin
     .from('contact_log')
@@ -125,6 +130,7 @@ Deno.serve(async (req) => {
   }
 
   // ── 5. Create Zammad ticket via API ──────────────────────────────────────────
+  _step = 'zammad'
   const zammadUrl   = Deno.env.get('ZAMMAD_URL')?.replace(/\/$/, '')
   const zammadToken = Deno.env.get('ZAMMAD_TOKEN')
 
@@ -178,6 +184,7 @@ Deno.serve(async (req) => {
   }
 
   // ── 6. Auto-reply to sender via SMTP (best-effort) ───────────────────────────
+  _step = 'smtp'
   if (customerEmail) {
     try {
       const smtpHost = Deno.env.get('SMTP_HOST')
@@ -336,6 +343,7 @@ Deno.serve(async (req) => {
   }
 
   // ── 7. Log submission for rate limiting ──────────────────────────────────────
+  _step = 'log'
   await admin.from('contact_log').insert({ user_id: userId }).catch((e: unknown) => {
     console.error('contact_log insert failed:', e)
   })
@@ -343,7 +351,7 @@ Deno.serve(async (req) => {
   return json({ ok: true })
 
   } catch (err) {
-    console.error('Unhandled error in contact-form:', err)
-    return json({ error: 'Interner Fehler. Bitte direkt an info@pixmatic.ch schreiben.' }, 500)
+    console.error(`Unhandled error in contact-form at step=${_step}:`, err)
+    return json({ error: 'Interner Fehler. Bitte direkt an info@pixmatic.ch schreiben.', step: _step }, 500)
   }
 })
