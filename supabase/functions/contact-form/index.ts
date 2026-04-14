@@ -21,7 +21,7 @@ const CORS = {
   'Access-Control-Max-Age': '86400',
 }
 
-const RECIPIENT     = 'info@pixmatic.ch'
+const RECIPIENT     = 'tickets@pixmatic.ch'
 const RATE_LIMIT    = 3          // max submissions
 const RATE_WINDOW_H = 24         // per N hours
 
