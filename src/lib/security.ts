@@ -68,6 +68,36 @@ export function validateSupabaseKey(key: string): boolean {
   return key.trim().startsWith('eyJ') && key.trim().length > 100;
 }
 
+// ── Magic bytes file validation ─────────────────────────────
+// Reads the first bytes of a file to verify the actual format matches
+// the claimed MIME type. Prevents polyglot / extension-spoofed uploads.
+
+const MAGIC_PATTERNS: Record<string, number[][]> = {
+  'application/pdf': [[0x25, 0x50, 0x44, 0x46]],                             // %PDF
+  'image/jpeg':      [[0xFF, 0xD8, 0xFF]],                                    // JPEG SOI
+  'image/png':       [[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]],    // PNG header
+  'image/gif':       [[0x47, 0x49, 0x46, 0x38]],                             // GIF8 (87a / 89a)
+}
+
+export async function validateMagicBytes(file: File): Promise<boolean> {
+  if (file.type === 'image/webp') {
+    // WebP = RIFF????WEBP (12 bytes)
+    const buf = await file.slice(0, 12).arrayBuffer()
+    const b = new Uint8Array(buf)
+    return (
+      b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 &&  // RIFF
+      b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50   // WEBP
+    )
+  }
+
+  const patterns = MAGIC_PATTERNS[file.type]
+  if (!patterns) return false  // unsupported MIME type
+
+  const buf = await file.slice(0, 8).arrayBuffer()
+  const b = new Uint8Array(buf)
+  return patterns.some(pattern => pattern.every((byte, i) => b[i] === byte))
+}
+
 // ── Rate limiter (in-memory, client-side) ───────────────────
 
 export class RateLimiter {

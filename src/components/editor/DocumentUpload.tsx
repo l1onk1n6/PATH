@@ -5,6 +5,7 @@ import { Upload, File, Trash2, FileText, Image, Download, AlertCircle, Loader } 
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
+import { validateMagicBytes } from '../../lib/security';
 import { uploadDocument, getDocumentSignedUrl, downloadFile, listUserDocuments } from '../../lib/storage';
 import type { UploadedDocument } from '../../types/resume';
 
@@ -78,6 +79,15 @@ export default function DocumentUpload() {
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (!resume) return;
     setSizeError('');
+
+    // Validate magic bytes before accepting any file
+    for (const file of acceptedFiles) {
+      const valid = await validateMagicBytes(file);
+      if (!valid) {
+        setSizeError(`Ungültige Datei: "${file.name}" — Dateiinhalt stimmt nicht mit dem Dateiformat überein.`);
+        return;
+      }
+    }
 
     const newBytes = acceptedFiles.reduce((s, f) => s + f.size, 0);
     if (totalUsedBytes + newBytes > totalLimitBytes) {

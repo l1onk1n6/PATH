@@ -7,14 +7,39 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Content-Type': 'application/json',
+const ALLOWED_ORIGIN = 'https://path.pixmatic.ch'
+
+// Only allow requests from the app origin; server-to-server (no Origin header) always allowed.
+function corsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get('origin') ?? ''
+  const h: Record<string, string> = { 'Content-Type': 'application/json', 'Vary': 'Origin' }
+  if (!origin || origin === ALLOWED_ORIGIN) {
+    h['Access-Control-Allow-Origin'] = ALLOWED_ORIGIN
+    h['Access-Control-Allow-Headers'] = 'content-type'
+  }
+  return h
 }
 
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), { status, headers: CORS })
+// ── Rate limiting ──────────────────────────────────────────────
+// Module-level map persists across requests within the same isolate.
+const rlMap = new Map<string, { n: number; resetAt: number }>()
+
+function checkRate(ip: string, key: string, limit: number, windowMs: number): boolean {
+  const now = Date.now()
+  const k = `${ip}:${key}`
+  let entry = rlMap.get(k)
+  if (!entry || now > entry.resetAt) {
+    entry = { n: 0, resetAt: now + windowMs }
+    rlMap.set(k, entry)
+  }
+  entry.n += 1
+  return entry.n <= limit
+}
+
+function getIp(req: Request): string {
+  return req.headers.get('cf-connecting-ip')
+    ?? req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    ?? 'unknown'
 }
 
 function parseDevice(ua: string): string {
@@ -33,12 +58,19 @@ function parseBrowser(ua: string): string {
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: CORS })
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders(req) })
+
+  const ip = getIp(req)
+  const ch = corsHeaders(req)
 
   const sb = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   )
+
+  function json(body: unknown, status = 200) {
+    return new Response(JSON.stringify(body), { status, headers: ch })
+  }
 
   try {
     // sendBeacon always uses POST; it passes ?method=PATCH to signal a duration update
@@ -47,6 +79,7 @@ Deno.serve(async (req: Request) => {
 
     // ── PATCH: update duration of an existing view ─────────
     if (method === 'PATCH') {
+      if (!checkRate(ip, 'patch', 30, 60_000)) return json({ error: 'rate limit exceeded' }, 429)
       const { view_id, duration_s } = await req.json()
       if (!view_id || typeof duration_s !== 'number') return json({ error: 'bad request' }, 400)
       await sb.from('resume_views').update({ duration_s }).eq('id', view_id)
@@ -55,6 +88,7 @@ Deno.serve(async (req: Request) => {
 
     // ── POST: log new view ─────────────────────────────────
     if (method !== 'POST') return json({ error: 'method not allowed' }, 405)
+    if (!checkRate(ip, 'post', 15, 60_000)) return json({ error: 'rate limit exceeded' }, 429)
 
     const { token } = await req.json()
     if (!token) return json({ error: 'token required' }, 400)
@@ -78,10 +112,10 @@ Deno.serve(async (req: Request) => {
     if (cfCountry && cfCountry !== 'XX') {
       countryCode = cfCountry
     } else {
-      const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-      if (ip && ip !== '::1' && !ip.startsWith('127.') && !ip.startsWith('192.168.')) {
+      const forwardedIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      if (forwardedIp && forwardedIp !== '::1' && !forwardedIp.startsWith('127.') && !forwardedIp.startsWith('192.168.')) {
         try {
-          const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,countryCode,city`, {
+          const res = await fetch(`http://ip-api.com/json/${forwardedIp}?fields=status,country,countryCode,city`, {
             signal: AbortSignal.timeout(2000),
           })
           const geo = await res.json()

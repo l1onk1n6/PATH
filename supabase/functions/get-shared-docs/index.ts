@@ -6,19 +6,50 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Content-Type': 'application/json',
+const ALLOWED_ORIGIN = 'https://path.pixmatic.ch'
+
+function corsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get('origin') ?? ''
+  const h: Record<string, string> = { 'Content-Type': 'application/json', 'Vary': 'Origin' }
+  if (!origin || origin === ALLOWED_ORIGIN) {
+    h['Access-Control-Allow-Origin'] = ALLOWED_ORIGIN
+    h['Access-Control-Allow-Headers'] = 'content-type'
+  }
+  return h
 }
 
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), { status, headers: CORS })
+// ── Rate limiting ──────────────────────────────────────────────
+const rlMap = new Map<string, { n: number; resetAt: number }>()
+
+function checkRate(ip: string, limit: number, windowMs: number): boolean {
+  const now = Date.now()
+  let entry = rlMap.get(ip)
+  if (!entry || now > entry.resetAt) {
+    entry = { n: 0, resetAt: now + windowMs }
+    rlMap.set(ip, entry)
+  }
+  entry.n += 1
+  return entry.n <= limit
+}
+
+function getIp(req: Request): string {
+  return req.headers.get('cf-connecting-ip')
+    ?? req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    ?? 'unknown'
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: CORS })
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders(req) })
+
+  const ch = corsHeaders(req)
+  function json(body: unknown, status = 200) {
+    return new Response(JSON.stringify(body), { status, headers: ch })
+  }
+
   if (req.method !== 'GET') return json({ error: 'method not allowed' }, 405)
+
+  const ip = getIp(req)
+  if (!checkRate(ip, 30, 60_000)) return json({ error: 'rate limit exceeded' }, 429)
 
   const token = new URL(req.url).searchParams.get('token')
   if (!token) return json({ error: 'token required' }, 400)
@@ -29,7 +60,7 @@ Deno.serve(async (req: Request) => {
   )
 
   try {
-    // Resolve token → resume_id via new share_links table
+    // Resolve token → resume_id via share_links table
     const { data: link } = await sb
       .from('share_links')
       .select('resume_id')
@@ -49,7 +80,8 @@ Deno.serve(async (req: Request) => {
       resumeId = (resume as { id: string } | null)?.id ?? null
     }
 
-    if (!resumeId) return json({ documents: [] })
+    // Return 404 instead of empty array — caller shows "not found" page
+    if (!resumeId) return json({ error: 'not found' }, 404)
 
     // Fetch document metadata
     const { data: docs, error } = await sb
