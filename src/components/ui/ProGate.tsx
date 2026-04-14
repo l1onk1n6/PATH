@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Lock, X, Sparkles, Loader2 } from 'lucide-react';
 import { usePlan, PRO_FEATURES } from '../../lib/plan';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
+import EarlyBirdBanner from './EarlyBirdBanner';
 
 // ── Checkout helper ────────────────────────────────────────
 async function startCheckout(): Promise<string | null> {
@@ -121,6 +122,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
 
         {/* CTA */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <EarlyBirdBanner variant="inline" />
           <button
             onClick={handleUpgrade}
             disabled={loading}

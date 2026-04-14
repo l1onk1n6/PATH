@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { LogoIcon } from '../components/layout/Logo';
 import AuthPage from './AuthPage';
 import { useIsMobile } from '../hooks/useBreakpoint';
+import EarlyBirdBanner from '../components/ui/EarlyBirdBanner';
 import {
   FileText, Sparkles, Globe, Clock, Share2, Download,
   Check, ChevronRight, ArrowRight, Star, ClipboardList,
@@ -212,6 +213,9 @@ export default function LandingPage() {
           </button>
         </div>
       </nav>
+
+      {/* ── Early Bird Banner ───────────────────────────────── */}
+      <EarlyBirdBanner variant="top" />
 
       {/* ── Hero ────────────────────────────────────────────── */}
       <section style={{
