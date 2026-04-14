@@ -127,10 +127,18 @@ async function imageToPdfBytes(url: string): Promise<Uint8Array | null> {
 async function exportAdaptive(
   parts: HTMLElement[],
   docDataUrls: { dataUrl: string; type: string }[],
+  onProgress?: (stage: string) => void,
 ): Promise<Uint8Array> {
   let quality = 0.92;
+  const MAX_ATTEMPTS = 4;
 
-  for (let attempt = 0; attempt < 4; attempt++) {
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    if (attempt === 0) {
+      onProgress?.('Rendere PDF…');
+    } else {
+      onProgress?.(`Komprimiere… (${attempt + 1}/${MAX_ATTEMPTS})`);
+    }
+
     const pdfParts: Uint8Array[] = [];
 
     for (const el of parts) {
@@ -158,6 +166,7 @@ async function exportAdaptive(
   }
 
   // Fallback – merge with lowest quality
+  onProgress?.('Finalisiere…');
   const pdfParts: Uint8Array[] = [];
   for (const el of parts) {
     const { pdfBytes } = await renderElementToPdfDoc(el, 0.55);
@@ -181,6 +190,7 @@ export default function Preview() {
   const resume = getActiveResume();
   const [zoom, setZoom] = useState(isMobile ? 0.42 : 1.0);
   const [exporting, setExporting] = useState(false);
+  const [exportStage, setExportStage] = useState('Exportiere…');
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const [showPasswordSoon, setShowPasswordSoon] = useState(false);
   const [showSharePanel, setShowSharePanel] = useState(false);
@@ -228,6 +238,7 @@ export default function Preview() {
       return;
     }
     setExporting(true);
+    setExportStage('Rendere PDF…');
     try {
       const elements: HTMLElement[] = [];
 
@@ -241,7 +252,7 @@ export default function Preview() {
       if (resumeEl) elements.push(resumeEl);
 
       const docs = (resume.documents ?? []).map(d => ({ dataUrl: d.dataUrl, type: d.type }));
-      const merged = await exportAdaptive(elements, docs);
+      const merged = await exportAdaptive(elements, docs, setExportStage);
 
       const blob = new Blob([merged.buffer as BlobPart], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
@@ -944,7 +955,7 @@ export default function Preview() {
               style={{ opacity: exporting ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 5 }}
             >
               {exporting
-                ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />{!isMobile && ' Exportiere…'}</>
+                ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />{!isMobile && ` ${exportStage}`}</>
                 : <><FolderDown size={13} />{!isMobile && ' Ganze Mappe'}</>
               }
             </button>

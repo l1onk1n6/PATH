@@ -35,8 +35,7 @@ export async function upsertPerson(person: Person): Promise<void> {
   try {
     const uid = await userId();
     if (!uid) return;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (sb().from('persons') as any).upsert({
+    await sb().from('persons').upsert({
       id: person.id,
       user_id: uid,
       name: person.name,
@@ -76,8 +75,7 @@ export async function upsertResume(resume: Resume): Promise<void> {
   try {
     const uid = await userId();
     if (!uid) return;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (sb().from('resumes') as any).upsert({
+    await sb().from('resumes').upsert({
       id: resume.id,
       person_id: resume.personId,
       user_id: uid,
@@ -87,15 +85,15 @@ export async function upsertResume(resume: Resume): Promise<void> {
       deadline: resume.deadline ?? '',
       template_id: resume.templateId,
       accent_color: resume.accentColor,
-      personal_info: resume.personalInfo,
-      cover_letter: resume.coverLetter,
-      work_experience: resume.workExperience,
-      education: resume.education,
-      skills: resume.skills,
-      languages: resume.languages,
-      projects: resume.projects,
-      certificates: resume.certificates,
-      custom_sections: resume.customSections ?? [],
+      personal_info: resume.personalInfo as import('../types/supabase').Json,
+      cover_letter: resume.coverLetter as import('../types/supabase').Json,
+      work_experience: resume.workExperience as import('../types/supabase').Json,
+      education: resume.education as import('../types/supabase').Json,
+      skills: resume.skills as import('../types/supabase').Json,
+      languages: resume.languages as import('../types/supabase').Json,
+      projects: resume.projects as import('../types/supabase').Json,
+      certificates: resume.certificates as import('../types/supabase').Json,
+      custom_sections: (resume.customSections ?? []) as import('../types/supabase').Json,
       share_token: resume.shareToken ?? null,
       reminder_days: resume.reminderDays ?? [],
     });
@@ -143,8 +141,7 @@ export async function upsertDocument(resumeId: string, doc: UploadedDocument): P
       console.error('[db] upsertDocument: kein User gefunden');
       return 'no-user';
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (sb().from('documents') as any).upsert({
+    const { error } = await sb().from('documents').upsert({
       id: doc.id,
       resume_id: resumeId,
       user_id: uid,
@@ -272,8 +269,7 @@ export async function upsertApplication(app: Application): Promise<void> {
   try {
     const uid = await userId();
     if (!uid) return;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (sb().from('applications') as any).upsert({
+    await sb().from('applications').upsert({
       id: app.id,
       user_id: uid,
       company: app.company,
@@ -320,8 +316,8 @@ function rowToApplication(row: Record<string, unknown>): Application {
 export async function getShareLinks(resumeId: string): Promise<ShareLink[]> {
   if (!isSupabaseConfigured()) return [];
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (sb().from('share_links') as any)
+    const { data, error } = await sb()
+      .from('share_links')
       .select('id, resume_id, token, label, is_active, created_at, resume_views(count)')
       .eq('resume_id', resumeId)
       .order('created_at', { ascending: false }) as { data: Record<string, unknown>[] | null; error: unknown };
@@ -346,8 +342,8 @@ export async function createShareLink(resumeId: string, label: string): Promise<
   try {
     const uid = await userId();
     if (!uid) return null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (sb().from('share_links') as any)
+    const { data, error } = await sb()
+      .from('share_links')
       .insert({ resume_id: resumeId, user_id: uid, label })
       .select('id, resume_id, token, label, is_active, created_at')
       .single() as { data: Record<string, unknown> | null; error: unknown };
@@ -363,11 +359,10 @@ export async function createShareLink(resumeId: string, label: string): Promise<
 export async function updateShareLink(linkId: string, patch: { label?: string; isActive?: boolean }): Promise<void> {
   if (!isSupabaseConfigured()) return;
   try {
-    const update: Record<string, unknown> = {};
+    const update: { label?: string; is_active?: boolean } = {};
     if (patch.label !== undefined) update.label = patch.label;
     if (patch.isActive !== undefined) update.is_active = patch.isActive;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (sb().from('share_links') as any).update(update).eq('id', linkId);
+    await sb().from('share_links').update(update).eq('id', linkId);
   } catch (e) {
     console.warn('[db] updateShareLink', e);
   }
@@ -435,8 +430,8 @@ export async function fetchSharedResumeByToken(token: string): Promise<Resume | 
 
     // Fetch documents via public edge function (bypasses RLS using service role)
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || localStorage.getItem('aicv-supabase-url') || '';
-      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || localStorage.getItem('aicv-supabase-key') || '';
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string || localStorage.getItem('aicv-supabase-url') || '';
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string || localStorage.getItem('aicv-supabase-key') || '';
       if (supabaseUrl) {
         const res = await fetch(`${supabaseUrl}/functions/v1/get-shared-docs?token=${encodeURIComponent(token)}`, {
           headers: { 'apikey': anonKey, 'Authorization': `Bearer ${anonKey}` },

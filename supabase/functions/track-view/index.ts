@@ -7,7 +7,8 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
-const ALLOWED_ORIGIN = 'https://path.pixmatic.ch'
+// Configurable via APP_ORIGIN secret; falls back to production domain.
+const ALLOWED_ORIGIN = Deno.env.get('APP_ORIGIN') ?? 'https://path.pixmatic.ch'
 
 // Only allow requests from the app origin; server-to-server (no Origin header) always allowed.
 function corsHeaders(req: Request): Record<string, string> {

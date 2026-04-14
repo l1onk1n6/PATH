@@ -44,6 +44,8 @@ function PlanSection() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [webhookPending, setWebhookPending] = useState(false);
   const [webhookFailed, setWebhookFailed] = useState(false);
+  const [webhookAttempt, setWebhookAttempt] = useState(0);
+  const WEBHOOK_MAX_ATTEMPTS = 6;
   const pdfCount = getPdfExportCount();
   const activeShareLinks = resumes.filter(r => r.shareToken).length;
   const isGift = user?.user_metadata?.gift_pro === true;
@@ -54,16 +56,18 @@ function PlanSection() {
     if (isSuccess) {
       setShowSuccess(true);
       setWebhookPending(true);
+      setWebhookAttempt(0);
       window.history.replaceState(null, '', window.location.pathname + window.location.hash.replace('?success=1', ''));
-      // Webhook is async — poll until plan is updated (max 6 attempts, 2s apart = 13s total)
+      // Webhook is async — poll until plan is updated (max 6 attempts, 2s apart = ~13s total)
       let attempts = 0;
       const poll = async () => {
         await refreshUser();
         attempts++;
+        setWebhookAttempt(attempts);
         const { user: u } = useAuthStore.getState();
         if (u?.user_metadata?.plan === 'pro') {
           setWebhookPending(false);
-        } else if (attempts < 6) {
+        } else if (attempts < WEBHOOK_MAX_ATTEMPTS) {
           setTimeout(poll, 2000);
         } else {
           setWebhookPending(false);
@@ -118,9 +122,16 @@ function PlanSection() {
       {webhookPending && (
         <div className="glass-card" style={{ padding: '14px 16px', border: '1px solid rgba(0,122,255,0.35)', background: 'rgba(0,122,255,0.08)', display: 'flex', alignItems: 'center', gap: 10 }}>
           <Loader2 size={18} style={{ color: 'var(--ios-blue)', flexShrink: 0, animation: 'spin 1s linear infinite' }} />
-          <div>
+          <div style={{ flex: 1 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ios-blue)' }}>Pro wird aktiviert…</div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>Zahlung bestätigt — warte auf Aktivierung (max. 15 Sek.)</div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
+              Zahlung bestätigt — warte auf Aktivierung
+              {webhookAttempt > 0 && (
+                <span style={{ marginLeft: 6, opacity: 0.6 }}>
+                  ({webhookAttempt}/{WEBHOOK_MAX_ATTEMPTS})
+                </span>
+              )}
+            </div>
           </div>
         </div>
       )}

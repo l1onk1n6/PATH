@@ -22,6 +22,8 @@ export default function ShareLinksPanel({ resumeId, readOnly }: Props) {
   const [showCreate, setShowCreate] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [firstLinkId, setFirstLinkId] = useState<string | null>(null);
+  const [labelError, setLabelError] = useState('');
+  const LABEL_MAX = 50;
 
   const load = useCallback(() => {
     getShareLinks(resumeId).then(l => { setLinks(l); setLoading(false); });
@@ -47,9 +49,15 @@ export default function ShareLinksPanel({ resumeId, readOnly }: Props) {
 
   async function create() {
     if (atLimit || creating) return;
+    const trimmed = newLabel.trim();
+    if (trimmed.length > LABEL_MAX) {
+      setLabelError(`Max. ${LABEL_MAX} Zeichen (${trimmed.length}/${LABEL_MAX})`);
+      return;
+    }
+    setLabelError('');
     setCreating(true);
     const isFirst = links.length === 0;
-    const link = await createShareLink(resumeId, newLabel.trim());
+    const link = await createShareLink(resumeId, trimmed);
     if (link) {
       setLinks(prev => [link, ...prev]);
       setNewLabel('');
@@ -107,19 +115,31 @@ export default function ShareLinksPanel({ resumeId, readOnly }: Props) {
 
       {/* Create form */}
       {!readOnly && showCreate && (
-        <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
-          <input
-            className="input-glass"
-            placeholder='Label, z.B. "Siemens AG" (optional)'
-            value={newLabel}
-            onChange={e => setNewLabel(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && create()}
-            style={{ flex: 1, fontSize: 12 }}
-            autoFocus
-          />
-          <button className="btn-glass btn-primary btn-sm" onClick={create} disabled={creating}>
-            {creating ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : 'Erstellen'}
-          </button>
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <input
+              className="input-glass"
+              placeholder='Label, z.B. "Siemens AG" (optional)'
+              value={newLabel}
+              onChange={e => { setNewLabel(e.target.value); if (labelError) setLabelError(''); }}
+              onKeyDown={e => e.key === 'Enter' && create()}
+              maxLength={LABEL_MAX + 1}
+              style={{ flex: 1, fontSize: 12, borderColor: labelError ? 'rgba(255,59,48,0.5)' : undefined }}
+              autoFocus
+            />
+            <button className="btn-glass btn-primary btn-sm" onClick={create} disabled={creating}>
+              {creating ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : 'Erstellen'}
+            </button>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+            {labelError
+              ? <span style={{ fontSize: 11, color: 'var(--ios-red)' }}>{labelError}</span>
+              : <span />
+            }
+            <span style={{ fontSize: 11, color: newLabel.length > LABEL_MAX * 0.8 ? 'var(--ios-orange)' : 'var(--text-muted)' }}>
+              {newLabel.length}/{LABEL_MAX}
+            </span>
+          </div>
         </div>
       )}
 

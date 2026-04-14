@@ -13,6 +13,7 @@ import { isSupabaseConfigured, getSupabase } from './lib/supabase';
 import { useIsMobile } from './hooks/useBreakpoint';
 import OnboardingModal, { isOnboardingDone } from './components/ui/OnboardingModal';
 import { ToastContainer } from './components/ui/Toast';
+import { OfflineBanner } from './components/ui/OfflineBanner';
 
 // Lazy-loaded pages — each page is split into its own JS chunk
 const Dashboard        = lazy(() => import('./pages/Dashboard'));
@@ -151,6 +152,9 @@ function AppShell() {
           </div>
         </div>
       </div>
+
+      {/* ── Offline banner ────────────────────────────────── */}
+      <OfflineBanner />
 
       {/* ── Global toasts ─────────────────────────────────── */}
       <ToastContainer />

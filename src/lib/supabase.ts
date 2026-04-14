@@ -1,6 +1,8 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '../types/supabase';
 
-// Werte entweder aus Build-Zeit-Env-Vars oder aus localStorage (Setup-Seite)
+// Build-time env vars take priority; localStorage is a fallback for self-hosted setups.
+// Note: VITE_SUPABASE_ANON_KEY is a public key — safe to store in localStorage.
 function getConfig() {
   const url =
     import.meta.env.VITE_SUPABASE_URL ||
@@ -27,18 +29,18 @@ export function saveSupabaseConfig(url: string, key: string) {
   localStorage.setItem('aicv-supabase-key', key.trim());
 }
 
-// Lazy singleton – wird erst beim ersten Aufruf erstellt
-let _client: ReturnType<typeof createClient> | null = null;
+// Lazy singleton — created on first access
+let _client: SupabaseClient<Database> | null = null;
 
-export function getSupabase() {
+export function getSupabase(): SupabaseClient<Database> {
   if (_client) return _client;
   const { url, key } = getConfig();
   if (!url || !key) throw new Error('Supabase nicht konfiguriert');
-  _client = createClient(url, key);
+  _client = createClient<Database>(url, key);
   return _client;
 }
 
-// Nach Konfigurationsänderung Client zurücksetzen
+// Reset after config change
 export function resetSupabaseClient() {
   _client = null;
 }
