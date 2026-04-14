@@ -87,12 +87,18 @@ Deno.serve(async (req) => {
     if (!turnstileToken) {
       return json({ error: 'Sicherheitsprüfung nicht abgeschlossen.', step: 'turnstile' }, 403)
     }
-    const verifyRes  = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body:    new URLSearchParams({ secret: turnstileSecret, response: turnstileToken }),
-    })
-    const verifyData = await verifyRes.json() as { success: boolean; 'error-codes'?: string[] }
+    let verifyData: { success: boolean; 'error-codes'?: string[] }
+    try {
+      const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body:    new URLSearchParams({ secret: turnstileSecret, response: turnstileToken }),
+      })
+      verifyData = await verifyRes.json() as { success: boolean; 'error-codes'?: string[] }
+    } catch (turnstileErr) {
+      console.error('Turnstile verification request failed:', turnstileErr)
+      return json({ error: 'Sicherheitsprüfung konnte nicht abgeschlossen werden. Bitte später erneut versuchen.', step: 'turnstile' }, 503)
+    }
     if (!verifyData.success) {
       return json({ error: 'Sicherheitsprüfung fehlgeschlagen. Bitte Seite neu laden und erneut versuchen.', step: 'turnstile' }, 403)
     }
