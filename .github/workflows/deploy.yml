@@ -38,6 +38,7 @@ jobs:
           publish_dir: ./dist
           publish_branch: gh-pages
           cname: path.pixmatic.ch
+          force_orphan: true
 
   deploy-functions:
     runs-on: ubuntu-latest
