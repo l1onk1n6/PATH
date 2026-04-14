@@ -7,7 +7,7 @@ export const EARLY_BIRD = {
   code:     'START25',
   discount: '50% Rabatt — einmalig',
   label:    'Early Bird',
-  endsAt:   new Date('2026-05-31T23:59:59'),
+  endsAt:   new Date('2026-05-25T23:59:59'),
 } as const;
 
 export function earlyBirdActive(): boolean {
