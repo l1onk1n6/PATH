@@ -190,7 +190,7 @@ Deno.serve(async (req) => {
         const safeMessage = message.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
         const safeName    = name.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
-      transporter.sendMail({
+      await transporter.sendMail({
         from:    smtpFrom,
         to:      customerEmail,
         subject: 'Wir haben deine Nachricht erhalten – PATH',
@@ -322,9 +322,7 @@ Deno.serve(async (req) => {
 
 </body>
 </html>`,
-      }).catch((e: unknown) => {
-          console.error('auto-reply failed:', e)
-        })
+      }).catch((e: unknown) => { console.error('auto-reply failed:', e) })
       }
     } catch (smtpErr) {
       console.error('SMTP block error:', smtpErr)
