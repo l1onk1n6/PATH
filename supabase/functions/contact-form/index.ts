@@ -172,24 +172,23 @@ Deno.serve(async (req) => {
   }
 
   // ── 6. Auto-reply to sender via SMTP (best-effort) ───────────────────────────
-  // Note: if Zammad is configured with a "ticket created" trigger that also emails
-  // the customer, disable either this or the Zammad trigger to avoid duplicates.
   if (customerEmail) {
-    const smtpHost = Deno.env.get('SMTP_HOST')
-    const smtpUser = Deno.env.get('SMTP_USER')
-    const smtpPass = Deno.env.get('SMTP_PASS')
-    const smtpFrom = Deno.env.get('SMTP_FROM')
+    try {
+      const smtpHost = Deno.env.get('SMTP_HOST')
+      const smtpUser = Deno.env.get('SMTP_USER')
+      const smtpPass = Deno.env.get('SMTP_PASS')
+      const smtpFrom = Deno.env.get('SMTP_FROM')
 
-    if (smtpHost && smtpUser && smtpPass && smtpFrom) {
-      const transporter = nodemailer.createTransport({
-        host:   smtpHost,
-        port:   parseInt(Deno.env.get('SMTP_PORT') ?? '587'),
-        secure: Deno.env.get('SMTP_PORT') === '465',
-        auth: { user: smtpUser, pass: smtpPass },
-      })
+      if (smtpHost && smtpUser && smtpPass && smtpFrom) {
+        const transporter = nodemailer.createTransport({
+          host:   smtpHost,
+          port:   parseInt(Deno.env.get('SMTP_PORT') ?? '587'),
+          secure: Deno.env.get('SMTP_PORT') === '465',
+          auth: { user: smtpUser, pass: smtpPass },
+        })
 
-      const safeMessage = message.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
-      const safeName    = name.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        const safeMessage = message.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
+        const safeName    = name.trim().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
       transporter.sendMail({
         from:    smtpFrom,
@@ -294,8 +293,11 @@ Deno.serve(async (req) => {
 </body>
 </html>`,
       }).catch((e: unknown) => {
-        console.error('auto-reply failed:', e)
-      })
+          console.error('auto-reply failed:', e)
+        })
+      }
+    } catch (smtpErr) {
+      console.error('SMTP block error:', smtpErr)
     }
   }
 
