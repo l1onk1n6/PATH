@@ -44,6 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -63,7 +64,7 @@ jobs:
           supabase functions deploy stripe-webhook              --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
 
       - name: Set Edge Function secrets
-        if: ${{ secrets.TURNSTILE_SECRET_KEY != '' }}
+        if: ${{ env.TURNSTILE_SECRET_KEY != '' }}
         run: |
-          supabase secrets set TURNSTILE_SECRET_KEY=${{ secrets.TURNSTILE_SECRET_KEY }} \
+          supabase secrets set TURNSTILE_SECRET_KEY=$TURNSTILE_SECRET_KEY \
             --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
