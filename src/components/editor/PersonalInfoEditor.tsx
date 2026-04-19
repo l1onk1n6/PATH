@@ -88,8 +88,10 @@ export default function PersonalInfoEditor() {
           </div>
         )}
 
-        {/* Name fields */}
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
+        {/* Name fields — Mobile: Vorname/Nachname in 2 Spalten neben dem Foto,
+            Berufsbezeichnung ausserhalb (siehe unten) damit die Foto-Spalte
+            keinen Leerraum darunter hat. Desktop: alles in einem 2-Spalten-Grid. */}
+        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <div>
             <label className="section-label">Vorname</label>
             <input className="input-glass" placeholder="Max" value={info.firstName} maxLength={50}
@@ -100,15 +102,28 @@ export default function PersonalInfoEditor() {
             <input className="input-glass" placeholder="Mustermann" value={info.lastName} maxLength={50}
               onChange={(e) => update('lastName', e.target.value)} />
           </div>
-          <div style={{ gridColumn: isMobile ? 'auto' : 'span 2' }}>
-            <label className="section-label">
-              <FileText size={10} style={{ display: 'inline', marginRight: 4 }} />Berufsbezeichnung
-            </label>
-            <input className="input-glass" placeholder="z.B. Senior Software Engineer" value={info.title} maxLength={100}
-              onChange={(e) => update('title', e.target.value)} />
-          </div>
+          {!isMobile && (
+            <div style={{ gridColumn: 'span 2' }}>
+              <label className="section-label">
+                <FileText size={10} style={{ display: 'inline', marginRight: 4 }} />Berufsbezeichnung
+              </label>
+              <input className="input-glass" placeholder="z.B. Senior Software Engineer" value={info.title} maxLength={100}
+                onChange={(e) => update('title', e.target.value)} />
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Mobile: Berufsbezeichnung separat, nach dem Foto-Row, damit voller Breite */}
+      {isMobile && (
+        <div style={{ marginBottom: 16 }}>
+          <label className="section-label">
+            <FileText size={10} style={{ display: 'inline', marginRight: 4 }} />Berufsbezeichnung
+          </label>
+          <input className="input-glass" placeholder="z.B. Senior Software Engineer" value={info.title} maxLength={100}
+            onChange={(e) => update('title', e.target.value)} />
+        </div>
+      )}
 
       {/* Contact */}
       <div className="section-label">

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Link, Calendar, Sparkles, Bell, BellOff, Loader2, Wand2, ChevronDown, ChevronUp, AlertTriangle, Check, ClipboardList } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
+import { useIsMobile } from '../../hooks/useBreakpoint';
 import { usePlan } from '../../lib/plan';
 import { generateCoverLetter, improveText } from '../../lib/ai';
 import ProGate from '../ui/ProGate';
@@ -120,6 +121,7 @@ export default function CoverLetterEditor() {
   const { getActiveResume, updateCoverLetter, updateResume } = useResumeStore();
   const { isPro } = usePlan();
   const resume = getActiveResume();
+  const isMobile = useIsMobile();
 
   const { addApplication, updateApplication } = useTrackerStore();
   const [showAiPanel, setShowAiPanel] = useState(false);
@@ -270,7 +272,7 @@ export default function CoverLetterEditor() {
       )}
 
       {/* Job details */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
         <div>
           <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
             <Link size={11} /> Stellenausschreibung URL

@@ -401,15 +401,20 @@ export default function Preview() {
                 <Layers size={14} />
               </button>
             )}
-            <button className="btn-glass btn-sm btn-icon" onClick={() => setZoom(Math.max(0.25, zoom - 0.1))} style={{ padding: 7 }}>
-              <ZoomOut size={13} />
-            </button>
-            <span style={{ fontSize: 11, minWidth: 36, textAlign: 'center', color: 'rgba(255,255,255,0.6)' }}>
-              {Math.round(zoom * 100)}%
-            </span>
-            <button className="btn-glass btn-sm btn-icon" onClick={() => setZoom(Math.min(1.2, zoom + 0.1))} style={{ padding: 7 }}>
-              <ZoomIn size={13} />
-            </button>
+            {/* Zoom-Buttons nur auf Desktop — mobile nutzt Pinch-to-Zoom */}
+            {!isMobile && (
+              <>
+                <button className="btn-glass btn-sm btn-icon" onClick={() => setZoom(Math.max(0.25, zoom - 0.1))} style={{ padding: 7 }}>
+                  <ZoomOut size={13} />
+                </button>
+                <span style={{ fontSize: 11, minWidth: 36, textAlign: 'center', color: 'rgba(255,255,255,0.6)' }}>
+                  {Math.round(zoom * 100)}%
+                </span>
+                <button className="btn-glass btn-sm btn-icon" onClick={() => setZoom(Math.min(1.2, zoom + 0.1))} style={{ padding: 7 }}>
+                  <ZoomIn size={13} />
+                </button>
+              </>
+            )}
           </div>
 
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
