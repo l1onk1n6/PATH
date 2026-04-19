@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
+import { Capacitor } from '@capacitor/core';
 import { Loader2, Cloud, Loader, ShieldAlert } from 'lucide-react';
 import { useSessionTimeout } from './hooks/useSessionTimeout';
 import Sidebar from './components/layout/Sidebar';
@@ -272,6 +273,10 @@ export default function App() {
   }
 
   if (!user) {
+    // In der nativen App gibt es keine Marketing-Landing-Page — direkt zum Login.
+    if (Capacitor.isNativePlatform()) {
+      return <HashRouter><AuthPage /></HashRouter>;
+    }
     return <HashRouter><LandingPage /></HashRouter>;
   }
 
