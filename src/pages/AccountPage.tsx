@@ -12,6 +12,8 @@ import { usePlan, PRO_FEATURES, LIMITS } from '../lib/plan';
 import { UpgradeModal } from '../components/ui/ProGate';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { getPdfExportCount } from '../lib/pdfExports';
+import { shareLink } from '../lib/shareLink';
+import { openExternal } from '../lib/openExternal';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 import { resetOnboarding } from '../components/ui/OnboardingModal';
 import { useNavigate } from 'react-router-dom';
@@ -544,8 +546,9 @@ function ReferralSection() {
       });
   }, [user]);
 
-  function copyLink() {
-    navigator.clipboard.writeText(refLink);
+  async function copyLink() {
+    const nativeSheet = await shareLink(refLink, 'Einladung zu PATH');
+    if (nativeSheet) return;
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -620,12 +623,12 @@ function PrivacySection() {
             { label: 'Datenschutzerklärung', href: 'https://pixmatic.ch/datenschutz' },
             { label: 'AGB', href: 'https://pixmatic.ch/agb' },
           ].map(({ label, href }) => (
-            <a key={label} href={href} target="_blank" rel="noopener noreferrer"
+            <button key={label} type="button" onClick={() => openExternal(href)}
               className="btn-glass"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', textDecoration: 'none', fontSize: 13 }}>
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', fontSize: 13, width: '100%', textAlign: 'left' }}>
               {label}
               <ExternalLink size={13} style={{ opacity: 0.5 }} />
-            </a>
+            </button>
           ))}
         </div>
       </div>

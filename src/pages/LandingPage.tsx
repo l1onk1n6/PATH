@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { LogoIcon } from '../components/layout/Logo';
 import AuthPage from './AuthPage';
 import { useIsMobile } from '../hooks/useBreakpoint';
+import { openExternal } from '../lib/openExternal';
 import {
   FileText, Sparkles, Globe, Clock, Share2, Download,
   Check, ChevronRight, ArrowRight, Star, ClipboardList, Mail, Import,
@@ -616,12 +617,12 @@ export default function LandingPage() {
               ['https://pixmatic.ch/agb', 'AGB'],
               ['mailto:info@pixmatic.ch', 'Kontakt'],
             ].map(([href, label]) => (
-              <a key={label} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer"
-                style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', transition: 'color 0.2s' }}
+              <button key={label} type="button" onClick={() => openExternal(href)}
+                style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', transition: 'color 0.2s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.8)')}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
                 {label}
-              </a>
+              </button>
             ))}
           </div>
 

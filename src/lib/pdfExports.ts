@@ -1,3 +1,6 @@
+import { Capacitor } from '@capacitor/core';
+import { Directory, Filesystem } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 import { getSupabase, isSupabaseConfigured } from './supabase';
 import { useAuthStore } from '../store/authStore';
 
@@ -67,4 +70,43 @@ export async function incrementPdfExport(): Promise<void> {
 
   // Fallback: localStorage (unauthenticated / offline)
   localStorage.setItem(LEGACY_KEY, JSON.stringify(updated));
+}
+
+function uint8ToBase64(bytes: Uint8Array): string {
+  let binary = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
+
+/**
+ * Persist a PDF to the user's device. On the web this triggers a browser
+ * download via a temporary blob URL; on Android/iOS the file is written
+ * to the Documents directory and surfaced through the native share sheet
+ * so the user can save/send it.
+ */
+export async function savePdf(bytes: Uint8Array, filename: string): Promise<void> {
+  if (Capacitor.isNativePlatform()) {
+    const result = await Filesystem.writeFile({
+      path: filename,
+      data: uint8ToBase64(bytes),
+      directory: Directory.Documents,
+      recursive: true,
+    });
+    await Share.share({
+      title: filename,
+      url: result.uri,
+      dialogTitle: 'PDF teilen oder speichern',
+    });
+    return;
+  }
+  const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }

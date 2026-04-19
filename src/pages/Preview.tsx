@@ -7,7 +7,7 @@ import ResumePreview from '../components/templates/ResumePreview';
 import { TEMPLATES } from '../components/templates/templateConfig';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { usePlan, FREE_TEMPLATE_IDS } from '../lib/plan';
-import { canExportPdf, incrementPdfExport, getPdfExportCount } from '../lib/pdfExports';
+import { canExportPdf, incrementPdfExport, getPdfExportCount, savePdf } from '../lib/pdfExports';
 import type { Resume } from '../types/resume';
 
 const MAX_PDF_BYTES = 5 * 1024 * 1024; // 5 MB
@@ -198,13 +198,9 @@ export default function Preview() {
     setExportError(null);
     try {
       const { pdfBytes } = await renderElementToPdfDoc(previewRef.current);
-      const blob = new Blob([pdfBytes as BlobPart], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url;
       const first = resume.personalInfo.firstName || 'Lebenslauf';
       const last = resume.personalInfo.lastName ? '_' + resume.personalInfo.lastName : '';
-      a.download = `${first}${last}_CV.pdf`;
-      a.click(); URL.revokeObjectURL(url);
+      await savePdf(pdfBytes, `${first}${last}_CV.pdf`);
       await incrementPdfExport();
     } catch (err) { console.error('PDF export failed:', err); }
     finally { setExporting(false); }
@@ -236,11 +232,7 @@ export default function Preview() {
       const docs = (resume.documents ?? []).map(d => ({ dataUrl: d.dataUrl, type: d.type }));
       const merged = await exportAdaptive(elements, docs);
 
-      const blob = new Blob([merged.buffer as BlobPart], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url;
-      a.download = buildFilename(resume);
-      a.click(); URL.revokeObjectURL(url);
+      await savePdf(merged, buildFilename(resume));
       await incrementPdfExport();
     } catch (err) { console.error('Mappe export failed:', err); }
     finally { setExporting(false); }

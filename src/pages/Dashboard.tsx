@@ -18,6 +18,7 @@ import {
   type ApplicationStatus,
 } from '../types/resume';
 import { calcCompleteness, completenessColor } from '../lib/completeness';
+import { shareLink } from '../lib/shareLink';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { v4 as uuidv4 } from 'uuid';
 import { UpgradeModal } from '../components/ui/ProGate';
@@ -80,9 +81,10 @@ function ShareModal({ resumeId, token, onClose }: { resumeId: string; token?: st
     setShareToken(resumeId, null);
   }
 
-  function copy() {
+  async function copy() {
     if (!shareUrl) return;
-    navigator.clipboard.writeText(shareUrl);
+    const nativeSheet = await shareLink(shareUrl, 'Lebenslauf teilen');
+    if (nativeSheet) return;
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
