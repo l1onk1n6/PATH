@@ -87,11 +87,15 @@ function uint8ToBase64(bytes: Uint8Array): string {
  * to the Documents directory and surfaced through the native share sheet
  * so the user can save/send it.
  */
-export async function savePdf(bytes: Uint8Array, filename: string): Promise<void> {
+export async function savePdf(bytes: Uint8Array | ArrayBuffer, filename: string): Promise<void> {
+  // jsPDF output('arraybuffer') returns an ArrayBuffer; pdf-lib save() returns
+  // a Uint8Array. Normalise so the base64 conversion below has a typed array.
+  const u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+
   if (Capacitor.isNativePlatform()) {
     const result = await Filesystem.writeFile({
       path: filename,
-      data: uint8ToBase64(bytes),
+      data: uint8ToBase64(u8),
       directory: Directory.Documents,
       recursive: true,
     });
@@ -102,7 +106,7 @@ export async function savePdf(bytes: Uint8Array, filename: string): Promise<void
     });
     return;
   }
-  const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' });
+  const blob = new Blob([u8 as BlobPart], { type: 'application/pdf' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
