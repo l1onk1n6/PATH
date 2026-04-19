@@ -395,10 +395,7 @@ export default function App() {
       <ErrorBoundary>
         <HashRouter>
           <Suspense fallback={<PageSpinner />}>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+            <AuthPage />
           </Suspense>
         </HashRouter>
       </ErrorBoundary>
