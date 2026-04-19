@@ -16,6 +16,7 @@ import { ToastContainer } from './components/ui/Toast';
 import { OfflineBanner } from './components/ui/OfflineBanner';
 
 // Lazy-loaded pages — each page is split into its own JS chunk
+const LandingPage      = lazy(() => import('./pages/LandingPage'));
 const Dashboard        = lazy(() => import('./pages/Dashboard'));
 const Editor           = lazy(() => import('./pages/Editor'));
 const Preview          = lazy(() => import('./pages/Preview'));
@@ -393,7 +394,7 @@ export default function App() {
       <ErrorBoundary>
         <HashRouter>
           <Suspense fallback={<PageSpinner />}>
-            <AuthPage />
+            <LandingPage />
           </Suspense>
         </HashRouter>
       </ErrorBoundary>
