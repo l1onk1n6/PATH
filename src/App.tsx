@@ -20,7 +20,6 @@ const Dashboard        = lazy(() => import('./pages/Dashboard'));
 const Editor           = lazy(() => import('./pages/Editor'));
 const Preview          = lazy(() => import('./pages/Preview'));
 const AuthPage         = lazy(() => import('./pages/AuthPage'));
-const LandingPage      = lazy(() => import('./pages/LandingPage'));
 const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage'));
 const SharedResumePage = lazy(() => import('./pages/SharedResumePage'));
 const ScreenshotPage   = lazy(() => import('./pages/ScreenshotPage'));
@@ -287,8 +286,7 @@ export default function App() {
     }
   }, [user, loading, passwordRecovery]);
 
-  // Capture referral code from URL (must run at App level — unauthenticated
-  // users see LandingPage, not AuthPage, so AuthPage's capture never fires)
+  // Capture referral code from URL before auth resolves
   useEffect(() => {
     const hash = window.location.hash;
     const q = hash.includes('?') ? hash.slice(hash.indexOf('?')) : '';
