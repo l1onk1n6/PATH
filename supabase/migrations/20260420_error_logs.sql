@@ -1,6 +1,7 @@
 -- Client-seitige Fehler-Logs.
 -- Wird von src/lib/errorLog.ts beim Auftreten von userError()-Fehlern und
 -- uncaught React-Errors (ErrorBoundary) befuellt. Admin liest via SQL-Editor.
+-- Idempotent (IF NOT EXISTS / DROP POLICY IF EXISTS) — darf wiederholt laufen.
 
 CREATE TABLE IF NOT EXISTS public.error_logs (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
