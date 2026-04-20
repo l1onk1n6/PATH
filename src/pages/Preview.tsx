@@ -158,10 +158,14 @@ export default function Preview() {
       // 2. Resume — Vektor (alle Template-IDs sind registriert)
       pdfParts.push(await renderResumePdf(resume));
 
-      // 3. Hochgeladene Dokumente: PDFs direkt einmergen, Bilder via @react-pdf
+      // 3. Hochgeladene Dokumente: PDFs direkt einmergen, Bilder via @react-pdf.
+      //    Defensiv: Dokumente ohne dataUrl (kaputter DB-Eintrag) auslassen.
       for (const d of resume.documents ?? []) {
-        if (d.type === 'application/pdf' || d.dataUrl.startsWith('data:application/pdf')) {
+        if (!d?.dataUrl) continue;
+        const isPdf = d.type === 'application/pdf' || d.dataUrl.startsWith('data:application/pdf');
+        if (isPdf) {
           const base64 = d.dataUrl.split(',')[1];
+          if (!base64) continue;
           pdfParts.push(Uint8Array.from(atob(base64), c => c.charCodeAt(0)));
         } else {
           pdfParts.push(await renderDocumentImagePdf(d));
