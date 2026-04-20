@@ -1,0 +1,99 @@
+name: Apply Supabase Migrations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+  workflow_dispatch:
+    inputs:
+      file:
+        description: 'Optional: einzelne Datei unter supabase/migrations/ anwenden (leer = alle neuen seit dem letzten Push)'
+        required: false
+        default: ''
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          # Wir brauchen HEAD^ zum Diffen; volle History ist overkill aber sicher.
+          fetch-depth: 0
+
+      - name: Determine migrations to apply
+        id: pick
+        env:
+          INPUT_FILE: ${{ inputs.file }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          if [ -n "${INPUT_FILE}" ]; then
+            # Einzeldatei via workflow_dispatch
+            if [ ! -f "${INPUT_FILE}" ]; then
+              echo "::error::Datei nicht gefunden: ${INPUT_FILE}"
+              exit 1
+            fi
+            echo "files=${INPUT_FILE}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Push-Trigger: nur Dateien, die in diesem Push NEU hinzugekommen sind.
+          # Fallback wenn HEAD^ nicht existiert (erster Commit) → alle Migrationen.
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            # Added (A) + Modified (M) — falls jemand eine existierende Migration
+            # aendert, soll sie erneut laufen (idempotente Migrationen
+            # vorausgesetzt, siehe CREATE TABLE IF NOT EXISTS etc.).
+            changed=$(git diff --name-only --diff-filter=AM HEAD^ HEAD -- 'supabase/migrations/*.sql' || true)
+          else
+            changed=$(printf '%s\n' supabase/migrations/*.sql)
+          fi
+          if [ -z "${changed}" ]; then
+            echo "Keine neuen Migrationen in diesem Push."
+            echo "files=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Multi-Line Output fuer spaeter
+          {
+            echo "files<<EOF"
+            echo "${changed}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          echo "Anzuwenden:"
+          echo "${changed}"
+
+      - name: Apply migrations via Management API
+        if: ${{ steps.pick.outputs.files != '' }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID:   ${{ secrets.SUPABASE_PROJECT_ID }}
+          FILES:                 ${{ steps.pick.outputs.files }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_ACCESS_TOKEN:-}" ] || [ -z "${SUPABASE_PROJECT_ID:-}" ]; then
+            echo "::error::SUPABASE_ACCESS_TOKEN oder SUPABASE_PROJECT_ID nicht gesetzt"
+            exit 1
+          fi
+          echo "${FILES}" | while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            echo ""
+            echo "───────────────────────────────────────────────────"
+            echo "▶ $file"
+            body=$(jq -Rs '{query: .}' < "$file")
+            http_code=$(curl -sS -o /tmp/resp.json -w '%{http_code}' \
+              -X POST \
+              -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
+              -H "Content-Type: application/json" \
+              --data "$body" \
+              "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_ID}/database/query")
+            if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+              echo "   ✓ OK (HTTP $http_code)"
+            else
+              echo "::error file=$file::Migration fehlgeschlagen (HTTP $http_code)"
+              echo "Response:"
+              cat /tmp/resp.json
+              exit 1
+            fi
+          done
+          echo ""
+          echo "✔ Alle ausgewaehlten Migrationen angewendet."
