@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FolderDown, Lock, FileBox } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ProGate from '../components/ui/ProGate';
 import ResumePreview from '../components/templates/ResumePreview';
@@ -99,9 +99,6 @@ export default function Preview() {
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
-  const previewRef = useRef<HTMLDivElement>(null);
-  const resumePageRef = useRef<HTMLDivElement>(null);
-  const coverLetterRef = useRef<HTMLDivElement>(null);
 
   if (!resume) {
     return (
@@ -200,8 +197,9 @@ export default function Preview() {
       fontSize: 13, lineHeight: 1.7, padding: '80px 80px 60px',
       boxSizing: 'border-box', position: 'relative',
     }}>
-      {/* Page break indicator — visible in preview only, ignored by html2canvas */}
-      <div data-html2canvas-ignore="true" style={{
+      {/* Page break indicator — visuelle Hilfe im Live-Preview, wird im Export
+          (via @react-pdf, der automatisch umbricht) nicht gerendert. */}
+      <div style={{
         position: 'absolute', top: 1123, left: 0, right: 0, pointerEvents: 'none',
         borderTop: '1.5px dashed rgba(180,180,220,0.7)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -406,23 +404,6 @@ export default function Preview() {
                   <DocumentPagePreview key={doc.id} doc={doc} style={pageShadow} />
                 ))}
               </div>
-            </div>
-          </div>
-
-          {/* Zweiter, unsichtbarer 1:1-Render ausschliesslich fuer den PDF-
-              Export. html2canvas mis-rechnet Koordinaten, wenn der Capture-
-              Root in einem transform:scale()-Ancestor liegt (Zeichen ueber-
-              lappen im Anschreiben). Deshalb haengen die Export-Refs hier
-              dran statt am skalierten Baum oben. */}
-          <div
-            aria-hidden
-            style={{ position: 'absolute', left: -99999, top: 0, pointerEvents: 'none' }}
-          >
-            <div ref={previewRef} style={{ display: 'flex', flexDirection: 'column', gap: 40, width: 794 }}>
-              {hasCoverLetterContent && (
-                <div ref={coverLetterRef}><CoverLetterPage /></div>
-              )}
-              <div ref={resumePageRef}><ResumePreview resume={resume} /></div>
             </div>
           </div>
         </div>
