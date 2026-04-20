@@ -10,13 +10,25 @@ import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 import { useTrackerStore } from '../../store/trackerStore';
 
-// Parse multiline recipient string into structured address fields
+// Parse multiline recipient string into structured address fields.
+// Adressen werden als 4 fixe Zeilen gespeichert (Firma / Person / Strasse / Ort)
+// — leere Zeilen bleiben erhalten, damit die Position stabil ist und der
+// Cursor im Editor nicht in ein anderes Feld "springt", wenn man eins leert.
+const ADDR_LINES = 4;
 function parseRecipient(s: string) {
-  const [company = '', dept = '', street = '', city = ''] = s.split('\n').map(l => l.trim());
+  const raw = s.split('\n');
+  const lines = Array.from({ length: ADDR_LINES }, (_, i) => (raw[i] ?? '').trim());
+  const [company, dept, street, city] = lines;
   return { company, dept, street, city };
 }
 function assembleRecipient(company: string, dept: string, street: string, city: string) {
-  return [company, dept, street, city].filter(Boolean).join('\n');
+  const all = [company, dept, street, city];
+  // Nur trailing-leere Zeilen abschneiden, damit die gespeicherte Repraesentation
+  // bei rein leeren Zusatzfeldern kein unnoetiges Padding hat. Innere leere
+  // Zeilen bleiben erhalten (s. parseRecipient).
+  let end = all.length;
+  while (end > 0 && !all[end - 1]) end--;
+  return all.slice(0, end).join('\n');
 }
 
 const CL_TEMPLATES = [

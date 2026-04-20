@@ -323,10 +323,12 @@ export default function Preview() {
         {pi.phone && <div>{pi.phone}</div>}
       </div>
 
-      {/* Recipient */}
-      {cl.recipient && (
+      {/* Recipient — leere Zeilen zwischen ausgefuellten Feldern ausblenden,
+          damit das Adressblock sauber bleibt. Der CoverLetterEditor speichert
+          leere Positionen, um den Cursor nicht ins falsche Feld zu werfen. */}
+      {cl.recipient && cl.recipient.trim() && (
         <div style={{ marginBottom: 32, whiteSpace: 'pre-line', fontSize: 13 }}>
-          {cl.recipient}
+          {cl.recipient.split('\n').filter(l => l.trim()).join('\n')}
         </div>
       )}
 
