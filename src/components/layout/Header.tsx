@@ -4,6 +4,7 @@ import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { useState } from 'react';
 import { UpgradeModal } from '../ui/ProGate';
+import { displayPersonName } from '../../lib/displayName';
 
 interface Props {
   isMobile?: boolean;
@@ -25,11 +26,13 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
     '/editor': 'Editor',
     '/preview': 'Vorschau',
     '/account': 'Konto',
+    '/tracker': 'Bewerbungs-Tracker',
   };
 
-  const title = pageTitle[location.pathname] ?? 'Path';
+  const title = pageTitle[location.pathname] ?? 'PATH';
+  const personName = displayPersonName(person, resume);
   const subtitle = person
-    ? `${person.name}${resume?.personalInfo.title ? ` · ${resume.personalInfo.title}` : ''}`
+    ? `${personName}${resume?.personalInfo.title ? ` · ${resume.personalInfo.title}` : ''}`
     : 'Kein Profil ausgewählt';
 
   return (

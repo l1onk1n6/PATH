@@ -15,6 +15,7 @@ import { useUIStore, type AccountSection } from '../../store/uiStore';
 import { LogoFull, LogoIcon } from './Logo';
 import { usePlan } from '../../lib/plan';
 import { UpgradeModal } from '../ui/ProGate';
+import { displayPersonName } from '../../lib/displayName';
 import type { EditorSection } from '../../types/resume';
 
 interface SidebarProps {
@@ -313,6 +314,8 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
             const isExpanded = expandedPersonIds.has(person.id) || isActiveP;
             const personResumes = resumes.filter((r) => person.resumeIds.includes(r.id));
             const photo = personResumes[0]?.personalInfo?.photo;
+            // Fallback wenn person.name leer oder aus alten DB-Zeiten eine UUID.
+            const displayName = displayPersonName(person, personResumes[0]);
             const isPersonFrozen = frozenPersonIds.has(person.id);
 
             return (
@@ -332,12 +335,12 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
                           <Lock size={11} style={{ color: '#FF9F0A' }} />
                         </div>
                       ) : (
-                        <div style={{ width: 24, height: 24, borderRadius: '50%', flexShrink: 0, overflow: 'hidden', background: photo ? 'transparent' : `linear-gradient(135deg, hsl(${person.name.charCodeAt(0) * 10 % 360}, 65%, 48%), hsl(${person.name.charCodeAt(0) * 15 % 360}, 55%, 38%))`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#fff' }}>
-                          {photo ? <img src={photo} alt={person.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : person.name.charAt(0).toUpperCase()}
+                        <div style={{ width: 24, height: 24, borderRadius: '50%', flexShrink: 0, overflow: 'hidden', background: photo ? 'transparent' : `linear-gradient(135deg, hsl(${displayName.charCodeAt(0) * 10 % 360}, 65%, 48%), hsl(${displayName.charCodeAt(0) * 15 % 360}, 55%, 38%))`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#fff' }}>
+                          {photo ? <img src={photo} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : displayName.charAt(0).toUpperCase()}
                         </div>
                       )}
                       <span style={{ fontSize: 12, fontWeight: isActiveP && !isPersonFrozen ? 600 : 400, color: isPersonFrozen ? '#FF9F0A' : undefined, opacity: isPersonFrozen ? 0.85 : isActiveP ? 1 : 0.8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {person.name}
+                        {displayName}
                       </span>
                     </div>
                     <span className="badge" style={{ fontSize: 10, flexShrink: 0 }}>{personResumes.length}</span>
