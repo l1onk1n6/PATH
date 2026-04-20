@@ -9,7 +9,7 @@ import { TEMPLATES } from '../components/templates/templateConfig';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { usePlan, FREE_TEMPLATE_IDS } from '../lib/plan';
 import { canExportPdf, incrementPdfExport, getPdfExportCount, savePdf } from '../lib/pdfExports';
-import { hasPdfTemplate, renderResumePdf } from '../lib/pdfRenderer';
+import { hasPdfTemplate, renderResumePdf, renderCoverLetterPdf, renderDocumentImagePdf } from '../lib/pdfRenderer';
 import type { Resume, UploadedDocument } from '../types/resume';
 
 /** Rendert ein hochgeladenes Dokument als A4-Seite in der Vorschau.
@@ -63,8 +63,6 @@ function DocumentPagePreview({ doc, style }: { doc: UploadedDocument; style?: Re
     </div>
   );
 }
-
-const MAX_PDF_BYTES = 5 * 1024 * 1024; // 5 MB
 
 // Renders an HTML element to jsPDF pages, returns the doc
 async function renderElementToPdfDoc(
@@ -151,75 +149,10 @@ async function mergePdfs(parts: Uint8Array[]): Promise<Uint8Array> {
   return merged.save();
 }
 
-// Embed an image dataUrl as a full A4 page in a new PDF
-async function imageToPdfBytes(dataUrl: string): Promise<Uint8Array | null> {
-  try {
-    const { PDFDocument } = await import('pdf-lib');
-    const doc = await PDFDocument.create();
-    const isJpeg = dataUrl.includes('data:image/jpeg') || dataUrl.includes('data:image/jpg');
-    const base64 = dataUrl.split(',')[1];
-    const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-    const img = isJpeg ? await doc.embedJpg(bytes) : await doc.embedPng(bytes);
-    const a4w = 595.28, a4h = 841.89; // pts
-    const scale = Math.min(a4w / img.width, a4h / img.height);
-    const w = img.width * scale, h = img.height * scale;
-    const page = doc.addPage([a4w, a4h]);
-    page.drawImage(img, { x: (a4w - w) / 2, y: (a4h - h) / 2, width: w, height: h });
-    return doc.save();
-  } catch { return null; }
-}
-
-// Adaptive quality: reduce JPEG quality until under MAX_PDF_BYTES
-type MappePart =
-  | { kind: 'html'; el: HTMLElement }
-  | { kind: 'bytes'; bytes: Uint8Array };  // already-rendered vector PDF
-
-async function exportAdaptive(
-  parts: MappePart[],
-  docDataUrls: { dataUrl: string; type: string }[],
-): Promise<Uint8Array> {
-  let quality = 0.92;
-
-  for (let attempt = 0; attempt < 4; attempt++) {
-    const pdfParts: Uint8Array[] = [];
-
-    for (const part of parts) {
-      if (part.kind === 'bytes') {
-        pdfParts.push(part.bytes);
-      } else {
-        const { pdfBytes } = await renderElementToPdfDoc(part.el, quality);
-        pdfParts.push(pdfBytes);
-      }
-    }
-
-    for (const { dataUrl, type } of docDataUrls) {
-      if (type === 'application/pdf' || dataUrl.startsWith('data:application/pdf')) {
-        const base64 = dataUrl.split(',')[1];
-        const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-        pdfParts.push(bytes);
-      } else {
-        const imgPdf = await imageToPdfBytes(dataUrl);
-        if (imgPdf) pdfParts.push(imgPdf);
-      }
-    }
-
-    const merged = await mergePdfs(pdfParts);
-    if (merged.length <= MAX_PDF_BYTES || quality <= 0.55) return merged;
-    quality -= 0.12;
-  }
-
-  // Fallback – merge with lowest quality
-  const pdfParts: Uint8Array[] = [];
-  for (const part of parts) {
-    if (part.kind === 'bytes') {
-      pdfParts.push(part.bytes);
-    } else {
-      const { pdfBytes } = await renderElementToPdfDoc(part.el, 0.55);
-      pdfParts.push(pdfBytes);
-    }
-  }
-  return mergePdfs(pdfParts);
-}
+// Phase 5: exportAdaptive/imageToPdfBytes werden nicht mehr gebraucht, weil
+// Anschreiben + Resume + Bilder komplett ueber @react-pdf gerendert werden.
+// renderElementToPdfDoc bleibt als Fallback fuer Templates, die kein
+// PDF-Template registriert haben.
 
 function buildFilename(resume: Resume): string {
   const first = resume.personalInfo.firstName || '';
@@ -290,25 +223,35 @@ export default function Preview() {
     setExporting(true);
     setExportError(null);
     try {
-      const parts: MappePart[] = [];
+      const pdfParts: Uint8Array[] = [];
 
-      // 1. Cover letter (if content exists) — bleibt vorerst html2canvas
+      // 1. Cover letter (if content exists) — Vektor
       const cl = resume.coverLetter;
       const hasContent = cl?.body || cl?.subject || cl?.recipient;
-      if (hasContent && coverLetterRef.current) {
-        parts.push({ kind: 'html', el: coverLetterRef.current });
+      if (hasContent) {
+        pdfParts.push(await renderCoverLetterPdf(resume));
       }
 
-      // 2. Resume — Vektor-PDF wenn Template migriert, sonst html2canvas
+      // 2. Resume — Vektor wenn Template migriert (aktuell alle), sonst Fallback
       if (hasPdfTemplate(resume.templateId)) {
-        parts.push({ kind: 'bytes', bytes: await renderResumePdf(resume) });
+        pdfParts.push(await renderResumePdf(resume));
       } else if (resumePageRef.current) {
-        parts.push({ kind: 'html', el: resumePageRef.current });
+        // Fallback nur fuer zukuenftige Custom-Templates ohne Variant-Eintrag
+        const { pdfBytes } = await renderElementToPdfDoc(resumePageRef.current);
+        pdfParts.push(new Uint8Array(pdfBytes as unknown as ArrayBuffer));
       }
 
-      const docs = (resume.documents ?? []).map(d => ({ dataUrl: d.dataUrl, type: d.type }));
-      const merged = await exportAdaptive(parts, docs);
+      // 3. Hochgeladene Dokumente: PDFs direkt einmergen, Bilder via @react-pdf
+      for (const d of resume.documents ?? []) {
+        if (d.type === 'application/pdf' || d.dataUrl.startsWith('data:application/pdf')) {
+          const base64 = d.dataUrl.split(',')[1];
+          pdfParts.push(Uint8Array.from(atob(base64), c => c.charCodeAt(0)));
+        } else {
+          pdfParts.push(await renderDocumentImagePdf(d));
+        }
+      }
 
+      const merged = await mergePdfs(pdfParts);
       await savePdf(merged, buildFilename(resume));
       await incrementPdfExport();
     } catch (err) { console.error('Mappe export failed:', err); }

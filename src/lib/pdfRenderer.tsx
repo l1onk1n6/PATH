@@ -11,10 +11,13 @@
  * - `hasPdfTemplate` sagt dem Aufrufer ob der neue Pfad fuer ein Template
  *   schon existiert — sonst muss er auf html2canvas-pro zurueckfallen.
  */
-import { pdf } from '@react-pdf/renderer';
-import type { Resume, TemplateId } from '../types/resume';
+import { pdf, type DocumentProps } from '@react-pdf/renderer';
+import type { ReactElement } from 'react';
+import type { Resume, TemplateId, UploadedDocument } from '../types/resume';
 import MinimalPdf from '../components/templates/pdf/MinimalPdf';
 import { StandardPdf, TEMPLATE_VARIANTS } from '../components/templates/pdf/StandardPdf';
+import CoverLetterPdf from '../components/templates/pdf/CoverLetterPdf';
+import DocumentImagePdf from '../components/templates/pdf/DocumentImagePdf';
 
 type PdfTemplateComponent = React.ComponentType<{ resume: Resume }>;
 
@@ -27,6 +30,12 @@ export function hasPdfTemplate(id: TemplateId): boolean {
   return Boolean(dedicated[id] || TEMPLATE_VARIANTS[id]);
 }
 
+async function renderDoc(element: ReactElement<DocumentProps>): Promise<Uint8Array> {
+  const blob = await pdf(element).toBlob();
+  const buffer = await blob.arrayBuffer();
+  return new Uint8Array(buffer);
+}
+
 export async function renderResumePdf(resume: Resume): Promise<Uint8Array> {
   const Dedicated = dedicated[resume.templateId];
   const variant = TEMPLATE_VARIANTS[resume.templateId];
@@ -36,8 +45,14 @@ export async function renderResumePdf(resume: Resume): Promise<Uint8Array> {
       ? <StandardPdf resume={resume} variant={variant} />
       : null;
   if (!element) throw new Error(`Kein PDF-Template fuer "${resume.templateId}" registriert`);
-  const blob = await pdf(element).toBlob();
-  const buffer = await blob.arrayBuffer();
-  return new Uint8Array(buffer);
+  return renderDoc(element);
+}
+
+export async function renderCoverLetterPdf(resume: Resume): Promise<Uint8Array> {
+  return renderDoc(<CoverLetterPdf resume={resume} />);
+}
+
+export async function renderDocumentImagePdf(doc: UploadedDocument): Promise<Uint8Array> {
+  return renderDoc(<DocumentImagePdf doc={doc} />);
 }
 
