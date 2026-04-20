@@ -167,7 +167,24 @@ export const useResumeStore = create<ResumeStore>()(
               customSections: r.customSections ?? [],
               documents: cloudDocs.filter(d => d.resumeId === r.id).map(({ resumeId: _rid, ...d }) => d),
             }));
-            set({ persons, resumes });
+            // Falls noch keine Auswahl existiert (z.B. Erstanmeldung auf einem
+            // neuen Geraet), die erste Person + deren gespeicherten oder ersten
+            // Lebenslauf aktiv setzen, damit Editor/Vorschau direkt Inhalt haben.
+            const current = get();
+            const keepPerson = persons.some(p => p.id === current.activePersonId);
+            const keepResume = resumes.some(r => r.id === current.activeResumeId);
+            const firstPerson = keepPerson ? null : persons[0] ?? null;
+            const firstResumeOfPerson = firstPerson
+              ? resumes.find(r => r.id === firstPerson.activeResumeId)
+                ?? resumes.find(r => r.personId === firstPerson.id)
+                ?? null
+              : null;
+            set({
+              persons,
+              resumes,
+              activePersonId: keepPerson ? current.activePersonId : firstPerson?.id ?? null,
+              activeResumeId: keepResume ? current.activeResumeId : firstResumeOfPerson?.id ?? null,
+            });
           }
         } finally {
           set({ syncing: false });
