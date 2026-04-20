@@ -118,7 +118,12 @@ export async function fetchDocuments(): Promise<(UploadedDocument & { resumeId: 
   try {
     const { data, error } = await sb().from('documents').select('*').order('uploaded_at');
     if (error) throw error;
-    return (data ?? []).map(rowToDocument);
+    // Defensive: Zeilen ohne data_url sind kaputt (frueher Bug oder abge-
+    // brochener Upload). Ohne dataUrl kann das Dokument weder angezeigt noch
+    // exportiert werden — gar nicht erst ins Store-Resultat aufnehmen.
+    return (data ?? [])
+      .filter((row: Record<string, unknown>) => typeof row.data_url === 'string' && (row.data_url as string).length > 0)
+      .map(rowToDocument);
   } catch (e) {
     console.warn('[db] fetchDocuments', e);
     return [];
@@ -127,6 +132,10 @@ export async function fetchDocuments(): Promise<(UploadedDocument & { resumeId: 
 
 export async function upsertDocument(resumeId: string, doc: UploadedDocument): Promise<void> {
   if (!isSupabaseConfigured()) return;
+  if (!doc.dataUrl) {
+    console.warn('[db] upsertDocument skipped (empty dataUrl)', doc.id);
+    return;
+  }
   try {
     const uid = await userId();
     if (!uid) return;

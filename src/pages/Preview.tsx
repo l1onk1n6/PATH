@@ -159,13 +159,15 @@ export default function Preview() {
       pdfParts.push(await renderResumePdf(resume));
 
       // 3. Hochgeladene Dokumente: PDFs direkt einmergen, Bilder via @react-pdf.
-      //    Defensiv: Dokumente ohne dataUrl (kaputter DB-Eintrag) auslassen.
+      //    Kaputte Eintraege (kein dataUrl / leerer Body) sammeln wir namentlich
+      //    und zeigen am Ende einen Hinweis — nicht stumm ueberspringen.
+      const skipped: string[] = [];
       for (const d of resume.documents ?? []) {
-        if (!d?.dataUrl) continue;
+        if (!d?.dataUrl) { skipped.push(d?.name || 'Unbekannt'); continue; }
         const isPdf = d.type === 'application/pdf' || d.dataUrl.startsWith('data:application/pdf');
         if (isPdf) {
           const base64 = d.dataUrl.split(',')[1];
-          if (!base64) continue;
+          if (!base64) { skipped.push(d.name); continue; }
           pdfParts.push(Uint8Array.from(atob(base64), c => c.charCodeAt(0)));
         } else {
           pdfParts.push(await renderDocumentImagePdf(d));
@@ -175,6 +177,9 @@ export default function Preview() {
       const merged = await mergePdfs(pdfParts);
       await savePdf(merged, buildFilename(resume));
       await incrementPdfExport();
+      if (skipped.length > 0) {
+        setExportError(`Export erstellt, aber ${skipped.length} Dokument(e) konnten nicht eingefügt werden: ${skipped.join(', ')}. Bitte im Editor neu hochladen.`);
+      }
     } catch (err) {
       console.error('Mappe export failed:', err);
       setExportError(`Mappen-Export fehlgeschlagen: ${err instanceof Error ? err.message : String(err)}`);
