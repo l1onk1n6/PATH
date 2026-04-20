@@ -124,7 +124,7 @@ export default function Tracker() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
             <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <ClipboardList size={15} />
+              <ClipboardList size={18} />
             </div>
             <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>Bewerbungs-Tracker</h2>
           </div>
@@ -134,10 +134,10 @@ export default function Tracker() {
         </div>
         <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap' }}>
           <button className="btn-glass" onClick={() => setShowImportModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Link size={14} /> Aus Mappe
+            <Link size={18} /> Aus Mappe
           </button>
           <button className="btn-glass btn-primary" onClick={addApplication} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Plus size={14} /> Bewerbung hinzufügen
+            <Plus size={18} /> Bewerbung hinzufügen
           </button>
         </div>
       </div>

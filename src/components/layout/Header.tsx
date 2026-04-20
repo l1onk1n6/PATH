@@ -88,21 +88,21 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
           }}
           title={isPro ? 'PATH Pro — alle Features aktiv' : 'Upgrade auf PATH Pro'}
         >
-          {isPro && <Sparkles size={11} />}
+          {isPro && <Sparkles size={14} />}
           {isPro ? 'PRO' : plan.toUpperCase()}
         </button>
 
         {location.pathname === '/editor' && (
           <>
             <button className="btn-glass btn-sm" onClick={() => navigate('/preview')}>
-              <Eye size={14} />
+              <Eye size={18} />
               {!isMobile && ' Vorschau'}
             </button>
           </>
         )}
         {location.pathname === '/preview' && (
           <button className="btn-glass btn-sm" onClick={() => navigate('/editor')}>
-            <Edit3 size={14} />
+            <Edit3 size={18} />
             {!isMobile && ' Bearbeiten'}
           </button>
         )}

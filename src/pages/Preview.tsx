@@ -1,5 +1,6 @@
+import type React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FileEdit, FileText, FolderDown, Lock } from 'lucide-react';
+import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FolderDown, Lock, FileBox } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ProGate from '../components/ui/ProGate';
@@ -8,7 +9,59 @@ import { TEMPLATES } from '../components/templates/templateConfig';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { usePlan, FREE_TEMPLATE_IDS } from '../lib/plan';
 import { canExportPdf, incrementPdfExport, getPdfExportCount, savePdf } from '../lib/pdfExports';
-import type { Resume } from '../types/resume';
+import type { Resume, UploadedDocument } from '../types/resume';
+
+/** Rendert ein hochgeladenes Dokument als A4-Seite in der Vorschau.
+ *  Bilder werden voll angezeigt, PDFs als Platzhalter-Kachel mit
+ *  Dateiname/Kategorie (die Export-Pipeline fuegt die echten PDF-Seiten
+ *  beim Mappen-Export hinzu, im Live-Preview waere ein pdf.js-Renderer
+ *  unverhaeltnismaessig teuer). */
+function DocumentPagePreview({ doc, style }: { doc: UploadedDocument; style?: React.CSSProperties }) {
+  const isImage = doc.type.startsWith('image/');
+  const categoryLabel = {
+    certificate: 'Zertifikat',
+    reference: 'Zeugnis',
+    portfolio: 'Portfolio',
+    other: 'Dokument',
+  }[doc.category] ?? 'Dokument';
+
+  return (
+    <div style={{
+      width: 794, minHeight: 1123, background: '#fff', color: '#111',
+      boxSizing: 'border-box', position: 'relative',
+      display: 'flex', flexDirection: 'column',
+      ...style,
+    }}>
+      <div style={{
+        padding: '28px 60px 18px', borderBottom: '1px solid #eee',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+      }}>
+        <div style={{ fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#888' }}>{categoryLabel}</div>
+        <div style={{ fontSize: 18, fontWeight: 600, marginTop: 4 }}>{doc.name}</div>
+      </div>
+      <div style={{ flex: 1, padding: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {isImage ? (
+          <img
+            src={doc.dataUrl}
+            alt={doc.name}
+            style={{ maxWidth: '100%', maxHeight: 980, objectFit: 'contain', display: 'block' }}
+          />
+        ) : (
+          <div style={{
+            textAlign: 'center', color: '#666',
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+          }}>
+            <FileBox size={64} style={{ opacity: 0.35, marginBottom: 16 }} />
+            <div style={{ fontSize: 16, fontWeight: 500 }}>PDF-Dokument</div>
+            <div style={{ fontSize: 13, marginTop: 6, opacity: 0.7 }}>
+              Der Inhalt wird beim Export in die Mappe eingefuegt.
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 const MAX_PDF_BYTES = 5 * 1024 * 1024; // 5 MB
 
@@ -172,7 +225,6 @@ export default function Preview() {
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
-  const [activeView, setActiveView] = useState<'resume' | 'cover-letter'>('resume');
   const previewRef = useRef<HTMLDivElement>(null);
   const resumePageRef = useRef<HTMLDivElement>(null);
   const coverLetterRef = useRef<HTMLDivElement>(null);
@@ -187,9 +239,9 @@ export default function Preview() {
     );
   }
 
-  // Export current view only
+  // Export nur Lebenslauf
   const handleExport = async () => {
-    if (!previewRef.current || exporting) return;
+    if (!resumePageRef.current || exporting) return;
     if (!canExportPdf(limits.pdfExportsPerMonth)) {
       setExportError(`PDF-Export-Limit erreicht (${limits.pdfExportsPerMonth}/Monat). Upgrade auf Pro für mehr Exporte.`);
       return;
@@ -197,7 +249,7 @@ export default function Preview() {
     setExporting(true);
     setExportError(null);
     try {
-      const { pdfBytes } = await renderElementToPdfDoc(previewRef.current);
+      const { pdfBytes } = await renderElementToPdfDoc(resumePageRef.current);
       const first = resume.personalInfo.firstName || 'Lebenslauf';
       const last = resume.personalInfo.lastName ? '_' + resume.personalInfo.lastName : '';
       await savePdf(pdfBytes, `${first}${last}_CV.pdf`);
@@ -241,6 +293,8 @@ export default function Preview() {
   const cl = resume.coverLetter ?? { recipient: '', subject: '', body: '', closing: 'Mit freundlichen Grüssen' };
   const pi = resume.personalInfo;
   const senderName = [pi.firstName, pi.lastName].filter(Boolean).join(' ');
+  const hasCoverLetterContent = Boolean(cl.body || cl.subject || cl.recipient);
+  const pageShadow: React.CSSProperties = { boxShadow: '0 20px 60px rgba(0,0,0,0.4)' };
 
   const CoverLetterPage = () => (
     <div style={{
@@ -363,55 +417,29 @@ export default function Preview() {
           padding: isMobile ? '8px 12px' : '10px 16px',
           borderBottom: '1px solid rgba(255,255,255,0.1)', flexShrink: 0, gap: 8,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {/* View tabs */}
-            <button
-              className="btn-glass btn-sm"
-              onClick={() => setActiveView('resume')}
-              style={{
-                padding: '5px 10px', gap: 5,
-                background: activeView === 'resume' ? 'rgba(0,122,255,0.2)' : undefined,
-                borderColor: activeView === 'resume' ? 'rgba(0,122,255,0.4)' : undefined,
-              }}
-            >
-              <FileText size={12} />{!isMobile && ' Lebenslauf'}
-            </button>
-            <button
-              className="btn-glass btn-sm"
-              onClick={() => setActiveView('cover-letter')}
-              style={{
-                padding: '5px 10px', gap: 5,
-                background: activeView === 'cover-letter' ? 'rgba(0,122,255,0.2)' : undefined,
-                borderColor: activeView === 'cover-letter' ? 'rgba(0,122,255,0.4)' : undefined,
-              }}
-            >
-              <FileEdit size={12} />{!isMobile && ' Anschreiben'}
-            </button>
-
-            <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.15)', margin: '0 2px' }} />
-
-            {/* Mobile: template picker toggle (only for resume view) */}
-            {isMobile && activeView === 'resume' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Mobile: template picker toggle */}
+            {isMobile && (
               <button
                 className="btn-glass btn-sm btn-icon"
                 onClick={() => setTemplatePickerOpen(true)}
-                style={{ padding: 7 }}
+                style={{ padding: 9 }}
                 title="Templates"
               >
-                <Layers size={14} />
+                <Layers size={18} />
               </button>
             )}
             {/* Zoom-Buttons nur auf Desktop — mobile nutzt Pinch-to-Zoom */}
             {!isMobile && (
               <>
-                <button className="btn-glass btn-sm btn-icon" onClick={() => setZoom(Math.max(0.25, zoom - 0.1))} style={{ padding: 7 }}>
-                  <ZoomOut size={13} />
+                <button className="btn-glass btn-sm btn-icon" onClick={() => setZoom(Math.max(0.25, zoom - 0.1))} style={{ padding: 9 }}>
+                  <ZoomOut size={16} />
                 </button>
-                <span style={{ fontSize: 11, minWidth: 36, textAlign: 'center', color: 'rgba(255,255,255,0.6)' }}>
+                <span style={{ fontSize: 12, minWidth: 40, textAlign: 'center', color: 'rgba(255,255,255,0.6)' }}>
                   {Math.round(zoom * 100)}%
                 </span>
-                <button className="btn-glass btn-sm btn-icon" onClick={() => setZoom(Math.min(1.2, zoom + 0.1))} style={{ padding: 7 }}>
-                  <ZoomIn size={13} />
+                <button className="btn-glass btn-sm btn-icon" onClick={() => setZoom(Math.min(1.2, zoom + 0.1))} style={{ padding: 9 }}>
+                  <ZoomIn size={16} />
                 </button>
               </>
             )}
@@ -427,18 +455,18 @@ export default function Preview() {
               className="btn-glass btn-sm"
               onClick={handleExport}
               disabled={exporting}
-              title="Nur aktuelle Seite exportieren"
-              style={{ opacity: exporting ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 5 }}
+              title="Nur Lebenslauf exportieren"
+              style={{ opacity: exporting ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px' }}
             >
               {exporting
-                ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />
-                : <Download size={13} />
+                ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                : <Download size={16} />
               }
               {!isMobile && ' PDF'}
             </button>
             <ProGate featureId="password" badge>
-              <button className="btn-glass btn-sm" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                <Lock size={13} />{!isMobile && ' Passwort'}
+              <button className="btn-glass btn-sm" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px' }}>
+                <Lock size={16} />{!isMobile && ' Passwort'}
               </button>
             </ProGate>
             <button
@@ -446,11 +474,11 @@ export default function Preview() {
               onClick={handleExportMappe}
               disabled={exporting}
               title="Ganze Bewerbungsmappe exportieren (Anschreiben + CV + Dokumente)"
-              style={{ opacity: exporting ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 5 }}
+              style={{ opacity: exporting ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px' }}
             >
               {exporting
-                ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />{!isMobile && ' Exportiere…'}</>
-                : <><FolderDown size={13} />{!isMobile && ' Ganze Mappe'}</>
+                ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />{!isMobile && ' Exportiere…'}</>
+                : <><FolderDown size={16} />{!isMobile && ' Ganze Mappe'}</>
               }
             </button>
           </div>
@@ -469,21 +497,17 @@ export default function Preview() {
           }}>
             <div style={{
               width: 794,
-              boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
               transformOrigin: 'top left',
               transform: `scale(${zoom})`,
             }}>
-              <div ref={previewRef}>
-                {activeView === 'resume'
-                  ? <div ref={resumePageRef}><ResumePreview resume={resume} /></div>
-                  : <div ref={coverLetterRef}><CoverLetterPage /></div>
-                }
-              </div>
-              {/* Hidden off-screen renders for Mappe export */}
-              <div style={{ position: 'absolute', left: -9999, top: 0, pointerEvents: 'none' }}>
-                <div ref={activeView === 'resume' ? coverLetterRef : resumePageRef}>
-                  {activeView === 'resume' ? <CoverLetterPage /> : <ResumePreview resume={resume} />}
-                </div>
+              <div ref={previewRef} style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
+                {hasCoverLetterContent && (
+                  <div ref={coverLetterRef} style={pageShadow}><CoverLetterPage /></div>
+                )}
+                <div ref={resumePageRef} style={pageShadow}><ResumePreview resume={resume} /></div>
+                {(resume.documents ?? []).map((doc) => (
+                  <DocumentPagePreview key={doc.id} doc={doc} style={pageShadow} />
+                ))}
               </div>
             </div>
           </div>
