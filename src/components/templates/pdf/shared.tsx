@@ -285,18 +285,18 @@ export function SkillChips({
   textColor?: string;
 }) {
   return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
       {skills.map(s => (
         <View
           key={s.id}
           style={{
-            paddingVertical: 2.5, paddingHorizontal: 7,
-            backgroundColor: alphaHex(color, 0.12),
-            borderWidth: 0.5, borderStyle: 'solid', borderColor: alphaHex(color, 0.28),
-            borderRadius: 8,
+            paddingTop: 4, paddingBottom: 4, paddingLeft: 9, paddingRight: 9,
+            backgroundColor: alphaHex(color, 0.14),
+            borderWidth: 0.7, borderStyle: 'solid', borderColor: alphaHex(color, 0.42),
+            borderRadius: 3,
           }}
         >
-          <Text style={{ fontSize: 9, color: textColor }}>{s.name}</Text>
+          <Text style={{ fontSize: 9, color: textColor, lineHeight: 1.2 }}>{s.name}</Text>
         </View>
       ))}
     </View>
