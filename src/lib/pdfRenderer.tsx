@@ -12,14 +12,20 @@ import { pdf, type DocumentProps } from '@react-pdf/renderer';
 import type { ReactElement } from 'react';
 import type { Resume, TemplateId, UploadedDocument } from '../types/resume';
 import MinimalPdf from '../components/templates/pdf/MinimalPdf';
+import ElegantPdf from '../components/templates/pdf/ElegantPdf';
+import TimelinePdf from '../components/templates/pdf/TimelinePdf';
 import { StandardPdf, TEMPLATE_VARIANTS } from '../components/templates/pdf/StandardPdf';
 import CoverLetterPdf from '../components/templates/pdf/CoverLetterPdf';
 import DocumentImagePdf from '../components/templates/pdf/DocumentImagePdf';
 
 type PdfTemplateComponent = React.ComponentType<{ resume: Resume }>;
 
+// Template-IDs mit handgebautem, visuell markantem PDF-Component.
+// Alle anderen fallen auf StandardPdf + Variant zurueck.
 const dedicated: Partial<Record<TemplateId, PdfTemplateComponent>> = {
-  minimal: MinimalPdf,
+  minimal:  MinimalPdf,
+  elegant:  ElegantPdf,
+  timeline: TimelinePdf,
 };
 
 async function renderDoc(element: ReactElement<DocumentProps>): Promise<Uint8Array> {

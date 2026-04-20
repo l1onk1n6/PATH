@@ -1,10 +1,6 @@
 /**
- * Minimal-Template als @react-pdf/renderer-Dokument.
- * Portierung von src/components/templates/renders/MinimalTemplate.tsx:
- * gleiche Struktur und Farbakzente, aber echte Vektorprimitive — der Text
- * ist im exportierten PDF selektierbar, E-Mail/Web-Felder sind klickbar.
- *
- * Einheit: Punkte (72 pt = 1 inch). A4 = 595 x 842 pt. Rand ~40 pt.
+ * Minimal — maximal reduziert, viel Weissraum, schlanke Typografie.
+ * Single-Column mit Sidebar-Sektion rechts.
  */
 import { Document, Page, View, Text, Link, Image, StyleSheet } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
@@ -14,16 +10,16 @@ import {
 
 export default function MinimalPdf({ resume }: { resume: Resume }) {
   const info = resume.personalInfo;
-  const color = resume.accentColor || '#007AFF';
+  const accent = resume.accentColor || '#007AFF';
   const name = [info.firstName, info.lastName].filter(Boolean).join(' ') || 'Ihr Name';
 
-  const contactParts: Array<{ text: string; href?: string }> = [];
-  if (info.email) contactParts.push({ text: info.email, href: `mailto:${info.email}` });
-  if (info.phone) contactParts.push({ text: info.phone, href: `tel:${info.phone.replace(/\s/g, '')}` });
+  const contacts: Array<{ text: string; href?: string }> = [];
+  if (info.email) contacts.push({ text: info.email, href: `mailto:${info.email}` });
+  if (info.phone) contacts.push({ text: info.phone, href: `tel:${info.phone.replace(/\s/g, '')}` });
   const addr = [info.street, info.location].filter(Boolean).join(', ');
-  if (addr) contactParts.push({ text: addr });
-  if (info.website) contactParts.push({ text: info.website, href: ensureProtocol(info.website) });
-  if (info.linkedin) contactParts.push({ text: info.linkedin, href: ensureProtocol(info.linkedin) });
+  if (addr) contacts.push({ text: addr });
+  if (info.website) contacts.push({ text: info.website, href: ensureProtocol(info.website) });
+  if (info.linkedin) contacts.push({ text: info.linkedin, href: ensureProtocol(info.linkedin) });
 
   return (
     <Document>
@@ -33,78 +29,85 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
           {info.photo ? <Image src={info.photo} style={styles.photo} /> : null}
           <View style={{ flex: 1 }}>
             <Text style={styles.name}>{name}</Text>
-            {info.title ? <Text style={{ ...styles.title, color }}>{info.title}</Text> : null}
+            {info.title ? <Text style={{ ...styles.title, color: accent }}>{info.title}</Text> : null}
             <View style={styles.contactRow}>
-              {contactParts.map((c, i) => {
-                const node = c.href
-                  ? <Link src={c.href} style={styles.contact}>{c.text}</Link>
-                  : <Text style={styles.contact}>{c.text}</Text>;
-                return (
-                  <View key={i} style={{ flexDirection: 'row' }}>
-                    {i > 0 ? <Text style={styles.contactSep}>·</Text> : null}
-                    {node}
-                  </View>
-                );
-              })}
+              {contacts.map((c, i) => (
+                <View key={i} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  {i > 0 ? <Text style={styles.dot}>·</Text> : null}
+                  {c.href
+                    ? <Link src={c.href}><Text style={styles.contact}>{c.text}</Text></Link>
+                    : <Text style={styles.contact}>{c.text}</Text>}
+                </View>
+              ))}
             </View>
           </View>
         </View>
+
+        {/* Accent divider */}
+        <View style={{ height: 1.2, backgroundColor: accent, marginBottom: 18 }} />
+
         {info.summary ? (
-          <Text style={{ ...styles.summary, borderLeftColor: color }}>{info.summary}</Text>
+          <Text style={styles.summary}>{info.summary}</Text>
         ) : null}
 
+        {/* Two columns: main (wider) + side */}
         <View style={styles.columns}>
-          {/* Main column */}
           <View style={styles.mainCol}>
             {resume.workExperience.length > 0 ? (
-              <View style={{ marginBottom: 14 }}>
-                <SectionHeading color={color}>Berufserfahrung</SectionHeading>
+              <View style={{ marginBottom: 16 }}>
+                <SectionHeading color={accent} kind="line">Berufserfahrung</SectionHeading>
                 {resume.workExperience.map(job => (
-                  <WorkEntry key={job.id} job={job} color={color} />
+                  <WorkEntry key={job.id} job={job} color={accent} />
                 ))}
               </View>
             ) : null}
 
             {resume.education.length > 0 ? (
-              <View>
-                <SectionHeading color={color}>Ausbildung</SectionHeading>
+              <View style={{ marginBottom: 16 }}>
+                <SectionHeading color={accent} kind="line">Ausbildung</SectionHeading>
                 {resume.education.map(edu => (
-                  <EduEntry key={edu.id} edu={edu} color={color} />
+                  <EduEntry key={edu.id} edu={edu} color={accent} />
+                ))}
+              </View>
+            ) : null}
+
+            {(resume.projects ?? []).length > 0 ? (
+              <View>
+                <SectionHeading color={accent} kind="line">Projekte</SectionHeading>
+                {resume.projects.map(p => (
+                  <View key={p.id} style={{ marginBottom: 9 }} wrap={false}>
+                    <Text style={{ fontSize: 10.5, fontFamily: 'Helvetica-Bold' }}>{p.name}</Text>
+                    {p.description ? (
+                      <Text style={{ fontSize: 10, color: alphaHex('#1c1c1e', 0.75), marginTop: 2, lineHeight: 1.5 }}>
+                        {p.description}
+                      </Text>
+                    ) : null}
+                  </View>
                 ))}
               </View>
             ) : null}
           </View>
 
-          {/* Side column */}
           <View style={styles.sideCol}>
             {resume.skills.length > 0 ? (
-              <View style={{ marginBottom: 14 }}>
-                <SectionHeading color={color}>Faehigkeiten</SectionHeading>
-                {resume.skills.map(s => <SkillBar key={s.id} skill={s} color={color} />)}
+              <View style={{ marginBottom: 16 }}>
+                <SectionHeading color={accent} kind="line">Fähigkeiten</SectionHeading>
+                {resume.skills.map(s => <SkillBar key={s.id} skill={s} color={accent} />)}
               </View>
             ) : null}
-
             {resume.languages.length > 0 ? (
-              <View style={{ marginBottom: 14 }}>
-                <SectionHeading color={color}>Sprachen</SectionHeading>
+              <View style={{ marginBottom: 16 }}>
+                <SectionHeading color={accent} kind="line">Sprachen</SectionHeading>
                 {resume.languages.map(l => <LanguageRow key={l.id} lang={l} />)}
               </View>
             ) : null}
-
             {(resume.certificates ?? []).length > 0 ? (
               <View>
-                <SectionHeading color={color}>Zertifikate</SectionHeading>
+                <SectionHeading color={accent} kind="line">Zertifikate</SectionHeading>
                 {resume.certificates.map(c => <CertItem key={c.id} cert={c} />)}
               </View>
             ) : null}
           </View>
-        </View>
-
-        {/* Footer: unsichtbar im Druck, hilft Screenreadern/Accessibility */}
-        <View style={{ marginTop: 'auto', paddingTop: 10, borderTopWidth: 0.5, borderTopStyle: 'solid', borderTopColor: alphaHex(color, 0.15) }}>
-          <Text style={{ fontSize: 7, color: '#bbb', textAlign: 'center' }}>
-            Erstellt mit PATH — path.pixmatic.ch
-          </Text>
         </View>
       </Page>
     </Document>
@@ -113,8 +116,7 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
 
 function ensureProtocol(url: string): string {
   if (/^https?:\/\//i.test(url)) return url;
-  if (/^(www\.|linkedin|github)/i.test(url)) return `https://${url}`;
-  return url;
+  return `https://${url.replace(/^\/+/, '')}`;
 }
 
 const styles = StyleSheet.create({
@@ -122,24 +124,21 @@ const styles = StyleSheet.create({
     fontFamily: 'Helvetica',
     fontSize: 10,
     color: '#1c1c1e',
-    paddingTop: 40,
-    paddingBottom: 40,
-    paddingLeft: 46,
-    paddingRight: 46,
-    lineHeight: 1.5,
+    paddingTop: 44,
+    paddingBottom: 44,
+    paddingLeft: 50,
+    paddingRight: 50,
+    lineHeight: 1.55,
   },
-  headerRow: { flexDirection: 'row', gap: 14, alignItems: 'flex-start', marginBottom: 8 },
-  photo: { width: 60, height: 60, borderRadius: 4, objectFit: 'cover' },
-  name: { fontSize: 22, fontWeight: 800, letterSpacing: -0.6, marginBottom: 2 },
-  title: { fontSize: 11, fontWeight: 500, marginBottom: 6 },
-  contactRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
+  headerRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 14 },
+  photo: { width: 72, height: 72, borderRadius: 4, marginRight: 18 },
+  name: { fontSize: 28, fontFamily: 'Helvetica-Bold', letterSpacing: -1, color: '#1c1c1e' },
+  title: { fontSize: 12, marginTop: 3 },
+  contactRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 },
   contact: { fontSize: 9, color: '#6e6e73' },
-  contactSep: { fontSize: 9, color: '#c7c7cc', marginHorizontal: 4 },
-  summary: {
-    marginTop: 10, marginBottom: 16, paddingLeft: 10, borderLeftWidth: 2,
-    fontSize: 10, color: '#444', lineHeight: 1.6,
-  },
-  columns: { flexDirection: 'row', gap: 22 },
+  dot: { fontSize: 9, color: '#c7c7cc', marginHorizontal: 5 },
+  summary: { fontSize: 10.5, color: '#444', marginBottom: 16, lineHeight: 1.65, fontStyle: 'italic' },
+  columns: { flexDirection: 'row', gap: 26 },
   mainCol: { flex: 1 },
   sideCol: { width: 150 },
 });
