@@ -1,87 +1,15 @@
-import type React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Download, ZoomIn, ZoomOut, Loader2, Layers, X, FolderDown, Lock, FileBox } from 'lucide-react';
-import { useState } from 'react';
+import { AlertCircle, Download, Loader2, Layers, X, FolderDown, Lock } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ProGate from '../components/ui/ProGate';
-import ResumePreview from '../components/templates/ResumePreview';
 import { TEMPLATES } from '../components/templates/templateConfig';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { usePlan, FREE_TEMPLATE_IDS } from '../lib/plan';
 import { canExportPdf, incrementPdfExport, getPdfExportCount, savePdf } from '../lib/pdfExports';
-import { renderResumePdf, renderCoverLetterPdf, renderDocumentImagePdf } from '../lib/pdfRenderer';
+import { renderResumePdf, buildMappePdfBytes } from '../lib/pdfRenderer';
 import { userError } from '../lib/userError';
-import type { Resume, UploadedDocument } from '../types/resume';
-
-/** Rendert ein hochgeladenes Dokument als A4-Seite in der Vorschau.
- *  Bilder werden voll angezeigt, PDFs als Platzhalter-Kachel mit
- *  Dateiname/Kategorie (die Export-Pipeline fuegt die echten PDF-Seiten
- *  beim Mappen-Export hinzu, im Live-Preview waere ein pdf.js-Renderer
- *  unverhaeltnismaessig teuer). */
-function DocumentPagePreview({ doc, style }: { doc: UploadedDocument; style?: React.CSSProperties }) {
-  const isImage = doc.type.startsWith('image/');
-  const categoryLabel = {
-    certificate: 'Zertifikat',
-    reference: 'Zeugnis',
-    portfolio: 'Portfolio',
-    other: 'Dokument',
-  }[doc.category] ?? 'Dokument';
-
-  return (
-    <div style={{
-      width: 794, minHeight: 1123, background: '#fff', color: '#111',
-      boxSizing: 'border-box', position: 'relative',
-      display: 'flex', flexDirection: 'column',
-      ...style,
-    }}>
-      <div style={{
-        padding: '28px 60px 18px', borderBottom: '1px solid #eee',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-      }}>
-        <div style={{ fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#888' }}>{categoryLabel}</div>
-        <div style={{ fontSize: 18, fontWeight: 600, marginTop: 4 }}>{doc.name}</div>
-      </div>
-      <div style={{ flex: 1, padding: 40, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        {isImage ? (
-          <img
-            src={doc.dataUrl}
-            alt={doc.name}
-            style={{ maxWidth: '100%', maxHeight: 980, objectFit: 'contain', display: 'block' }}
-          />
-        ) : (
-          <div style={{
-            textAlign: 'center', color: '#666',
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-          }}>
-            <FileBox size={64} style={{ opacity: 0.35, marginBottom: 16 }} />
-            <div style={{ fontSize: 16, fontWeight: 500 }}>PDF-Dokument</div>
-            <div style={{ fontSize: 13, marginTop: 6, opacity: 0.7 }}>
-              Der Inhalt wird beim Export in die Mappe eingefuegt.
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Merge multiple PDFs (as Uint8Array/ArrayBuffer) using pdf-lib.
-// Wird gebraucht, um Anschreiben + Lebenslauf + Dokumente zu einer Mappe
-// zu verketten. pdf-lib bleibt Teil der Pipeline, html2canvas/jspdf nicht.
-async function mergePdfs(parts: Uint8Array[]): Promise<Uint8Array> {
-  const { PDFDocument } = await import('pdf-lib');
-  const merged = await PDFDocument.create();
-
-  for (const part of parts) {
-    try {
-      const src = await PDFDocument.load(part, { ignoreEncryption: true });
-      const pages = await merged.copyPages(src, src.getPageIndices());
-      pages.forEach(p => merged.addPage(p));
-    } catch { /* skip corrupt/encrypted pages */ }
-  }
-
-  return merged.save();
-}
+import type { Resume } from '../types/resume';
 
 function buildFilename(resume: Resume): string {
   const first = resume.personalInfo.firstName || '';
@@ -96,10 +24,57 @@ export default function Preview() {
   const { getActiveResume, setTemplate } = useResumeStore();
   const { limits, isPro } = usePlan();
   const resume = getActiveResume();
-  const [zoom, setZoom] = useState(isMobile ? 0.42 : 0.7);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+
+  // Live-Vorschau: baut bei jeder Template- oder Resume-Aenderung die komplette
+  // Mappe als PDF-Blob und zeigt sie in einem iframe. So sieht der User
+  // pixelgenau das, was beim Export rauskommt — keine separate HTML-Rendering-
+  // Pipeline mehr, die sich anders verhalten koennte.
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewBuilding, setPreviewBuilding] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+  const currentUrlRef = useRef<string | null>(null);
+  // Key-String, der sich nur bei sichtbaren Aenderungen aendert. Verhindert,
+  // dass innere React-State-Updates (z. B. Template-Picker-Open) das PDF
+  // unnoetig neu bauen.
+  const pdfKey = resume ? JSON.stringify({
+    t: resume.templateId, c: resume.accentColor,
+    pi: resume.personalInfo, w: resume.workExperience, e: resume.education,
+    s: resume.skills, l: resume.languages, p: resume.projects, cert: resume.certificates,
+    cl: resume.coverLetter, cs: resume.customSections,
+    docs: resume.documents?.map(d => d.id),
+  }) : '';
+
+  useEffect(() => {
+    if (!resume) return;
+    let cancelled = false;
+    setPreviewBuilding(true);
+    setPreviewError(null);
+    (async () => {
+      try {
+        const bytes = await buildMappePdfBytes(resume);
+        if (cancelled) return;
+        const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        if (currentUrlRef.current) URL.revokeObjectURL(currentUrlRef.current);
+        currentUrlRef.current = url;
+        setPreviewUrl(url);
+      } catch (err) {
+        console.error('Preview PDF build failed:', err);
+        if (!cancelled) setPreviewError(userError('Die Vorschau konnte nicht aufgebaut werden', err));
+      } finally {
+        if (!cancelled) setPreviewBuilding(false);
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pdfKey]);
+
+  useEffect(() => () => {
+    if (currentUrlRef.current) URL.revokeObjectURL(currentUrlRef.current);
+  }, []);
 
   if (!resume) {
     return (
@@ -111,7 +86,7 @@ export default function Preview() {
     );
   }
 
-  // Export nur Lebenslauf (Vektor via @react-pdf).
+  // Export: Lebenslauf-Einzel-PDF.
   const handleExport = async () => {
     if (exporting) return;
     if (!canExportPdf(limits.pdfExportsPerMonth)) {
@@ -123,17 +98,15 @@ export default function Preview() {
     try {
       const first = resume.personalInfo.firstName || 'Lebenslauf';
       const last = resume.personalInfo.lastName ? '_' + resume.personalInfo.lastName : '';
-      const filename = `${first}${last}_CV.pdf`;
-      const pdfBytes = await renderResumePdf(resume);
-      await savePdf(pdfBytes, filename);
+      const bytes = await renderResumePdf(resume);
+      await savePdf(bytes, `${first}${last}_CV.pdf`);
       await incrementPdfExport();
     } catch (err) {
       setExportError(userError('Der PDF-Export hat nicht funktioniert', err));
-    }
-    finally { setExporting(false); }
+    } finally { setExporting(false); }
   };
 
-  // Export full Bewerbungsmappe: cover letter + resume + documents
+  // Export: komplette Bewerbungsmappe (Anschreiben + Lebenslauf + Dokumente).
   const handleExportMappe = async () => {
     if (exporting) return;
     if (!canExportPdf(limits.pdfExportsPerMonth)) {
@@ -143,113 +116,13 @@ export default function Preview() {
     setExporting(true);
     setExportError(null);
     try {
-      const pdfParts: Uint8Array[] = [];
-
-      // 1. Cover letter (if content exists) — Vektor
-      const cl = resume.coverLetter;
-      const hasContent = cl?.body || cl?.subject || cl?.recipient;
-      if (hasContent) {
-        pdfParts.push(await renderCoverLetterPdf(resume));
-      }
-
-      // 2. Resume — Vektor (alle Template-IDs sind registriert)
-      pdfParts.push(await renderResumePdf(resume));
-
-      // 3. Hochgeladene Dokumente: PDFs direkt einmergen, Bilder via @react-pdf.
-      //    Kaputte Eintraege (kein dataUrl / leerer Body) sammeln wir namentlich
-      //    und zeigen am Ende einen Hinweis — nicht stumm ueberspringen.
-      const skipped: string[] = [];
-      for (const d of resume.documents ?? []) {
-        if (!d?.dataUrl) { skipped.push(d?.name || 'Unbekannt'); continue; }
-        const isPdf = d.type === 'application/pdf' || d.dataUrl.startsWith('data:application/pdf');
-        if (isPdf) {
-          const base64 = d.dataUrl.split(',')[1];
-          if (!base64) { skipped.push(d.name); continue; }
-          pdfParts.push(Uint8Array.from(atob(base64), c => c.charCodeAt(0)));
-        } else {
-          pdfParts.push(await renderDocumentImagePdf(d));
-        }
-      }
-
-      const merged = await mergePdfs(pdfParts);
-      await savePdf(merged, buildFilename(resume));
+      const bytes = await buildMappePdfBytes(resume);
+      await savePdf(bytes, buildFilename(resume));
       await incrementPdfExport();
-      if (skipped.length > 0) {
-        setExportError(`Export erstellt, aber ${skipped.length} Dokument(e) konnten nicht eingefügt werden: ${skipped.join(', ')}. Bitte im Editor neu hochladen.`);
-      }
     } catch (err) {
       setExportError(userError('Der Mappen-Export hat nicht funktioniert', err));
-    }
-    finally { setExporting(false); }
+    } finally { setExporting(false); }
   };
-
-  const cl = resume.coverLetter ?? { recipient: '', subject: '', body: '', closing: 'Mit freundlichen Grüssen' };
-  const pi = resume.personalInfo;
-  const senderName = [pi.firstName, pi.lastName].filter(Boolean).join(' ');
-  const hasCoverLetterContent = Boolean(cl.body || cl.subject || cl.recipient);
-  const pageShadow: React.CSSProperties = { boxShadow: '0 20px 60px rgba(0,0,0,0.4)' };
-
-  const CoverLetterPage = () => (
-    <div style={{
-      width: 794, minHeight: 1123, background: '#fff', color: '#111',
-      fontFamily: 'Georgia, "Times New Roman", serif',
-      fontSize: 13, lineHeight: 1.7, padding: '80px 80px 60px',
-      boxSizing: 'border-box', position: 'relative',
-    }}>
-      {/* Page break indicator — visuelle Hilfe im Live-Preview, wird im Export
-          (via @react-pdf, der automatisch umbricht) nicht gerendert. */}
-      <div style={{
-        position: 'absolute', top: 1123, left: 0, right: 0, pointerEvents: 'none',
-        borderTop: '1.5px dashed rgba(180,180,220,0.7)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        <span style={{
-          fontSize: 9, color: 'rgba(100,100,180,0.7)', background: '#fff',
-          padding: '0 8px', letterSpacing: '0.05em', fontFamily: 'sans-serif',
-        }}>— Seite 2 —</span>
-      </div>
-      {/* Sender info top right */}
-      <div style={{ textAlign: 'right', marginBottom: 40, fontSize: 12, color: '#555' }}>
-        {senderName && <div style={{ fontWeight: 700, fontSize: 14, color: '#111' }}>{senderName}</div>}
-        {pi.title && <div>{pi.title}</div>}
-        {pi.location && <div>{pi.location}</div>}
-        {pi.email && <div>{pi.email}</div>}
-        {pi.phone && <div>{pi.phone}</div>}
-      </div>
-
-      {/* Recipient — leere Zeilen zwischen ausgefuellten Feldern ausblenden,
-          damit das Adressblock sauber bleibt. Der CoverLetterEditor speichert
-          leere Positionen, um den Cursor nicht ins falsche Feld zu werfen. */}
-      {cl.recipient && cl.recipient.trim() && (
-        <div style={{ marginBottom: 32, whiteSpace: 'pre-line', fontSize: 13 }}>
-          {cl.recipient.split('\n').filter(l => l.trim()).join('\n')}
-        </div>
-      )}
-
-      {/* Date */}
-      <div style={{ textAlign: 'right', marginBottom: 28, color: '#555', fontSize: 12 }}>
-        {pi.location ? pi.location + ', ' : ''}{new Date().toLocaleDateString('de-CH', { day: '2-digit', month: 'long', year: 'numeric' })}
-      </div>
-
-      {/* Subject */}
-      {cl.subject && (
-        <div style={{ fontWeight: 700, marginBottom: 24, fontSize: 14 }}>
-          {cl.subject}
-        </div>
-      )}
-
-      {/* Body */}
-      <div style={{ whiteSpace: 'pre-wrap', marginBottom: 40 }}>
-        {cl.body || <span style={{ color: '#aaa' }}>Kein Anschreiben-Text vorhanden.</span>}
-      </div>
-
-      {/* Closing */}
-      <div>
-        <div style={{ marginBottom: 48, whiteSpace: 'pre-wrap' }}>{cl.closing || 'Mit freundlichen Grüssen'}</div>
-        {senderName && <div style={{ fontWeight: 700 }}>{senderName}</div>}
-      </div>
-    </div>
-  );
 
   const TemplatePicker = () => (
     <>
@@ -294,7 +167,7 @@ export default function Preview() {
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', gap: 16, height: '100%', overflow: 'hidden', position: 'relative' }}>
-      {/* ── Desktop: template sidebar ── */}
+      {/* Desktop: Template-Sidebar */}
       {!isMobile && (
         <aside style={{ width: 160, flexShrink: 0, overflow: 'auto' }}>
           <div className="section-label" style={{ marginBottom: 8 }}>Templates</div>
@@ -302,11 +175,8 @@ export default function Preview() {
         </aside>
       )}
 
-      {/* ── Preview area ── */}
-      <div
-        className="glass"
-        style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
-      >
+      {/* Vorschau-Bereich */}
+      <div className="glass" style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {/* Toolbar */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -314,7 +184,6 @@ export default function Preview() {
           borderBottom: '1px solid rgba(255,255,255,0.1)', flexShrink: 0, gap: 8,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {/* Mobile: template picker toggle */}
             {isMobile && (
               <button
                 className="btn-glass btn-sm btn-icon"
@@ -325,19 +194,11 @@ export default function Preview() {
                 <Layers size={18} />
               </button>
             )}
-            {/* Zoom-Buttons nur auf Desktop — mobile nutzt Pinch-to-Zoom */}
-            {!isMobile && (
-              <>
-                <button className="btn-glass btn-sm btn-icon" onClick={() => setZoom(Math.max(0.25, zoom - 0.1))} style={{ padding: 9 }}>
-                  <ZoomOut size={16} />
-                </button>
-                <span style={{ fontSize: 12, minWidth: 40, textAlign: 'center', color: 'rgba(255,255,255,0.6)' }}>
-                  {Math.round(zoom * 100)}%
-                </span>
-                <button className="btn-glass btn-sm btn-icon" onClick={() => setZoom(Math.min(1.2, zoom + 0.1))} style={{ padding: 9 }}>
-                  <ZoomIn size={16} />
-                </button>
-              </>
+            {previewBuilding && (
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
+                <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />
+                Vorschau aktualisieren…
+              </span>
             )}
           </div>
 
@@ -380,35 +241,30 @@ export default function Preview() {
           </div>
         </div>
 
-        {/* Preview scroll area */}
-        <div style={{ flex: 1, overflow: 'auto', padding: isMobile ? 12 : 24, background: '#555' }}>
-          {/* Outer wrapper haelt die tatsaechlich sichtbare Groesse (794 * zoom)
-              damit margin: 0 auto den skalierten Inhalt korrekt zentriert.
-              Transform-Scale veraendert sonst nur die Darstellung, nicht das
-              Layout-Box — das liess die Vorschau auf Mobile nach rechts rutschen. */}
-          <div style={{
-            width: 794 * zoom,
-            margin: '0 auto',
-            maxWidth: '100%',
-          }}>
-            <div style={{
-              width: 794,
-              transformOrigin: 'top left',
-              transform: `scale(${zoom})`,
-            }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
-                {hasCoverLetterContent && <div style={pageShadow}><CoverLetterPage /></div>}
-                <div style={pageShadow}><ResumePreview resume={resume} /></div>
-                {(resume.documents ?? []).map((doc) => (
-                  <DocumentPagePreview key={doc.id} doc={doc} style={pageShadow} />
-                ))}
+        {/* PDF-Vorschau (iframe) */}
+        <div style={{ flex: 1, background: '#555', position: 'relative' }}>
+          {previewError ? (
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, textAlign: 'center' }}>
+              <div style={{ maxWidth: 360, color: 'rgba(255,255,255,0.85)' }}>
+                <AlertCircle size={28} style={{ opacity: 0.7, marginBottom: 10 }} />
+                <p style={{ fontSize: 13, lineHeight: 1.5 }}>{previewError}</p>
               </div>
             </div>
-          </div>
+          ) : previewUrl ? (
+            <iframe
+              title="Vorschau"
+              src={previewUrl}
+              style={{ width: '100%', height: '100%', border: 'none', background: '#555' }}
+            />
+          ) : (
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Loader2 size={28} style={{ color: 'rgba(255,255,255,0.5)', animation: 'spin 1s linear infinite' }} />
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ── Mobile: template picker modal ── */}
+      {/* Mobile: Template-Picker-Modal */}
       {isMobile && templatePickerOpen && (
         <>
           <div
@@ -434,7 +290,7 @@ export default function Preview() {
         </>
       )}
 
-      {/* Export error toast */}
+      {/* Export-Fehler-Toast */}
       {exportError && (
         <div style={{
           position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',

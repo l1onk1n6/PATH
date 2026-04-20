@@ -53,3 +53,41 @@ export async function renderCoverLetterPdf(resume: Resume): Promise<Uint8Array> 
 export async function renderDocumentImagePdf(doc: UploadedDocument): Promise<Uint8Array> {
   return renderDoc(<DocumentImagePdf doc={doc} />);
 }
+
+/**
+ * Kompletten Mappen-PDF bauen: Anschreiben (falls Inhalt) + Lebenslauf +
+ * hochgeladene Dokumente, via pdf-lib zu einem PDF verkettet.
+ * Einheit fuer Live-Vorschau und 'Ganze Mappe'-Export.
+ */
+export async function buildMappePdfBytes(resume: Resume): Promise<Uint8Array> {
+  const { PDFDocument } = await import('pdf-lib');
+  const parts: Uint8Array[] = [];
+
+  const cl = resume.coverLetter;
+  if (cl?.body || cl?.subject || cl?.recipient) {
+    parts.push(await renderCoverLetterPdf(resume));
+  }
+  parts.push(await renderResumePdf(resume));
+
+  for (const d of resume.documents ?? []) {
+    if (!d?.dataUrl) continue;
+    const isPdf = d.type === 'application/pdf' || d.dataUrl.startsWith('data:application/pdf');
+    if (isPdf) {
+      const base64 = d.dataUrl.split(',')[1];
+      if (!base64) continue;
+      parts.push(Uint8Array.from(atob(base64), c => c.charCodeAt(0)));
+    } else {
+      parts.push(await renderDocumentImagePdf(d));
+    }
+  }
+
+  const merged = await PDFDocument.create();
+  for (const part of parts) {
+    try {
+      const src = await PDFDocument.load(part, { ignoreEncryption: true });
+      const pages = await merged.copyPages(src, src.getPageIndices());
+      pages.forEach(p => merged.addPage(p));
+    } catch { /* beschaedigte Teile ueberspringen */ }
+  }
+  return merged.save();
+}
