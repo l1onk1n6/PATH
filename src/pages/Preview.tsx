@@ -458,24 +458,32 @@ export default function Preview() {
 
         {/* Preview scroll area */}
         <div style={{ flex: 1, overflow: 'auto', padding: isMobile ? 12 : 24, background: '#555' }}>
+          {/* Outer wrapper haelt die tatsaechlich sichtbare Groesse (794 * zoom)
+              damit margin: 0 auto den skalierten Inhalt korrekt zentriert.
+              Transform-Scale veraendert sonst nur die Darstellung, nicht das
+              Layout-Box — das liess die Vorschau auf Mobile nach rechts rutschen. */}
           <div style={{
-            width: 794,
+            width: 794 * zoom,
             margin: '0 auto',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
-            transformOrigin: 'top center',
-            transform: `scale(${zoom})`,
-            marginBottom: `calc((${zoom} - 1) * -100%)`,
+            maxWidth: '100%',
           }}>
-            <div ref={previewRef}>
-              {activeView === 'resume'
-                ? <div ref={resumePageRef}><ResumePreview resume={resume} /></div>
-                : <div ref={coverLetterRef}><CoverLetterPage /></div>
-              }
-            </div>
-            {/* Hidden off-screen renders for Mappe export */}
-            <div style={{ position: 'absolute', left: -9999, top: 0, pointerEvents: 'none' }}>
-              <div ref={activeView === 'resume' ? coverLetterRef : resumePageRef}>
-                {activeView === 'resume' ? <CoverLetterPage /> : <ResumePreview resume={resume} />}
+            <div style={{
+              width: 794,
+              boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+              transformOrigin: 'top left',
+              transform: `scale(${zoom})`,
+            }}>
+              <div ref={previewRef}>
+                {activeView === 'resume'
+                  ? <div ref={resumePageRef}><ResumePreview resume={resume} /></div>
+                  : <div ref={coverLetterRef}><CoverLetterPage /></div>
+                }
+              </div>
+              {/* Hidden off-screen renders for Mappe export */}
+              <div style={{ position: 'absolute', left: -9999, top: 0, pointerEvents: 'none' }}>
+                <div ref={activeView === 'resume' ? coverLetterRef : resumePageRef}>
+                  {activeView === 'resume' ? <CoverLetterPage /> : <ResumePreview resume={resume} />}
+                </div>
               </div>
             </div>
           </div>
