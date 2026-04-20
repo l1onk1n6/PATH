@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp,
   FolderPlus, Pencil, Copy, Search, ExternalLink, Clock,
-  Download, Share2, CheckCircle, List, X, BarChart2,
+  Share2, CheckCircle, List, X, BarChart2,
   Lock, MoreHorizontal, ClipboardList,
 } from 'lucide-react';
 
@@ -168,7 +168,7 @@ export default function Dashboard() {
   const {
     persons, resumes, addPerson, deletePerson, setActivePerson, activePersonId,
     addResume, deleteResume, setActiveResume, renameResume, duplicateResume, setResumeStatus,
-    exportGdprData, limitError, clearLimitError,
+    limitError, clearLimitError,
   } = useResumeStore();
 
   const [newName, setNewName] = useState('');
@@ -403,9 +403,6 @@ export default function Dashboard() {
           <AtsButton />
         </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          <button className="btn-glass btn-sm" onClick={exportGdprData} title="Alle Daten exportieren (DSGVO Art. 20)">
-            <Download size={13} /> {!isMobile && 'Export'}
-          </button>
           <button
             className="btn-glass btn-primary btn-sm"
             style={{ flexShrink: 0, opacity: persons.length >= limits.persons ? 0.5 : 1 }}
