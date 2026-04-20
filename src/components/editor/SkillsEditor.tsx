@@ -143,10 +143,20 @@ export default function SkillsEditor() {
           </button>
         </div>
 
+        {languages.length > 0 && (
+          <div style={{ display: 'flex', gap: 10, paddingLeft: isMobile ? 32 : 22, paddingRight: 38, marginBottom: 4 }}>
+            <span style={{ flex: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>Sprache</span>
+            <span style={{ flex: 1, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>Niveau</span>
+            <span style={{ width: 166, flexShrink: 0 }} />
+          </div>
+        )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {languages.map((lang) => (
             <div key={lang.id} className="glass-card" style={{ padding: '12px 14px' }}>
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                {/* Platzhalter, damit die Spalten ueber Skills+Sprachen gleich ausgerichtet sind
+                    (Skills haben links einen Grip / Pfeile) */}
+                <div style={{ width: isMobile ? 20 : 14, flexShrink: 0 }} />
                 <input
                   className="input-glass"
                   placeholder="Sprache (z.B. Englisch)"
@@ -164,6 +174,8 @@ export default function SkillsEditor() {
                     <option key={lvl} value={lvl}>{lvl}</option>
                   ))}
                 </select>
+                {/* Platzhalter in der Breite der Skills-Niveau-Spalte (5 Dots 16px + 4 Gaps 4px + 70px Label) */}
+                <div style={{ width: 166, flexShrink: 0 }} />
                 <button
                   className="btn-glass btn-danger btn-icon"
                   onClick={() => removeLanguage(resume.id, lang.id)}

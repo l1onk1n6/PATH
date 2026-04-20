@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import {
   User, Briefcase, GraduationCap, Zap, FolderOpen,
   Upload, Palette, AlertCircle, FileEdit, LayoutList, Lock,
+  Pencil, Check, X,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import { usePlan } from '../lib/plan';
@@ -36,11 +38,21 @@ const SECTIONS: { id: EditorSection; label: string; short: string; icon: React.C
 export default function Editor() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { getActiveResume, getActivePerson, activeSection, setActiveSection, resumes } = useResumeStore();
+  const { getActiveResume, getActivePerson, activeSection, setActiveSection, resumes, renameResume } = useResumeStore();
   const { limits } = usePlan();
   const { showTranslate, setShowTranslate } = useUIStore();
   const resume = getActiveResume();
   const person = getActivePerson();
+
+  // Inline-Umbenennen der aktuellen Bewerbungsmappe.
+  const [renaming, setRenaming] = useState(false);
+  const [renameValue, setRenameValue] = useState('');
+  const startRename = () => { if (resume) { setRenameValue(resume.name ?? ''); setRenaming(true); } };
+  const commitRename = () => {
+    if (resume && renameValue.trim()) renameResume(resume.id, renameValue.trim());
+    setRenaming(false);
+  };
+  const cancelRename = () => setRenaming(false);
 
   // Check if the active resume is frozen (beyond plan limit)
   const resumeIndex = resume ? resumes.findIndex(r => r.id === resume.id) : -1;
@@ -108,6 +120,18 @@ export default function Editor() {
   if (isMobile) {
     return (
       <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+        {/* Rename-Mappe-Leiste ueber den Tabs */}
+        <div style={{ paddingBottom: 8, flexShrink: 0 }}>
+          <MappeRename
+            renaming={renaming}
+            value={renameValue}
+            onValueChange={setRenameValue}
+            currentName={resume.name}
+            onStart={startRename}
+            onCommit={commitRename}
+            onCancel={cancelRename}
+          />
+        </div>
         {/* Horizontal scrollable tab bar */}
         <div style={{
           display: 'flex', overflowX: 'auto', gap: 6, paddingBottom: 8,
@@ -150,20 +174,79 @@ export default function Editor() {
         <VersionHistoryPanel resumeId={resume.id} />
       ) : (
         <>
-          {/* Section header */}
+          {/* Section header + Mappe-Umbennenen */}
           <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              {currentSection?.icon && (
-                <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <currentSection.icon size={15} />
-                </div>
-              )}
-              <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{currentSection?.label}</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                {currentSection?.icon && (
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <currentSection.icon size={15} />
+                  </div>
+                )}
+                <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{currentSection?.label}</h2>
+              </div>
+              <MappeRename
+                renaming={renaming}
+                value={renameValue}
+                onValueChange={setRenameValue}
+                currentName={resume.name}
+                onStart={startRename}
+                onCommit={commitRename}
+                onCancel={cancelRename}
+              />
             </div>
           </div>
           {renderSection()}
         </>
       )}
     </div>
+  );
+}
+
+interface MappeRenameProps {
+  renaming: boolean;
+  value: string;
+  currentName: string;
+  onValueChange: (v: string) => void;
+  onStart: () => void;
+  onCommit: () => void;
+  onCancel: () => void;
+}
+
+function MappeRename({ renaming, value, currentName, onValueChange, onStart, onCommit, onCancel }: MappeRenameProps) {
+  if (renaming) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+        <input
+          className="input-glass"
+          autoFocus
+          value={value}
+          maxLength={80}
+          onChange={(e) => onValueChange(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') onCommit(); if (e.key === 'Escape') onCancel(); }}
+          placeholder="Name der Bewerbungsmappe"
+          style={{ fontSize: 13, padding: '7px 10px', width: 240, maxWidth: '60vw' }}
+        />
+        <button className="btn-glass btn-icon btn-sm" onClick={onCommit} title="Speichern" style={{ padding: 6 }}>
+          <Check size={14} style={{ color: 'var(--ios-green)' }} />
+        </button>
+        <button className="btn-glass btn-icon btn-sm" onClick={onCancel} title="Abbrechen" style={{ padding: 6 }}>
+          <X size={14} />
+        </button>
+      </div>
+    );
+  }
+  return (
+    <button
+      className="btn-glass btn-sm"
+      onClick={onStart}
+      title="Bewerbungsmappe umbenennen"
+      style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', maxWidth: '100%' }}
+    >
+      <Pencil size={13} style={{ opacity: 0.6, flexShrink: 0 }} />
+      <span style={{ fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {currentName || 'Bewerbungsmappe'}
+      </span>
+    </button>
   );
 }
