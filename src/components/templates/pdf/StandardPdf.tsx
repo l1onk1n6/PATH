@@ -212,16 +212,19 @@ export function StandardPdf({ resume, variant = {} }: Props) {
 
   return (
     <Document>
-      <Page size="A4" style={{ fontFamily, fontSize: 10, color: text, backgroundColor: pageBg, padding: 0, lineHeight: 1.5 }}>
+      <Page size="A4" style={{ fontFamily, fontSize: 10, color: text, backgroundColor: pageBg, lineHeight: 1.5 }}>
         {headerMode === 'banner' ? <Header /> : (
-          <View style={{ padding: '34pt 40pt 0' }}><Header /></View>
+          <View style={{ paddingTop: 34, paddingLeft: 40, paddingRight: 40 }}><Header /></View>
         )}
 
         {sidebarMode === 'none' ? (
-          <View style={{ padding: '0 40pt 40pt' }}><MainCol /><SideCol wide /></View>
+          <View style={{ paddingLeft: 40, paddingRight: 40, paddingBottom: 40 }}><MainCol /><SideCol wide /></View>
         ) : (
-          <View style={{ flexDirection: sidebarMode === 'left' ? 'row' : 'row-reverse', padding: '0 40pt 40pt', gap: 20 }}>
-            <View style={{ backgroundColor: sidebarBg, padding: 14, width: 160, borderRadius: 2 }}>
+          <View style={{
+            flexDirection: sidebarMode === 'left' ? 'row' : 'row-reverse',
+            paddingLeft: 40, paddingRight: 40, paddingBottom: 40, gap: 20,
+          }}>
+            <View style={{ backgroundColor: sidebarBg, padding: 14, width: 160 }}>
               <SideCol inverse={sidebarBg !== '#fff' && sidebarBg !== alphaHex(accent, 0.08)} />
             </View>
             <MainCol />

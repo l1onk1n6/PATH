@@ -101,7 +101,7 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
         </View>
 
         {/* Footer: unsichtbar im Druck, hilft Screenreadern/Accessibility */}
-        <View style={{ marginTop: 'auto', paddingTop: 10, borderTop: `0.5pt solid ${alphaHex(color, 0.15)}` }}>
+        <View style={{ marginTop: 'auto', paddingTop: 10, borderTopWidth: 0.5, borderTopStyle: 'solid', borderTopColor: alphaHex(color, 0.15) }}>
           <Text style={{ fontSize: 7, color: '#bbb', textAlign: 'center' }}>
             Erstellt mit PATH — path.pixmatic.ch
           </Text>
@@ -122,7 +122,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Helvetica',
     fontSize: 10,
     color: '#1c1c1e',
-    padding: '40pt 46pt',
+    paddingTop: 40,
+    paddingBottom: 40,
+    paddingLeft: 46,
+    paddingRight: 46,
     lineHeight: 1.5,
   },
   headerRow: { flexDirection: 'row', gap: 14, alignItems: 'flex-start', marginBottom: 8 },

@@ -129,7 +129,10 @@ export default function Preview() {
       const pdfBytes = await renderResumePdf(resume);
       await savePdf(pdfBytes, filename);
       await incrementPdfExport();
-    } catch (err) { console.error('PDF export failed:', err); }
+    } catch (err) {
+      console.error('PDF export failed:', err);
+      setExportError(`PDF-Export fehlgeschlagen: ${err instanceof Error ? err.message : String(err)}`);
+    }
     finally { setExporting(false); }
   };
 
@@ -168,7 +171,10 @@ export default function Preview() {
       const merged = await mergePdfs(pdfParts);
       await savePdf(merged, buildFilename(resume));
       await incrementPdfExport();
-    } catch (err) { console.error('Mappe export failed:', err); }
+    } catch (err) {
+      console.error('Mappe export failed:', err);
+      setExportError(`Mappen-Export fehlgeschlagen: ${err instanceof Error ? err.message : String(err)}`);
+    }
     finally { setExporting(false); }
   };
 

@@ -16,8 +16,8 @@ const CATEGORY_LABEL: Record<UploadedDocument['category'], string> = {
 export default function DocumentImagePdf({ doc }: { doc: UploadedDocument }) {
   return (
     <Document>
-      <Page size="A4" style={{ padding: '32pt 40pt', backgroundColor: '#fff', fontFamily: 'Helvetica' }}>
-        <View style={{ marginBottom: 12, borderBottom: '0.5pt solid #ddd', paddingBottom: 8 }}>
+      <Page size="A4" style={{ paddingTop: 32, paddingBottom: 32, paddingLeft: 40, paddingRight: 40, backgroundColor: '#fff', fontFamily: 'Helvetica' }}>
+        <View style={{ marginBottom: 12, borderBottomWidth: 0.5, borderBottomColor: '#ddd', borderBottomStyle: 'solid', paddingBottom: 8 }}>
           <Text style={{ fontSize: 8, letterSpacing: 2, color: '#888', textTransform: 'uppercase' }}>
             {CATEGORY_LABEL[doc.category] ?? 'Dokument'}
           </Text>

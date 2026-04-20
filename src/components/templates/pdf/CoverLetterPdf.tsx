@@ -69,7 +69,10 @@ const styles = {
     fontFamily: 'Times-Roman',
     fontSize: 11,
     color: '#111',
-    padding: '50pt 55pt 45pt',
+    paddingTop: 50,
+    paddingLeft: 55,
+    paddingRight: 55,
+    paddingBottom: 45,
     lineHeight: 1.55,
   },
   sender: {
