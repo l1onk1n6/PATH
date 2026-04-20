@@ -9,6 +9,7 @@ import { TEMPLATES } from '../components/templates/templateConfig';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { usePlan, FREE_TEMPLATE_IDS } from '../lib/plan';
 import { canExportPdf, incrementPdfExport, getPdfExportCount, savePdf } from '../lib/pdfExports';
+import { hasPdfTemplate, renderResumePdf } from '../lib/pdfRenderer';
 import type { Resume, UploadedDocument } from '../types/resume';
 
 /** Rendert ein hochgeladenes Dokument als A4-Seite in der Vorschau.
@@ -169,8 +170,12 @@ async function imageToPdfBytes(dataUrl: string): Promise<Uint8Array | null> {
 }
 
 // Adaptive quality: reduce JPEG quality until under MAX_PDF_BYTES
+type MappePart =
+  | { kind: 'html'; el: HTMLElement }
+  | { kind: 'bytes'; bytes: Uint8Array };  // already-rendered vector PDF
+
 async function exportAdaptive(
-  parts: HTMLElement[],
+  parts: MappePart[],
   docDataUrls: { dataUrl: string; type: string }[],
 ): Promise<Uint8Array> {
   let quality = 0.92;
@@ -178,9 +183,13 @@ async function exportAdaptive(
   for (let attempt = 0; attempt < 4; attempt++) {
     const pdfParts: Uint8Array[] = [];
 
-    for (const el of parts) {
-      const { pdfBytes } = await renderElementToPdfDoc(el, quality);
-      pdfParts.push(pdfBytes);
+    for (const part of parts) {
+      if (part.kind === 'bytes') {
+        pdfParts.push(part.bytes);
+      } else {
+        const { pdfBytes } = await renderElementToPdfDoc(part.el, quality);
+        pdfParts.push(pdfBytes);
+      }
     }
 
     for (const { dataUrl, type } of docDataUrls) {
@@ -201,9 +210,13 @@ async function exportAdaptive(
 
   // Fallback – merge with lowest quality
   const pdfParts: Uint8Array[] = [];
-  for (const el of parts) {
-    const { pdfBytes } = await renderElementToPdfDoc(el, 0.55);
-    pdfParts.push(pdfBytes);
+  for (const part of parts) {
+    if (part.kind === 'bytes') {
+      pdfParts.push(part.bytes);
+    } else {
+      const { pdfBytes } = await renderElementToPdfDoc(part.el, 0.55);
+      pdfParts.push(pdfBytes);
+    }
   }
   return mergePdfs(pdfParts);
 }
@@ -239,9 +252,11 @@ export default function Preview() {
     );
   }
 
-  // Export nur Lebenslauf
+  // Export nur Lebenslauf — wenn ein @react-pdf-Template registriert ist,
+  // Vektor-Pfad (selektierbarer Text, kleinere Dateien). Sonst Fallback auf
+  // html2canvas-pro. So koennen Templates einzeln migriert werden.
   const handleExport = async () => {
-    if (!resumePageRef.current || exporting) return;
+    if (exporting) return;
     if (!canExportPdf(limits.pdfExportsPerMonth)) {
       setExportError(`PDF-Export-Limit erreicht (${limits.pdfExportsPerMonth}/Monat). Upgrade auf Pro für mehr Exporte.`);
       return;
@@ -249,10 +264,17 @@ export default function Preview() {
     setExporting(true);
     setExportError(null);
     try {
-      const { pdfBytes } = await renderElementToPdfDoc(resumePageRef.current);
       const first = resume.personalInfo.firstName || 'Lebenslauf';
       const last = resume.personalInfo.lastName ? '_' + resume.personalInfo.lastName : '';
-      await savePdf(pdfBytes, `${first}${last}_CV.pdf`);
+      const filename = `${first}${last}_CV.pdf`;
+      let pdfBytes: Uint8Array | ArrayBuffer;
+      if (hasPdfTemplate(resume.templateId)) {
+        pdfBytes = await renderResumePdf(resume);
+      } else {
+        if (!resumePageRef.current) return;
+        pdfBytes = (await renderElementToPdfDoc(resumePageRef.current)).pdfBytes;
+      }
+      await savePdf(pdfBytes, filename);
       await incrementPdfExport();
     } catch (err) { console.error('PDF export failed:', err); }
     finally { setExporting(false); }
@@ -268,21 +290,24 @@ export default function Preview() {
     setExporting(true);
     setExportError(null);
     try {
-      const elements: HTMLElement[] = [];
+      const parts: MappePart[] = [];
 
-      // 1. Cover letter (if content exists)
+      // 1. Cover letter (if content exists) — bleibt vorerst html2canvas
       const cl = resume.coverLetter;
       const hasContent = cl?.body || cl?.subject || cl?.recipient;
       if (hasContent && coverLetterRef.current) {
-        elements.push(coverLetterRef.current);
+        parts.push({ kind: 'html', el: coverLetterRef.current });
       }
 
-      // 2. Resume (always)
-      const resumeEl = resumePageRef.current;
-      if (resumeEl) elements.push(resumeEl);
+      // 2. Resume — Vektor-PDF wenn Template migriert, sonst html2canvas
+      if (hasPdfTemplate(resume.templateId)) {
+        parts.push({ kind: 'bytes', bytes: await renderResumePdf(resume) });
+      } else if (resumePageRef.current) {
+        parts.push({ kind: 'html', el: resumePageRef.current });
+      }
 
       const docs = (resume.documents ?? []).map(d => ({ dataUrl: d.dataUrl, type: d.type }));
-      const merged = await exportAdaptive(elements, docs);
+      const merged = await exportAdaptive(parts, docs);
 
       await savePdf(merged, buildFilename(resume));
       await incrementPdfExport();
