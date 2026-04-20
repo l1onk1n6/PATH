@@ -10,7 +10,7 @@ import type { Resume } from '../../../types/resume';
 import type { HeadingStyle } from './shared';
 import {
   alphaHex, readableOn, MUTED_COLOR, MUTED_DARK,
-  SectionHeading, WorkEntry, EduEntry, SkillBar, SkillDots, SkillChips, groupSkillsByCategory,
+  SectionHeading, Section, WorkEntry, EduEntry, SkillBar, SkillDots, SkillChips, groupSkillsByCategory,
   LanguageRow, CertItem, dateRange,
 } from './shared';
 
@@ -170,29 +170,26 @@ export function StandardPdf({ resume, variant = {} }: Props) {
   ) : null;
 
   const WorkSection = () => resume.workExperience.length > 0 ? (
-    <View style={{ marginBottom: 14 }}>
-      <SectionHeading color={accent} kind={headingStyle}>Berufserfahrung</SectionHeading>
+    <Section title="Berufserfahrung" color={accent} kind={headingStyle}>
       {resume.workExperience.map(job => (
         <WorkEntry key={job.id} job={job} color={accent} textColor={text} mutedColor={muted} boldFont={boldFont} />
       ))}
-    </View>
+    </Section>
   ) : null;
 
   const EduSection = () => resume.education.length > 0 ? (
-    <View style={{ marginBottom: 14 }}>
-      <SectionHeading color={accent} kind={headingStyle}>Ausbildung</SectionHeading>
+    <Section title="Ausbildung" color={accent} kind={headingStyle}>
       {resume.education.map(edu => (
         <EduEntry key={edu.id} edu={edu} color={accent} textColor={text} mutedColor={muted} boldFont={boldFont} />
       ))}
-    </View>
+    </Section>
   ) : null;
 
   const ProjectsSection = () => (resume.projects ?? []).length > 0 ? (
-    <View style={{ marginBottom: 14 }}>
-      <SectionHeading color={accent} kind={headingStyle}>Projekte</SectionHeading>
+    <Section title="Projekte" color={accent} kind={headingStyle}>
       {resume.projects.map(p => (
-        <View key={p.id} style={{ marginBottom: 10 }} wrap={false}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View key={p.id} style={{ marginBottom: 12 }}>
+          <View wrap={false} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
             <View style={{ flex: 1, marginRight: 10 }}>
               <Text style={{ fontSize: 10.5, fontFamily: boldFont, color: text }}>{p.name}</Text>
               {p.url ? (
@@ -204,7 +201,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
             <Text style={{ fontSize: 9, color: muted }}>{dateRange(p.startDate, p.endDate)}</Text>
           </View>
           {p.description ? (
-            <Text style={{ fontSize: 10, color: alphaHex(text, 0.75), marginTop: 3, lineHeight: 1.5 }}>
+            <Text style={{ fontSize: 10, color: alphaHex(text, 0.78), lineHeight: 1.55 }}>
               {p.description}
             </Text>
           ) : null}
@@ -213,21 +210,20 @@ export function StandardPdf({ resume, variant = {} }: Props) {
           ) : null}
         </View>
       ))}
-    </View>
+    </Section>
   ) : null;
 
   const CustomSections = () => (
     <>
       {(resume.customSections ?? []).map(cs => cs.items?.length ? (
-        <View key={cs.id} style={{ marginBottom: 14 }}>
-          <SectionHeading color={accent} kind={headingStyle}>{cs.title}</SectionHeading>
+        <Section key={cs.id} title={cs.title} color={accent} kind={headingStyle}>
           {cs.items.map((it, i) => (
-            <View key={i} style={{ flexDirection: 'row', marginBottom: 3 }}>
+            <View key={i} style={{ flexDirection: 'row', marginBottom: 4 }} wrap={false}>
               <Text style={{ fontSize: 10, color: accent, width: 12 }}>•</Text>
-              <Text style={{ fontSize: 10, color: alphaHex(text, 0.8), flex: 1, lineHeight: 1.5 }}>{it}</Text>
+              <Text style={{ fontSize: 10, color: alphaHex(text, 0.82), flex: 1, lineHeight: 1.55 }}>{it}</Text>
             </View>
           ))}
-        </View>
+        </Section>
       ) : null)}
     </>
   );

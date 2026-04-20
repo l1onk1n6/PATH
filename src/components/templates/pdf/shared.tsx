@@ -113,6 +113,36 @@ export function SectionHeading({
   );
 }
 
+/**
+ * Section-Wrapper, der das Heading mit dem ersten Inhalts-Eintrag zusammen-
+ * haelt. Verhindert Witwen: ein Section-Header alleine am Seitenende, Inhalt
+ * erst auf der naechsten Seite.
+ *
+ * @param children ein oder mehrere Eintrags-Views (z. B. WorkEntry). Der
+ *   erste wird zusammen mit dem Heading in einen wrap={false}-Block gepackt.
+ */
+export function Section({
+  title, color, kind = 'line', children, style,
+}: {
+  title: string;
+  color: string;
+  kind?: HeadingStyle;
+  children: React.ReactNode;
+  style?: Style;
+}) {
+  const arr = Array.isArray(children) ? children : [children];
+  const [first, ...rest] = arr.filter(Boolean);
+  return (
+    <View style={{ marginBottom: 14, ...style }}>
+      <View wrap={false} minPresenceAhead={30}>
+        <SectionHeading color={color} kind={kind}>{title}</SectionHeading>
+        {first}
+      </View>
+      {rest}
+    </View>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────
 //  Eintraege
 // ─────────────────────────────────────────────────────────────
@@ -127,8 +157,13 @@ export function WorkEntry({
   boldFont?: string;
 }) {
   return (
-    <View style={{ marginBottom: 12 }} wrap={false}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+    <View style={{ marginBottom: 14 }}>
+      {/* Kopfzeile (Position/Firma + Datum/Ort) muss zusammenbleiben,
+          damit sie nicht alleine am Seitenende haengt oder gesplittet wird.
+          Die Beschreibung darunter darf hingegen ueber Seiten brechen,
+          sonst wuerde ein langer Job-Text auf die naechste Seite geschmissen
+          und eine halbleere Seite davor stehenlassen. */}
+      <View wrap={false} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
         <View style={{ flex: 1, marginRight: 10 }}>
           <Text style={{ fontSize: 11, fontFamily: boldFont, color: textColor }}>{job.position}</Text>
           {job.company ? (
@@ -141,16 +176,16 @@ export function WorkEntry({
         </View>
       </View>
       {job.description ? (
-        <Text style={{ fontSize: 10, color: alphaHex(textColor, 0.75), marginTop: 4, lineHeight: 1.55 }}>
+        <Text style={{ fontSize: 10, color: alphaHex(textColor, 0.78), lineHeight: 1.6 }}>
           {job.description}
         </Text>
       ) : null}
       {job.highlights && job.highlights.length > 0 ? (
         <View style={{ marginTop: 4 }}>
           {job.highlights.map((h, i) => (
-            <View key={i} style={{ flexDirection: 'row', marginTop: 1 }}>
+            <View key={i} style={{ flexDirection: 'row', marginTop: 2 }}>
               <Text style={{ fontSize: 10, color, width: 10 }}>•</Text>
-              <Text style={{ fontSize: 10, color: alphaHex(textColor, 0.75), flex: 1, lineHeight: 1.5 }}>{h}</Text>
+              <Text style={{ fontSize: 10, color: alphaHex(textColor, 0.78), flex: 1, lineHeight: 1.55 }}>{h}</Text>
             </View>
           ))}
         </View>
@@ -168,12 +203,14 @@ export function EduEntry({
   mutedColor?: string;
   boldFont?: string;
 }) {
+  // Bildungseintraege sind in der Regel kurz (Title + Institution + Datum);
+  // als Ganzes zusammenhalten ist hier sinnvoll.
   return (
-    <View style={{ marginBottom: 10 }} wrap={false}>
+    <View style={{ marginBottom: 12 }} wrap={false}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <View style={{ flex: 1, marginRight: 10 }}>
           <Text style={{ fontSize: 10.5, fontFamily: boldFont, color: textColor }}>{edu.degree}</Text>
-          {edu.field ? <Text style={{ fontSize: 10, color: alphaHex(textColor, 0.75) }}>{edu.field}</Text> : null}
+          {edu.field ? <Text style={{ fontSize: 10, color: alphaHex(textColor, 0.78) }}>{edu.field}</Text> : null}
           {edu.institution ? <Text style={{ fontSize: 10, color, marginTop: 1 }}>{edu.institution}</Text> : null}
         </View>
         <View style={{ alignItems: 'flex-end' }}>
@@ -309,9 +346,9 @@ export function CertItem({
   boldFont?: string;
 }) {
   return (
-    <View style={{ marginBottom: 5 }} wrap={false}>
+    <View style={{ marginBottom: 7 }} wrap={false}>
       <Text style={{ fontSize: 10, fontFamily: boldFont, color: textColor }}>{cert.name}</Text>
-      <Text style={{ fontSize: 9, color: mutedColor }}>
+      <Text style={{ fontSize: 9, color: mutedColor, marginTop: 1 }}>
         {cert.issuer}{cert.date ? ` · ${formatDate(cert.date)}` : ''}
       </Text>
     </View>

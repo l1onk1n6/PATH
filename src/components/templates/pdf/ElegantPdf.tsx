@@ -58,8 +58,8 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
           <>
             <SH>Berufserfahrung</SH>
             {resume.workExperience.map(job => (
-              <View key={job.id} style={{ marginBottom: 12 }} wrap={false}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View key={job.id} style={{ marginBottom: 14 }}>
+                <View wrap={false} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
                   <View style={{ flex: 1, marginRight: 10 }}>
                     <Text style={{ fontFamily: 'Times-Bold', fontSize: 12 }}>{job.position}</Text>
                     {job.company ? <Text style={{ fontSize: 11, color: accent, fontStyle: 'italic' }}>{job.company}{job.location ? `, ${job.location}` : ''}</Text> : null}
@@ -67,7 +67,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
                   <Text style={{ fontSize: 10, color: '#555' }}>{dateRange(job.startDate, job.endDate, job.current)}</Text>
                 </View>
                 {job.description ? (
-                  <Text style={{ fontSize: 10.5, marginTop: 3, lineHeight: 1.6, color: '#333' }}>{job.description}</Text>
+                  <Text style={{ fontSize: 10.5, lineHeight: 1.65, color: '#333' }}>{job.description}</Text>
                 ) : null}
               </View>
             ))}

@@ -5,7 +5,7 @@
 import { Document, Page, View, Text, Link, Image, StyleSheet } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
 import {
-  SectionHeading, WorkEntry, EduEntry, SkillBar, LanguageRow, CertItem, alphaHex,
+  Section, WorkEntry, EduEntry, SkillBar, LanguageRow, CertItem, alphaHex,
 } from './shared';
 
 export default function MinimalPdf({ resume }: { resume: Resume }) {
@@ -54,58 +54,52 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
         <View style={styles.columns}>
           <View style={styles.mainCol}>
             {resume.workExperience.length > 0 ? (
-              <View style={{ marginBottom: 16 }}>
-                <SectionHeading color={accent} kind="line">Berufserfahrung</SectionHeading>
+              <Section title="Berufserfahrung" color={accent} kind="line">
                 {resume.workExperience.map(job => (
                   <WorkEntry key={job.id} job={job} color={accent} />
                 ))}
-              </View>
+              </Section>
             ) : null}
 
             {resume.education.length > 0 ? (
-              <View style={{ marginBottom: 16 }}>
-                <SectionHeading color={accent} kind="line">Ausbildung</SectionHeading>
+              <Section title="Ausbildung" color={accent} kind="line">
                 {resume.education.map(edu => (
                   <EduEntry key={edu.id} edu={edu} color={accent} />
                 ))}
-              </View>
+              </Section>
             ) : null}
 
             {(resume.projects ?? []).length > 0 ? (
-              <View>
-                <SectionHeading color={accent} kind="line">Projekte</SectionHeading>
+              <Section title="Projekte" color={accent} kind="line">
                 {resume.projects.map(p => (
-                  <View key={p.id} style={{ marginBottom: 9 }} wrap={false}>
-                    <Text style={{ fontSize: 10.5, fontFamily: 'Helvetica-Bold' }}>{p.name}</Text>
+                  <View key={p.id} style={{ marginBottom: 10 }}>
+                    <Text style={{ fontSize: 10.5, fontFamily: 'Helvetica-Bold' }} wrap={false}>{p.name}</Text>
                     {p.description ? (
-                      <Text style={{ fontSize: 10, color: alphaHex('#1c1c1e', 0.75), marginTop: 2, lineHeight: 1.5 }}>
+                      <Text style={{ fontSize: 10, color: alphaHex('#1c1c1e', 0.78), marginTop: 2, lineHeight: 1.55 }}>
                         {p.description}
                       </Text>
                     ) : null}
                   </View>
                 ))}
-              </View>
+              </Section>
             ) : null}
           </View>
 
           <View style={styles.sideCol}>
             {resume.skills.length > 0 ? (
-              <View style={{ marginBottom: 16 }}>
-                <SectionHeading color={accent} kind="line">Fähigkeiten</SectionHeading>
+              <Section title="Fähigkeiten" color={accent} kind="line">
                 {resume.skills.map(s => <SkillBar key={s.id} skill={s} color={accent} />)}
-              </View>
+              </Section>
             ) : null}
             {resume.languages.length > 0 ? (
-              <View style={{ marginBottom: 16 }}>
-                <SectionHeading color={accent} kind="line">Sprachen</SectionHeading>
+              <Section title="Sprachen" color={accent} kind="line">
                 {resume.languages.map(l => <LanguageRow key={l.id} lang={l} />)}
-              </View>
+              </Section>
             ) : null}
             {(resume.certificates ?? []).length > 0 ? (
-              <View>
-                <SectionHeading color={accent} kind="line">Zertifikate</SectionHeading>
+              <Section title="Zertifikate" color={accent} kind="line">
                 {resume.certificates.map(c => <CertItem key={c.id} cert={c} />)}
-              </View>
+              </Section>
             ) : null}
           </View>
         </View>
