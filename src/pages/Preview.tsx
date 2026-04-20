@@ -9,7 +9,7 @@ import { TEMPLATES } from '../components/templates/templateConfig';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { usePlan, FREE_TEMPLATE_IDS } from '../lib/plan';
 import { canExportPdf, incrementPdfExport, getPdfExportCount, savePdf } from '../lib/pdfExports';
-import { hasPdfTemplate, renderResumePdf, renderCoverLetterPdf, renderDocumentImagePdf } from '../lib/pdfRenderer';
+import { renderResumePdf, renderCoverLetterPdf, renderDocumentImagePdf } from '../lib/pdfRenderer';
 import type { Resume, UploadedDocument } from '../types/resume';
 
 /** Rendert ein hochgeladenes Dokument als A4-Seite in der Vorschau.
@@ -64,76 +64,9 @@ function DocumentPagePreview({ doc, style }: { doc: UploadedDocument; style?: Re
   );
 }
 
-// Renders an HTML element to jsPDF pages, returns the doc
-async function renderElementToPdfDoc(
-  element: HTMLElement,
-  quality = 0.92,
-): Promise<{ pdfBytes: Uint8Array; pageCount: number }> {
-  const html2canvas = (await import('html2canvas-pro')).default;
-  const jsPDF = (await import('jspdf')).default;
-
-  const canvas = await html2canvas(element, {
-    scale: 2, useCORS: true, allowTaint: true,
-    backgroundColor: '#ffffff', width: 794, height: element.scrollHeight,
-  });
-
-  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-  const pdfW = pdf.internal.pageSize.getWidth();   // 210 mm
-  const pdfH = pdf.internal.pageSize.getHeight();  // 297 mm
-
-  // canvas pixels per mm (canvas is 2x scaled)
-  const pxPerMm = canvas.width / pdfW;
-  const pageHeightPx = pdfH * pxPerMm; // canvas pixels per A4 page
-
-  /**
-   * Scan upward from targetY to find a nearly-blank row (whitespace between
-   * paragraphs). Cuts there instead of mid-line. Falls back to targetY if no
-   * good break is found within the search window (8% of page height).
-   */
-  function findBreakPoint(targetY: number): number {
-    const ctx = canvas.getContext('2d')!;
-    const searchPx = Math.round(pageHeightPx * 0.08);
-    const start = Math.min(Math.round(targetY), canvas.height - 1);
-    for (let y = start; y > start - searchPx; y--) {
-      if (y <= 0) break;
-      const { data } = ctx.getImageData(0, y, canvas.width, 1);
-      let dark = 0;
-      for (let i = 0; i < data.length; i += 4) {
-        if (data[i] < 240 || data[i + 1] < 240 || data[i + 2] < 240) dark++;
-      }
-      if (dark < canvas.width * 0.03) return y; // >97% white → good break
-    }
-    return start; // no whitespace found, cut at original boundary
-  }
-
-  let srcY = 0;
-  let pageCount = 0;
-
-  while (srcY < canvas.height) {
-    if (pageCount > 0) pdf.addPage();
-
-    const isLastPage = srcY + pageHeightPx >= canvas.height;
-    const breakY = isLastPage
-      ? canvas.height
-      : findBreakPoint(srcY + pageHeightPx);
-
-    const srcH = Math.round(breakY - srcY);
-    const pg = document.createElement('canvas');
-    pg.width = canvas.width;
-    pg.height = srcH;
-    pg.getContext('2d')!.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
-
-    const imgH = srcH / pxPerMm; // mm height for this chunk
-    pdf.addImage(pg.toDataURL('image/jpeg', quality), 'JPEG', 0, 0, pdfW, imgH);
-
-    srcY = Math.round(breakY);
-    pageCount++;
-  }
-
-  return { pdfBytes: pdf.output('arraybuffer') as unknown as Uint8Array, pageCount };
-}
-
-// Merge multiple PDFs (as Uint8Array/ArrayBuffer) using pdf-lib
+// Merge multiple PDFs (as Uint8Array/ArrayBuffer) using pdf-lib.
+// Wird gebraucht, um Anschreiben + Lebenslauf + Dokumente zu einer Mappe
+// zu verketten. pdf-lib bleibt Teil der Pipeline, html2canvas/jspdf nicht.
 async function mergePdfs(parts: Uint8Array[]): Promise<Uint8Array> {
   const { PDFDocument } = await import('pdf-lib');
   const merged = await PDFDocument.create();
@@ -148,11 +81,6 @@ async function mergePdfs(parts: Uint8Array[]): Promise<Uint8Array> {
 
   return merged.save();
 }
-
-// Phase 5: exportAdaptive/imageToPdfBytes werden nicht mehr gebraucht, weil
-// Anschreiben + Resume + Bilder komplett ueber @react-pdf gerendert werden.
-// renderElementToPdfDoc bleibt als Fallback fuer Templates, die kein
-// PDF-Template registriert haben.
 
 function buildFilename(resume: Resume): string {
   const first = resume.personalInfo.firstName || '';
@@ -185,9 +113,7 @@ export default function Preview() {
     );
   }
 
-  // Export nur Lebenslauf — wenn ein @react-pdf-Template registriert ist,
-  // Vektor-Pfad (selektierbarer Text, kleinere Dateien). Sonst Fallback auf
-  // html2canvas-pro. So koennen Templates einzeln migriert werden.
+  // Export nur Lebenslauf (Vektor via @react-pdf).
   const handleExport = async () => {
     if (exporting) return;
     if (!canExportPdf(limits.pdfExportsPerMonth)) {
@@ -200,13 +126,7 @@ export default function Preview() {
       const first = resume.personalInfo.firstName || 'Lebenslauf';
       const last = resume.personalInfo.lastName ? '_' + resume.personalInfo.lastName : '';
       const filename = `${first}${last}_CV.pdf`;
-      let pdfBytes: Uint8Array | ArrayBuffer;
-      if (hasPdfTemplate(resume.templateId)) {
-        pdfBytes = await renderResumePdf(resume);
-      } else {
-        if (!resumePageRef.current) return;
-        pdfBytes = (await renderElementToPdfDoc(resumePageRef.current)).pdfBytes;
-      }
+      const pdfBytes = await renderResumePdf(resume);
       await savePdf(pdfBytes, filename);
       await incrementPdfExport();
     } catch (err) { console.error('PDF export failed:', err); }
@@ -215,7 +135,7 @@ export default function Preview() {
 
   // Export full Bewerbungsmappe: cover letter + resume + documents
   const handleExportMappe = async () => {
-    if (!previewRef.current || exporting) return;
+    if (exporting) return;
     if (!canExportPdf(limits.pdfExportsPerMonth)) {
       setExportError(`PDF-Export-Limit erreicht (${limits.pdfExportsPerMonth}/Monat). Upgrade auf Pro für mehr Exporte.`);
       return;
@@ -232,14 +152,8 @@ export default function Preview() {
         pdfParts.push(await renderCoverLetterPdf(resume));
       }
 
-      // 2. Resume — Vektor wenn Template migriert (aktuell alle), sonst Fallback
-      if (hasPdfTemplate(resume.templateId)) {
-        pdfParts.push(await renderResumePdf(resume));
-      } else if (resumePageRef.current) {
-        // Fallback nur fuer zukuenftige Custom-Templates ohne Variant-Eintrag
-        const { pdfBytes } = await renderElementToPdfDoc(resumePageRef.current);
-        pdfParts.push(new Uint8Array(pdfBytes as unknown as ArrayBuffer));
-      }
+      // 2. Resume — Vektor (alle Template-IDs sind registriert)
+      pdfParts.push(await renderResumePdf(resume));
 
       // 3. Hochgeladene Dokumente: PDFs direkt einmergen, Bilder via @react-pdf
       for (const d of resume.documents ?? []) {
