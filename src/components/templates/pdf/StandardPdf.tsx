@@ -110,11 +110,11 @@ export function StandardPdf({ resume, variant = {} }: Props) {
               <Image src={info.photo!} style={{ width: 66, height: 66, borderRadius: 33, marginRight: 16 }} />
             ) : null}
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: nameSize, fontFamily: boldFont, color: bannerText, letterSpacing: nameTracking }}>
+              <Text style={{ fontSize: nameSize, fontFamily: boldFont, color: bannerText, letterSpacing: nameTracking, lineHeight: 1.15 }}>
                 {name}
               </Text>
               {info.title ? (
-                <Text style={{ fontSize: 12, color: alphaHex(bannerText, 0.85), marginTop: 2 }}>{info.title}</Text>
+                <Text style={{ fontSize: 12, color: alphaHex(bannerText, 0.85), marginTop: 5, lineHeight: 1.3 }}>{info.title}</Text>
               ) : null}
             </View>
           </View>
@@ -137,9 +137,9 @@ export function StandardPdf({ resume, variant = {} }: Props) {
           <Image src={info.photo!} style={{ width: 64, height: 64, borderRadius: 4, marginRight: 16 }} />
         ) : null}
         <View style={{ flex: centered ? undefined : 1, alignItems: centered ? 'center' : 'flex-start' }}>
-          <Text style={{ fontSize: nameSize, fontFamily: boldFont, color, letterSpacing: nameTracking }}>{name}</Text>
+          <Text style={{ fontSize: nameSize, fontFamily: boldFont, color, letterSpacing: nameTracking, lineHeight: 1.15 }}>{name}</Text>
           {info.title ? (
-            <Text style={{ fontSize: 12, color: accentColor, marginTop: 2 }}>{info.title}</Text>
+            <Text style={{ fontSize: 12, color: accentColor, marginTop: 5, lineHeight: 1.3 }}>{info.title}</Text>
           ) : null}
           <View style={{
             flexDirection: 'row', flexWrap: 'wrap', marginTop: 8,

@@ -126,8 +126,10 @@ const styles = StyleSheet.create({
   },
   headerRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 14 },
   photo: { width: 72, height: 72, borderRadius: 4, marginRight: 18 },
-  name: { fontSize: 28, fontFamily: 'Helvetica-Bold', letterSpacing: -1, color: '#1c1c1e' },
-  title: { fontSize: 12, marginTop: 3 },
+  // lineHeight explizit, weil @react-pdf sonst die Page-lineHeight von 1.55
+  // erbt und bei grossem fontSize Title ueber den Namen drueberklappt.
+  name: { fontSize: 28, fontFamily: 'Helvetica-Bold', letterSpacing: -0.5, color: '#1c1c1e', lineHeight: 1.15 },
+  title: { fontSize: 12, marginTop: 6, lineHeight: 1.3 },
   contactRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 },
   contact: { fontSize: 9, color: '#6e6e73' },
   dot: { fontSize: 9, color: '#c7c7cc', marginHorizontal: 5 },
