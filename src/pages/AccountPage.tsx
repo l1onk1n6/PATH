@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Capacitor } from '@capacitor/core';
+import { presentCustomerCenter } from '../lib/revenuecat';
 import {
   User, Shield, Lock, Sparkles, Mail, ExternalLink,
   AlertTriangle, Download, Trash2, KeyRound,
@@ -77,9 +79,22 @@ function PlanSection() {
   }, []);
 
   async function handlePortal() {
-    if (!isSupabaseConfigured()) return;
     setPortalLoading(true);
     setPortalError('');
+    // Native: RevenueCat Customer Center (Play-Store-Abrechnung)
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await presentCustomerCenter();
+      } catch (err) {
+        console.error('Customer Center error:', err);
+        setPortalError('Abo-Verwaltung konnte nicht geöffnet werden.');
+      } finally {
+        setPortalLoading(false);
+      }
+      return;
+    }
+    // Web: Stripe Customer Portal
+    if (!isSupabaseConfigured()) { setPortalLoading(false); return; }
     try {
       const supabase = getSupabase();
       const { data: { session } } = await supabase.auth.getSession();

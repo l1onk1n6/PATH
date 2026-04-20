@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { Capacitor } from '@capacitor/core';
 
 const INACTIVE_MS  = 30 * 60 * 1000; // 30 min → show warning
 const COUNTDOWN_S  = 60;              // 60 s countdown before auto-logout
@@ -8,6 +9,10 @@ export function useSessionTimeout(onSignOut: () => void) {
   const inactiveTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const countdownRef   = useRef(COUNTDOWN_S);
+  // Auf der nativen App kein automatischer Logout — der User kennt sein Geraet
+  // und die Biometrie/PIN des Systems schuetzt den App-Zugriff. Timer hier
+  // waeren eher stoerend als hilfreich.
+  const disabled = Capacitor.isNativePlatform();
 
   const clearAll = useCallback(() => {
     if (inactiveTimer.current)  clearTimeout(inactiveTimer.current);
@@ -42,6 +47,7 @@ export function useSessionTimeout(onSignOut: () => void) {
   }, [clearAll, startCountdown]);
 
   useEffect(() => {
+    if (disabled) return;
     const events = ['mousemove', 'keydown', 'pointerdown', 'scroll', 'touchstart'];
     events.forEach(e => window.addEventListener(e, resetTimer, { passive: true }));
     resetTimer(); // start on mount
@@ -49,7 +55,7 @@ export function useSessionTimeout(onSignOut: () => void) {
       clearAll();
       events.forEach(e => window.removeEventListener(e, resetTimer));
     };
-  }, [resetTimer, clearAll]);
+  }, [resetTimer, clearAll, disabled]);
 
-  return { countdown, stayLoggedIn };
+  return { countdown: disabled ? null : countdown, stayLoggedIn };
 }

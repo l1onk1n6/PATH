@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Lock, X, Sparkles, Loader2 } from 'lucide-react';
+import { Capacitor } from '@capacitor/core';
 import { usePlan, PRO_FEATURES } from '../../lib/plan';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
+import { presentProPaywall } from '../../lib/revenuecat';
 
 // ── Checkout helper ────────────────────────────────────────
 async function startCheckout(): Promise<string | null> {
@@ -28,6 +30,20 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
   async function handleUpgrade() {
     setLoading(true);
     setCheckoutError('');
+    // Native: Google-Play-IAP via RevenueCat-Paywall (Play-Store-Pflicht)
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const purchased = await presentProPaywall();
+        if (purchased) onClose();
+      } catch (err) {
+        console.error('Paywall error:', err);
+        setCheckoutError('Kauf konnte nicht abgeschlossen werden. Bitte erneut versuchen.');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+    // Web: Stripe-Checkout
     const url = await startCheckout();
     if (url) {
       window.location.href = url;
@@ -131,7 +147,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
             }}
           >
             {loading
-              ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> Weiterleitung zu Stripe…</>
+              ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> {Capacitor.isNativePlatform() ? 'Öffne Google Play…' : 'Weiterleitung zu Stripe…'}</>
               : <><Sparkles size={14} /> Jetzt upgraden — PATH Pro</>
             }
           </button>
@@ -143,7 +159,9 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
           )}
 
           <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>
-            Sichere Zahlung via Stripe · Jederzeit kündbar
+            {Capacitor.isNativePlatform()
+              ? 'Abrechnung über Google Play · Jederzeit kündbar'
+              : 'Sichere Zahlung via Stripe · Jederzeit kündbar'}
           </p>
         </div>
       </div>

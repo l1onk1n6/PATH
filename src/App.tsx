@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
+import { initRevenueCat, logOutRevenueCat } from './lib/revenuecat';
 import { Loader2, Cloud, Loader, ShieldAlert } from 'lucide-react';
 import { useSessionTimeout } from './hooks/useSessionTimeout';
 import Sidebar from './components/layout/Sidebar';
@@ -226,6 +227,15 @@ export default function App() {
   useEffect(() => {
     if (user && !passwordRecovery) syncFromCloud();
   }, [user, passwordRecovery, syncFromCloud]);
+
+  // RevenueCat auf der nativen App mit Supabase-User-ID verknuepfen, damit
+  // Pro-Entitlements pro User getrackt werden und nach (Re-)Login der Status
+  // korrekt geladen wird. Web nutzt weiter Stripe → kein Init.
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    if (!user) { logOutRevenueCat(); return; }
+    initRevenueCat(user.id).catch(err => console.warn('RevenueCat init failed:', err));
+  }, [user]);
 
   // Process pending referral after login/signup
   useEffect(() => {
