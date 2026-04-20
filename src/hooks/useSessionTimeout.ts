@@ -5,13 +5,17 @@ const INACTIVE_MS  = 30 * 60 * 1000; // 30 min → show warning
 const COUNTDOWN_S  = 60;              // 60 s countdown before auto-logout
 
 export function useSessionTimeout(onSignOut: () => void) {
-  const [countdown, setCountdown] = useState<number | null>(null); // null = inactive warning hidden
+  const [countdown, setCountdown] = useState<number | null>(null);
   const inactiveTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const countdownRef   = useRef(COUNTDOWN_S);
+  // Wichtig: "Warnung aktiv?" als Ref, nicht aus State ableiten. Sonst wuerde
+  // jede Sekunde (Countdown-Tick) den useCallback neu bauen, der useEffect
+  // deswegen neu mounten, und der Cleanup den Countdown-Interval toeten
+  // bevor er 0 erreicht → auto-logout feuerte nie.
+  const warningActiveRef = useRef(false);
   // Auf der nativen App kein automatischer Logout — der User kennt sein Geraet
-  // und die Biometrie/PIN des Systems schuetzt den App-Zugriff. Timer hier
-  // waeren eher stoerend als hilfreich.
+  // und die Biometrie/PIN des Systems schuetzt den App-Zugriff.
   const disabled = Capacitor.isNativePlatform();
 
   const clearAll = useCallback(() => {
@@ -20,6 +24,7 @@ export function useSessionTimeout(onSignOut: () => void) {
   }, []);
 
   const startCountdown = useCallback(() => {
+    warningActiveRef.current = true;
     countdownRef.current = COUNTDOWN_S;
     setCountdown(COUNTDOWN_S);
     countdownTimer.current = setInterval(() => {
@@ -27,21 +32,23 @@ export function useSessionTimeout(onSignOut: () => void) {
       setCountdown(countdownRef.current);
       if (countdownRef.current <= 0) {
         clearAll();
+        warningActiveRef.current = false;
         onSignOut();
       }
     }, 1_000);
   }, [clearAll, onSignOut]);
 
   const resetTimer = useCallback(() => {
-    // If countdown is already running, don't reset — user must click "Bleib angemeldet"
-    if (countdown !== null) return;
+    // Solange die Warnung sichtbar ist, muss der User sie bewusst mit
+    // "Angemeldet bleiben" wegklicken — Mausbewegung reicht nicht.
+    if (warningActiveRef.current) return;
     clearAll();
     inactiveTimer.current = setTimeout(startCountdown, INACTIVE_MS);
-  }, [clearAll, startCountdown, countdown]);
+  }, [clearAll, startCountdown]);
 
-  // User chose to stay — dismiss warning and restart idle timer
   const stayLoggedIn = useCallback(() => {
     clearAll();
+    warningActiveRef.current = false;
     setCountdown(null);
     inactiveTimer.current = setTimeout(startCountdown, INACTIVE_MS);
   }, [clearAll, startCountdown]);
@@ -50,7 +57,7 @@ export function useSessionTimeout(onSignOut: () => void) {
     if (disabled) return;
     const events = ['mousemove', 'keydown', 'pointerdown', 'scroll', 'touchstart'];
     events.forEach(e => window.addEventListener(e, resetTimer, { passive: true }));
-    resetTimer(); // start on mount
+    resetTimer();
     return () => {
       clearAll();
       events.forEach(e => window.removeEventListener(e, resetTimer));
