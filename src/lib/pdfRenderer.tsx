@@ -14,21 +14,29 @@
 import { pdf } from '@react-pdf/renderer';
 import type { Resume, TemplateId } from '../types/resume';
 import MinimalPdf from '../components/templates/pdf/MinimalPdf';
+import { StandardPdf, TEMPLATE_VARIANTS } from '../components/templates/pdf/StandardPdf';
 
 type PdfTemplateComponent = React.ComponentType<{ resume: Resume }>;
 
-const registry: Partial<Record<TemplateId, PdfTemplateComponent>> = {
+/** Templates mit eigenem, handgebautem PDF-Component. */
+const dedicated: Partial<Record<TemplateId, PdfTemplateComponent>> = {
   minimal: MinimalPdf,
 };
 
 export function hasPdfTemplate(id: TemplateId): boolean {
-  return Boolean(registry[id]);
+  return Boolean(dedicated[id] || TEMPLATE_VARIANTS[id]);
 }
 
 export async function renderResumePdf(resume: Resume): Promise<Uint8Array> {
-  const Component = registry[resume.templateId];
-  if (!Component) throw new Error(`Kein PDF-Template fuer "${resume.templateId}" registriert`);
-  const blob = await pdf(<Component resume={resume} />).toBlob();
+  const Dedicated = dedicated[resume.templateId];
+  const variant = TEMPLATE_VARIANTS[resume.templateId];
+  const element = Dedicated
+    ? <Dedicated resume={resume} />
+    : variant
+      ? <StandardPdf resume={resume} variant={variant} />
+      : null;
+  if (!element) throw new Error(`Kein PDF-Template fuer "${resume.templateId}" registriert`);
+  const blob = await pdf(element).toBlob();
   const buffer = await blob.arrayBuffer();
   return new Uint8Array(buffer);
 }
