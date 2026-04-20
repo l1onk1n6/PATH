@@ -500,15 +500,30 @@ export default function Preview() {
               transformOrigin: 'top left',
               transform: `scale(${zoom})`,
             }}>
-              <div ref={previewRef} style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
-                {hasCoverLetterContent && (
-                  <div ref={coverLetterRef} style={pageShadow}><CoverLetterPage /></div>
-                )}
-                <div ref={resumePageRef} style={pageShadow}><ResumePreview resume={resume} /></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
+                {hasCoverLetterContent && <div style={pageShadow}><CoverLetterPage /></div>}
+                <div style={pageShadow}><ResumePreview resume={resume} /></div>
                 {(resume.documents ?? []).map((doc) => (
                   <DocumentPagePreview key={doc.id} doc={doc} style={pageShadow} />
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* Zweiter, unsichtbarer 1:1-Render ausschliesslich fuer den PDF-
+              Export. html2canvas mis-rechnet Koordinaten, wenn der Capture-
+              Root in einem transform:scale()-Ancestor liegt (Zeichen ueber-
+              lappen im Anschreiben). Deshalb haengen die Export-Refs hier
+              dran statt am skalierten Baum oben. */}
+          <div
+            aria-hidden
+            style={{ position: 'absolute', left: -99999, top: 0, pointerEvents: 'none' }}
+          >
+            <div ref={previewRef} style={{ display: 'flex', flexDirection: 'column', gap: 40, width: 794 }}>
+              {hasCoverLetterContent && (
+                <div ref={coverLetterRef}><CoverLetterPage /></div>
+              )}
+              <div ref={resumePageRef}><ResumePreview resume={resume} /></div>
             </div>
           </div>
         </div>

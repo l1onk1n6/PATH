@@ -35,7 +35,7 @@ export default function ExecutiveTemplate({ resume }: { resume: Resume }) {
           <div>
             <div style={{ fontSize: 10, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Sprachen</div>
             {languages.map(lang => (
-              <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4, color: 'rgba(255,255,255,0.8)' }}>
+              <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 4, color: 'rgba(255,255,255,0.8)' }}>
                 <span>{lang.name}</span>
                 <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10 }}>{lang.level}</span>
               </div>

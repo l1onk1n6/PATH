@@ -71,7 +71,7 @@ export default function CorporateTemplate({ resume }: { resume: Resume }) {
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 14 }}>
             <SideLabel>Sprachen</SideLabel>
             {languages.map(lang => (
-              <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, marginBottom: 5, color: 'rgba(255,255,255,0.8)' }}>
+              <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 10.5, marginBottom: 5, color: 'rgba(255,255,255,0.8)' }}>
                 <span style={{ fontWeight: 700 }}>{lang.name}</span>
                 <span style={{ fontSize: 9.5, opacity: 0.55 }}>{lang.level}</span>
               </div>

@@ -82,7 +82,7 @@ export default function VintageTemplate({ resume }: { resume: Resume }) {
                 ✦ Sprachen ✦
               </h2>
               {languages.map(lang => (
-                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 5, borderBottom: '1px dotted #ddd', paddingBottom: 4 }}>
+                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 12, marginBottom: 5, borderBottom: '1px dotted #ddd', paddingBottom: 4 }}>
                   <span style={{ fontStyle: 'italic' }}>{lang.name}</span>
                   <span style={{ color: '#888', fontSize: 11 }}>{lang.level}</span>
                 </div>

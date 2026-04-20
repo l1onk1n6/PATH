@@ -116,7 +116,7 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
             <div style={{ marginBottom: 18 }}>
               <SectionHeading>Sprachen</SectionHeading>
               {languages.map(lang => (
-                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 5, alignItems: 'center' }}>
+                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 5, alignItems: 'center' }}>
                   <span style={{ fontWeight: 500 }}>{lang.name}</span>
                   <span style={{ fontSize: 10, color: '#8e8e93' }}>{lang.level}</span>
                 </div>

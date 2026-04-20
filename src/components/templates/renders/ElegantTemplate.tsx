@@ -122,7 +122,7 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
             <div style={{ marginBottom: 20 }}>
               <SectionHeading>Sprachen</SectionHeading>
               {languages.map(lang => (
-                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 6, borderBottom: '1px dotted #e0d8cc', paddingBottom: 5 }}>
+                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 6, borderBottom: '1px dotted #e0d8cc', paddingBottom: 5 }}>
                   <span style={{ fontStyle: 'italic' }}>{lang.name}</span>
                   <span style={{ color: '#999', fontSize: 10 }}>{lang.level}</span>
                 </div>

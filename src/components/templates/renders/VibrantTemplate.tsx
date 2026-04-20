@@ -95,7 +95,7 @@ export default function VibrantTemplate({ resume }: { resume: Resume }) {
             <div>
               <h2 style={{ fontSize: 11, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Sprachen</h2>
               {languages.map(lang => (
-                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 6 }}>
+                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 6 }}>
                   <span style={{ fontWeight: 600, color: '#333' }}>{lang.name}</span>
                   <span style={{
                     fontSize: 10, padding: '2px 8px', borderRadius: 10,

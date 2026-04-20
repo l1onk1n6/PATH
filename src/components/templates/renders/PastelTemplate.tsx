@@ -99,7 +99,7 @@ export default function PastelTemplate({ resume }: { resume: Resume }) {
             <>
               <SectionTitle title="Sprachen" />
               {languages.map(lang => (
-                <div key={lang.id} style={{ marginBottom: 6, display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
+                <div key={lang.id} style={{ marginBottom: 6, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11 }}>
                   <span style={{ fontWeight: 600, color: '#555' }}>{lang.name}</span>
                   <span style={{ color: '#aaa' }}>{lang.level}</span>
                 </div>

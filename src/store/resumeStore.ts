@@ -245,7 +245,25 @@ export const useResumeStore = create<ResumeStore>()(
         const resumeName = name || `Bewerbungsmappe ${existing.length + 1}`;
         const resume = createDefaultResume(personId, resumeName);
         if (existing.length > 0) {
-          resume.personalInfo = { ...existing[0].personalInfo };
+          // Persoenliche Daten + Lebenslauf-Inhalte von der ersten Mappe der
+          // gleichen Person uebernehmen (Ausbildung, Erfahrung, Fertigkeiten
+          // etc. aendern sich nicht pro Bewerbung). Anschreiben, Dokumente,
+          // Template und Jobdetails bleiben bewusst leer, weil sie pro
+          // Bewerbung unterschiedlich sind. Neue UUIDs, damit Edits einer
+          // Mappe die andere nicht beeinflussen.
+          const src = existing[0];
+          resume.personalInfo = { ...src.personalInfo };
+          resume.workExperience = src.workExperience.map(w => ({ ...w, id: uuidv4() }));
+          resume.education = src.education.map(e => ({ ...e, id: uuidv4() }));
+          resume.skills = src.skills.map(s => ({ ...s, id: uuidv4() }));
+          resume.languages = src.languages.map(l => ({ ...l, id: uuidv4() }));
+          resume.projects = (src.projects ?? []).map(p => ({ ...p, id: uuidv4() }));
+          resume.certificates = (src.certificates ?? []).map(c => ({ ...c, id: uuidv4() }));
+          resume.customSections = (src.customSections ?? []).map(cs => ({
+            ...cs,
+            id: uuidv4(),
+            items: [...(cs.items ?? [])],
+          }));
         }
         set((s) => ({
           resumes: [...s.resumes, resume],

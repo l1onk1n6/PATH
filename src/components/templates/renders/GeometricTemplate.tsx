@@ -120,7 +120,7 @@ export default function GeometricTemplate({ resume }: { resume: Resume }) {
                   <h2 style={{ margin: 0, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#333' }}>Sprachen</h2>
                 </div>
                 {languages.map(lang => (
-                  <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 6, padding: '4px 8px', background: `${color}08`, borderRadius: 4 }}>
+                  <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 12, marginBottom: 6, padding: '4px 8px', background: `${color}08`, borderRadius: 4 }}>
                     <span style={{ fontWeight: 600 }}>{lang.name}</span>
                     <span style={{ color: '#888', fontSize: 11 }}>{lang.level}</span>
                   </div>

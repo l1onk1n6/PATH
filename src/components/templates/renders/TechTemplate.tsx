@@ -103,7 +103,7 @@ export default function TechTemplate({ resume }: { resume: Resume }) {
             <div>
               <div style={{ fontSize: 9, color: color, fontWeight: 700, letterSpacing: '0.1em', marginBottom: 10 }}>// LANGUAGES</div>
               {languages.map(lang => (
-                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, marginBottom: 4, color: '#8b949e' }}>
+                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 10, marginBottom: 4, color: '#8b949e' }}>
                   <span>{lang.name}</span>
                   <span style={{ color: color, fontSize: 9 }}>{lang.level}</span>
                 </div>

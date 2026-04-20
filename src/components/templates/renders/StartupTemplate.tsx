@@ -128,7 +128,7 @@ export default function StartupTemplate({ resume }: { resume: Resume }) {
               <div>
                 <h2 style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#111', marginBottom: 10 }}>Sprachen</h2>
                 {languages.map(lang => (
-                  <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
+                  <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 4 }}>
                     <span style={{ fontWeight: 600, color: '#333' }}>{lang.name}</span>
                     <span style={{ fontSize: 10, color: '#999' }}>{lang.level}</span>
                   </div>

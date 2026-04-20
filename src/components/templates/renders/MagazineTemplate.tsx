@@ -46,7 +46,7 @@ export default function MagazineTemplate({ resume }: { resume: Resume }) {
           <div>
             <div style={{ fontSize: 9, color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Sprachen</div>
             {languages.map(lang => (
-              <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 5, color: '#ccc' }}>
+              <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 5, color: '#ccc' }}>
                 <span>{lang.name}</span>
                 <span style={{ color: '#888', fontSize: 10 }}>{lang.level}</span>
               </div>

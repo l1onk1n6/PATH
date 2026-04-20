@@ -95,7 +95,7 @@ export default function CreativeTemplate({ resume }: { resume: Resume }) {
             <div style={{ background: `${color}10`, borderRadius: 12, padding: 14 }}>
               <h2 style={{ fontSize: 11, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Sprachen</h2>
               {languages.map(lang => (
-                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 5 }}>
+                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 5 }}>
                   <span style={{ fontWeight: 600 }}>{lang.name}</span>
                   <span style={{ color: '#888' }}>{lang.level}</span>
                 </div>

@@ -87,7 +87,7 @@ export default function BoldTemplate({ resume }: { resume: Resume }) {
             <div>
               <h2 style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 12 }}>Sprachen</h2>
               {languages.map(lang => (
-                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 5 }}>
+                <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 5 }}>
                   <span style={{ fontWeight: 600 }}>{lang.name}</span>
                   <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>{lang.level}</span>
                 </div>

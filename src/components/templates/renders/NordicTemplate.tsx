@@ -108,7 +108,7 @@ export default function NordicTemplate({ resume }: { resume: Resume }) {
               <div style={{ marginBottom: 20 }}>
                 <SectionHeading>Sprachen</SectionHeading>
                 {languages.map(lang => (
-                  <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 6, color: '#4a5568' }}>
+                  <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 6, color: '#4a5568' }}>
                     <span style={{ fontWeight: 600 }}>{lang.name}</span>
                     <span style={{ color: '#a0aec0', fontSize: 10 }}>{lang.level}</span>
                   </div>
