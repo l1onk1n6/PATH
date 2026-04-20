@@ -128,7 +128,7 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
                 {resume.languages.map(l => (
                   <View key={l.id} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
                     <Text style={{ fontSize: 10 }}>{l.name}</Text>
-                    <Text style={{ fontSize: 9.5, color: '#8e8e93' }}>{l.level}</Text>
+                    <Text style={{ fontSize: 9.5, color: '#6e6e73' }}>{l.level}</Text>
                   </View>
                 ))}
               </View>
@@ -139,7 +139,7 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
                 {resume.certificates.map(c => (
                   <View key={c.id} style={{ marginBottom: 4 }}>
                     <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold' }}>{c.name}</Text>
-                    <Text style={{ fontSize: 9.5, color: '#8e8e93' }}>{c.issuer}</Text>
+                    <Text style={{ fontSize: 9.5, color: '#6e6e73' }}>{c.issuer}</Text>
                   </View>
                 ))}
               </View>

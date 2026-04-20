@@ -33,6 +33,30 @@ export function alphaHex(hex: string, alpha: number) {
   return `${hex}${a}`;
 }
 
+/** Relative Luminanz nach WCAG (0 = dunkel, 1 = hell). */
+function luminance(hex: string): number {
+  const h = hex.replace('#', '').slice(0, 6);
+  const full = h.length === 3 ? h.split('').map(c => c + c).join('') : h;
+  const r = parseInt(full.slice(0, 2), 16) / 255;
+  const g = parseInt(full.slice(2, 4), 16) / 255;
+  const b = parseInt(full.slice(4, 6), 16) / 255;
+  const toLin = (c: number) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+  return 0.2126 * toLin(r) + 0.7152 * toLin(g) + 0.0722 * toLin(b);
+}
+
+/** Waehlt schwarz oder weiss fuer besten Kontrast auf dem gegebenen Hintergrund. */
+export function readableOn(bgHex: string): string {
+  return luminance(bgHex) > 0.5 ? '#1c1c1e' : '#ffffff';
+}
+
+/**
+ * Standard-Muted-Farbe fuer Datums- und Meta-Text. #6e6e73 ergibt auf Weiss
+ * ~5.4:1 Kontrast \xE2\x80\x94 WCAG AA (4.5:1) fuer normale Textgroessen erfuellt.
+ * Davor hatten wir #8e8e93 mit ~3.8:1, was durchgefallen waere.
+ */
+export const MUTED_COLOR = '#6e6e73';
+export const MUTED_DARK = '#4a4a4f';   // fuer kleineren Text (Cert-Issuer etc.)
+
 // ─────────────────────────────────────────────────────────────
 //  Section-Header (verschiedene Stile via Variant)
 // ─────────────────────────────────────────────────────────────
@@ -94,7 +118,7 @@ export function SectionHeading({
 // ─────────────────────────────────────────────────────────────
 
 export function WorkEntry({
-  job, color, textColor = '#1c1c1e', mutedColor = '#8e8e93', boldFont = 'Helvetica-Bold',
+  job, color, textColor = '#1c1c1e', mutedColor = MUTED_COLOR, boldFont = 'Helvetica-Bold',
 }: {
   job: WorkExperience;
   color: string;
@@ -136,7 +160,7 @@ export function WorkEntry({
 }
 
 export function EduEntry({
-  edu, color, textColor = '#1c1c1e', mutedColor = '#8e8e93', boldFont = 'Helvetica-Bold',
+  edu, color, textColor = '#1c1c1e', mutedColor = MUTED_COLOR, boldFont = 'Helvetica-Bold',
 }: {
   edu: Education;
   color: string;
@@ -211,30 +235,83 @@ export function SkillDots({
   );
 }
 
+/**
+ * Skills als Pill-Chips (moderner Look, keine Level-Visualisierung).
+ * Erwartet ein ganzes Array — Gruppierung nach Kategorie wird vom Aufrufer
+ * gemacht, falls gewuenscht (SkillChips rendert die uebergebene Liste flach).
+ */
+export function SkillChips({
+  skills, color, textColor = '#1c1c1e',
+}: {
+  skills: Skill[];
+  color: string;
+  textColor?: string;
+}) {
+  return (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+      {skills.map(s => (
+        <View
+          key={s.id}
+          style={{
+            paddingVertical: 2.5, paddingHorizontal: 7,
+            backgroundColor: alphaHex(color, 0.12),
+            borderWidth: 0.5, borderStyle: 'solid', borderColor: alphaHex(color, 0.28),
+            borderRadius: 8,
+          }}
+        >
+          <Text style={{ fontSize: 9, color: textColor }}>{s.name}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+/** Gruppiert Skills nach Kategorie; wenn alle in einer Standardkategorie
+ *  liegen oder keine Kategorie gepflegt ist, liefert es [{category:'', skills:[...]}].
+ */
+export function groupSkillsByCategory(skills: Skill[]): Array<{ category: string; skills: Skill[] }> {
+  const map = new Map<string, Skill[]>();
+  for (const s of skills) {
+    const key = (s.category ?? '').trim();
+    if (!map.has(key)) map.set(key, []);
+    map.get(key)!.push(s);
+  }
+  // Wenn nur eine Kategorie (oder alle leer), keine Gruppierung.
+  if (map.size <= 1) return [{ category: '', skills }];
+  return [...map.entries()].map(([category, skills]) => ({ category, skills }));
+}
+
 // ─────────────────────────────────────────────────────────────
 //  Languages + Certificates
 // ─────────────────────────────────────────────────────────────
 
-export function LanguageRow({ lang, textColor = '#1c1c1e' }: { lang: Language; textColor?: string }) {
+export function LanguageRow({
+  lang, textColor = '#1c1c1e', mutedColor = MUTED_COLOR,
+}: {
+  lang: Language;
+  textColor?: string;
+  mutedColor?: string;
+}) {
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4, flexWrap: 'wrap' }}>
       <Text style={{ fontSize: 10, color: textColor }}>{lang.name}</Text>
-      <Text style={{ fontSize: 9, color: alphaHex(textColor, 0.55) }}>{lang.level}</Text>
+      <Text style={{ fontSize: 9, color: mutedColor }}>{lang.level}</Text>
     </View>
   );
 }
 
 export function CertItem({
-  cert, textColor = '#1c1c1e', boldFont = 'Helvetica-Bold',
+  cert, textColor = '#1c1c1e', mutedColor = MUTED_DARK, boldFont = 'Helvetica-Bold',
 }: {
   cert: Certificate;
   textColor?: string;
+  mutedColor?: string;
   boldFont?: string;
 }) {
   return (
     <View style={{ marginBottom: 5 }} wrap={false}>
       <Text style={{ fontSize: 10, fontFamily: boldFont, color: textColor }}>{cert.name}</Text>
-      <Text style={{ fontSize: 9, color: alphaHex(textColor, 0.55) }}>
+      <Text style={{ fontSize: 9, color: mutedColor }}>
         {cert.issuer}{cert.date ? ` · ${formatDate(cert.date)}` : ''}
       </Text>
     </View>

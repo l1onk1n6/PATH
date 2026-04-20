@@ -9,8 +9,8 @@ import { Document, Page, View, Text, Link, Image } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
 import type { HeadingStyle } from './shared';
 import {
-  alphaHex,
-  SectionHeading, WorkEntry, EduEntry, SkillBar, SkillDots,
+  alphaHex, readableOn, MUTED_COLOR, MUTED_DARK,
+  SectionHeading, WorkEntry, EduEntry, SkillBar, SkillDots, SkillChips, groupSkillsByCategory,
   LanguageRow, CertItem, dateRange,
 } from './shared';
 
@@ -23,7 +23,7 @@ export interface StandardVariant {
   pageBg?: string;
   /** Haupt-Textfarbe (default #1c1c1e). */
   textColor?: string;
-  /** Muted / Sekundaer (default #8e8e93). */
+  /** Muted / Sekundaer (default MUTED_COLOR = #6e6e73, WCAG AA-safe). */
   mutedColor?: string;
   /** Akzent-Farbe; default = resume.accentColor. */
   accent?: string;
@@ -53,7 +53,7 @@ export interface StandardVariant {
   headingStyle?: HeadingStyle;
 
   /** Skill-Darstellung. */
-  skillStyle?: 'bar' | 'dots';
+  skillStyle?: 'bar' | 'dots' | 'chips';
 
   /** Groesse des Namens. */
   nameSize?: number;
@@ -71,7 +71,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
   const info = resume.personalInfo;
   const accent = variant.accent ?? resume.accentColor ?? '#007AFF';
   const text = variant.textColor ?? '#1c1c1e';
-  const muted = variant.mutedColor ?? '#8e8e93';
+  const muted = variant.mutedColor ?? MUTED_COLOR;
   const pageBg = variant.pageBg ?? '#fff';
   const fontFamily = variant.serif ? 'Times-Roman' : 'Helvetica';
   const boldFont = variant.serif ? 'Times-Bold' : 'Helvetica-Bold';
@@ -86,7 +86,9 @@ export function StandardPdf({ resume, variant = {} }: Props) {
   const nameSize = variant.nameSize ?? 26;
   const nameTracking = variant.nameTracking ?? -0.8;
   const bannerBg = variant.bannerBg ?? accent;
-  const bannerText = variant.bannerText ?? '#fff';
+  // Auto-Kontrast: wenn der Banner-Hintergrund hell ist, darf der Text nicht
+  // weiss sein \xE2\x80\x94 sonst unleserlich. WCAG-konformer Fallback.
+  const bannerText = variant.bannerText ?? readableOn(bannerBg);
 
   const name = [info.firstName, info.lastName].filter(Boolean).join(' ') || 'Ihr Name';
 
@@ -257,14 +259,27 @@ export function StandardPdf({ resume, variant = {} }: Props) {
   const SkillsSection = ({ inverse = false }: { inverse?: boolean }) => {
     if (resume.skills.length === 0) return null;
     const sText = inverse ? sidebarText : text;
+    const sMuted = inverse ? alphaHex(sidebarText, 0.7) : muted;
+    // Nach Kategorie gruppieren, wenn welche gepflegt sind \xE2\x80\x94 moderner Stil.
+    const groups = groupSkillsByCategory(resume.skills);
+    const renderGroup = (skills: typeof resume.skills) => {
+      if (skillStyle === 'chips') return <SkillChips skills={skills} color={accent} textColor={sText} />;
+      if (skillStyle === 'dots')  return <>{skills.map(s => <SkillDots key={s.id} skill={s} color={accent} textColor={sText} />)}</>;
+      return <>{skills.map(s => <SkillBar key={s.id} skill={s} color={accent} textColor={sText} trackColor={alphaHex(sText, 0.12)} />)}</>;
+    };
     return (
       <View style={{ marginBottom: 14 }}>
         <SectionHeading color={inverse ? sidebarText : accent} kind={headingStyle}>Fähigkeiten</SectionHeading>
-        {resume.skills.map(s =>
-          skillStyle === 'dots'
-            ? <SkillDots key={s.id} skill={s} color={accent} textColor={sText} />
-            : <SkillBar key={s.id} skill={s} color={accent} textColor={sText} trackColor={alphaHex(sText, 0.12)} />
-        )}
+        {groups.map((g, i) => (
+          <View key={i} style={{ marginBottom: i < groups.length - 1 ? 8 : 0 }}>
+            {g.category ? (
+              <Text style={{ fontSize: 9, fontFamily: boldFont, color: sMuted, marginBottom: 4, letterSpacing: 0.5 }}>
+                {g.category}
+              </Text>
+            ) : null}
+            {renderGroup(g.skills)}
+          </View>
+        ))}
       </View>
     );
   };
@@ -272,10 +287,11 @@ export function StandardPdf({ resume, variant = {} }: Props) {
   const LanguagesSection = ({ inverse = false }: { inverse?: boolean }) => {
     if (resume.languages.length === 0) return null;
     const sText = inverse ? sidebarText : text;
+    const sMuted = inverse ? alphaHex(sidebarText, 0.7) : muted;
     return (
       <View style={{ marginBottom: 14 }}>
         <SectionHeading color={inverse ? sidebarText : accent} kind={headingStyle}>Sprachen</SectionHeading>
-        {resume.languages.map(l => <LanguageRow key={l.id} lang={l} textColor={sText} />)}
+        {resume.languages.map(l => <LanguageRow key={l.id} lang={l} textColor={sText} mutedColor={sMuted} />)}
       </View>
     );
   };
@@ -283,10 +299,11 @@ export function StandardPdf({ resume, variant = {} }: Props) {
   const CertsSection = ({ inverse = false }: { inverse?: boolean }) => {
     if ((resume.certificates ?? []).length === 0) return null;
     const sText = inverse ? sidebarText : text;
+    const sMuted = inverse ? alphaHex(sidebarText, 0.7) : MUTED_DARK;
     return (
       <View style={{ marginBottom: 14 }}>
         <SectionHeading color={inverse ? sidebarText : accent} kind={headingStyle}>Zertifikate</SectionHeading>
-        {resume.certificates.map(c => <CertItem key={c.id} cert={c} textColor={sText} boldFont={boldFont} />)}
+        {resume.certificates.map(c => <CertItem key={c.id} cert={c} textColor={sText} mutedColor={sMuted} boldFont={boldFont} />)}
       </View>
     );
   };
@@ -405,27 +422,27 @@ function ContactChip({ c, color }: { c: { text: string; href?: string }; color: 
 
 export const TEMPLATE_VARIANTS: Record<string, StandardVariant> = {
   // Klassische, ruhige Stile
-  corporate:     { sidebar: 'left',  sidebarBg: '#f4f6f8', headingStyle: 'bar',      skillStyle: 'bar' },
-  nordic:        { sidebar: 'right', sidebarBg: '#eef3f7', headingStyle: 'line',     skillStyle: 'dots' },
-  compact:       { sidebar: 'right', sidebarBg: '#f7f7f9', headingStyle: 'underline',skillStyle: 'dots', nameSize: 22 },
-  international: { sidebar: 'left',  sidebarBg: '#f7f7f7', header: 'centered',       headingStyle: 'underline' },
-  academic:      { sidebar: 'none',  serif: true,          header: 'centered',       headingStyle: 'underline', nameSize: 28 },
+  corporate:     { sidebar: 'left',  sidebarBg: '#f4f6f8', headingStyle: 'bar',       skillStyle: 'bar',   nameSize: 28 },
+  nordic:        { sidebar: 'right', sidebarBg: '#eef3f7', headingStyle: 'line',      skillStyle: 'dots',  nameSize: 28 },
+  compact:       { sidebar: 'right', sidebarBg: '#f7f7f9', headingStyle: 'underline', skillStyle: 'chips', nameSize: 24 },
+  international: { sidebar: 'left',  sidebarBg: '#f7f7f7', header: 'centered',        headingStyle: 'underline', skillStyle: 'chips', nameSize: 30 },
+  academic:      { sidebar: 'none',  serif: true,          header: 'centered',        headingStyle: 'underline', skillStyle: 'dots',  nameSize: 30 },
 
   // Banner-Header-Stile
-  executive:     { sidebar: 'left',  sidebarBg: '#1a1a2e', sidebarText: '#f5f5f7', header: 'banner', bannerBg: '#1a1a2e',   headingStyle: 'bar',   skillStyle: 'dots', nameSize: 28 },
-  bold:          { sidebar: 'left',  sidebarBg: '#1c1c1e', sidebarText: '#f5f5f7', header: 'banner', bannerBg: '#1c1c1e',   headingStyle: 'bar',   skillStyle: 'bar',  nameSize: 30 },
-  creative:      { sidebar: 'left',  sidebarBg: '#2d1b4e', sidebarText: '#f5f5f7', header: 'banner', photoInSidebar: true,  headingStyle: 'block', skillStyle: 'dots', nameSize: 28 },
-  vibrant:       { sidebar: 'right', sidebarBg: '#fff5f7', header: 'banner',       headingStyle: 'block',                   skillStyle: 'bar',     nameSize: 28 },
+  executive:     { sidebar: 'left',  sidebarBg: '#1a1a2e', sidebarText: '#f5f5f7', header: 'banner', bannerBg: '#1a1a2e', headingStyle: 'bar',   skillStyle: 'dots',  nameSize: 30 },
+  bold:          { sidebar: 'left',  sidebarBg: '#1c1c1e', sidebarText: '#f5f5f7', header: 'banner', bannerBg: '#1c1c1e', headingStyle: 'bar',   skillStyle: 'bar',   nameSize: 32 },
+  creative:      { sidebar: 'left',  sidebarBg: '#2d1b4e', sidebarText: '#f5f5f7', header: 'banner', photoInSidebar: true, headingStyle: 'block', skillStyle: 'chips', nameSize: 30 },
+  vibrant:       { sidebar: 'right', sidebarBg: '#fff5f7', header: 'banner',       headingStyle: 'block',                    skillStyle: 'chips', nameSize: 30 },
 
   // Sidebar-Akzent-Stile
-  modern:        { sidebar: 'left',  sidebarBg: '#0f1923', sidebarText: '#e5e7eb',  photoInSidebar: true, headingStyle: 'underline', skillStyle: 'bar', nameSize: 26 },
-  tech:          { sidebar: 'left',  sidebarBg: '#0d1117', sidebarText: '#c9d1d9',  photoInSidebar: true, headingStyle: 'bar',       skillStyle: 'bar', nameSize: 24 },
-  startup:       { sidebar: 'right', sidebarBg: '#f0fdf4', headingStyle: 'bar',      skillStyle: 'dots' },
-  pastel:        { sidebar: 'right', sidebarBg: '#fdf2f8', headingStyle: 'line',     skillStyle: 'dots' },
-  freelancer:    { sidebar: 'right', sidebarBg: '#fef6e4', headingStyle: 'bar',      skillStyle: 'bar' },
-  geometric:     { sidebar: 'left',  sidebarBg: '#f1f5f9', headingStyle: 'block',    skillStyle: 'bar' },
+  modern:        { sidebar: 'left',  sidebarBg: '#0f1923', sidebarText: '#e5e7eb',  photoInSidebar: true, headingStyle: 'underline', skillStyle: 'bar',   nameSize: 28 },
+  tech:          { sidebar: 'left',  sidebarBg: '#0d1117', sidebarText: '#c9d1d9',  photoInSidebar: true, headingStyle: 'bar',       skillStyle: 'chips', nameSize: 26 },
+  startup:       { sidebar: 'right', sidebarBg: '#f0fdf4', headingStyle: 'bar',      skillStyle: 'chips', nameSize: 28 },
+  pastel:        { sidebar: 'right', sidebarBg: '#fdf2f8', headingStyle: 'line',     skillStyle: 'dots',  nameSize: 28 },
+  freelancer:    { sidebar: 'right', sidebarBg: '#fef6e4', headingStyle: 'bar',      skillStyle: 'chips', nameSize: 28 },
+  geometric:     { sidebar: 'left',  sidebarBg: '#f1f5f9', headingStyle: 'block',    skillStyle: 'bar',   nameSize: 28 },
 
   // Ungewoehnliche Layouts
-  magazine:      { sidebar: 'left',  sidebarBg: '#111',    sidebarText: '#f5f5f7', photoInSidebar: true, headingStyle: 'underline', skillStyle: 'dots', nameSize: 32, nameTracking: -1.2 },
-  vintage:       { sidebar: 'none',  serif: true,          header: 'centered',      headingStyle: 'underline', skillStyle: 'dots', nameSize: 30 },
+  magazine:      { sidebar: 'left',  sidebarBg: '#111',    sidebarText: '#f5f5f7', photoInSidebar: true, headingStyle: 'underline', skillStyle: 'dots', nameSize: 34, nameTracking: -1.2 },
+  vintage:       { sidebar: 'none',  serif: true,          header: 'centered',      headingStyle: 'underline', skillStyle: 'dots', nameSize: 32 },
 };
