@@ -10,6 +10,7 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 import { usePlan, FREE_TEMPLATE_IDS } from '../lib/plan';
 import { canExportPdf, incrementPdfExport, getPdfExportCount, savePdf } from '../lib/pdfExports';
 import { renderResumePdf, renderCoverLetterPdf, renderDocumentImagePdf } from '../lib/pdfRenderer';
+import { userError } from '../lib/userError';
 import type { Resume, UploadedDocument } from '../types/resume';
 
 /** Rendert ein hochgeladenes Dokument als A4-Seite in der Vorschau.
@@ -127,8 +128,7 @@ export default function Preview() {
       await savePdf(pdfBytes, filename);
       await incrementPdfExport();
     } catch (err) {
-      console.error('PDF export failed:', err);
-      setExportError(`PDF-Export fehlgeschlagen: ${err instanceof Error ? err.message : String(err)}`);
+      setExportError(userError('Der PDF-Export hat nicht funktioniert', err));
     }
     finally { setExporting(false); }
   };
@@ -178,8 +178,7 @@ export default function Preview() {
         setExportError(`Export erstellt, aber ${skipped.length} Dokument(e) konnten nicht eingefügt werden: ${skipped.join(', ')}. Bitte im Editor neu hochladen.`);
       }
     } catch (err) {
-      console.error('Mappe export failed:', err);
-      setExportError(`Mappen-Export fehlgeschlagen: ${err instanceof Error ? err.message : String(err)}`);
+      setExportError(userError('Der Mappen-Export hat nicht funktioniert', err));
     }
     finally { setExporting(false); }
   };

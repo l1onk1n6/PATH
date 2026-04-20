@@ -3,6 +3,7 @@ import { Languages, X, Loader2, CheckCircle } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { translateFields } from '../../lib/ai';
+import { userError } from '../../lib/userError';
 import { UpgradeModal } from '../ui/ProGate';
 import type { Resume } from '../../types/resume';
 
@@ -97,7 +98,7 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
     if (count === 0) { setError('Kein übersetzbarer Text gefunden.'); setLoading(false); return; }
 
     const translated = await translateFields(fields, lang);
-    if (!translated) { setError('Übersetzung fehlgeschlagen. Bitte versuche es erneut.'); setLoading(false); return; }
+    if (!translated) { setError(userError('Die Übersetzung hat nicht funktioniert')); setLoading(false); return; }
 
     // Get latest resume state from store (not stale closure)
     const latest = useResumeStore.getState().resumes.find(r => r.id === resumeId);

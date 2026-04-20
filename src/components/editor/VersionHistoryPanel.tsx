@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { History, Plus, RotateCcw, Trash2, Loader2, Clock, AlertCircle } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
+import { userError } from '../../lib/userError';
 import {
   saveVersion, listVersions, deleteVersion,
   relativeTime, type ResumeVersion,
@@ -43,7 +44,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
     setError(null);
     const ok = await saveVersion(resume, labelInput.trim() || undefined);
     if (!ok) {
-      setError('Version konnte nicht gespeichert werden. Bitte prüfe ob die Datenbanktabelle angelegt ist.');
+      setError(userError('Die Version konnte nicht gespeichert werden'));
     } else {
       setLabelInput('');
       setShowLabel(false);

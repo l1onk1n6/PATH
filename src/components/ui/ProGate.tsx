@@ -4,6 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { usePlan, PRO_FEATURES } from '../../lib/plan';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
 import { presentProPaywall } from '../../lib/revenuecat';
+import { userError } from '../../lib/userError';
 
 // ── Checkout helper ────────────────────────────────────────
 async function startCheckout(): Promise<string | null> {
@@ -36,8 +37,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
         const purchased = await presentProPaywall();
         if (purchased) onClose();
       } catch (err) {
-        console.error('Paywall error:', err);
-        setCheckoutError('Kauf konnte nicht abgeschlossen werden. Bitte erneut versuchen.');
+        setCheckoutError(userError('Der Kauf konnte nicht abgeschlossen werden', err));
       } finally {
         setLoading(false);
       }
@@ -48,7 +48,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
     if (url) {
       window.location.href = url;
     } else {
-      setCheckoutError('Fehler beim Starten des Checkouts. Bitte versuche es erneut oder kontaktiere uns.');
+      setCheckoutError(userError('Der Checkout konnte nicht gestartet werden'));
       setLoading(false);
     }
   }

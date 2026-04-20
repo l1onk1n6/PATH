@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { presentCustomerCenter } from '../lib/revenuecat';
+import { userError } from '../lib/userError';
 import {
   User, Shield, Lock, Sparkles, Mail, ExternalLink,
   AlertTriangle, Download, Trash2, KeyRound,
@@ -86,8 +87,7 @@ function PlanSection() {
       try {
         await presentCustomerCenter();
       } catch (err) {
-        console.error('Customer Center error:', err);
-        setPortalError('Abo-Verwaltung konnte nicht geöffnet werden.');
+        setPortalError(userError('Die Abo-Verwaltung konnte nicht geöffnet werden', err));
       } finally {
         setPortalLoading(false);
       }
@@ -103,12 +103,12 @@ function PlanSection() {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (error || !data?.url) {
-        setPortalError(data?.error ?? 'Portal konnte nicht geöffnet werden. Bitte info@pixmatic.ch kontaktieren.');
+        setPortalError(userError('Das Abo-Portal konnte nicht geöffnet werden', error ?? data?.error));
       } else {
         window.location.href = data.url;
       }
-    } catch {
-      setPortalError('Portal konnte nicht geöffnet werden. Bitte info@pixmatic.ch kontaktieren.');
+    } catch (err) {
+      setPortalError(userError('Das Abo-Portal konnte nicht geöffnet werden', err));
     } finally {
       setPortalLoading(false);
     }

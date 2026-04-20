@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Loader2, Check, AlertCircle, Smartphone, Monitor } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { getSupabase } from '../../lib/supabase';
+import { userError } from '../../lib/userError';
 
 interface ParsedData {
   firstName?: string;
@@ -55,7 +56,7 @@ export default function LinkedInImportDialog({ onClose }: Props) {
       setParsed(data as ParsedData);
       setStep(2);
     } catch (e) {
-      setError(`Fehler beim Analysieren: ${e instanceof Error ? e.message : 'Unbekannter Fehler'}`);
+      setError(userError('Der LinkedIn-Import hat nicht funktioniert', e));
     } finally {
       setLoading(false);
     }

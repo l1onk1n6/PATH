@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { Link, Calendar, Sparkles, Bell, BellOff, Loader2, Wand2, ChevronDown, ChevronUp, AlertTriangle, Check, ClipboardList } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useIsMobile } from '../../hooks/useBreakpoint';
+import { userError } from '../../lib/userError';
 import { usePlan } from '../../lib/plan';
 import { generateCoverLetter, improveText } from '../../lib/ai';
 import ProGate from '../ui/ProGate';
@@ -88,8 +89,8 @@ function ReminderPanel({ resumeId, deadline, reminderDays, onClose }: {
           body: { resume_id: resumeId, deadline, reminder_days: selected, resume_name: resume?.name ?? '' },
           headers: { Authorization: `Bearer ${session.access_token}` },
         });
-        if (fnErr) setError('Gespeichert, aber Sync fehlgeschlagen.');
-      } catch { setError('Gespeichert, aber Sync fehlgeschlagen.'); }
+        if (fnErr) setError(userError('Die Änderungen wurden gespeichert, aber die Synchronisation hat nicht funktioniert'));
+      } catch { setError(userError('Die Änderungen wurden gespeichert, aber die Synchronisation hat nicht funktioniert')); }
     }
     setSaving(false); setSaved(true);
     setTimeout(onClose, 900);
