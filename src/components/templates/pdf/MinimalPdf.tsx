@@ -32,12 +32,9 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
             {info.title ? <Text style={{ ...styles.title, color: accent }}>{info.title}</Text> : null}
             <View style={styles.contactRow}>
               {contacts.map((c, i) => (
-                <View key={i} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  {i > 0 ? <Text style={styles.dot}>·</Text> : null}
-                  {c.href
-                    ? <Link src={c.href}><Text style={styles.contact}>{c.text}</Text></Link>
-                    : <Text style={styles.contact}>{c.text}</Text>}
-                </View>
+                c.href
+                  ? <Link key={i} src={c.href}><Text style={styles.contact}>{c.text}</Text></Link>
+                  : <Text key={i} style={styles.contact}>{c.text}</Text>
               ))}
             </View>
           </View>
@@ -130,9 +127,8 @@ const styles = StyleSheet.create({
   // erbt und bei grossem fontSize Title ueber den Namen drueberklappt.
   name: { fontSize: 28, fontFamily: 'Helvetica-Bold', letterSpacing: -0.5, color: '#1c1c1e', lineHeight: 1.15 },
   title: { fontSize: 12, marginTop: 6, lineHeight: 1.3 },
-  contactRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 },
+  contactRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 10, gap: 14 },
   contact: { fontSize: 9, color: '#6e6e73' },
-  dot: { fontSize: 9, color: '#c7c7cc', marginHorizontal: 5 },
   summary: { fontSize: 10.5, color: '#444', marginBottom: 16, lineHeight: 1.65, fontStyle: 'italic' },
   columns: { flexDirection: 'row', gap: 26 },
   mainCol: { flex: 1 },

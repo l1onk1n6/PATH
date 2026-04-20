@@ -56,14 +56,11 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
           <View style={{ flex: 1 }}>
             <Text style={styles.name}>{name}</Text>
             {info.title ? <Text style={{ ...styles.title, color: accent }}>{info.title}</Text> : null}
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 8, gap: 14 }}>
               {contacts.map((c, i) => (
-                <View key={i} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  {i > 0 ? <Text style={styles.dot}>·</Text> : null}
-                  {c.href
-                    ? <Link src={c.href}><Text style={styles.contact}>{c.text}</Text></Link>
-                    : <Text style={styles.contact}>{c.text}</Text>}
-                </View>
+                c.href
+                  ? <Link key={i} src={c.href}><Text style={styles.contact}>{c.text}</Text></Link>
+                  : <Text key={i} style={styles.contact}>{c.text}</Text>
               ))}
             </View>
           </View>

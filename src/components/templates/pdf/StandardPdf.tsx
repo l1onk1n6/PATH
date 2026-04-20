@@ -142,15 +142,10 @@ export function StandardPdf({ resume, variant = {} }: Props) {
             <Text style={{ fontSize: 12, color: accentColor, marginTop: 5, lineHeight: 1.3 }}>{info.title}</Text>
           ) : null}
           <View style={{
-            flexDirection: 'row', flexWrap: 'wrap', marginTop: 8,
+            flexDirection: 'row', flexWrap: 'wrap', marginTop: 10, gap: 14,
             justifyContent: centered ? 'center' : 'flex-start',
           }}>
-            {contacts.map((c, i) => (
-              <View key={i} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                {i > 0 ? <Text style={{ fontSize: 9, color: subMuted, marginHorizontal: 5 }}>·</Text> : null}
-                <ContactInline c={c} color={subMuted} />
-              </View>
-            ))}
+            {contacts.map((c, i) => <ContactInline key={i} c={c} color={subMuted} />)}
           </View>
         </View>
       </View>
