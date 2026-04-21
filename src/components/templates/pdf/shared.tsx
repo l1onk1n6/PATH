@@ -212,13 +212,10 @@ export function WorkEntry({
   boldFont?: string;
 }) {
   return (
-    <View style={{ marginBottom: 14 }}>
-      {/* Kopfzeile (Position/Firma + Datum/Ort) muss zusammenbleiben,
-          damit sie nicht alleine am Seitenende haengt oder gesplittet wird.
-          Die Beschreibung darunter darf hingegen ueber Seiten brechen,
-          sonst wuerde ein langer Job-Text auf die naechste Seite geschmissen
-          und eine halbleere Seite davor stehenlassen. */}
-      <View wrap={false} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+    <View wrap={false} style={{ marginBottom: 14 }}>
+      {/* Ganzer Eintrag auf einer Seite halten — kein Abriss zwischen
+          Header und Body, keine einzeln haengenden Zeilen am Seitenende. */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
         <View style={{ flex: 1, marginRight: 10 }}>
           <Text style={{ fontSize: 11, fontFamily: boldFont, color: textColor }}>{job.position}</Text>
           {job.company ? (
@@ -256,9 +253,8 @@ export function EduEntry({
 }) {
   const hasBody = parseBulletLines(edu.description).length > 0;
   return (
-    <View style={{ marginBottom: 12 }}>
-      {/* Kopfzeile zusammenhalten, Body darf umbrechen */}
-      <View wrap={false} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+    <View wrap={false} style={{ marginBottom: 12 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <View style={{ flex: 1, marginRight: 10 }}>
           <Text style={{ fontSize: 10.5, fontFamily: boldFont, color: textColor }}>{edu.degree}</Text>
           {edu.field ? <Text style={{ fontSize: 10, color: alphaHex(textColor, 0.78) }}>{edu.field}</Text> : null}

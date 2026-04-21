@@ -184,8 +184,8 @@ export function StandardPdf({ resume, variant = {} }: Props) {
   const ProjectsSection = () => (resume.projects ?? []).length > 0 ? (
     <Section title="Projekte" color={accent} kind={headingStyle}>
       {resume.projects.map(p => (
-        <View key={p.id} style={{ marginBottom: 12 }}>
-          <View wrap={false} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
+        <View key={p.id} wrap={false} style={{ marginBottom: 12 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
             <View style={{ flex: 1, marginRight: 10 }}>
               <Text style={{ fontSize: 10.5, fontFamily: boldFont, color: text }}>{p.name}</Text>
               {p.url ? (

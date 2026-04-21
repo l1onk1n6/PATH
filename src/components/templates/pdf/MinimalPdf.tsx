@@ -70,8 +70,8 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
             {(resume.projects ?? []).length > 0 ? (
               <Section title="Projekte" color={accent} kind="line">
                 {resume.projects.map(p => (
-                  <View key={p.id} style={{ marginBottom: 10 }}>
-                    <Text style={{ fontSize: 10.5, fontFamily: 'Helvetica-Bold' }} wrap={false}>{p.name}</Text>
+                  <View key={p.id} wrap={false} style={{ marginBottom: 10 }}>
+                    <Text style={{ fontSize: 10.5, fontFamily: 'Helvetica-Bold' }}>{p.name}</Text>
                     <DescriptionBlock text={p.description} color={accent} fontSize={10} marginTop={2} />
                   </View>
                 ))}
