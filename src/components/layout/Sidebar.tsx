@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useIsMobile } from '../../hooks/useBreakpoint';
 import {
-  Plus, ChevronRight, ChevronDown, Trash2,
+  Plus, ChevronDown, Trash2,
   LayoutDashboard, FileText, Eye, FilePlus, LogOut,
   PanelLeftClose, PanelLeftOpen, Sparkles, UserCircle, Lock,
   ClipboardList, FileEdit,
@@ -165,7 +165,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
 }
 
 // ─────────────────────────────────────────────────────────────
-//  Aktive-Mappe-Header + Switcher
+//  Aktive-Mappe-Header + Switcher (two-column panel)
 // ─────────────────────────────────────────────────────────────
 
 interface MappeSwitcherProps {
@@ -183,20 +183,45 @@ interface MappeSwitcherProps {
   isMobile: boolean;
 }
 
+function personAvatar(name: string, photo: string | undefined, size: number, ring: boolean) {
+  const hue1 = name.charCodeAt(0) * 10 % 360;
+  const hue2 = name.charCodeAt(0) * 15 % 360;
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
+      background: photo ? 'transparent' : `linear-gradient(135deg, hsl(${hue1},65%,48%), hsl(${hue2},55%,38%))`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: size * 0.42, fontWeight: 700, color: '#fff',
+      boxShadow: ring ? '0 0 0 2px rgba(0,122,255,0.65)' : 'none',
+      transition: 'box-shadow 0.15s',
+    }}>
+      {photo
+        ? <img src={photo} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        : name.charAt(0).toUpperCase()}
+    </div>
+  );
+}
+
 function MappeSwitcher(props: MappeSwitcherProps) {
   const {
     persons, resumes, activePerson, activeResume,
     frozenPersonIds, frozenResumeIds,
     onSelectPerson, onSelectResume, onAddPerson, onAddResume, onDeleteResume,
+    isMobile,
   } = props;
 
   const [open, setOpen] = useState(false);
+  const [focusedPersonId, setFocusedPersonId] = useState<string | null>(activePerson?.id ?? null);
   const [addingPerson, setAddingPerson] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [expanded, setExpanded] = useState<Set<string>>(() => new Set(activePerson ? [activePerson.id] : []));
-
-  // Klick ausserhalb → schliessen
+  const [newPersonName, setNewPersonName] = useState('');
   const rootRef = useRef<HTMLDivElement>(null);
+
+  // Reset focus to active person whenever panel closes
+  useEffect(() => {
+    if (!open && activePerson) setFocusedPersonId(activePerson.id);
+  }, [open, activePerson]);
+
+  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const onDoc = (e: MouseEvent) => {
@@ -207,161 +232,233 @@ function MappeSwitcher(props: MappeSwitcherProps) {
   }, [open]);
 
   const activePersonResumes = activePerson ? resumes.filter(r => activePerson.resumeIds.includes(r.id)) : [];
-  const photo = activePersonResumes.find(r => r.personalInfo.photo)?.personalInfo.photo;
-  const headerName = displayPersonName(activePerson, activeResume ?? activePersonResumes[0]);
-  const headerSub  = activeResume?.name ?? activeResume?.personalInfo.title ?? 'Keine Mappe ausgewählt';
+  const headerPhoto = activePersonResumes.find(r => r.personalInfo.photo)?.personalInfo.photo;
+  const headerName  = displayPersonName(activePerson, activeResume ?? activePersonResumes[0]);
+  const headerSub   = activeResume?.name ?? activeResume?.personalInfo.title ?? 'Keine Mappe ausgewählt';
 
-  function toggleExpand(id: string) {
-    setExpanded(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
-  }
+  const focusedPerson  = persons.find(p => p.id === focusedPersonId) ?? persons[0] ?? null;
+  const focusedResumes = focusedPerson ? resumes.filter(r => focusedPerson.resumeIds.includes(r.id)) : [];
+  const focusedFrozen  = focusedPerson ? frozenPersonIds.has(focusedPerson.id) : false;
+
+  const LEFT_W = isMobile ? 130 : 160;
 
   async function submitNewPerson() {
-    if (!newName.trim()) return;
-    await onAddPerson(newName.trim());
-    setNewName(''); setAddingPerson(false); setOpen(false);
+    if (!newPersonName.trim()) return;
+    await onAddPerson(newPersonName.trim());
+    setNewPersonName(''); setAddingPerson(false); setOpen(false);
   }
 
   return (
     <div ref={rootRef} style={{ position: 'relative' }}>
-      {/* Header-Button */}
+      {/* ── Trigger button ── */}
       <button
         onClick={() => setOpen(v => !v)}
         className="btn-glass"
         style={{
           width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
-          borderRadius: 'var(--radius-sm)', boxShadow: 'none',
-          background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
-          textAlign: 'left',
+          borderRadius: 'var(--radius-sm)', boxShadow: 'none', textAlign: 'left',
+          background: open ? 'rgba(0,122,255,0.12)' : 'rgba(255,255,255,0.06)',
+          border: open ? '1px solid rgba(0,122,255,0.35)' : '1px solid rgba(255,255,255,0.12)',
         }}
       >
-        <div style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
-          background: photo ? 'transparent' : `linear-gradient(135deg, hsl(${headerName.charCodeAt(0) * 10 % 360}, 65%, 48%), hsl(${headerName.charCodeAt(0) * 15 % 360}, 55%, 38%))`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: '#fff' }}>
-          {photo ? <img src={photo} alt={headerName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : headerName.charAt(0).toUpperCase()}
-        </div>
+        {personAvatar(headerName, headerPhoto, 32, false)}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {headerName}
           </div>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {headerSub}
           </div>
         </div>
-        <ChevronDown size={14} style={{ opacity: 0.55, flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.18s' }} />
+        <ChevronDown size={14} style={{ opacity: 0.5, flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.18s' }} />
       </button>
 
-      {/* Popover — inline ausklappend, nicht absolut, damit er in der Sidebar
-          nicht ueber andere Nav-Items floatet. */}
+      {/* ── Two-column panel ── */}
       {open && (
         <div style={{
-          marginTop: 6, padding: 8, maxHeight: 420, overflowY: 'auto',
+          position: 'absolute',
+          top: 'calc(100% + 6px)',
+          left: 0,
+          width: isMobile ? 310 : 400,
+          zIndex: 9999,
           borderRadius: 'var(--radius-sm)',
-          background: 'rgba(12,12,20,0.75)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
+          background: 'rgba(8,10,20,0.94)',
+          border: '1px solid rgba(255,255,255,0.13)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
+          display: 'flex',
+          flexDirection: 'column',
+          maxHeight: 480,
+          overflow: 'hidden',
         }}>
-          {persons.length === 0 && !addingPerson && (
-            <div style={{ padding: '20px 8px', textAlign: 'center', color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>
-              Noch keine Person.
-            </div>
-          )}
 
-          {persons.map(person => {
-            const personResumes = resumes.filter(r => person.resumeIds.includes(r.id));
-            const isFrozen = frozenPersonIds.has(person.id);
-            const isExpanded = expanded.has(person.id) || person.id === activePerson?.id;
-            const dname = displayPersonName(person, personResumes[0]);
-            const ppic = personResumes.find(r => r.personalInfo.photo)?.personalInfo.photo;
-            return (
-              <div key={person.id} style={{ marginBottom: 4, opacity: isFrozen ? 0.6 : 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <button onClick={() => toggleExpand(person.id)}
-                    style={{ background: 'none', border: 'none', padding: '4px 2px', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-                    <ChevronRight size={12} style={{ transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.18s' }} />
-                  </button>
-                  <button onClick={() => { if (isFrozen) return; onSelectPerson(person.id); setOpen(false); }}
-                    className="btn-glass"
-                    style={{ flex: 1, justifyContent: 'flex-start', padding: '6px 8px', gap: 8, borderRadius: 6, boxShadow: 'none',
-                      background: person.id === activePerson?.id ? 'rgba(0,122,255,0.15)' : 'transparent',
-                      border: person.id === activePerson?.id ? '1px solid rgba(0,122,255,0.3)' : '1px solid transparent',
-                      minWidth: 0, cursor: isFrozen ? 'default' : 'pointer' }}>
-                    <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
-                      background: ppic ? 'transparent' : `linear-gradient(135deg, hsl(${dname.charCodeAt(0) * 10 % 360}, 65%, 48%), hsl(${dname.charCodeAt(0) * 15 % 360}, 55%, 38%))`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#fff' }}>
-                      {ppic ? <img src={ppic} alt={dname} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : dname.charAt(0).toUpperCase()}
-                    </div>
-                    <span style={{ fontSize: 12, fontWeight: person.id === activePerson?.id ? 600 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-                      {dname}
-                    </span>
-                    {isFrozen && <Lock size={10} style={{ color: '#FF9F0A', flexShrink: 0 }} />}
-                    <span className="badge" style={{ fontSize: 10, flexShrink: 0 }}>{personResumes.length}</span>
-                  </button>
+          {/* Columns */}
+          <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
+
+            {/* Left: persons list */}
+            <div style={{
+              width: LEFT_W, flexShrink: 0,
+              borderRight: '1px solid rgba(255,255,255,0.09)',
+              overflowY: 'auto', padding: '6px 5px',
+            }}>
+              {persons.length === 0 && (
+                <div style={{ padding: '24px 8px', textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
+                  Noch keine Person.
                 </div>
-
-                {isExpanded && (
-                  <div style={{ marginLeft: 14, marginTop: 2, paddingLeft: 8, borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
-                    {personResumes.map(r => {
-                      const isResumeFrozen = isFrozen || frozenResumeIds.has(r.id);
-                      const isActiveR = r.id === activeResume?.id;
-                      const name = r.name || `Bewerbungsmappe ${personResumes.indexOf(r) + 1}`;
-                      return (
-                        <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 2, opacity: isResumeFrozen ? 0.5 : 1 }}>
-                          <button onClick={() => { if (!isResumeFrozen) { onSelectResume(r.id); setOpen(false); } }}
-                            className="btn-glass"
-                            style={{ flex: 1, justifyContent: 'flex-start', padding: '6px 8px', borderRadius: 6, boxShadow: 'none', gap: 6, minWidth: 0,
-                              background: isActiveR && !isResumeFrozen ? 'rgba(0,122,255,0.2)' : 'transparent',
-                              border: isActiveR && !isResumeFrozen ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
-                              cursor: isResumeFrozen ? 'default' : 'pointer' }}>
-                            {isResumeFrozen ? <Lock size={10} style={{ opacity: 0.5, flexShrink: 0 }} /> : <FileText size={10} style={{ opacity: 0.5, flexShrink: 0 }} />}
-                            <span style={{ fontSize: 11, opacity: isActiveR ? 1 : 0.7, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {name}
-                            </span>
-                          </button>
-                          {personResumes.length > 1 && (
-                            <button onClick={() => onDeleteResume(r.id)}
-                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, opacity: 0.35, color: 'inherit', flexShrink: 0, display: 'flex' }}>
-                              <Trash2 size={10} />
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
-                    {!isFrozen && (
-                      <button onClick={() => { onAddResume(person.id); setOpen(false); }}
-                        style={{ display: 'flex', alignItems: 'center', gap: 5, width: '100%', background: 'none', border: 'none', borderTop: '1px dashed rgba(255,255,255,0.1)', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', fontSize: 11, padding: '5px 6px', marginTop: 2 }}>
-                        <FilePlus size={10} /> Mappe hinzufügen
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
-          <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '6px 4px' }} />
-
-          {addingPerson ? (
-            <div style={{ padding: 6 }}>
-              <input className="input-glass" placeholder="Name eingeben..." value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') submitNewPerson(); if (e.key === 'Escape') { setAddingPerson(false); setNewName(''); } }}
-                autoFocus style={{ fontSize: 13, padding: '7px 9px', marginBottom: 6 }} />
-              <div style={{ display: 'flex', gap: 6 }}>
-                <button className="btn-glass btn-primary btn-sm" onClick={submitNewPerson} style={{ flex: 1, fontSize: 12 }}>Anlegen</button>
-                <button className="btn-glass btn-sm" onClick={() => { setAddingPerson(false); setNewName(''); }} style={{ fontSize: 12 }}>Abbruch</button>
-              </div>
+              )}
+              {persons.map(person => {
+                const personResumes = resumes.filter(r => person.resumeIds.includes(r.id));
+                const isFrozenP    = frozenPersonIds.has(person.id);
+                const isFocused    = person.id === focusedPersonId;
+                const dname        = displayPersonName(person, personResumes[0]);
+                const ppic         = personResumes.find(r => r.personalInfo.photo)?.personalInfo.photo;
+                return (
+                  <button
+                    key={person.id}
+                    className="btn-glass"
+                    onClick={() => setFocusedPersonId(person.id)}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '8px 8px', marginBottom: 3,
+                      borderRadius: 'var(--radius-sm)', boxShadow: 'none',
+                      background: isFocused ? 'rgba(0,122,255,0.18)' : 'rgba(255,255,255,0.03)',
+                      border: isFocused ? '1px solid rgba(0,122,255,0.38)' : '1px solid transparent',
+                      opacity: isFrozenP ? 0.55 : 1, cursor: 'pointer',
+                      justifyContent: 'flex-start',
+                    }}
+                  >
+                    {personAvatar(dname, ppic, 30, isFocused)}
+                    <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                      <div style={{ fontSize: 12, fontWeight: isFocused ? 600 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {dname}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>{personResumes.length} {personResumes.length === 1 ? 'Mappe' : 'Mappen'}</span>
+                        {isFrozenP && <Lock size={9} style={{ color: '#FF9F0A', flexShrink: 0 }} />}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
-          ) : (
-            <button onClick={() => setAddingPerson(true)}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.6)', fontSize: 12, padding: '7px 8px' }}>
-              <Plus size={12} /> Neue Person
+
+            {/* Right: Mappen of focused person */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '6px 5px', minWidth: 0 }}>
+              {!focusedPerson ? (
+                <div style={{ padding: '24px 8px', textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
+                  Person auswählen
+                </div>
+              ) : (
+                <>
+                  {/* Section header */}
+                  <div style={{
+                    fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase',
+                    color: 'rgba(255,255,255,0.3)', padding: '4px 8px 8px',
+                  }}>
+                    Mappen
+                  </div>
+
+                  {focusedResumes.length === 0 && (
+                    <div style={{ padding: '12px 8px', textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
+                      Keine Mappen vorhanden
+                    </div>
+                  )}
+
+                  {focusedResumes.map((r, idx) => {
+                    const isResumeFrozen = focusedFrozen || frozenResumeIds.has(r.id);
+                    const isActiveR = r.id === activeResume?.id;
+                    const name = r.name || `Bewerbungsmappe ${idx + 1}`;
+                    return (
+                      <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 3 }}>
+                        <button
+                          onClick={() => {
+                            if (isResumeFrozen) return;
+                            onSelectResume(r.id);
+                            // also switch active person if needed
+                            if (focusedPerson.id !== activePerson?.id) onSelectPerson(focusedPerson.id);
+                            setOpen(false);
+                          }}
+                          className="btn-glass"
+                          style={{
+                            flex: 1, justifyContent: 'flex-start', padding: '9px 10px',
+                            borderRadius: 'var(--radius-sm)', boxShadow: 'none', gap: 8, minWidth: 0,
+                            background: isActiveR ? 'rgba(0,122,255,0.2)' : 'rgba(255,255,255,0.04)',
+                            border: isActiveR ? '1px solid rgba(0,122,255,0.4)' : '1px solid rgba(255,255,255,0.07)',
+                            opacity: isResumeFrozen ? 0.5 : 1,
+                            cursor: isResumeFrozen ? 'default' : 'pointer',
+                          }}
+                        >
+                          {isResumeFrozen
+                            ? <Lock size={12} style={{ flexShrink: 0, color: '#FF9F0A', opacity: 0.7 }} />
+                            : <FileText size={12} style={{ flexShrink: 0, opacity: 0.45 }} />}
+                          <span style={{ fontSize: 13, fontWeight: isActiveR ? 600 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                            {name}
+                          </span>
+                          {isActiveR && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#007AFF', flexShrink: 0 }} />}
+                        </button>
+                        {focusedResumes.length > 1 && !isResumeFrozen && (
+                          <button
+                            onClick={() => onDeleteResume(r.id)}
+                            title="Mappe löschen"
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 5, opacity: 0.28, color: 'inherit', flexShrink: 0, display: 'flex' }}
+                          >
+                            <Trash2 size={11} />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* ── Footer ── */}
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.09)', display: 'flex', alignItems: 'stretch', minHeight: 42 }}>
+            {/* + Neue Person */}
+            {addingPerson ? (
+              <div style={{ width: LEFT_W, flexShrink: 0, display: 'flex', gap: 4, padding: '5px 6px', borderRight: '1px solid rgba(255,255,255,0.09)' }}>
+                <input
+                  className="input-glass"
+                  placeholder="Name..."
+                  value={newPersonName}
+                  onChange={(e) => setNewPersonName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') submitNewPerson(); if (e.key === 'Escape') { setAddingPerson(false); setNewPersonName(''); } }}
+                  autoFocus
+                  style={{ flex: 1, fontSize: 12, padding: '5px 7px' }}
+                />
+                <button className="btn-glass btn-primary" onClick={submitNewPerson} style={{ fontSize: 11, padding: '4px 7px', boxShadow: 'none' }}>OK</button>
+                <button className="btn-glass" onClick={() => { setAddingPerson(false); setNewPersonName(''); }} style={{ fontSize: 11, padding: '4px 7px', boxShadow: 'none' }}>✕</button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setAddingPerson(true)}
+                style={{
+                  width: LEFT_W, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                  background: 'none', border: 'none', borderRight: '1px solid rgba(255,255,255,0.09)',
+                  cursor: 'pointer', color: 'rgba(255,255,255,0.5)', fontSize: 12, padding: '0 8px',
+                }}
+              >
+                <Plus size={13} /> Neue Person
+              </button>
+            )}
+
+            {/* + Neue Mappe */}
+            <button
+              onClick={() => { if (focusedPerson && !focusedFrozen) { onAddResume(focusedPerson.id); setOpen(false); } }}
+              disabled={!focusedPerson || focusedFrozen}
+              style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                background: 'none', border: 'none',
+                cursor: focusedPerson && !focusedFrozen ? 'pointer' : 'default',
+                color: focusedPerson && !focusedFrozen ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)',
+                fontSize: 12, padding: '0 8px',
+              }}
+            >
+              <FilePlus size={13} /> Neue Mappe
             </button>
-          )}
+          </div>
         </div>
       )}
     </div>
