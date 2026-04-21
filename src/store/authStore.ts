@@ -49,6 +49,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
           set({ session, user: session?.user ?? null });
         } else {
           set({ session, user: session?.user ?? null, loading: false, passwordRecovery: false });
+          // Live-Sync des Stripe-Abostatus — zieht Pro auf Mobile/Web gleich.
+          // Async, blockiert den Auth-Flow nicht.
+          if (session && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
+            void useAuthStore.getState().refreshUser();
+          }
         }
       });
 
@@ -180,6 +185,21 @@ export const useAuthStore = create<AuthStore>((set) => ({
     if (!isSupabaseConfigured()) return;
     try {
       const supabase = getSupabase();
+
+      // Vor dem eigentlichen User-Refresh: Stripe-Abo live syncen.
+      // Stellt sicher dass Web-Pro auf Mobile und Mobile-Pro auf Web
+      // erscheint, auch wenn ein Webhook verpasst wurde.
+      const { data: { session: s0 } } = await supabase.auth.getSession();
+      if (s0?.access_token) {
+        try {
+          await supabase.functions.invoke('sync-subscription', {
+            headers: { Authorization: `Bearer ${s0.access_token}` },
+          });
+        } catch (e) {
+          console.warn('[auth] sync-subscription failed', e);
+        }
+      }
+
       // getUser() always fetches fresh metadata from the server (no JWT cache)
       const { data: userData } = await supabase.auth.getUser();
       if (userData.user) {

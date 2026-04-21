@@ -94,7 +94,9 @@ async function syncEntitlementToSupabase(info: CustomerInfo): Promise<void> {
   // Wenn der User via Stripe (Web) auf Pro ist, darf ein negativer RC-Status
   // den Stripe-Pro nicht wegschreiben — sonst verlierst du beim ersten Android-
   // Login deinen Web-Pro. Stripe hat seinen eigenen Webhook fuer Downgrades.
-  if (!isPro && currentSource && currentSource !== 'revenuecat') {
+  // Guard auch wenn kein source-Tag vorhanden ist (Altbestand), aber currentPlan
+  // bereits Pro ist — dann bloss nichts anfassen.
+  if (!isPro && currentPlan === 'pro' && currentSource !== 'revenuecat') {
     return;
   }
 

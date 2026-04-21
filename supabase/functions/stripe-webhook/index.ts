@@ -65,7 +65,10 @@ Deno.serve(async (req) => {
           const sub = await stripe.subscriptions.retrieve(subId)
           periodEnd = sub.current_period_end ?? null
         }
-        await setPlan(userId, 'pro', periodEnd ? { subscription_period_end: periodEnd } : {})
+        await setPlan(userId, 'pro', {
+          subscription_source: 'stripe',
+          ...(periodEnd ? { subscription_period_end: periodEnd } : {}),
+        })
 
         // ── Referral reward ──────────────────────────────────
         // If this user was referred and hasn't been rewarded yet, credit the referrer 1 month
@@ -112,7 +115,10 @@ Deno.serve(async (req) => {
       if (userId) {
         const plan: 'pro' | 'free' =
           ['active', 'trialing'].includes(sub.status) ? 'pro' : 'free'
-        await setPlan(userId, plan, { subscription_period_end: sub.current_period_end ?? null })
+        await setPlan(userId, plan, {
+          subscription_source: plan === 'pro' ? 'stripe' : undefined,
+          subscription_period_end: sub.current_period_end ?? null,
+        })
       }
       break
     }
