@@ -18,9 +18,7 @@ import {
   type ApplicationStatus,
 } from '../types/resume';
 import { calcCompleteness, completenessColor } from '../lib/completeness';
-import { shareLink } from '../lib/shareLink';
 import { useIsMobile } from '../hooks/useBreakpoint';
-import { v4 as uuidv4 } from 'uuid';
 import { UpgradeModal } from '../components/ui/ProGate';
 import { usePlan } from '../lib/plan';
 import AtsDialog from '../components/ats/AtsDialog';
