@@ -111,34 +111,100 @@ export async function deleteResume(id: string): Promise<void> {
   }
 }
 
-// ── Documents ──────────────────────────────────────────────
+// ── Documents (Storage-basiert) ────────────────────────────
+// Neu: Dateibytes liegen im Storage-Bucket "documents" unter {user_id}/{doc_id}.
+// Die Tabelle "documents" enthaelt nur Metadaten + storage_path.
+// Altbestand mit data_url (base64) wird beim Fetch transparent mitgeliefert
+// und kann ueber migrateDocumentToStorage() lazy migriert werden.
+
+const DOCUMENTS_BUCKET = 'documents';
+const SIGNED_URL_TTL_SECONDS = 60 * 60; // 1 Stunde
+
+/** Pfad im Bucket: {user_id}/{document_id} */
+function storagePath(uid: string, docId: string) {
+  return `${uid}/${docId}`;
+}
+
+/** base64 (data:mime;base64,...) → Blob */
+function dataUrlToBlob(dataUrl: string): Blob {
+  const m = /^data:([^;]+);base64,(.+)$/.exec(dataUrl);
+  const mime = m ? m[1] : 'application/octet-stream';
+  const b64  = m ? m[2] : dataUrl;
+  const bin  = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+}
+
+/** Datei in Storage hochladen. Gibt den storage_path zurueck oder null bei Fehler. */
+export async function uploadDocumentFile(doc: UploadedDocument, blob: Blob): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    const uid = await userId();
+    if (!uid) return null;
+    const path = storagePath(uid, doc.id);
+    const { error } = await sb().storage.from(DOCUMENTS_BUCKET).upload(path, blob, {
+      contentType: doc.type || 'application/octet-stream',
+      upsert: true,
+    });
+    if (error) throw error;
+    return path;
+  } catch (e) {
+    console.warn('[db] uploadDocumentFile', e);
+    return null;
+  }
+}
+
+/** Signierte URL fuer ein im Storage abgelegtes Dokument. */
+async function signedUrlFor(path: string): Promise<string | null> {
+  try {
+    const { data, error } = await sb().storage.from(DOCUMENTS_BUCKET).createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
+    if (error) throw error;
+    return data?.signedUrl ?? null;
+  } catch (e) {
+    console.warn('[db] signedUrlFor', e);
+    return null;
+  }
+}
 
 export async function fetchDocuments(): Promise<(UploadedDocument & { resumeId: string })[]> {
   if (!isSupabaseConfigured()) return [];
   try {
     const { data, error } = await sb().from('documents').select('*').order('uploaded_at');
     if (error) throw error;
-    // Defensive: Zeilen ohne data_url sind kaputt (frueher Bug oder abge-
-    // brochener Upload). Ohne dataUrl kann das Dokument weder angezeigt noch
-    // exportiert werden — gar nicht erst ins Store-Resultat aufnehmen.
-    return (data ?? [])
-      .filter((row: Record<string, unknown>) => typeof row.data_url === 'string' && (row.data_url as string).length > 0)
-      .map(rowToDocument);
+    const rows = (data ?? []) as Record<string, unknown>[];
+
+    const docs = await Promise.all(rows.map(async (row) => {
+      const base = rowToDocument(row);
+      const path = (row.storage_path as string) || null;
+      if (path) {
+        const url = await signedUrlFor(path);
+        // Wenn Signing fehlschlaegt, lassen wir dataUrl leer — UI filtert dann.
+        return { ...base, dataUrl: url ?? '' };
+      }
+      // Altbestand: data_url ist direkt base64
+      return base;
+    }));
+
+    // Kaputte / unsigierbare Zeilen herausfiltern
+    return docs.filter(d => d.dataUrl && d.dataUrl.length > 0);
   } catch (e) {
     console.warn('[db] fetchDocuments', e);
     return [];
   }
 }
 
-export async function upsertDocument(resumeId: string, doc: UploadedDocument): Promise<void> {
+/**
+ * Legt einen Metadaten-Datensatz an oder aktualisiert ihn.
+ * Erwartet, dass die Datei vorher via uploadDocumentFile() im Storage liegt.
+ * Fuer Altbestand (mit base64 data_url) wird das Feld weiterhin akzeptiert.
+ */
+export async function upsertDocument(resumeId: string, doc: UploadedDocument, opts?: { storagePath?: string }): Promise<void> {
   if (!isSupabaseConfigured()) return;
-  if (!doc.dataUrl) {
-    console.warn('[db] upsertDocument skipped (empty dataUrl)', doc.id);
-    return;
-  }
   try {
     const uid = await userId();
     if (!uid) return;
+    const path = opts?.storagePath ?? null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (sb().from('documents') as any).upsert({
       id: doc.id,
@@ -148,7 +214,9 @@ export async function upsertDocument(resumeId: string, doc: UploadedDocument): P
       type: doc.type,
       size: doc.size,
       category: doc.category,
-      data_url: doc.dataUrl,
+      // Nur setzen wenn wir tatsaechlich base64 haben (Altbestand / Fallback)
+      data_url: path ? null : (doc.dataUrl && doc.dataUrl.startsWith('data:') ? doc.dataUrl : null),
+      storage_path: path,
     });
   } catch (e) {
     console.warn('[db] upsertDocument', e);
@@ -158,9 +226,41 @@ export async function upsertDocument(resumeId: string, doc: UploadedDocument): P
 export async function deleteDocument(id: string): Promise<void> {
   if (!isSupabaseConfigured()) return;
   try {
+    // Pfad vor dem Loeschen holen, damit wir danach im Storage aufraeumen koennen
+    const { data: row } = await sb().from('documents').select('storage_path').eq('id', id).maybeSingle();
+    const path = (row as { storage_path?: string } | null)?.storage_path;
     await sb().from('documents').delete().eq('id', id);
+    if (path) {
+      await sb().storage.from(DOCUMENTS_BUCKET).remove([path]).catch((e) => console.warn('[db] storage remove', e));
+    }
   } catch (e) {
     console.warn('[db] deleteDocument', e);
+  }
+}
+
+/**
+ * Einmal-Migration: bestehenden base64-Eintrag in Storage verschieben.
+ * Greift nur, wenn data_url gesetzt ist und noch kein storage_path existiert.
+ * Wird vom Store beim syncFromCloud transparent aufgerufen.
+ */
+export async function migrateDocumentToStorage(_resumeId: string, doc: UploadedDocument): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null;
+  if (!doc.dataUrl || !doc.dataUrl.startsWith('data:')) return null;
+  try {
+    const blob = dataUrlToBlob(doc.dataUrl);
+    const path = await uploadDocumentFile(doc, blob);
+    if (!path) return null;
+    const uid = await userId();
+    if (!uid) return null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (sb().from('documents') as any).update({
+      storage_path: path,
+      data_url: null,
+    }).eq('id', doc.id);
+    return path;
+  } catch (e) {
+    console.warn('[db] migrateDocumentToStorage', e);
+    return null;
   }
 }
 
@@ -230,7 +330,9 @@ function rowToDocument(row: Record<string, unknown>): UploadedDocument & { resum
     type: row.type as string,
     size: row.size as number,
     category: row.category as UploadedDocument['category'],
-    dataUrl: row.data_url as string,
+    // Bei Storage-Dokumenten setzt fetchDocuments() dies nachtraeglich auf die Signed URL.
+    // Bei Altbestand (data_url gesetzt) bleibt's die base64-Data-URL.
+    dataUrl: (row.data_url as string) ?? '',
     uploadedAt: row.uploaded_at as string,
   };
 }

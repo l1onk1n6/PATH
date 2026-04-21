@@ -97,8 +97,12 @@ interface ResumeStore {
   updateCertificate: (resumeId: string, id: string, data: Partial<Certificate>) => void;
   removeCertificate: (resumeId: string, id: string) => void;
   reorderCertificates: (resumeId: string, from: number, to: number) => void;
-  addDocument: (resumeId: string, doc: Omit<UploadedDocument, 'id' | 'uploadedAt'>) => void;
+  /** Nur State (und DB-Metadata). File muss schon im Storage liegen wenn storagePath gesetzt ist. */
+  addDocument: (resumeId: string, doc: Omit<UploadedDocument, 'id' | 'uploadedAt'>, opts?: { storagePath?: string }) => void;
+  /** Datei nach Storage hochladen, Signed URL holen, State + DB aktualisieren. */
+  uploadDocument: (resumeId: string, file: File, category?: UploadedDocument['category']) => Promise<{ ok: boolean; error?: string }>;
   removeDocument: (resumeId: string, id: string) => void;
+  updateDocumentCategory: (resumeId: string, docId: string, category: UploadedDocument['category']) => void;
 
   // Custom sections
   addCustomSection: (resumeId: string) => void;
@@ -155,15 +159,33 @@ export const useResumeStore = create<ResumeStore>()(
           const [cloudPersons, cloudResumes, cloudDocs] = await Promise.all([
             db.fetchPersons(), db.fetchResumes(), db.fetchDocuments(),
           ]);
+
+          // Lazy-Migration: Altbestand mit base64 data_url in Storage verschieben.
+          // Laeuft asynchron im Hintergrund, blockiert den Sync nicht.
+          const legacyDocs = cloudDocs.filter(d => d.dataUrl?.startsWith('data:'));
+          if (legacyDocs.length > 0) {
+            void Promise.all(legacyDocs.map(d => db.migrateDocumentToStorage(d.resumeId, d)))
+              .catch((e) => console.warn('[store] legacy doc migration', e));
+          }
+
           if (cloudPersons.length === 0 && cloudResumes.length === 0) {
             // Neues Konto: lokale Daten hochladen
             const { persons, resumes } = get();
-            const allDocs = resumes.flatMap(r => r.documents.map(d => ({ resumeId: r.id, doc: d })));
             await Promise.all([
               ...persons.map(db.upsertPerson),
               ...resumes.map(db.upsertResume),
-              ...allDocs.map(({ resumeId, doc }) => db.upsertDocument(resumeId, doc)),
             ]);
+            // Dokumente: base64 aus localStorage direkt nach Storage migrieren
+            for (const r of resumes) {
+              for (const d of r.documents) {
+                if (d.dataUrl?.startsWith('data:')) {
+                  await db.migrateDocumentToStorage(r.id, d);
+                } else if (d.dataUrl) {
+                  // schon HTTPS oder leer → nur Metadaten anlegen
+                  await db.upsertDocument(r.id, d);
+                }
+              }
+            }
           } else {
             // resumeIds aus Cloud-Daten rekonstruieren + Dokumente einfügen
             const persons = cloudPersons.map(p => ({
@@ -493,15 +515,58 @@ export const useResumeStore = create<ResumeStore>()(
         queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 
-      addDocument: (resumeId, doc) => {
+      addDocument: (resumeId, doc, opts) => {
         const item: UploadedDocument = { ...doc, id: uuidv4(), uploadedAt: new Date().toISOString() };
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, documents: [...r.documents, item], updatedAt: new Date().toISOString() } : r) }));
-        db.upsertDocument(resumeId, item);
+        db.upsertDocument(resumeId, item, opts?.storagePath ? { storagePath: opts.storagePath } : undefined);
+      },
+
+      uploadDocument: async (resumeId, file, category = 'other') => {
+        const id = uuidv4();
+        const item: UploadedDocument = {
+          id,
+          name: file.name,
+          type: file.type || 'application/octet-stream',
+          size: file.size,
+          category,
+          dataUrl: '',
+          uploadedAt: new Date().toISOString(),
+        };
+        const storagePath = await db.uploadDocumentFile(item, file);
+        if (!storagePath) return { ok: false, error: 'Upload in Storage fehlgeschlagen' };
+
+        // Metadaten speichern, Signed URL fuer sofortige Anzeige holen
+        await db.upsertDocument(resumeId, item, { storagePath });
+        const freshDocs = await db.fetchDocuments();
+        const fresh = freshDocs.find(d => d.id === id);
+        const itemWithUrl: UploadedDocument = fresh
+          ? { ...item, dataUrl: fresh.dataUrl }
+          : item;
+
+        set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, documents: [...r.documents, itemWithUrl], updatedAt: new Date().toISOString() } : r) }));
+        return { ok: true };
       },
 
       removeDocument: (resumeId, id) => {
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, documents: r.documents.filter(d => d.id !== id), updatedAt: new Date().toISOString() } : r) }));
         db.deleteDocument(id);
+      },
+
+      updateDocumentCategory: (resumeId, docId, category) => {
+        set((s) => ({
+          resumes: s.resumes.map(r =>
+            r.id === resumeId
+              ? { ...r, documents: r.documents.map(d => d.id === docId ? { ...d, category } : d), updatedAt: new Date().toISOString() }
+              : r,
+          ),
+        }));
+        // Nur Metadaten-Update, keine Storage-Bewegung
+        const doc = get().resumes.find(r => r.id === resumeId)?.documents.find(d => d.id === docId);
+        if (doc) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (getSupabase().from('documents') as any).update({ category }).eq('id', docId)
+            .then((res: { error: unknown }) => { if (res.error) console.warn('[store] updateDocumentCategory', res.error); });
+        }
       },
 
       // ── Custom sections ──────────────────────────────────

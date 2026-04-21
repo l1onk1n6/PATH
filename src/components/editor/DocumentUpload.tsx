@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, File, Trash2, FileText, Image, ExternalLink, AlertCircle } from 'lucide-react';
+import { Upload, File, Trash2, FileText, Image, ExternalLink, AlertCircle, Loader2 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import type { UploadedDocument } from '../../types/resume';
@@ -23,21 +23,22 @@ function formatBytes(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-const MAX_FILE_MB = 2;
+const MAX_FILE_MB = 10;
 const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
 
 export default function DocumentUpload() {
-  const { getActiveResume, addDocument, removeDocument, resumes } = useResumeStore();
+  const { getActiveResume, uploadDocument, removeDocument, updateDocumentCategory, resumes } = useResumeStore();
   const resume = getActiveResume();
   const { limits } = usePlan();
   const [sizeError, setSizeError] = useState('');
+  const [uploadingCount, setUploadingCount] = useState(0);
 
   // Total used across ALL resumes (documents are per-user, not per-resume)
   const totalUsedBytes = resumes.reduce((sum, r) =>
     sum + r.documents.reduce((s, d) => s + d.size, 0), 0);
   const totalLimitBytes = limits.documentsMb * 1024 * 1024;
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (!resume) return;
     setSizeError('');
 
@@ -50,20 +51,13 @@ export default function DocumentUpload() {
       return;
     }
 
-    acceptedFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        addDocument(resume.id, {
-          name: file.name,
-          type: file.type,
-          size: file.size,
-          dataUrl: reader.result as string,
-          category: 'other',
-        });
-      };
-      reader.readAsDataURL(file);
-    });
-  }, [resume, addDocument, totalUsedBytes, totalLimitBytes, limits.documentsMb]);
+    setUploadingCount(c => c + acceptedFiles.length);
+    for (const file of acceptedFiles) {
+      const res = await uploadDocument(resume.id, file, 'other');
+      if (!res.ok) setSizeError(res.error ?? 'Upload fehlgeschlagen');
+    }
+    setUploadingCount(c => Math.max(0, c - acceptedFiles.length));
+  }, [resume, uploadDocument, totalUsedBytes, totalLimitBytes, limits.documentsMb]);
 
   const onDropRejected = useCallback((rejections: { file: File }[]) => {
     const tooBig = rejections.some(r => r.file.size > MAX_FILE_BYTES);
@@ -85,10 +79,7 @@ export default function DocumentUpload() {
 
   function updateCategory(docId: string, category: UploadedDocument['category']) {
     if (!resume) return;
-    const doc = resume.documents.find(d => d.id === docId);
-    if (!doc) return;
-    removeDocument(resume.id, docId);
-    addDocument(resume.id, { ...doc, category });
+    updateDocumentCategory(resume.id, docId, category);
   }
 
   return (
@@ -119,9 +110,15 @@ export default function DocumentUpload() {
         style={{ marginBottom: 20, opacity: storageFull ? 0.45 : 1, pointerEvents: storageFull ? 'none' : undefined }}
       >
         <input {...getInputProps()} />
-        <Upload size={28} style={{ margin: '0 auto 10px', display: 'block', opacity: isDragActive ? 1 : 0.5 }} />
+        {uploadingCount > 0 ? (
+          <Loader2 size={28} style={{ margin: '0 auto 10px', display: 'block', animation: 'spin 1s linear infinite', color: 'var(--ios-blue)' }} />
+        ) : (
+          <Upload size={28} style={{ margin: '0 auto 10px', display: 'block', opacity: isDragActive ? 1 : 0.5 }} />
+        )}
         <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 4 }}>
-          {storageFull ? 'Speicher voll' : isDragActive ? 'Dateien hier ablegen...' : 'Dokumente hochladen'}
+          {uploadingCount > 0
+            ? `Lädt ${uploadingCount} Datei${uploadingCount === 1 ? '' : 'en'} hoch…`
+            : storageFull ? 'Speicher voll' : isDragActive ? 'Dateien hier ablegen...' : 'Dokumente hochladen'}
         </div>
         <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
           {storageFull

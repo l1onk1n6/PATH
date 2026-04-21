@@ -50,8 +50,33 @@ export async function renderCoverLetterPdf(resume: Resume): Promise<Uint8Array> 
   return renderDoc(<CoverLetterPdf resume={resume} />);
 }
 
+/** base64 helper fuer Bytes → data: URL (Workaround gegen @react-pdf CORS-Issues). */
+async function urlToDataUrl(url: string, fallbackMime: string): Promise<string> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return url;
+    const blob = await res.blob();
+    const mime = blob.type || fallbackMime || 'application/octet-stream';
+    const buf = await blob.arrayBuffer();
+    // btoa mit grossen Uint8Arrays crashed → chunkweise
+    let binary = '';
+    const bytes = new Uint8Array(buf);
+    const CHUNK = 0x8000;
+    for (let i = 0; i < bytes.length; i += CHUNK) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
+    }
+    return `data:${mime};base64,${btoa(binary)}`;
+  } catch {
+    return url;
+  }
+}
+
 export async function renderDocumentImagePdf(doc: UploadedDocument): Promise<Uint8Array> {
-  return renderDoc(<DocumentImagePdf doc={doc} />);
+  // Signed HTTPS URLs → zu data: URL vorwandeln, damit @react-pdf sicher embedden kann
+  const embedDoc: UploadedDocument = /^https?:\/\//i.test(doc.dataUrl)
+    ? { ...doc, dataUrl: await urlToDataUrl(doc.dataUrl, doc.type) }
+    : doc;
+  return renderDoc(<DocumentImagePdf doc={embedDoc} />);
 }
 
 /**
@@ -71,12 +96,24 @@ export async function buildMappePdfBytes(resume: Resume): Promise<Uint8Array> {
 
   for (const d of resume.documents ?? []) {
     if (!d?.dataUrl) continue;
+    const isHttpUrl = /^https?:\/\//i.test(d.dataUrl);
     const isPdf = d.type === 'application/pdf' || d.dataUrl.startsWith('data:application/pdf');
+
     if (isPdf) {
-      const base64 = d.dataUrl.split(',')[1];
-      if (!base64) continue;
-      parts.push(Uint8Array.from(atob(base64), c => c.charCodeAt(0)));
+      // PDF-Bytes holen — aus base64 (Altbestand) oder Signed URL (Storage)
+      let bytes: Uint8Array | null = null;
+      if (isHttpUrl) {
+        try {
+          const res = await fetch(d.dataUrl);
+          if (res.ok) bytes = new Uint8Array(await res.arrayBuffer());
+        } catch { /* ignore */ }
+      } else {
+        const base64 = d.dataUrl.split(',')[1];
+        if (base64) bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+      }
+      if (bytes) parts.push(bytes);
     } else {
+      // Bilder — @react-pdf's Image unterstuetzt sowohl data: als auch https:
       parts.push(await renderDocumentImagePdf(d));
     }
   }
