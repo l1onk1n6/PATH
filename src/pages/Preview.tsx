@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Download, Loader2, Layers, X, FolderDown, Lock, ChevronDown, FileText, FileEdit, Share2 } from 'lucide-react';
+import { AlertCircle, Download, Loader2, Layers, X, FolderDown, Lock, ChevronDown, FileText, FileEdit, Share2, Check } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ProGate from '../components/ui/ProGate';
@@ -157,13 +157,29 @@ export default function Preview() {
         const card = (
           <div
             className="glass-card"
-            style={{ padding: 10, border: isSelected ? `2px solid ${resume.accentColor}` : '1px solid rgba(255,255,255,0.12)', opacity: locked ? 0.55 : 1, position: 'relative' }}
+            style={{
+              padding: 10,
+              border: isSelected ? `2px solid ${resume.accentColor}` : '1px solid rgba(255,255,255,0.12)',
+              background: isSelected ? `${resume.accentColor}1a` : undefined,
+              opacity: locked ? 0.55 : 1,
+              position: 'relative',
+            }}
           >
             <div style={{ height: 40, borderRadius: 6, background: tmpl.preview, marginBottom: 6 }} />
             <div style={{ fontSize: 11, fontWeight: isSelected ? 700 : 500, textAlign: 'left', display: 'flex', alignItems: 'center', gap: 4 }}>
               {tmpl.name}
               {locked && <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 4px', borderRadius: 3, background: 'linear-gradient(135deg, #FF9F0A, #FF375F)', color: '#fff' }}>PRO</span>}
             </div>
+            {isSelected && (
+              <div style={{
+                position: 'absolute', top: 6, right: 6,
+                width: 18, height: 18, borderRadius: '50%',
+                background: resume.accentColor,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Check size={11} color="#fff" strokeWidth={3} />
+              </div>
+            )}
           </div>
         );
 

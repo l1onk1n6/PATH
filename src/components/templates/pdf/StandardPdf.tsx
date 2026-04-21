@@ -288,7 +288,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
     const sMuted = inverse ? alphaHex(sidebarText, 0.7) : MUTED_DARK;
     return (
       <Section title="Zertifikate" color={inverse ? sidebarText : accent} kind={headingStyle}>
-        {resume.certificates.map(c => <CertItem key={c.id} cert={c} textColor={sText} mutedColor={sMuted} boldFont={boldFont} />)}
+        {resume.certificates.map(c => <CertItem key={c.id} cert={c} textColor={sText} mutedColor={sMuted} boldFont={boldFont} linkColor={inverse ? sidebarText : accent} />)}
       </Section>
     );
   };

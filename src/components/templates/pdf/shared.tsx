@@ -4,7 +4,7 @@
  * konsistente Datums-/Label-Spalte, 3-5x kleinere Dateien als der alte
  * html2canvas-Raster-Ansatz.
  */
-import { Text, View } from '@react-pdf/renderer';
+import { Text, View, Link } from '@react-pdf/renderer';
 import type { Style } from '@react-pdf/types';
 import type { WorkExperience, Education, Skill, Language, Certificate } from '../../../types/resume';
 
@@ -392,19 +392,29 @@ export function LanguageRow({
 }
 
 export function CertItem({
-  cert, textColor = '#1c1c1e', mutedColor = MUTED_DARK, boldFont = 'Helvetica-Bold',
+  cert, textColor = '#1c1c1e', mutedColor = MUTED_DARK, boldFont = 'Helvetica-Bold', linkColor,
 }: {
   cert: Certificate;
   textColor?: string;
   mutedColor?: string;
   boldFont?: string;
+  linkColor?: string;
 }) {
+  const resolvedLinkColor = linkColor ?? '#007AFF';
   return (
     <View style={{ marginBottom: 7 }} wrap={false}>
       <Text style={{ fontSize: 10, fontFamily: boldFont, color: textColor }}>{cert.name}</Text>
       <Text style={{ fontSize: 9, color: mutedColor, marginTop: 1 }}>
         {cert.issuer}{cert.date ? ` · ${formatDate(cert.date)}` : ''}
       </Text>
+      {cert.url ? (
+        <Link
+          src={cert.url}
+          style={{ fontSize: 8.5, color: resolvedLinkColor, textDecoration: 'underline', marginTop: 2 }}
+        >
+          {cert.url}
+        </Link>
+      ) : null}
     </View>
   );
 }

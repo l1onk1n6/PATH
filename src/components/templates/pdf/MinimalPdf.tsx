@@ -92,7 +92,7 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
             ) : null}
             {(resume.certificates ?? []).length > 0 ? (
               <Section title="Zertifikate" color={accent} kind="line">
-                {resume.certificates.map(c => <CertItem key={c.id} cert={c} />)}
+                {resume.certificates.map(c => <CertItem key={c.id} cert={c} linkColor={accent} />)}
               </Section>
             ) : null}
           </View>

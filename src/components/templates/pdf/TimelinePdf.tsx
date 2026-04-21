@@ -135,9 +135,14 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
               <View style={{ flex: 1 }}>
                 <SectionTitle>Zertifikate</SectionTitle>
                 {resume.certificates.map(c => (
-                  <View key={c.id} style={{ marginBottom: 4 }}>
+                  <View key={c.id} style={{ marginBottom: 4 }} wrap={false}>
                     <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold' }}>{c.name}</Text>
                     <Text style={{ fontSize: 9.5, color: '#6e6e73' }}>{c.issuer}</Text>
+                    {c.url ? (
+                      <Link src={c.url} style={{ fontSize: 8.5, color: accent, textDecoration: 'underline', marginTop: 1 }}>
+                        {c.url}
+                      </Link>
+                    ) : null}
                   </View>
                 ))}
               </View>
