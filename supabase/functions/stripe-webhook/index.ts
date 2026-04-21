@@ -35,10 +35,16 @@ Deno.serve(async (req) => {
     return data?.user_id ?? null
   }
 
-  /** Update user_metadata.plan (and optional extra fields) without overwriting other metadata */
+  /** Update user_metadata.plan (and optional extra fields) without overwriting other metadata.
+   *  Geschenk-Pro (gift_pro) wird nicht ueberschrieben — egal was Stripe sagt. */
   async function setPlan(userId: string, plan: 'free' | 'pro', extra: Record<string, unknown> = {}) {
     const { data: u } = await admin.auth.admin.getUserById(userId)
     const existing = u?.user?.user_metadata ?? {}
+
+    if (existing.gift_pro === true) {
+      console.log(`↷ ${userId} skipped (gift_pro)`)
+      return
+    }
 
     const { error } = await admin.auth.admin.updateUserById(userId, {
       user_metadata: { ...existing, plan, ...extra },

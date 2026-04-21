@@ -55,6 +55,13 @@ Deno.serve(async (req) => {
     const existing = u?.user?.user_metadata ?? {}
     const currentPlan   = (existing.plan as string | undefined) ?? 'free'
     const currentSource = existing.subscription_source as string | undefined
+    const giftPro       = existing.gift_pro === true
+
+    // Geschenk-Pro ist unantastbar — weder Stripe-Sync noch Source-Logik
+    // duerfen das aushebeln.
+    if (giftPro) {
+      return json({ plan: currentPlan, source: currentSource, gift: true, changed: false })
+    }
 
     // RevenueCat hat Vorrang, wenn es selbst geschrieben hat — nicht ueberschreiben.
     if (currentSource === 'revenuecat') {

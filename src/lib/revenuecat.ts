@@ -88,7 +88,11 @@ async function syncEntitlementToSupabase(info: CustomerInfo): Promise<void> {
   const isPro = Boolean(entitlement);
   const currentPlan = (user.user_metadata?.plan as string | undefined) ?? 'free';
   const currentSource = user.user_metadata?.subscription_source as string | undefined;
+  const giftPro = user.user_metadata?.gift_pro === true;
   const nextPlan = isPro ? 'pro' : 'free';
+
+  // Geschenk-Pro ist unantastbar — RC darf nie ran.
+  if (giftPro) return;
 
   // Wichtig: RevenueCat darf nur Pro-Status verwalten, den es selbst gesetzt hat.
   // Wenn der User via Stripe (Web) auf Pro ist, darf ein negativer RC-Status
