@@ -6,6 +6,7 @@
 import { Document, Page, View, Text, Link, Image, StyleSheet } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
 import { alphaHex, dateRange } from './shared';
+import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
 export default function TimelinePdf({ resume }: { resume: Resume }) {
   const info = resume.personalInfo;
@@ -71,7 +72,7 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
         {resume.workExperience.length > 0 ? (
           <>
             <SectionTitle>Berufserfahrung</SectionTitle>
-            {resume.workExperience.map(job => (
+            {sortWorkExperience(resume.workExperience).map(job => (
               <TimelineItem
                 key={job.id}
                 year={dateRange(job.startDate, job.endDate, job.current) || '—'}
@@ -86,7 +87,7 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
         {resume.education.length > 0 ? (
           <>
             <SectionTitle>Ausbildung</SectionTitle>
-            {resume.education.map(edu => (
+            {sortEducation(resume.education).map(edu => (
               <TimelineItem
                 key={edu.id}
                 year={dateRange(edu.startDate, edu.endDate) || '—'}

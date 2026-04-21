@@ -7,6 +7,7 @@ import type { Resume } from '../../../types/resume';
 import {
   Section, WorkEntry, EduEntry, SkillBar, LanguageRow, CertItem, alphaHex,
 } from './shared';
+import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
 export default function MinimalPdf({ resume }: { resume: Resume }) {
   const info = resume.personalInfo;
@@ -52,7 +53,7 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
           <View style={styles.mainCol}>
             {resume.workExperience.length > 0 ? (
               <Section title="Berufserfahrung" color={accent} kind="line">
-                {resume.workExperience.map(job => (
+                {sortWorkExperience(resume.workExperience).map(job => (
                   <WorkEntry key={job.id} job={job} color={accent} />
                 ))}
               </Section>
@@ -60,7 +61,7 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
 
             {resume.education.length > 0 ? (
               <Section title="Ausbildung" color={accent} kind="line">
-                {resume.education.map(edu => (
+                {sortEducation(resume.education).map(edu => (
                   <EduEntry key={edu.id} edu={edu} color={accent} />
                 ))}
               </Section>

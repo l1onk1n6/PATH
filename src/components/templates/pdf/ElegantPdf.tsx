@@ -5,6 +5,7 @@
 import { Document, Page, View, Text, Link, Image, StyleSheet } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
 import { alphaHex, dateRange, formatDate } from './shared';
+import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
 export default function ElegantPdf({ resume }: { resume: Resume }) {
   const info = resume.personalInfo;
@@ -57,7 +58,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
         {resume.workExperience.length > 0 ? (
           <>
             <SH>Berufserfahrung</SH>
-            {resume.workExperience.map(job => (
+            {sortWorkExperience(resume.workExperience).map(job => (
               <View key={job.id} style={{ marginBottom: 14 }}>
                 <View wrap={false} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
                   <View style={{ flex: 1, marginRight: 10 }}>
@@ -77,7 +78,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
         {resume.education.length > 0 ? (
           <>
             <SH>Ausbildung</SH>
-            {resume.education.map(edu => (
+            {sortEducation(resume.education).map(edu => (
               <View key={edu.id} style={{ marginBottom: 8 }} wrap={false}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <View style={{ flex: 1, marginRight: 10 }}>

@@ -13,6 +13,7 @@ import {
   SectionHeading, Section, WorkEntry, EduEntry, SkillBar, SkillDots, SkillChips, groupSkillsByCategory,
   LanguageRow, CertItem, dateRange,
 } from './shared';
+import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
 // ─────────────────────────────────────────────────────────────
 //  Variant-API
@@ -166,7 +167,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
 
   const WorkSection = () => resume.workExperience.length > 0 ? (
     <Section title="Berufserfahrung" color={accent} kind={headingStyle}>
-      {resume.workExperience.map(job => (
+      {sortWorkExperience(resume.workExperience).map(job => (
         <WorkEntry key={job.id} job={job} color={accent} textColor={text} mutedColor={muted} boldFont={boldFont} />
       ))}
     </Section>
@@ -174,7 +175,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
 
   const EduSection = () => resume.education.length > 0 ? (
     <Section title="Ausbildung" color={accent} kind={headingStyle}>
-      {resume.education.map(edu => (
+      {sortEducation(resume.education).map(edu => (
         <EduEntry key={edu.id} edu={edu} color={accent} textColor={text} mutedColor={muted} boldFont={boldFont} />
       ))}
     </Section>

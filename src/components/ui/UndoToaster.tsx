@@ -18,8 +18,10 @@ export default function UndoToaster() {
 
   return (
     <div style={{
-      position: 'fixed', bottom: 18, left: '50%', transform: 'translateX(-50%)',
-      zIndex: 500, display: 'flex', flexDirection: 'column', gap: 8,
+      position: 'fixed',
+      bottom: `calc(env(safe-area-inset-bottom, 0px) + 18px)`,
+      left: '50%', transform: 'translateX(-50%)',
+      zIndex: 9500, display: 'flex', flexDirection: 'column', gap: 8,
       pointerEvents: 'none', alignItems: 'center',
     }}>
       {toasts.map(t => {
