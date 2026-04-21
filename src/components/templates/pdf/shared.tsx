@@ -288,9 +288,7 @@ export function SkillBar({
   const track = trackColor ?? alphaHex(textColor, 0.1);
   return (
     <View style={{ marginBottom: 6 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
-        <Text style={{ fontSize: 9.5, color: textColor }}>{skill.name}</Text>
-      </View>
+      <Text style={{ fontSize: 9.5, color: textColor, marginBottom: 3, lineHeight: 1.3 }}>{skill.name}</Text>
       <View style={{ height: 3, backgroundColor: track, borderRadius: 1.5 }}>
         <View style={{ height: 3, width: `${skill.level * 20}%`, backgroundColor: color, borderRadius: 1.5 }} />
       </View>
@@ -306,9 +304,14 @@ export function SkillDots({
   textColor?: string;
 }) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
-      <Text style={{ fontSize: 9.5, color: textColor }}>{skill.name}</Text>
-      <View style={{ flexDirection: 'row', gap: 2 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+      {/* flex: 1 + marginRight: 8 → Text umbricht sauber, Dots bleiben
+          unkollidierend rechts. alignItems: center haelt Dots auf Hoehe
+          der Text-Mitte (auch wenn Text ueber 2 Zeilen geht). */}
+      <Text style={{ fontSize: 9.5, color: textColor, flex: 1, marginRight: 8, lineHeight: 1.3 }}>
+        {skill.name}
+      </Text>
+      <View style={{ flexDirection: 'row', gap: 2, flexShrink: 0 }}>
         {[1, 2, 3, 4, 5].map(i => (
           <View
             key={i}
@@ -381,9 +384,9 @@ export function LanguageRow({
   mutedColor?: string;
 }) {
   return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4, flexWrap: 'wrap' }}>
-      <Text style={{ fontSize: 10, color: textColor }}>{lang.name}</Text>
-      <Text style={{ fontSize: 9, color: mutedColor }}>{lang.level}</Text>
+    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+      <Text style={{ fontSize: 10, color: textColor, flex: 1, marginRight: 8, lineHeight: 1.3 }}>{lang.name}</Text>
+      <Text style={{ fontSize: 9, color: mutedColor, flexShrink: 0 }}>{lang.level}</Text>
     </View>
   );
 }
