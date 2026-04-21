@@ -319,7 +319,36 @@ export async function fetchSharedResume(token: string): Promise<Resume | null> {
       .not('share_token', 'is', null)
       .maybeSingle();
     if (error || !data) return null;
-    return rowToResume(data as Record<string, unknown>);
+    const resume = rowToResume(data as Record<string, unknown>);
+
+    // Dokumente des geteilten Resumes zusaetzlich laden (RLS erlaubt SELECT
+    // fuer Docs deren Resume einen share_token hat).
+    try {
+      const { data: docRows } = await sb()
+        .from('documents')
+        .select('*')
+        .eq('resume_id', resume.id)
+        .order('order_index', { ascending: true, nullsFirst: false })
+        .order('uploaded_at', { ascending: true });
+
+      const rows = (docRows ?? []) as Record<string, unknown>[];
+      const docs = await Promise.all(rows.map(async (row) => {
+        const base = rowToDocument(row);
+        const path = (row.storage_path as string) || null;
+        if (path) {
+          const url = await signedUrlFor(path);
+          return { ...base, dataUrl: url ?? '' };
+        }
+        return base;
+      }));
+      resume.documents = docs
+        .filter(d => d.dataUrl && d.dataUrl.length > 0)
+        .map(({ resumeId: _rid, ...d }) => d);
+    } catch (e) {
+      console.warn('[db] fetchSharedResume docs', e);
+    }
+
+    return resume;
   } catch (e) {
     console.warn('[db] fetchSharedResume', e);
     return null;
