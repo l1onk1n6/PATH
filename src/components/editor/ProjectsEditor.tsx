@@ -138,10 +138,10 @@ export default function ProjectsEditor() {
                   </div>
                   <div style={{ gridColumn: isMobile ? 'auto' : 'span 2' }}>
                     <label className="section-label">Technologien (Komma-getrennt)</label>
-                    <input className="input-glass"
-                      placeholder="z.B. React, TypeScript, Node.js"
-                      value={project.technologies.join(', ')} maxLength={300}
-                      onChange={(e) => updateProject(resume.id, project.id, { technologies: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })} />
+                    <TechnologiesInput
+                      value={project.technologies}
+                      onChange={(techs) => updateProject(resume.id, project.id, { technologies: techs })}
+                    />
                   </div>
                 </div>
                 <div>
@@ -299,5 +299,28 @@ export default function ProjectsEditor() {
         )}
       </div>
     </div>
+  );
+}
+
+/**
+ * Technologien-Input mit lokalem Raw-String-State.
+ * Nur beim Blur wird in ein Array geparst — waehrend des Tippens bleiben
+ * Leerzeichen erhalten (sonst wuerde `.map(trim)` sie live wegfressen).
+ */
+function TechnologiesInput({ value, onChange }: { value: string[]; onChange: (techs: string[]) => void }) {
+  const [raw, setRaw] = useState(value.join(', '));
+  return (
+    <input
+      className="input-glass"
+      placeholder="z.B. React, TypeScript, Node.js"
+      value={raw}
+      maxLength={300}
+      onChange={(e) => setRaw(e.target.value)}
+      onBlur={() => {
+        const techs = raw.split(',').map(t => t.trim()).filter(Boolean);
+        onChange(techs);
+        setRaw(techs.join(', '));
+      }}
+    />
   );
 }

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Download, Loader2, Layers, X, FolderDown, Lock } from 'lucide-react';
+import { AlertCircle, Download, Loader2, Layers, X, FolderDown, Lock, ChevronDown, FileText } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ProGate from '../components/ui/ProGate';
@@ -27,6 +27,7 @@ export default function Preview() {
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+  const [downloadMenuOpen, setDownloadMenuOpen] = useState(false);
 
   // Live-Vorschau: baut bei jeder Template- oder Resume-Aenderung die komplette
   // Mappe als PDF-Blob und zeigt sie in einem iframe. So sieht der User
@@ -202,42 +203,73 @@ export default function Preview() {
             )}
           </div>
 
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center', position: 'relative' }}>
             {!isMobile && limits.pdfExportsPerMonth !== Infinity && (
               <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', whiteSpace: 'nowrap' }}>
                 {getPdfExportCount()}/{limits.pdfExportsPerMonth} PDF
               </span>
             )}
+            {/* Download Split-Button: primaere Aktion = ganze Mappe, Chevron oeffnet die Optionen */}
             <button
-              className="btn-glass btn-sm"
-              onClick={handleExport}
+              className="btn-glass btn-primary btn-sm"
+              onClick={handleExportMappe}
               disabled={exporting}
-              title="Nur Lebenslauf exportieren"
+              title="Ganze Mappe herunterladen"
               style={{ opacity: exporting ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px' }}
             >
               {exporting
                 ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
                 : <Download size={16} />
               }
-              {!isMobile && ' PDF'}
+              {!isMobile && ' Download'}
             </button>
-            <ProGate featureId="password" badge>
-              <button className="btn-glass btn-sm" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px' }}>
-                <Lock size={16} />{!isMobile && ' Passwort'}
-              </button>
-            </ProGate>
             <button
               className="btn-glass btn-primary btn-sm"
-              onClick={handleExportMappe}
+              onClick={() => setDownloadMenuOpen(v => !v)}
               disabled={exporting}
-              title="Ganze Bewerbungsmappe exportieren (Anschreiben + CV + Dokumente)"
-              style={{ opacity: exporting ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px' }}
+              title="Weitere Download-Optionen"
+              aria-label="Weitere Download-Optionen"
+              style={{ padding: '7px 8px' }}
             >
-              {exporting
-                ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />{!isMobile && ' Exportiere…'}</>
-                : <><FolderDown size={16} />{!isMobile && ' Ganze Mappe'}</>
-              }
+              <ChevronDown size={14} style={{ transform: downloadMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
             </button>
+
+            {downloadMenuOpen && (
+              <>
+                <div onClick={() => setDownloadMenuOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 40 }} />
+                <div style={{
+                  position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 50,
+                  minWidth: 220, padding: 6,
+                  background: 'rgba(14,14,22,0.97)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: 'var(--radius-sm)',
+                  backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+                  boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+                }}>
+                  <button className="btn-glass"
+                    onClick={() => { setDownloadMenuOpen(false); handleExportMappe(); }}
+                    style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 10px', gap: 8, marginBottom: 2, boxShadow: 'none', background: 'transparent', border: '1px solid transparent' }}>
+                    <FolderDown size={14} style={{ opacity: 0.7 }} />
+                    <span style={{ fontSize: 13 }}>Ganze Mappe</span>
+                  </button>
+                  <button className="btn-glass"
+                    onClick={() => { setDownloadMenuOpen(false); handleExport(); }}
+                    style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 10px', gap: 8, marginBottom: 2, boxShadow: 'none', background: 'transparent', border: '1px solid transparent' }}>
+                    <FileText size={14} style={{ opacity: 0.7 }} />
+                    <span style={{ fontSize: 13 }}>Nur Lebenslauf</span>
+                  </button>
+                  <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '4px 0' }} />
+                  <ProGate featureId="password" badge>
+                    <button className="btn-glass"
+                      onClick={() => { setDownloadMenuOpen(false); /* Pro-Feature, handler kommt noch */ }}
+                      style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 10px', gap: 8, boxShadow: 'none', background: 'transparent', border: '1px solid transparent' }}>
+                      <Lock size={14} style={{ opacity: 0.7 }} />
+                      <span style={{ fontSize: 13 }}>Mit Passwort…</span>
+                    </button>
+                  </ProGate>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
