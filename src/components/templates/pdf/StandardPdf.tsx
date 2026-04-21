@@ -256,10 +256,9 @@ export function StandardPdf({ resume, variant = {} }: Props) {
       return <>{skills.map(s => <SkillBar key={s.id} skill={s} color={accent} textColor={sText} trackColor={alphaHex(sText, 0.12)} />)}</>;
     };
     return (
-      <View style={{ marginBottom: 14 }}>
-        <SectionHeading color={inverse ? sidebarText : accent} kind={headingStyle}>Fähigkeiten</SectionHeading>
+      <Section title="Fähigkeiten" color={inverse ? sidebarText : accent} kind={headingStyle}>
         {groups.map((g, i) => (
-          <View key={i} style={{ marginBottom: i < groups.length - 1 ? 8 : 0 }}>
+          <View key={i} wrap={false} style={{ marginBottom: i < groups.length - 1 ? 8 : 0 }}>
             {g.category ? (
               <Text style={{ fontSize: 9, fontFamily: boldFont, color: sMuted, marginBottom: 4, letterSpacing: 0.5 }}>
                 {g.category}
@@ -268,7 +267,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
             {renderGroup(g.skills)}
           </View>
         ))}
-      </View>
+      </Section>
     );
   };
 
@@ -277,10 +276,9 @@ export function StandardPdf({ resume, variant = {} }: Props) {
     const sText = inverse ? sidebarText : text;
     const sMuted = inverse ? alphaHex(sidebarText, 0.7) : muted;
     return (
-      <View style={{ marginBottom: 14 }}>
-        <SectionHeading color={inverse ? sidebarText : accent} kind={headingStyle}>Sprachen</SectionHeading>
+      <Section title="Sprachen" color={inverse ? sidebarText : accent} kind={headingStyle}>
         {resume.languages.map(l => <LanguageRow key={l.id} lang={l} textColor={sText} mutedColor={sMuted} />)}
-      </View>
+      </Section>
     );
   };
 
@@ -289,10 +287,9 @@ export function StandardPdf({ resume, variant = {} }: Props) {
     const sText = inverse ? sidebarText : text;
     const sMuted = inverse ? alphaHex(sidebarText, 0.7) : MUTED_DARK;
     return (
-      <View style={{ marginBottom: 14 }}>
-        <SectionHeading color={inverse ? sidebarText : accent} kind={headingStyle}>Zertifikate</SectionHeading>
+      <Section title="Zertifikate" color={inverse ? sidebarText : accent} kind={headingStyle}>
         {resume.certificates.map(c => <CertItem key={c.id} cert={c} textColor={sText} mutedColor={sMuted} boldFont={boldFont} />)}
-      </View>
+      </Section>
     );
   };
 
