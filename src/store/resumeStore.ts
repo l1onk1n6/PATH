@@ -120,6 +120,9 @@ interface ResumeStore {
 
   // GDPR export
   exportGdprData: () => void;
+  importGdprData: (json: string, mode: 'merge' | 'replace') =>
+    { ok: true; added: { persons: number; resumes: number } }
+    | { ok: false; error: string };
 
   setActiveSection: (section: EditorSection) => void;
   getActiveResume: () => Resume | null;
@@ -562,6 +565,52 @@ export const useResumeStore = create<ResumeStore>()(
         a.download = `path-export-${new Date().toISOString().split('T')[0]}.json`;
         a.click();
         URL.revokeObjectURL(url);
+      },
+
+      // ── GDPR import ──────────────────────────────────────
+      // `merge`   = bestehende Daten bleiben, Import-Datensaetze mit neuen IDs dazu
+      // `replace` = bestehende Personen/Mappen werden ersetzt
+      importGdprData: (json, mode) => {
+        let parsed: { persons?: Person[]; resumes?: Resume[] };
+        try {
+          parsed = JSON.parse(json);
+        } catch {
+          return { ok: false, error: 'Datei ist kein gültiges JSON.' };
+        }
+        const inPersons = Array.isArray(parsed.persons) ? parsed.persons : [];
+        const inResumes = Array.isArray(parsed.resumes) ? parsed.resumes : [];
+        if (inPersons.length === 0 && inResumes.length === 0) {
+          return { ok: false, error: 'Keine Personen oder Mappen in der Datei gefunden.' };
+        }
+
+        if (mode === 'replace') {
+          set({ persons: inPersons, resumes: inResumes, activePersonId: inPersons[0]?.id ?? null, activeResumeId: inResumes[0]?.id ?? null });
+        } else {
+          // Merge: neue IDs generieren, damit Konflikte ausgeschlossen sind
+          const idMap = new Map<string, string>();
+          const remappedResumes = inResumes.map(r => {
+            const newId = uuidv4();
+            idMap.set(r.id, newId);
+            return { ...r, id: newId };
+          });
+          const remappedPersons = inPersons.map(p => ({
+            ...p,
+            id: uuidv4(),
+            resumeIds: p.resumeIds.map(rid => idMap.get(rid) ?? rid).filter(rid => remappedResumes.some(r => r.id === rid)),
+            activeResumeId: p.activeResumeId && idMap.get(p.activeResumeId) ? idMap.get(p.activeResumeId)! : (remappedResumes[0]?.id ?? ''),
+          }));
+          set((s) => ({
+            persons: [...s.persons, ...remappedPersons],
+            resumes: [...s.resumes, ...remappedResumes],
+          }));
+        }
+
+        // Sync alle neuen/ersetzten Datensaetze in die Cloud, falls konfiguriert
+        const current = get();
+        for (const p of current.persons) queueSave(`person-${p.id}`, () => db.upsertPerson(p));
+        for (const r of current.resumes) queueSave(`resume-${r.id}`, () => db.upsertResume(r));
+
+        return { ok: true, added: { persons: inPersons.length, resumes: inResumes.length } };
       },
 
       clearLimitError: () => set({ limitError: null }),

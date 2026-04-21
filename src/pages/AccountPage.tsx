@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { presentCustomerCenter } from '../lib/revenuecat';
@@ -7,7 +7,7 @@ import {
   User, Shield, Lock, Sparkles, Mail, ExternalLink,
   AlertTriangle, Download, Trash2, KeyRound,
   CreditCard, Loader2, CheckCircle, PlayCircle, LogOut,
-  Copy, Check, Gift,
+  Copy, Check, Gift, Upload, AlertCircle, X,
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useResumeStore } from '../store/resumeStore';
@@ -627,7 +627,45 @@ function ReferralSection() {
 
 // ── Section: Privacy ───────────────────────────────────────
 function PrivacySection() {
-  const { exportGdprData } = useResumeStore();
+  const { exportGdprData, importGdprData, persons, resumes } = useResumeStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pendingImport, setPendingImport] = useState<{ json: string; persons: number; resumes: number } | null>(null);
+  const [importMsg, setImportMsg] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
+
+  function openFilePicker() {
+    setImportMsg(null);
+    fileInputRef.current?.click();
+  }
+
+  async function handleFile(file: File) {
+    setImportMsg(null);
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      const np = Array.isArray(parsed.persons) ? parsed.persons.length : 0;
+      const nr = Array.isArray(parsed.resumes) ? parsed.resumes.length : 0;
+      if (np === 0 && nr === 0) {
+        setImportMsg({ kind: 'error', text: 'Datei enthält keine Personen oder Mappen.' });
+        return;
+      }
+      setPendingImport({ json: text, persons: np, resumes: nr });
+    } catch {
+      setImportMsg({ kind: 'error', text: 'Datei ist kein gültiges JSON.' });
+    }
+  }
+
+  function applyImport(mode: 'merge' | 'replace') {
+    if (!pendingImport) return;
+    const res = importGdprData(pendingImport.json, mode);
+    if (res.ok) {
+      setImportMsg({ kind: 'success', text: `${res.added.persons} Person(en) und ${res.added.resumes} Mappe(n) wurden ${mode === 'merge' ? 'hinzugefügt' : 'ersetzt'}.` });
+    } else {
+      setImportMsg({ kind: 'error', text: res.error });
+    }
+    setPendingImport(null);
+  }
+
+  const hasExistingData = persons.length > 0 || resumes.length > 0;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -668,6 +706,103 @@ function PrivacySection() {
           <Download size={13} /> Daten herunterladen
         </button>
       </div>
+
+      {/* Daten-Import / Wiederherstellen */}
+      <div className="glass-card" style={{ padding: 20 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>DATEN WIEDERHERSTELLEN</div>
+        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
+          Stelle Personen und Mappen aus einer zuvor exportierten JSON-Datei wieder her.
+          Beim Zusammenführen bleiben bestehende Mappen erhalten, importierte bekommen neue IDs.
+        </p>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json,.json"
+          style={{ display: 'none' }}
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ''; }}
+        />
+        <button className="btn-glass btn-sm" onClick={openFilePicker} style={{ gap: 6 }}>
+          <Upload size={13} /> JSON-Datei auswählen…
+        </button>
+
+        {importMsg && (
+          <div style={{
+            display: 'flex', alignItems: 'flex-start', gap: 8, marginTop: 12,
+            padding: '10px 12px', borderRadius: 10, fontSize: 12,
+            background: importMsg.kind === 'success' ? 'rgba(52,199,89,0.12)' : 'rgba(255,59,48,0.12)',
+            border: `1px solid ${importMsg.kind === 'success' ? 'rgba(52,199,89,0.3)' : 'rgba(255,59,48,0.3)'}`,
+            color: 'rgba(255,255,255,0.85)',
+          }}>
+            {importMsg.kind === 'success'
+              ? <CheckCircle size={13} style={{ color: '#34C759', flexShrink: 0, marginTop: 1 }} />
+              : <AlertCircle size={13} style={{ color: '#FF3B30', flexShrink: 0, marginTop: 1 }} />}
+            <span style={{ flex: 1 }}>{importMsg.text}</span>
+            <button onClick={() => setImportMsg(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', opacity: 0.5, padding: 2, display: 'flex' }}>
+              <X size={12} />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Confirm-Modal */}
+      {pendingImport && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 9500, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }}
+          onClick={() => setPendingImport(null)}
+        >
+          <div className="glass-card animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+            style={{ padding: 24, width: 400, maxWidth: '92vw', background: 'rgba(14,14,22,0.97)' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(0,122,255,0.15)', border: '1px solid rgba(0,122,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Upload size={18} style={{ color: 'var(--ios-blue)' }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 700 }}>Import bestätigen</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
+                  {pendingImport.persons} Person(en), {pendingImport.resumes} Mappe(n)
+                </div>
+              </div>
+            </div>
+
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 16, lineHeight: 1.5 }}>
+              Wie möchtest du importieren?
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+              <button
+                className="btn-glass btn-primary"
+                onClick={() => applyImport('merge')}
+                style={{ justifyContent: 'flex-start', padding: '11px 14px', textAlign: 'left' }}
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: 13, fontWeight: 600 }}>Zusammenführen (empfohlen)</span>
+                  <span style={{ fontSize: 11, opacity: 0.7 }}>Importierte als zusätzliche Datensätze hinzufügen</span>
+                </div>
+              </button>
+              {hasExistingData && (
+                <button
+                  className="btn-glass btn-danger"
+                  onClick={() => {
+                    if (confirm('Alle bestehenden Personen und Mappen werden ersetzt. Fortfahren?')) applyImport('replace');
+                  }}
+                  style={{ justifyContent: 'flex-start', padding: '11px 14px', textAlign: 'left' }}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'flex-start' }}>
+                    <span style={{ fontSize: 13, fontWeight: 600 }}>Komplett ersetzen</span>
+                    <span style={{ fontSize: 11, opacity: 0.8 }}>⚠ Bestehende Daten werden überschrieben</span>
+                  </div>
+                </button>
+              )}
+            </div>
+
+            <button className="btn-glass" onClick={() => setPendingImport(null)} style={{ width: '100%', justifyContent: 'center' }}>
+              Abbrechen
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="glass-card" style={{ padding: 20, border: '1px solid rgba(255,59,48,0.2)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 600, marginBottom: 8, color: 'var(--ios-red)', opacity: 0.9 }}>
