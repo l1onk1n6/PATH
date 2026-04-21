@@ -82,10 +82,34 @@ const PRO_FEATURES = [
   'Deadline-Reminder',
 ];
 
+const EARLYBIRD_DEADLINE = new Date('2026-05-15T23:59:59');
+
+function useCountdown(deadline: Date) {
+  const calc = () => {
+    const diff = deadline.getTime() - Date.now();
+    if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0, expired: true };
+    return {
+      days:    Math.floor(diff / 86_400_000),
+      hours:   Math.floor((diff % 86_400_000) / 3_600_000),
+      minutes: Math.floor((diff % 3_600_000)  /    60_000),
+      seconds: Math.floor((diff %    60_000)  /     1_000),
+      expired: false,
+    };
+  };
+  const [tick, setTick] = useState(calc);
+  useEffect(() => {
+    const id = setInterval(() => setTick(calc()), 1000);
+    return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return tick;
+}
+
 export default function LandingPage() {
   const [showAuth, setShowAuth] = useState<false | 'login' | 'register'>(false);
   const [scrolled, setScrolled] = useState(false);
   const isMobile = useIsMobile();
+  const countdown = useCountdown(EARLYBIRD_DEADLINE);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Allow page to scroll (body has overflow:hidden normally)
@@ -178,6 +202,78 @@ export default function LandingPage() {
           </button>
         </div>
       </nav>
+
+      {/* ── Earlybird Banner ────────────────────────────────── */}
+      {!countdown.expired && (
+        <div style={{
+          background: 'linear-gradient(90deg, rgba(255,159,10,0.18) 0%, rgba(255,55,95,0.15) 50%, rgba(175,82,222,0.15) 100%)',
+          borderBottom: '1px solid rgba(255,159,10,0.25)',
+          padding: isMobile ? '10px 16px' : '11px 48px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          gap: isMobile ? 10 : 20, flexWrap: 'wrap',
+          backdropFilter: 'blur(8px)',
+        }}>
+          {/* Label + Code */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: 'rgba(255,159,10,0.25)', border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', letterSpacing: '0.06em', flexShrink: 0 }}>
+              LAUNCH-ANGEBOT
+            </span>
+            <span style={{ fontSize: isMobile ? 13 : 14, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>
+              50% Rabatt im ersten Monat —{' '}
+              <span style={{ color: '#FF9F0A' }}>CHF 2.50 statt CHF 5</span>
+            </span>
+            <span style={{
+              fontSize: 12, fontWeight: 800, letterSpacing: '0.06em',
+              padding: '3px 10px', borderRadius: 7,
+              background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
+              color: '#fff', fontFamily: 'monospace', cursor: 'default',
+            }}
+              title="Gutschein-Code kopieren"
+              onClick={() => navigator.clipboard?.writeText('START25')}
+            >
+              START25
+            </span>
+          </div>
+
+          {/* Divider */}
+          {!isMobile && <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.15)' }} />}
+
+          {/* Countdown */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', flexShrink: 0 }}>Noch</span>
+            {[
+              [countdown.days,    'd'],
+              [countdown.hours,   'h'],
+              [countdown.minutes, 'm'],
+              [countdown.seconds, 's'],
+            ].map(([val, unit]) => (
+              <span key={unit as string} style={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                <span style={{
+                  fontSize: 15, fontWeight: 800, fontVariantNumeric: 'tabular-nums',
+                  minWidth: unit === 'd' ? 20 : 18, textAlign: 'right',
+                  color: '#FF9F0A',
+                }}>
+                  {String(val).padStart(2, '0')}
+                </span>
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginRight: 4 }}>{unit}</span>
+              </span>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <button onClick={() => setShowAuth('register')} style={{
+            fontSize: 12, fontWeight: 700, padding: '6px 14px', borderRadius: 8, flexShrink: 0,
+            background: 'linear-gradient(135deg, #FF9F0A, #FF375F)',
+            border: 'none', color: '#fff', cursor: 'pointer',
+            boxShadow: '0 3px 12px rgba(255,159,10,0.35)',
+            transition: 'transform 0.15s, box-shadow 0.15s',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 5px 18px rgba(255,159,10,0.5)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 3px 12px rgba(255,159,10,0.35)'; }}>
+            Jetzt sichern
+          </button>
+        </div>
+      )}
 
       {/* ── Hero ────────────────────────────────────────────── */}
       <section style={{
