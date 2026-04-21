@@ -211,21 +211,35 @@ function MappeSwitcher(props: MappeSwitcherProps) {
   } = props;
 
   const [open, setOpen] = useState(false);
+  const [panelPos, setPanelPos] = useState<{ top: number; left: number } | null>(null);
   const [focusedPersonId, setFocusedPersonId] = useState<string | null>(activePerson?.id ?? null);
   const [addingPerson, setAddingPerson] = useState(false);
   const [newPersonName, setNewPersonName] = useState('');
-  const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef   = useRef<HTMLDivElement>(null);
 
   // Reset focus to active person whenever panel closes
   useEffect(() => {
     if (!open && activePerson) setFocusedPersonId(activePerson.id);
   }, [open, activePerson]);
 
-  // Close on outside click
+  // Compute fixed position when opening
+  function openPanel() {
+    if (triggerRef.current) {
+      const r = triggerRef.current.getBoundingClientRect();
+      setPanelPos({ top: r.bottom + 6, left: r.left });
+    }
+    setOpen(true);
+  }
+
+  // Close on outside click (fixed panel is outside the rootRef subtree)
   useEffect(() => {
     if (!open) return;
     const onDoc = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
+      const t = e.target as Node;
+      const insideTrigger = triggerRef.current?.contains(t);
+      const insidePanel   = panelRef.current?.contains(t);
+      if (!insideTrigger && !insidePanel) setOpen(false);
     };
     document.addEventListener('mousedown', onDoc);
     return () => document.removeEventListener('mousedown', onDoc);
@@ -249,10 +263,11 @@ function MappeSwitcher(props: MappeSwitcherProps) {
   }
 
   return (
-    <div ref={rootRef} style={{ position: 'relative' }}>
+    <div style={{ position: 'relative' }}>
       {/* ── Trigger button ── */}
       <button
-        onClick={() => setOpen(v => !v)}
+        ref={triggerRef}
+        onClick={() => open ? setOpen(false) : openPanel()}
         className="btn-glass"
         style={{
           width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
@@ -273,12 +288,12 @@ function MappeSwitcher(props: MappeSwitcherProps) {
         <ChevronDown size={14} style={{ opacity: 0.5, flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.18s' }} />
       </button>
 
-      {/* ── Two-column panel ── */}
-      {open && (
-        <div style={{
-          position: 'absolute',
-          top: 'calc(100% + 6px)',
-          left: 0,
+      {/* ── Two-column panel (fixed so it escapes sidebar overflow:hidden) ── */}
+      {open && panelPos && (
+        <div ref={panelRef} style={{
+          position: 'fixed',
+          top: panelPos.top,
+          left: panelPos.left,
           width: isMobile ? 310 : 400,
           zIndex: 9999,
           borderRadius: 'var(--radius-sm)',
