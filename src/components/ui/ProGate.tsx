@@ -7,7 +7,7 @@ import { presentProPaywall } from '../../lib/revenuecat';
 import { userError } from '../../lib/userError';
 
 // ── Checkout helper ────────────────────────────────────────
-async function startCheckout(): Promise<string | null> {
+async function startCheckout(plan: 'monthly' | 'yearly'): Promise<string | null> {
   if (!isSupabaseConfigured()) return null;
   const supabase = getSupabase();
   const { data: { session } } = await supabase.auth.getSession();
@@ -15,6 +15,7 @@ async function startCheckout(): Promise<string | null> {
 
   const { data, error } = await supabase.functions.invoke('create-checkout-session', {
     headers: { Authorization: `Bearer ${session.access_token}` },
+    body: { plan },
   });
   if (error || !data?.url) {
     console.error('Checkout error:', error ?? data);
@@ -27,6 +28,7 @@ async function startCheckout(): Promise<string | null> {
 export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; highlightId?: string }) {
   const [loading, setLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
+  const [plan, setPlan] = useState<'monthly' | 'yearly'>('yearly');
 
   async function handleUpgrade() {
     setLoading(true);
@@ -44,7 +46,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
       return;
     }
     // Web: Stripe-Checkout
-    const url = await startCheckout();
+    const url = await startCheckout(plan);
     if (url) {
       window.location.href = url;
     } else {
@@ -69,7 +71,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #FF9F0A, #FF375F)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -85,6 +87,46 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
             <X size={14} />
           </button>
         </div>
+
+        {/* Plan Toggle — nur Web */}
+        {!Capacitor.isNativePlatform() && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 0, marginBottom: 20,
+            background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: 3,
+            border: '1px solid rgba(255,255,255,0.1)',
+          }}>
+            {(['monthly', 'yearly'] as const).map((p) => {
+              const active = plan === p;
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPlan(p)}
+                  style={{
+                    flex: 1, padding: '8px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                    fontSize: 13, fontWeight: 600, transition: 'all 0.15s',
+                    background: active ? 'linear-gradient(135deg, rgba(255,159,10,0.35), rgba(255,55,95,0.28))' : 'transparent',
+                    color: active ? '#fff' : 'rgba(255,255,255,0.45)',
+                    boxShadow: active ? '0 2px 8px rgba(0,0,0,0.25)' : 'none',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                  }}
+                >
+                  {p === 'monthly' ? (
+                    <>Monatlich <span style={{ fontSize: 12, fontWeight: 500 }}>CHF 5</span></>
+                  ) : (
+                    <>
+                      Jährlich <span style={{ fontSize: 12, fontWeight: 500 }}>CHF 49</span>
+                      <span style={{
+                        fontSize: 10, fontWeight: 700, padding: '1px 5px', borderRadius: 4,
+                        background: active ? 'rgba(52,199,89,0.35)' : 'rgba(52,199,89,0.2)',
+                        color: '#34C759', border: '1px solid rgba(52,199,89,0.4)',
+                      }}>−18%</span>
+                    </>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* Feature list */}
         <div style={{ marginBottom: 24 }}>
@@ -148,7 +190,12 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
           >
             {loading
               ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> {Capacitor.isNativePlatform() ? 'Öffne Google Play…' : 'Weiterleitung zu Stripe…'}</>
-              : <><Sparkles size={14} /> Jetzt upgraden — PATH Pro</>
+              : <><Sparkles size={14} /> {Capacitor.isNativePlatform()
+                  ? 'Jetzt upgraden — PATH Pro'
+                  : plan === 'yearly'
+                    ? 'Jetzt upgraden — CHF 49 / Jahr'
+                    : 'Jetzt upgraden — CHF 5 / Monat'
+                }</>
             }
           </button>
 
@@ -161,7 +208,9 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
           <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>
             {Capacitor.isNativePlatform()
               ? 'Abrechnung über Google Play · Jederzeit kündbar'
-              : 'Sichere Zahlung via Stripe · Jederzeit kündbar'}
+              : plan === 'yearly'
+                ? 'Sichere Zahlung via Stripe · Jährliche Abrechnung · Jederzeit kündbar'
+                : 'Sichere Zahlung via Stripe · Monatlich kündbar'}
           </p>
         </div>
       </div>

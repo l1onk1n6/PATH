@@ -1,8 +1,9 @@
 import Stripe from 'npm:stripe@14'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
-const PRICE_ID = 'price_1TJhY4FR6KM5Wltxzkoyt3Uy'
-const APP_URL  = 'https://path.pixmatic.ch'
+const PRICE_MONTHLY = 'price_1TJhY4FR6KM5Wltxzkoyt3Uy'
+const PRICE_YEARLY  = 'price_1TOiqjFR6KM5WltxyL15HA80'
+const APP_URL       = 'https://path.pixmatic.ch'
 
 const cors = {
   'Access-Control-Allow-Origin':  '*',
@@ -46,6 +47,16 @@ Deno.serve(async (req) => {
       return new Response('Unauthorized', { status: 401, headers: cors })
     }
 
+    // Optional body: { plan: 'monthly' | 'yearly' }
+    let plan: 'monthly' | 'yearly' = 'monthly'
+    try {
+      const body = await req.json()
+      if (body?.plan === 'yearly') plan = 'yearly'
+    } catch { /* no body — default monthly */ }
+
+    const priceId = plan === 'yearly' ? PRICE_YEARLY : PRICE_MONTHLY
+    console.log('[checkout] plan:', plan, '| priceId:', priceId)
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!)
     const admin = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -75,7 +86,7 @@ Deno.serve(async (req) => {
 
     const session = await stripe.checkout.sessions.create({
       customer:              customerId,
-      line_items:            [{ price: PRICE_ID, quantity: 1 }],
+      line_items:            [{ price: priceId, quantity: 1 }],
       mode:                  'subscription',
       success_url:           `${APP_URL}/#/account?success=1`,
       cancel_url:            `${APP_URL}/#/account`,

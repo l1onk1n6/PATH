@@ -527,118 +527,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Pricing ─────────────────────────────────────────── */}
-      <section id="pricing" style={{ padding: isMobile ? '80px 24px' : '100px 48px', maxWidth: 1000, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 60 }}>
-          <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
-            Transparent & fair
-          </h2>
-          <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.5)', margin: 0, lineHeight: 1.6 }}>
-            Kostenlos starten, bei Bedarf upgraden. Jederzeit kündbar.
-          </p>
-        </div>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-          gap: 24, alignItems: 'start',
-        }}>
-          {/* Free */}
-          <div style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: 24, padding: 36,
-          }}>
-            <div style={{ marginBottom: 28 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginBottom: 8, letterSpacing: '0.06em' }}>KOSTENLOS</div>
-              <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-1px' }}>CHF 0</div>
-              <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>Für immer kostenlos</div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
-              {FREE_FEATURES.map(f => (
-                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14 }}>
-                  <Check size={15} style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }} />
-                  <span style={{ color: 'rgba(255,255,255,0.65)' }}>{f}</span>
-                </div>
-              ))}
-            </div>
-
-            <button onClick={() => setShowAuth('register')} style={{
-              width: '100%', padding: '13px 20px', borderRadius: 12,
-              background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
-              color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer',
-              transition: 'background 0.2s',
-            }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.13)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}>
-              Kostenlos starten
-            </button>
-          </div>
-
-          {/* Pro */}
-          <div style={{
-            background: 'linear-gradient(160deg, rgba(0,122,255,0.12) 0%, rgba(88,86,214,0.1) 100%)',
-            border: '1px solid rgba(0,122,255,0.35)',
-            borderRadius: 24, padding: 36, position: 'relative', overflow: 'hidden',
-          }}>
-            {/* Glow */}
-            <div style={{
-              position: 'absolute', top: -60, right: -60,
-              width: 200, height: 200, borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(0,122,255,0.2) 0%, transparent 70%)',
-              pointerEvents: 'none',
-            }} />
-
-            <div style={{
-              position: 'absolute', top: 20, right: 20,
-              fontSize: 11, fontWeight: 700, padding: '4px 10px',
-              borderRadius: 99, background: 'linear-gradient(135deg, #FF9F0A, #FF6B35)',
-              color: '#fff', letterSpacing: '0.04em',
-            }}>
-              EMPFOHLEN
-            </div>
-
-            <div style={{ marginBottom: 28 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <Sparkles size={14} style={{ color: '#FF9F0A' }} />
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.06em' }}>PATH PRO</div>
-              </div>
-              <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-1px' }}>
-                CHF 5
-                <span style={{ fontSize: 18, fontWeight: 500, color: 'rgba(255,255,255,0.5)', letterSpacing: 0 }}> / Monat</span>
-              </div>
-              <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>Jederzeit kündbar</div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 11, marginBottom: 32 }}>
-              {PRO_FEATURES.map(f => (
-                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14 }}>
-                  <Check size={15} style={{ color: '#34C759', flexShrink: 0 }} />
-                  <span>{f}</span>
-                </div>
-              ))}
-            </div>
-
-            <button onClick={() => setShowAuth('register')} style={{
-              width: '100%', padding: '14px 20px', borderRadius: 12,
-              background: 'linear-gradient(135deg, #007AFF, #5856D6)',
-              border: 'none',
-              color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer',
-              boxShadow: '0 6px 24px rgba(0,122,255,0.3)',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 32px rgba(0,122,255,0.4)'; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,122,255,0.3)'; }}>
-              <Sparkles size={15} /> Jetzt PATH Pro holen
-            </button>
-
-            <div style={{ textAlign: 'center', marginTop: 12, fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
-              Sichere Zahlung via Stripe · Keine versteckten Kosten
-            </div>
-          </div>
-        </div>
-      </section>
+      <PricingSection isMobile={isMobile} onRegister={() => setShowAuth('register')} />
 
       {/* ── Testimonials / Trust ────────────────────────────── */}
       <section style={{
@@ -848,6 +737,141 @@ export default function LandingPage() {
         html { scroll-behavior: smooth; }
       `}</style>
     </div>
+  );
+}
+
+function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegister: () => void }) {
+  const [billing, setBilling] = useState<'monthly' | 'yearly'>('yearly');
+  const isYearly = billing === 'yearly';
+
+  return (
+    <section id="pricing" style={{ padding: isMobile ? '80px 24px' : '100px 48px', maxWidth: 1000, margin: '0 auto' }}>
+      <div style={{ textAlign: 'center', marginBottom: 48 }}>
+        <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
+          Transparent & fair
+        </h2>
+        <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.5)', margin: '0 0 28px', lineHeight: 1.6 }}>
+          Kostenlos starten, bei Bedarf upgraden. Jederzeit kündbar.
+        </p>
+
+        {/* Billing Toggle */}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: 'rgba(255,255,255,0.06)', borderRadius: 12, padding: 4, border: '1px solid rgba(255,255,255,0.1)' }}>
+          {(['monthly', 'yearly'] as const).map((b) => (
+            <button
+              key={b}
+              onClick={() => setBilling(b)}
+              style={{
+                padding: '8px 20px', borderRadius: 9, border: 'none', cursor: 'pointer',
+                fontSize: 14, fontWeight: 600, transition: 'all 0.15s',
+                background: billing === b ? 'rgba(0,122,255,0.85)' : 'transparent',
+                color: billing === b ? '#fff' : 'rgba(255,255,255,0.5)',
+                display: 'flex', alignItems: 'center', gap: 7,
+              }}
+            >
+              {b === 'monthly' ? 'Monatlich' : (
+                <>Jährlich <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: 'rgba(52,199,89,0.3)', color: '#34C759', border: '1px solid rgba(52,199,89,0.4)' }}>−18%</span></>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 24, alignItems: 'start' }}>
+        {/* Free */}
+        <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, padding: 36 }}>
+          <div style={{ marginBottom: 28 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginBottom: 8, letterSpacing: '0.06em' }}>KOSTENLOS</div>
+            <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-1px' }}>CHF 0</div>
+            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>Für immer kostenlos</div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
+            {FREE_FEATURES.map(f => (
+              <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14 }}>
+                <Check size={15} style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }} />
+                <span style={{ color: 'rgba(255,255,255,0.65)' }}>{f}</span>
+              </div>
+            ))}
+          </div>
+          <button onClick={onRegister} style={{
+            width: '100%', padding: '13px 20px', borderRadius: 12,
+            background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+            color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s',
+          }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.13)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}>
+            Kostenlos starten
+          </button>
+        </div>
+
+        {/* Pro */}
+        <div style={{
+          background: 'linear-gradient(160deg, rgba(0,122,255,0.12) 0%, rgba(88,86,214,0.1) 100%)',
+          border: '1px solid rgba(0,122,255,0.35)',
+          borderRadius: 24, padding: 36, position: 'relative', overflow: 'hidden',
+        }}>
+          <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,122,255,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', top: 20, right: 20, fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 99, background: 'linear-gradient(135deg, #FF9F0A, #FF6B35)', color: '#fff', letterSpacing: '0.04em' }}>
+            EMPFOHLEN
+          </div>
+
+          <div style={{ marginBottom: 28 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <Sparkles size={14} style={{ color: '#FF9F0A' }} />
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.06em' }}>PATH PRO</div>
+            </div>
+
+            {isYearly ? (
+              <>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+                  <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-1px' }}>
+                    CHF 49
+                    <span style={{ fontSize: 18, fontWeight: 500, color: 'rgba(255,255,255,0.5)', letterSpacing: 0 }}> / Jahr</span>
+                  </div>
+                  <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', textDecoration: 'line-through' }}>CHF 60</span>
+                </div>
+                <div style={{ fontSize: 14, color: '#34C759', marginTop: 4, fontWeight: 600 }}>
+                  CHF 4.08 / Monat · 2 Monate gratis
+                </div>
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-1px' }}>
+                  CHF 5
+                  <span style={{ fontSize: 18, fontWeight: 500, color: 'rgba(255,255,255,0.5)', letterSpacing: 0 }}> / Monat</span>
+                </div>
+                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>Jederzeit kündbar</div>
+              </>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 11, marginBottom: 32 }}>
+            {PRO_FEATURES.map(f => (
+              <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14 }}>
+                <Check size={15} style={{ color: '#34C759', flexShrink: 0 }} />
+                <span>{f}</span>
+              </div>
+            ))}
+          </div>
+
+          <button onClick={onRegister} style={{
+            width: '100%', padding: '14px 20px', borderRadius: 12,
+            background: 'linear-gradient(135deg, #007AFF, #5856D6)', border: 'none',
+            color: '#fff', fontSize: 15, fontWeight: 700, cursor: 'pointer',
+            boxShadow: '0 6px 24px rgba(0,122,255,0.3)',
+            transition: 'transform 0.2s, box-shadow 0.2s',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 32px rgba(0,122,255,0.4)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,122,255,0.3)'; }}>
+            <Sparkles size={15} /> {isYearly ? 'Jetzt starten — CHF 49 / Jahr' : 'Jetzt PATH Pro holen'}
+          </button>
+
+          <div style={{ textAlign: 'center', marginTop: 12, fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
+            Sichere Zahlung via Stripe · Keine versteckten Kosten
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
