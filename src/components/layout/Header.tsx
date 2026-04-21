@@ -37,7 +37,6 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
 
   return (
     <header
-      className="glass"
       style={{
         display: 'flex',
         alignItems: 'center',
