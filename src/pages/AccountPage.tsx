@@ -731,19 +731,42 @@ export default function AccountPage() {
     );
   }
 
+  // Desktop: zwei Spalten (Rail links, Inhalt rechts).
   return (
-    <div className="animate-fade-in glass" style={{ height: '100%', overflow: 'auto', borderRadius: 'var(--radius-lg)', padding: '20px 28px 20px 22px' }}>
-      <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {current && (
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <current.icon size={15} />
-            </div>
-          )}
-          <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{current?.label}</h2>
+    <div className="animate-fade-in" style={{ display: 'flex', gap: 12, height: '100%', overflow: 'hidden' }}>
+      <aside className="glass" style={{ width: 210, flexShrink: 0, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: 8 }}>
+        {NAV.map(({ id, label, icon: Icon }) => {
+          const active = section === id;
+          return (
+            <button key={id} className="btn-glass"
+              onClick={() => setSection(id)}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                padding: '8px 10px', marginBottom: 2, borderRadius: 'var(--radius-sm)',
+                boxShadow: 'none',
+                background: active ? 'rgba(0,122,255,0.2)' : 'transparent',
+                border: active ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
+              }}>
+              <Icon size={14} />
+              <span style={{ fontSize: 13, fontWeight: active ? 600 : 500, opacity: active ? 1 : 0.78 }}>{label}</span>
+            </button>
+          );
+        })}
+      </aside>
+
+      <div className="glass" style={{ flex: 1, overflow: 'auto', borderRadius: 'var(--radius-lg)', padding: '20px 28px 20px 22px' }}>
+        <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {current && (
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <current.icon size={15} />
+              </div>
+            )}
+            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{current?.label}</h2>
+          </div>
         </div>
+        {renderSection()}
       </div>
-      {renderSection()}
     </div>
   );
 }

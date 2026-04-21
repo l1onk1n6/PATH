@@ -3,7 +3,7 @@ import { useState } from 'react';
 import {
   User, Briefcase, GraduationCap, Zap, FolderOpen,
   Upload, Palette, AlertCircle, FileEdit, LayoutList, Lock,
-  Pencil, Check, X,
+  Pencil, Check, X, Languages, History,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import { usePlan } from '../lib/plan';
@@ -165,40 +165,95 @@ export default function Editor() {
     );
   }
 
-  // ── Desktop layout: full-width content ───────────────────
+  // ── Desktop layout: zwei Spalten (Sektions-Rail links, Inhalt rechts) ──
   return (
-    <div className="animate-fade-in glass" style={{ height: '100%', overflow: 'auto', borderRadius: 'var(--radius-lg)', padding: '20px 28px 20px 22px' }}>
+    <div className="animate-fade-in" style={{ display: 'flex', gap: 12, height: '100%', overflow: 'hidden' }}>
       {showTranslate && <TranslateDialog onClose={() => setShowTranslate(false)} />}
 
-      {activeSection === 'history' ? (
-        <VersionHistoryPanel resumeId={resume.id} />
-      ) : (
-        <>
-          {/* Section header + Mappe-Umbennenen */}
-          <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between', flexWrap: 'wrap' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                {currentSection?.icon && (
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <currentSection.icon size={15} />
-                  </div>
-                )}
-                <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{currentSection?.label}</h2>
+      {/* Links: Rail mit Editor-Sektionen + Aktionen */}
+      <aside className="glass" style={{ width: 210, flexShrink: 0, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: 8 }}>
+        {SECTIONS.map(({ id, label, icon: Icon }) => {
+          const active = activeSection === id && activeSection !== 'history';
+          return (
+            <button key={id} className="btn-glass"
+              onClick={() => setActiveSection(id)}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                padding: '8px 10px', marginBottom: 2, borderRadius: 'var(--radius-sm)',
+                boxShadow: 'none',
+                background: active ? 'rgba(0,122,255,0.2)' : 'transparent',
+                border: active ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
+              }}>
+              <Icon size={14} style={{ opacity: active ? 1 : 0.65 }} />
+              <span style={{ fontSize: 13, fontWeight: active ? 600 : 500, opacity: active ? 1 : 0.78 }}>{label}</span>
+            </button>
+          );
+        })}
+
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '6px 4px' }} />
+
+        {/* Übersetzen */}
+        <button className="btn-glass"
+          onClick={() => setShowTranslate(true)}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', marginBottom: 2, borderRadius: 'var(--radius-sm)', boxShadow: 'none', background: 'transparent', border: '1px solid transparent' }}>
+          <Languages size={14} style={{ opacity: 0.65 }} />
+          <span style={{ fontSize: 13, opacity: 0.78 }}>Übersetzen</span>
+        </button>
+
+        {/* Versionen (Pro) */}
+        {limits.versionHistory ? (
+          <button className="btn-glass"
+            onClick={() => setActiveSection(activeSection === 'history' ? 'personal' : 'history')}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', marginBottom: 2,
+              borderRadius: 'var(--radius-sm)', boxShadow: 'none',
+              background: activeSection === 'history' ? 'rgba(0,122,255,0.2)' : 'transparent',
+              border: activeSection === 'history' ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
+            }}>
+            <History size={14} style={{ opacity: activeSection === 'history' ? 1 : 0.65 }} />
+            <span style={{ fontSize: 13, opacity: 0.78 }}>Versionen</span>
+          </button>
+        ) : (
+          <button disabled className="btn-glass"
+            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 'var(--radius-sm)', boxShadow: 'none', opacity: 0.4, cursor: 'not-allowed', background: 'transparent', border: '1px solid transparent' }}>
+            <History size={14} />
+            <span style={{ fontSize: 13, flex: 1, textAlign: 'left' }}>Versionen</span>
+            <Lock size={11} />
+          </button>
+        )}
+      </aside>
+
+      {/* Rechts: Inhalt */}
+      <div className="glass" style={{ flex: 1, overflow: 'auto', borderRadius: 'var(--radius-lg)', padding: '20px 28px 20px 22px' }}>
+        {activeSection === 'history' ? (
+          <VersionHistoryPanel resumeId={resume.id} />
+        ) : (
+          <>
+            <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                  {currentSection?.icon && (
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <currentSection.icon size={15} />
+                    </div>
+                  )}
+                  <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{currentSection?.label}</h2>
+                </div>
+                <MappeRename
+                  renaming={renaming}
+                  value={renameValue}
+                  onValueChange={setRenameValue}
+                  currentName={resume.name}
+                  onStart={startRename}
+                  onCommit={commitRename}
+                  onCancel={cancelRename}
+                />
               </div>
-              <MappeRename
-                renaming={renaming}
-                value={renameValue}
-                onValueChange={setRenameValue}
-                currentName={resume.name}
-                onStart={startRename}
-                onCommit={commitRename}
-                onCancel={cancelRename}
-              />
             </div>
-          </div>
-          {renderSection()}
-        </>
-      )}
+            {renderSection()}
+          </>
+        )}
+      </div>
     </div>
   );
 }
