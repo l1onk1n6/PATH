@@ -328,13 +328,33 @@ export function StandardPdf({ resume, variant = {} }: Props) {
 
   // Wichtig: paddingTop/Bottom auf der Page, nicht auf Inner-Views — nur
   // so bekommt JEDE Seite (auch Folgeseiten bei Umbruch) Abstand zum Rand.
-  const pageStyle = { fontFamily, fontSize: 10, color: text, backgroundColor: pageBg, lineHeight: 1.5, paddingTop: 40, paddingBottom: 40 };
+  const PAGE_VERTICAL = 40;
+  const pageStyle = { fontFamily, fontSize: 10, color: text, backgroundColor: pageBg, lineHeight: 1.5, paddingTop: PAGE_VERTICAL, paddingBottom: PAGE_VERTICAL };
+
+  // Sidebar-Hintergrund als fixed-Layer, damit er auf JEDER Seite voll
+  // bis zum Blattrand reicht. Negative Offsets, um die Page-Padding-Zone
+  // zu "escapen" (sonst bliebe oben/unten ein weisser Streifen).
+  const SidebarBackground = () => (
+    sidebarMode === 'none' ? null : (
+      <View
+        fixed
+        style={{
+          position: 'absolute',
+          top: -PAGE_VERTICAL, bottom: -PAGE_VERTICAL,
+          [sidebarMode === 'left' ? 'left' : 'right']: 0,
+          width: sidebarWidth,
+          backgroundColor: sidebarBg,
+        }}
+      />
+    )
+  );
 
   // Banner-Header: volle Breite; Sidebar/Main darunter.
   if (headerMode === 'banner') {
     return (
       <Document>
         <Page size="A4" style={pageStyle}>
+          <SidebarBackground />
           <Header inverse />
           {sidebarMode === 'none' ? (
             <View style={{ paddingHorizontal: 40, paddingTop: 20 }}><Main /></View>
@@ -353,6 +373,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
   return (
     <Document>
       <Page size="A4" style={pageStyle}>
+        <SidebarBackground />
         {sidebarMode === 'none' ? (
           <View style={{ paddingHorizontal: 46 }}>
             <Header />
