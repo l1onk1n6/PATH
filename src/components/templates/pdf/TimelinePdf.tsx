@@ -5,7 +5,7 @@
  */
 import { Document, Page, View, Text, Link, Image, StyleSheet } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
-import { alphaHex, dateRange } from './shared';
+import { alphaHex, dateRange, DescriptionBlock } from './shared';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
 export default function TimelinePdf({ resume }: { resume: Resume }) {
@@ -43,7 +43,7 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
       <View style={{ flex: 1, paddingLeft: 10, paddingBottom: 4 }}>
         <Text style={{ fontSize: 11.5, fontFamily: 'Helvetica-Bold' }}>{title}</Text>
         {sub ? <Text style={{ fontSize: 10.5, color: accent, marginTop: 1 }}>{sub}</Text> : null}
-        {body ? <Text style={{ fontSize: 10, color: '#444', marginTop: 4, lineHeight: 1.55 }}>{body}</Text> : null}
+        <DescriptionBlock text={body} color={accent} textColor="#444" fontSize={10} marginTop={4} />
       </View>
     </View>
   );

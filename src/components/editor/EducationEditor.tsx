@@ -129,13 +129,17 @@ export default function EducationEditor() {
                 </div>
               </div>
               <div>
-                <label className="section-label">Beschreibung / Schwerpunkte</label>
+                <label className="section-label">Schwerpunkte & Erfolge</label>
                 <textarea
                   className="input-glass"
-                  placeholder="Beschreiben Sie Schwerpunkte, Projekte oder besondere Leistungen..."
+                  placeholder={'Pro Zeile ein Stichpunkt:\nSchwerpunkt Software Engineering\nAbschlussarbeit "Skalierbare Microservices"\nAustauschsemester in Kopenhagen'}
                   value={edu.description} maxLength={1000}
+                  rows={4}
                   onChange={(e) => updateEducation(resume.id, edu.id, { description: e.target.value })}
                 />
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>
+                  Tipp: Einfach tippen — pro Zeile ein Punkt. Bullets fügt das System automatisch ein.
+                </div>
               </div>
             </div>
           )}

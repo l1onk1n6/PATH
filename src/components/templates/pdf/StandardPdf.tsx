@@ -11,7 +11,7 @@ import type { HeadingStyle } from './shared';
 import {
   alphaHex, readableOn, MUTED_COLOR, MUTED_DARK,
   SectionHeading, Section, WorkEntry, EduEntry, SkillBar, SkillDots, SkillChips, groupSkillsByCategory,
-  LanguageRow, CertItem, dateRange,
+  LanguageRow, CertItem, dateRange, DescriptionBlock,
 } from './shared';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
@@ -196,11 +196,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
             </View>
             <Text style={{ fontSize: 9, color: muted }}>{dateRange(p.startDate, p.endDate)}</Text>
           </View>
-          {p.description ? (
-            <Text style={{ fontSize: 10, color: alphaHex(text, 0.78), lineHeight: 1.55 }}>
-              {p.description}
-            </Text>
-          ) : null}
+          <DescriptionBlock text={p.description} color={accent} textColor={text} fontSize={10} marginTop={2} />
           {p.technologies?.length ? (
             <Text style={{ fontSize: 9, color: muted, marginTop: 3 }}>{p.technologies.join(' · ')}</Text>
           ) : null}

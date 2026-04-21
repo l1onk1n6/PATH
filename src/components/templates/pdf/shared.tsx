@@ -147,6 +147,61 @@ export function Section({
 //  Eintraege
 // ─────────────────────────────────────────────────────────────
 
+/**
+ * Zerlegt einen freien Beschreibungstext in Bullet-Zeilen.
+ * - teilt an Zeilenumbruechen
+ * - strippt User-typische Prefixe (•, -, –, *, ·, > plus Whitespace)
+ * - filtert leere Zeilen
+ * So bekommt der Nutzer konsistent formatierte Aufzaehlungen, egal ob er
+ * "- foo", "* foo", "• foo" oder nur "foo" tippt.
+ */
+export function parseBulletLines(text: string | undefined | null): string[] {
+  if (!text) return [];
+  return text
+    .split(/\r?\n/)
+    .map(line => line.replace(/^\s*[•\-*–·>]+\s*/, '').trim())
+    .filter(line => line.length > 0);
+}
+
+/**
+ * Rendert einen Beschreibungs-Block:
+ *  - leer  → nichts
+ *  - 1 Zeile → Fliesstext
+ *  - n Zeilen → Bullet-Liste
+ * Einheitlicher Stil ueber alle Templates.
+ */
+export function DescriptionBlock({
+  text, color, textColor = '#1c1c1e', fontSize = 10, marginTop = 4,
+}: {
+  text: string | undefined | null;
+  color: string;
+  textColor?: string;
+  fontSize?: number;
+  marginTop?: number;
+}) {
+  const lines = parseBulletLines(text);
+  if (lines.length === 0) return null;
+  const bodyColor = alphaHex(textColor, 0.78);
+
+  if (lines.length === 1) {
+    return (
+      <Text style={{ fontSize, color: bodyColor, lineHeight: 1.6, marginTop }}>
+        {lines[0]}
+      </Text>
+    );
+  }
+  return (
+    <View style={{ marginTop }}>
+      {lines.map((l, i) => (
+        <View key={i} style={{ flexDirection: 'row', marginTop: i === 0 ? 0 : 3 }}>
+          <Text style={{ fontSize, color, width: 10, lineHeight: 1.55 }}>•</Text>
+          <Text style={{ fontSize, color: bodyColor, flex: 1, lineHeight: 1.55 }}>{l}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 export function WorkEntry({
   job, color, textColor = '#1c1c1e', mutedColor = MUTED_COLOR, boldFont = 'Helvetica-Bold',
 }: {
@@ -175,11 +230,7 @@ export function WorkEntry({
           {job.location ? <Text style={{ fontSize: 9, color: mutedColor, marginTop: 1 }}>{job.location}</Text> : null}
         </View>
       </View>
-      {job.description ? (
-        <Text style={{ fontSize: 10, color: alphaHex(textColor, 0.78), lineHeight: 1.6 }}>
-          {job.description}
-        </Text>
-      ) : null}
+      <DescriptionBlock text={job.description} color={color} textColor={textColor} />
       {job.highlights && job.highlights.length > 0 ? (
         <View style={{ marginTop: 4 }}>
           {job.highlights.map((h, i) => (
@@ -203,11 +254,11 @@ export function EduEntry({
   mutedColor?: string;
   boldFont?: string;
 }) {
-  // Bildungseintraege sind in der Regel kurz (Title + Institution + Datum);
-  // als Ganzes zusammenhalten ist hier sinnvoll.
+  const hasBody = parseBulletLines(edu.description).length > 0;
   return (
-    <View style={{ marginBottom: 12 }} wrap={false}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+    <View style={{ marginBottom: 12 }}>
+      {/* Kopfzeile zusammenhalten, Body darf umbrechen */}
+      <View wrap={false} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <View style={{ flex: 1, marginRight: 10 }}>
           <Text style={{ fontSize: 10.5, fontFamily: boldFont, color: textColor }}>{edu.degree}</Text>
           {edu.field ? <Text style={{ fontSize: 10, color: alphaHex(textColor, 0.78) }}>{edu.field}</Text> : null}
@@ -218,6 +269,7 @@ export function EduEntry({
           {edu.grade ? <Text style={{ fontSize: 9, color: mutedColor, marginTop: 1 }}>Note {edu.grade}</Text> : null}
         </View>
       </View>
+      {hasBody && <DescriptionBlock text={edu.description} color={color} textColor={textColor} />}
     </View>
   );
 }

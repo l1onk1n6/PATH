@@ -4,7 +4,7 @@
  */
 import { Document, Page, View, Text, Link, Image, StyleSheet } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
-import { alphaHex, dateRange, formatDate } from './shared';
+import { alphaHex, dateRange, formatDate, DescriptionBlock } from './shared';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
 export default function ElegantPdf({ resume }: { resume: Resume }) {
@@ -67,9 +67,8 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
                   </View>
                   <Text style={{ fontSize: 10, color: '#555' }}>{dateRange(job.startDate, job.endDate, job.current)}</Text>
                 </View>
-                {job.description ? (
-                  <Text style={{ fontSize: 10.5, lineHeight: 1.65, color: '#333' }}>{job.description}</Text>
-                ) : null}
+                <DescriptionBlock text={job.description} color={accent} textColor="#333" fontSize={10.5} />
+
               </View>
             ))}
           </>

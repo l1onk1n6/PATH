@@ -146,8 +146,14 @@ export default function ProjectsEditor() {
                 </div>
                 <div>
                   <label className="section-label">Beschreibung</label>
-                  <textarea className="input-glass" placeholder="Was wurde entwickelt?" value={project.description} maxLength={1000}
+                  <textarea className="input-glass"
+                    placeholder={'Pro Zeile ein Stichpunkt:\nAufbau einer REST-API mit 12 Endpunkten\nReduzierung der Ladezeit um 60%'}
+                    value={project.description} maxLength={1000}
+                    rows={4}
                     onChange={(e) => updateProject(resume.id, project.id, { description: e.target.value })} />
+                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>
+                    Tipp: Einfach tippen — pro Zeile ein Punkt. Bullets fügt das System automatisch ein.
+                  </div>
                 </div>
               </div>
             )}

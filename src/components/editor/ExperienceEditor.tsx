@@ -126,11 +126,15 @@ export default function ExperienceEditor() {
                 </div>
               </div>
               <div>
-                <label className="section-label">Beschreibung / Aufgaben</label>
+                <label className="section-label">Aufgaben & Erfolge</label>
                 <textarea className="input-glass"
-                  placeholder="Beschreiben Sie Ihre Aufgaben und Verantwortlichkeiten..."
+                  placeholder={'Pro Zeile ein Stichpunkt — System formatiert als Aufzählung:\nEntwicklung und Betreuung von Microsoft-Power-Platform-Lösungen\nKonzeption von M365-Teams-Strukturen\nLeitung IT-Projekte'}
                   value={job.description} maxLength={1500}
+                  rows={5}
                   onChange={(e) => updateWorkExperience(resume.id, job.id, { description: e.target.value })} />
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>
+                  Tipp: Einfach tippen — pro Zeile ein Punkt. Bullets fügt das System automatisch ein.
+                </div>
               </div>
             </div>
           )}

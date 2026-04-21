@@ -63,13 +63,7 @@ export default function Preview() {
         setPreviewUrl(url);
       } catch (err) {
         console.error('Preview PDF build failed:', err);
-        if (!cancelled) {
-          // Technische Details im UI mitzeigen — erleichtert Fehlersuche enorm
-          const detail = err instanceof Error
-            ? `${err.name}: ${err.message}`
-            : String(err);
-          setPreviewError(`${userError('Die Vorschau konnte nicht aufgebaut werden', err)}\n\nTechnischer Hinweis: ${detail}`);
-        }
+        if (!cancelled) setPreviewError(userError('Die Vorschau konnte nicht aufgebaut werden', err));
       } finally {
         if (!cancelled) setPreviewBuilding(false);
       }
@@ -253,7 +247,7 @@ export default function Preview() {
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, textAlign: 'center' }}>
               <div style={{ maxWidth: 360, color: 'rgba(255,255,255,0.85)' }}>
                 <AlertCircle size={28} style={{ opacity: 0.7, marginBottom: 10 }} />
-                <p style={{ fontSize: 13, lineHeight: 1.5, whiteSpace: 'pre-line' }}>{previewError}</p>
+                <p style={{ fontSize: 13, lineHeight: 1.5 }}>{previewError}</p>
               </div>
             </div>
           ) : previewUrl ? (

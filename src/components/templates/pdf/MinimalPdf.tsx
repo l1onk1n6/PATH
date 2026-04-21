@@ -5,7 +5,7 @@
 import { Document, Page, View, Text, Link, Image, StyleSheet } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
 import {
-  Section, WorkEntry, EduEntry, SkillBar, LanguageRow, CertItem, alphaHex,
+  Section, WorkEntry, EduEntry, SkillBar, LanguageRow, CertItem, DescriptionBlock,
 } from './shared';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
@@ -72,11 +72,7 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
                 {resume.projects.map(p => (
                   <View key={p.id} style={{ marginBottom: 10 }}>
                     <Text style={{ fontSize: 10.5, fontFamily: 'Helvetica-Bold' }} wrap={false}>{p.name}</Text>
-                    {p.description ? (
-                      <Text style={{ fontSize: 10, color: alphaHex('#1c1c1e', 0.78), marginTop: 2, lineHeight: 1.55 }}>
-                        {p.description}
-                      </Text>
-                    ) : null}
+                    <DescriptionBlock text={p.description} color={accent} fontSize={10} marginTop={2} />
                   </View>
                 ))}
               </Section>
