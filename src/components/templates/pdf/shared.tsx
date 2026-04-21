@@ -217,7 +217,7 @@ export function WorkEntry({
       {/* Layout: Position links, Datum rechts (beide einzeilig).
           Firma + Ort auf einer eigenen Subzeile links, voll ausnutzbar.
           Beschreibung darunter — keine Kollision mehr mit der Datums-Spalte. */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 }}>
         <Text style={{ fontSize: 11, fontFamily: boldFont, color: textColor, flex: 1, marginRight: 10 }}>
           {job.position}
         </Text>
@@ -257,7 +257,7 @@ export function EduEntry({
   const metaRight = [dateRange(edu.startDate, edu.endDate), edu.grade ? `Note ${edu.grade}` : ''].filter(Boolean).join(' · ');
   return (
     <View wrap={false} style={{ marginBottom: 12 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 }}>
         <Text style={{ fontSize: 10.5, fontFamily: boldFont, color: textColor, flex: 1, marginRight: 10 }}>
           {titleLine}
         </Text>
