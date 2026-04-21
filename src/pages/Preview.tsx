@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Download, Loader2, Layers, X, FolderDown, Lock, ChevronDown, FileText, FileEdit, Share2, Check } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ProGate from '../components/ui/ProGate';
 import { TEMPLATES } from '../components/templates/templateConfig';
@@ -9,6 +9,7 @@ import { usePlan, FREE_TEMPLATE_IDS } from '../lib/plan';
 import { canExportPdf, incrementPdfExport, getPdfExportCount, savePdf } from '../lib/pdfExports';
 import { renderResumePdf, renderCoverLetterPdf, buildMappePdfBytes } from '../lib/pdfRenderer';
 import ShareModal from '../components/ui/ShareModal';
+import PdfPreview from '../components/ui/PdfPreview';
 import { userError } from '../lib/userError';
 import type { Resume } from '../types/resume';
 
@@ -32,13 +33,12 @@ export default function Preview() {
   const [shareOpen, setShareOpen] = useState(false);
 
   // Live-Vorschau: baut bei jeder Template- oder Resume-Aenderung die komplette
-  // Mappe als PDF-Blob und zeigt sie in einem iframe. So sieht der User
-  // pixelgenau das, was beim Export rauskommt — keine separate HTML-Rendering-
-  // Pipeline mehr, die sich anders verhalten koennte.
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  // Mappe als PDF-Bytes und rendert sie via pdf.js in <canvas>. Chrome-Mobile
+  // zeigt PDF-Blobs im iframe nur als grauen Screen — Canvas-Rendering
+  // funktioniert ueberall.
+  const [previewBytes, setPreviewBytes] = useState<Uint8Array | null>(null);
   const [previewBuilding, setPreviewBuilding] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
-  const currentUrlRef = useRef<string | null>(null);
   // Key-String, der sich nur bei sichtbaren Aenderungen aendert. Verhindert,
   // dass innere React-State-Updates (z. B. Template-Picker-Open) das PDF
   // unnoetig neu bauen.
@@ -59,11 +59,7 @@ export default function Preview() {
       try {
         const bytes = await buildMappePdfBytes(resume);
         if (cancelled) return;
-        const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        if (currentUrlRef.current) URL.revokeObjectURL(currentUrlRef.current);
-        currentUrlRef.current = url;
-        setPreviewUrl(url);
+        setPreviewBytes(bytes);
       } catch (err) {
         console.error('Preview PDF build failed:', err);
         if (!cancelled) setPreviewError(userError('Die Vorschau konnte nicht aufgebaut werden', err));
@@ -74,10 +70,6 @@ export default function Preview() {
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pdfKey]);
-
-  useEffect(() => () => {
-    if (currentUrlRef.current) URL.revokeObjectURL(currentUrlRef.current);
-  }, []);
 
   if (!resume) {
     return (
@@ -330,26 +322,9 @@ export default function Preview() {
           </div>
         </div>
 
-        {/* PDF-Vorschau (iframe) */}
-        <div style={{ flex: 1, background: '#555', position: 'relative' }}>
-          {previewError ? (
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, textAlign: 'center' }}>
-              <div style={{ maxWidth: 360, color: 'rgba(255,255,255,0.85)' }}>
-                <AlertCircle size={28} style={{ opacity: 0.7, marginBottom: 10 }} />
-                <p style={{ fontSize: 13, lineHeight: 1.5 }}>{previewError}</p>
-              </div>
-            </div>
-          ) : previewUrl ? (
-            <iframe
-              title="Vorschau"
-              src={previewUrl}
-              style={{ width: '100%', height: '100%', border: 'none', background: '#555' }}
-            />
-          ) : (
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Loader2 size={28} style={{ color: 'rgba(255,255,255,0.5)', animation: 'spin 1s linear infinite' }} />
-            </div>
-          )}
+        {/* PDF-Vorschau (Canvas via pdf.js) */}
+        <div style={{ flex: 1, position: 'relative', minHeight: 0 }}>
+          <PdfPreview bytes={previewBytes} building={previewBuilding} error={previewError} />
         </div>
       </div>
 
