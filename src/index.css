@@ -43,6 +43,9 @@ body {
   background: linear-gradient(135deg, #0d1117 0%, #161b2e 30%, #0f2a4a 60%, #1a0533 100%);
   background-attachment: fixed;
   color: #fff;
+  /* Heller Custom-Cursor, damit der Pointer auf dem dunklen Hintergrund
+     sichtbar bleibt (OS-Default ist oft schwarz auf Windows/Linux). */
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'><path d='M3 2 L3 17 L7.2 13.2 L10.2 19.5 L12.4 18.5 L9.5 12.4 L15 12.4 Z' fill='white' stroke='%23111' stroke-width='1.2' stroke-linejoin='round'/></svg>") 3 2, default;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
 }
