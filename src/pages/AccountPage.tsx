@@ -7,7 +7,7 @@ import {
   User, Shield, Lock, Sparkles, Mail, ExternalLink,
   AlertTriangle, Download, Trash2, KeyRound,
   CreditCard, Loader2, CheckCircle, PlayCircle, LogOut,
-  Copy, Check, Gift,
+  Copy, Check, Gift, XCircle,
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useResumeStore } from '../store/resumeStore';
@@ -193,15 +193,31 @@ function PlanSection() {
             })()}
           </div>
           {isPro && !isGift ? (
-            <button
-              className="btn-glass btn-sm"
-              onClick={handlePortal}
-              disabled={portalLoading}
-              style={{ padding: '8px 14px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}
-            >
-              {portalLoading ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <CreditCard size={12} />}
-              Abo verwalten
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+              <button
+                className="btn-glass btn-sm"
+                onClick={handlePortal}
+                disabled={portalLoading}
+                style={{ padding: '8px 14px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                {portalLoading ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <CreditCard size={12} />}
+                Abo verwalten
+              </button>
+              <button
+                onClick={handlePortal}
+                disabled={portalLoading}
+                style={{
+                  background: 'none', border: 'none', padding: 0,
+                  fontSize: 11, color: 'rgba(255,255,255,0.45)',
+                  cursor: portalLoading ? 'default' : 'pointer',
+                  display: 'flex', alignItems: 'center', gap: 4,
+                  textDecoration: 'underline', textUnderlineOffset: 3,
+                }}
+                title="Kündigung läuft über das Abo-Portal"
+              >
+                <XCircle size={11} /> Abo kündigen
+              </button>
+            </div>
           ) : !isPro ? (
 
             <button
