@@ -3,9 +3,12 @@ import MonthYearPicker from '../ui/MonthYearPicker';
 import { useState } from 'react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import EmptyState from '../ui/EmptyState';
+import { useUndoToast } from '../../lib/undoToast';
 
 export default function EducationEditor() {
-  const { getActiveResume, addEducation, updateEducation, removeEducation, reorderEducation } = useResumeStore();
+  const { getActiveResume, addEducation, updateEducation, removeEducation, reorderEducation, restoreItemAt } = useResumeStore();
+  const showUndo = useUndoToast(s => s.show);
   const resume = getActiveResume();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [dragging, setDragging] = useState<number | null>(null);
@@ -33,10 +36,13 @@ export default function EducationEditor() {
       </div>
 
       {education.length === 0 && (
-        <div className="glass-card" style={{ padding: 24, textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>
-          <GraduationCap size={28} style={{ marginBottom: 8, opacity: 0.4 }} />
-          <div style={{ fontSize: 14 }}>Noch keine Ausbildung eingetragen</div>
-        </div>
+        <EmptyState
+          icon={GraduationCap}
+          title="Ausbildung hinzufügen"
+          description="Schule, Lehre, Studium — alles was zu deinem Bildungsweg gehört."
+          ctaLabel="Ersten Eintrag anlegen"
+          onCta={() => addEducation(resume.id)}
+        />
       )}
 
       {education.map((edu, i) => (
@@ -88,7 +94,14 @@ export default function EducationEditor() {
             <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
               <button
                 className="btn-glass btn-danger btn-sm btn-icon"
-                onClick={(e) => { e.stopPropagation(); removeEducation(resume.id, edu.id); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const snapshot = edu;
+                  const idx = i;
+                  removeEducation(resume.id, edu.id);
+                  const label = edu.institution || edu.degree || 'Eintrag';
+                  showUndo(`Ausbildung «${label}» gelöscht`, () => restoreItemAt(resume.id, 'education', snapshot, idx));
+                }}
                 style={{ padding: 6 }}
               >
                 <Trash2 size={12} />

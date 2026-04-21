@@ -156,10 +156,12 @@ export default function Editor() {
         {/* Editor content — also handles 'history' on mobile */}
         <div className="glass" style={{ flex: 1, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: '16px 16px' }}>
           {showTranslate && <TranslateDialog onClose={() => setShowTranslate(false)} />}
-          {activeSection === 'history'
-            ? <VersionHistoryPanel resumeId={resume.id} />
-            : renderSection()
-          }
+          <div key={activeSection} className="animate-section-in">
+            {activeSection === 'history'
+              ? <VersionHistoryPanel resumeId={resume.id} />
+              : renderSection()
+            }
+          </div>
         </div>
       </div>
     );
@@ -225,34 +227,36 @@ export default function Editor() {
 
       {/* Rechts: Inhalt */}
       <div className="glass" style={{ flex: 1, overflow: 'auto', borderRadius: 'var(--radius-lg)', padding: '20px 28px 20px 22px' }}>
-        {activeSection === 'history' ? (
-          <VersionHistoryPanel resumeId={resume.id} />
-        ) : (
-          <>
-            <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                  {currentSection?.icon && (
-                    <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <currentSection.icon size={15} />
-                    </div>
-                  )}
-                  <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{currentSection?.label}</h2>
+        <div key={activeSection} className="animate-section-in">
+          {activeSection === 'history' ? (
+            <VersionHistoryPanel resumeId={resume.id} />
+          ) : (
+            <>
+              <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                    {currentSection?.icon && (
+                      <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <currentSection.icon size={15} />
+                      </div>
+                    )}
+                    <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{currentSection?.label}</h2>
+                  </div>
+                  <MappeRename
+                    renaming={renaming}
+                    value={renameValue}
+                    onValueChange={setRenameValue}
+                    currentName={resume.name}
+                    onStart={startRename}
+                    onCommit={commitRename}
+                    onCancel={cancelRename}
+                  />
                 </div>
-                <MappeRename
-                  renaming={renaming}
-                  value={renameValue}
-                  onValueChange={setRenameValue}
-                  currentName={resume.name}
-                  onStart={startRename}
-                  onCommit={commitRename}
-                  onCancel={cancelRename}
-                />
               </div>
-            </div>
-            {renderSection()}
-          </>
-        )}
+              {renderSection()}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

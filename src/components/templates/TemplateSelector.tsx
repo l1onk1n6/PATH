@@ -1,6 +1,7 @@
 import { Check, Palette } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { TEMPLATES } from './templateConfig';
+import TemplateMiniPreview from './TemplateMiniPreview';
 import type { TemplateId } from '../../types/resume';
 
 const ACCENT_COLORS = [
@@ -57,31 +58,22 @@ export default function TemplateSelector() {
                   transition: 'all 0.2s',
                 }}
               >
-                {/* Thumbnail */}
-                <div style={{
-                  height: 70,
-                  borderRadius: 8,
-                  background: tmpl.preview,
-                  marginBottom: 10,
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}>
-                  {/* Simulated resume lines */}
-                  <div style={{ position: 'absolute', inset: 0, padding: '10px 12px' }}>
-                    <div style={{ width: '40%', height: 8, background: 'rgba(255,255,255,0.6)', borderRadius: 4, marginBottom: 5 }} />
-                    <div style={{ width: '60%', height: 5, background: 'rgba(255,255,255,0.35)', borderRadius: 3, marginBottom: 8 }} />
-                    <div style={{ width: '80%', height: 3, background: 'rgba(255,255,255,0.2)', borderRadius: 2, marginBottom: 3 }} />
-                    <div style={{ width: '65%', height: 3, background: 'rgba(255,255,255,0.2)', borderRadius: 2, marginBottom: 3 }} />
-                    <div style={{ width: '70%', height: 3, background: 'rgba(255,255,255,0.15)', borderRadius: 2 }} />
-                  </div>
+                {/* Thumbnail — realistic layout preview */}
+                <div style={{ position: 'relative', marginBottom: 10 }}>
+                  <TemplateMiniPreview
+                    templateId={tmpl.id as TemplateId}
+                    accent={resume.accentColor}
+                    height={110}
+                  />
                   {isSelected && (
                     <div style={{
                       position: 'absolute', top: 6, right: 6,
-                      width: 20, height: 20, borderRadius: '50%',
+                      width: 22, height: 22, borderRadius: '50%',
                       background: resume.accentColor,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
                     }}>
-                      <Check size={11} color="#fff" strokeWidth={3} />
+                      <Check size={12} color="#fff" strokeWidth={3} />
                     </div>
                   )}
                 </div>

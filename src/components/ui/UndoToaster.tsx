@@ -1,0 +1,75 @@
+import { useEffect, useState } from 'react';
+import { RotateCcw, X } from 'lucide-react';
+import { useUndoToast } from '../../lib/undoToast';
+
+export default function UndoToaster() {
+  const toasts   = useUndoToast(s => s.toasts);
+  const dismiss  = useUndoToast(s => s.dismiss);
+  const [, tick] = useState(0);
+
+  // re-render every 100ms so progress bars animate smoothly
+  useEffect(() => {
+    if (toasts.length === 0) return;
+    const id = setInterval(() => tick(t => t + 1), 100);
+    return () => clearInterval(id);
+  }, [toasts.length]);
+
+  if (toasts.length === 0) return null;
+
+  return (
+    <div style={{
+      position: 'fixed', bottom: 18, left: '50%', transform: 'translateX(-50%)',
+      zIndex: 500, display: 'flex', flexDirection: 'column', gap: 8,
+      pointerEvents: 'none', alignItems: 'center',
+    }}>
+      {toasts.map(t => {
+        const elapsed  = Date.now() - t.createdAt;
+        const progress = Math.max(0, Math.min(1, 1 - elapsed / t.durationMs));
+        return (
+          <div key={t.id}
+            className="animate-slide-up"
+            style={{
+              pointerEvents: 'auto',
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '10px 12px 10px 16px',
+              borderRadius: 12,
+              background: 'rgba(18,20,30,0.96)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+              minWidth: 320, maxWidth: '92vw', position: 'relative', overflow: 'hidden',
+            }}
+          >
+            <div style={{ flex: 1, fontSize: 13, color: 'rgba(255,255,255,0.9)' }}>
+              {t.message}
+            </div>
+            <button
+              className="btn-glass btn-sm"
+              onClick={() => { t.onUndo(); dismiss(t.id); }}
+              style={{
+                gap: 5, padding: '6px 10px', fontSize: 12, fontWeight: 600,
+                background: 'rgba(0,122,255,0.18)', border: '1px solid rgba(0,122,255,0.35)',
+                color: 'var(--ios-blue)', boxShadow: 'none',
+              }}
+            >
+              <RotateCcw size={12} /> Rückgängig
+            </button>
+            <button
+              onClick={() => dismiss(t.id)}
+              aria-label="Schliessen"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', padding: 4, display: 'flex' }}
+            >
+              <X size={13} />
+            </button>
+            {/* Progress bar */}
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, height: 2,
+              width: `${progress * 100}%`, background: 'rgba(0,122,255,0.55)',
+              transition: 'width 0.1s linear',
+            }} />
+          </div>
+        );
+      })}
+    </div>
+  );
+}

@@ -2,6 +2,8 @@ import { Plus, Trash2, Zap, Globe, GripVertical, ChevronUp, ChevronDown } from '
 import { useState } from 'react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import EmptyState from '../ui/EmptyState';
+import { useUndoToast } from '../../lib/undoToast';
 import type { Language } from '../../types/resume';
 
 const SKILL_LEVELS = [1, 2, 3, 4, 5];
@@ -15,7 +17,9 @@ export default function SkillsEditor() {
     getActiveResume,
     addSkill, updateSkill, removeSkill, reorderSkills,
     addLanguage, updateLanguage, removeLanguage,
+    restoreItemAt,
   } = useResumeStore();
+  const showUndo = useUndoToast(s => s.show);
   const [dragging, setDragging] = useState<number | null>(null);
   const [dragOver, setDragOver] = useState<number | null>(null);
   const isMobile = useIsMobile();
@@ -39,9 +43,14 @@ export default function SkillsEditor() {
         </div>
 
         {skills.length === 0 && (
-          <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
-            Noch keine Fähigkeiten eingetragen
-          </div>
+          <EmptyState
+            compact
+            icon={Zap}
+            title="Fähigkeiten hinzufügen"
+            description="Tools, Frameworks, Methoden — mit Niveau-Bewertung."
+            ctaLabel="Erste Fähigkeit"
+            onCta={() => addSkill(resume.id)}
+          />
         )}
 
         {skills.length > 0 && (
@@ -117,7 +126,13 @@ export default function SkillsEditor() {
                 </span>
                 <button
                   className="btn-glass btn-danger btn-icon"
-                  onClick={() => removeSkill(resume.id, skill.id)}
+                  onClick={() => {
+                    const snapshot = skill;
+                    const idx = i;
+                    removeSkill(resume.id, skill.id);
+                    const label = skill.name || 'Fähigkeit';
+                    showUndo(`Fähigkeit «${label}» gelöscht`, () => restoreItemAt(resume.id, 'skills', snapshot, idx));
+                  }}
                   style={{ padding: 6, flexShrink: 0 }}
                 >
                   <Trash2 size={12} />
@@ -178,7 +193,13 @@ export default function SkillsEditor() {
                 <div style={{ width: 166, flexShrink: 0 }} />
                 <button
                   className="btn-glass btn-danger btn-icon"
-                  onClick={() => removeLanguage(resume.id, lang.id)}
+                  onClick={() => {
+                    const snapshot = lang;
+                    const idx = resume.languages.findIndex(l => l.id === lang.id);
+                    removeLanguage(resume.id, lang.id);
+                    const label = lang.name || 'Sprache';
+                    showUndo(`Sprache «${label}» gelöscht`, () => restoreItemAt(resume.id, 'languages', snapshot, idx));
+                  }}
                   style={{ padding: 6, flexShrink: 0 }}
                 >
                   <Trash2 size={12} />
@@ -187,9 +208,14 @@ export default function SkillsEditor() {
             </div>
           ))}
           {languages.length === 0 && (
-            <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
-              Noch keine Sprachen eingetragen
-            </div>
+            <EmptyState
+              compact
+              icon={Globe}
+              title="Sprachen hinzufügen"
+              description="Welche Sprachen sprichst du und auf welchem Niveau?"
+              ctaLabel="Sprache hinzufügen"
+              onCta={() => addLanguage(resume.id)}
+            />
           )}
         </div>
       </div>

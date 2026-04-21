@@ -106,6 +106,14 @@ interface ResumeStore {
   removeCustomSection: (resumeId: string, id: string) => void;
   reorderCustomSections: (resumeId: string, from: number, to: number) => void;
 
+  // Undo: re-insert an item at the given index in any list section
+  restoreItemAt: (
+    resumeId: string,
+    section: 'workExperience' | 'education' | 'skills' | 'languages' | 'projects' | 'certificates' | 'customSections',
+    item: unknown,
+    index: number,
+  ) => void;
+
   // Share token
   setShareToken: (resumeId: string, token: string | null) => void;
   clearLimitError: () => void;
@@ -515,6 +523,21 @@ export const useResumeStore = create<ResumeStore>()(
 
       reorderCustomSections: (resumeId, from, to) => {
         set((s) => ({ resumes: s.resumes.map(r => { if (r.id !== resumeId) return r; const a = [...(r.customSections ?? [])]; const [m] = a.splice(from, 1); a.splice(to, 0, m); return { ...r, customSections: a, updatedAt: new Date().toISOString() }; }) }));
+        queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
+      },
+
+      // ── Undo: re-insert an item at the given index ───────
+      restoreItemAt: (resumeId, section, item, index) => {
+        set((s) => ({
+          resumes: s.resumes.map(r => {
+            if (r.id !== resumeId) return r;
+            const existing = (r[section] ?? []) as unknown[];
+            const arr = [...existing];
+            const safeIdx = Math.max(0, Math.min(index, arr.length));
+            arr.splice(safeIdx, 0, item);
+            return { ...r, [section]: arr, updatedAt: new Date().toISOString() };
+          }),
+        }));
         queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
 

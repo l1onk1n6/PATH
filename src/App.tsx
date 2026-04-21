@@ -20,6 +20,7 @@ import { useResumeStore } from './store/resumeStore';
 import { isSupabaseConfigured, getSupabase } from './lib/supabase';
 import { useIsMobile } from './hooks/useBreakpoint';
 import OnboardingModal, { isOnboardingDone } from './components/ui/OnboardingModal';
+import UndoToaster from './components/ui/UndoToaster';
 
 const APP_VERSION = '1.8.0';
 
@@ -131,6 +132,9 @@ function AppShell() {
       {showOnboarding && (
         <OnboardingModal onClose={() => setShowOnboarding(false)} />
       )}
+
+      {/* ── Undo-Toaster (global) ─────────────────────────── */}
+      <UndoToaster />
 
       {/* ── Session timeout warning ───────────────────────── */}
       {countdown !== null && (

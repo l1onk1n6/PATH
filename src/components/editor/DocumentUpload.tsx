@@ -138,9 +138,9 @@ export default function DocumentUpload() {
 
       {/* Uploaded files */}
       {documents.length === 0 && (
-        <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
-          <File size={24} style={{ marginBottom: 8, opacity: 0.4 }} />
-          <div>Noch keine Dokumente hochgeladen</div>
+        <div style={{ padding: '14px 16px', textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 12, borderTop: '1px dashed rgba(255,255,255,0.08)', marginTop: 4 }}>
+          <File size={18} style={{ marginBottom: 4, opacity: 0.4, display: 'block', margin: '0 auto 4px' }} />
+          Keine Dokumente hochgeladen — zieh Dateien in die Dropzone oben.
         </div>
       )}
 

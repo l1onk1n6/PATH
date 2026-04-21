@@ -3,13 +3,17 @@ import MonthYearPicker from '../ui/MonthYearPicker';
 import { useState } from 'react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import EmptyState from '../ui/EmptyState';
+import { useUndoToast } from '../../lib/undoToast';
 
 export default function ProjectsEditor() {
   const {
     getActiveResume,
     addProject, updateProject, removeProject, reorderProjects,
     addCertificate, updateCertificate, removeCertificate, reorderCertificates,
+    restoreItemAt,
   } = useResumeStore();
+  const showUndo = useUndoToast(s => s.show);
   const resume = getActiveResume();
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
   const [draggingP, setDraggingP] = useState<number | null>(null);
@@ -94,7 +98,14 @@ export default function ProjectsEditor() {
               <div style={{ display: 'flex', gap: 6 }}>
                 <button
                   className="btn-glass btn-danger btn-sm btn-icon"
-                  onClick={(e) => { e.stopPropagation(); removeProject(resume.id, project.id); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const snapshot = project;
+                    const idx = i;
+                    removeProject(resume.id, project.id);
+                    const label = project.name || 'Projekt';
+                    showUndo(`Projekt «${label}» gelöscht`, () => restoreItemAt(resume.id, 'projects', snapshot, idx));
+                  }}
                   style={{ padding: 6 }}
                 >
                   <Trash2 size={12} />
@@ -143,10 +154,14 @@ export default function ProjectsEditor() {
         ))}
 
         {projects.length === 0 && (
-          <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
-            <FolderOpen size={24} style={{ marginBottom: 8, opacity: 0.4 }} />
-            <div>Noch keine Projekte eingetragen</div>
-          </div>
+          <EmptyState
+            compact
+            icon={FolderOpen}
+            title="Projekte hinzufügen"
+            description="Nebenprojekte, Open Source, Praktika — alles was dich auszeichnet."
+            ctaLabel="Projekt anlegen"
+            onCta={() => addProject(resume.id)}
+          />
         )}
       </div>
 
@@ -225,7 +240,13 @@ export default function ProjectsEditor() {
                   </div>
                 </div>
                 <div style={{ marginTop: 10, textAlign: 'right' }}>
-                  <button className="btn-glass btn-danger btn-sm" onClick={() => removeCertificate(resume.id, cert.id)}>
+                  <button className="btn-glass btn-danger btn-sm" onClick={() => {
+                    const snapshot = cert;
+                    const idx = i;
+                    removeCertificate(resume.id, cert.id);
+                    const label = cert.name || 'Zertifikat';
+                    showUndo(`Zertifikat «${label}» gelöscht`, () => restoreItemAt(resume.id, 'certificates', snapshot, idx));
+                  }}>
                     <Trash2 size={12} /> Entfernen
                   </button>
                 </div>
@@ -235,9 +256,14 @@ export default function ProjectsEditor() {
         ))}
 
         {certificates.length === 0 && (
-          <div className="glass-card" style={{ padding: 20, textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
-            Noch keine Zertifikate eingetragen
-          </div>
+          <EmptyState
+            compact
+            icon={Award}
+            title="Zertifikate hinzufügen"
+            description="Abschlüsse, Weiterbildungen, Online-Kurse."
+            ctaLabel="Zertifikat anlegen"
+            onCta={() => addCertificate(resume.id)}
+          />
         )}
       </div>
     </div>

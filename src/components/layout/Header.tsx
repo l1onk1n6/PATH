@@ -1,14 +1,71 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Eye, Edit3, Menu, Sparkles } from 'lucide-react';
+import { Eye, Edit3, Menu, Sparkles, Cloud, CloudOff, Loader2, Check } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { UpgradeModal } from '../ui/ProGate';
 import { displayPersonName } from '../../lib/displayName';
+import { isSupabaseConfigured } from '../../lib/supabase';
 
 interface Props {
   isMobile?: boolean;
   onMenuToggle?: () => void;
+}
+
+function SaveStatusPill({ isMobile }: { isMobile?: boolean }) {
+  const savePending = useResumeStore(s => s.savePending);
+  const syncing     = useResumeStore(s => s.syncing);
+  const cloudOn     = isSupabaseConfigured();
+  const [justSaved, setJustSaved] = useState(false);
+  const [prevPending, setPrevPending] = useState(savePending);
+
+  // Flash "Gespeichert" for 1.6s after pending falls to false
+  useEffect(() => {
+    if (prevPending && !savePending) {
+      setJustSaved(true);
+      const t = setTimeout(() => setJustSaved(false), 1600);
+      setPrevPending(savePending);
+      return () => clearTimeout(t);
+    }
+    setPrevPending(savePending);
+  }, [savePending, prevPending]);
+
+  let Icon: typeof Cloud = Cloud;
+  let text = 'Synchronisiert';
+  let color = 'rgba(255,255,255,0.45)';
+  let bg = 'transparent';
+  let border = '1px solid transparent';
+
+  if (!cloudOn) {
+    Icon = CloudOff; text = 'Lokal'; color = 'rgba(255,255,255,0.4)';
+  } else if (syncing) {
+    Icon = Loader2; text = 'Synchronisiert…'; color = '#007AFF';
+    bg = 'rgba(0,122,255,0.1)'; border = '1px solid rgba(0,122,255,0.25)';
+  } else if (savePending) {
+    Icon = Loader2; text = 'Speichert…'; color = '#FF9F0A';
+    bg = 'rgba(255,159,10,0.1)'; border = '1px solid rgba(255,159,10,0.25)';
+  } else if (justSaved) {
+    Icon = Check; text = 'Gespeichert'; color = '#34C759';
+    bg = 'rgba(52,199,89,0.12)'; border = '1px solid rgba(52,199,89,0.3)';
+  }
+
+  const spinning = Icon === Loader2;
+
+  return (
+    <div
+      title={text}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        padding: isMobile ? '5px 8px' : '6px 10px',
+        borderRadius: 16, fontSize: 11, fontWeight: 600, color, background: bg, border,
+        transition: 'all 0.25s ease',
+        flexShrink: 0,
+      }}
+    >
+      <Icon size={12} style={spinning ? { animation: 'spin 1s linear infinite' } : undefined} />
+      {!isMobile && <span>{text}</span>}
+    </div>
+  );
 }
 
 export default function Header({ isMobile, onMenuToggle }: Props) {
@@ -75,6 +132,7 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
 
       <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
         {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
+        <SaveStatusPill isMobile={isMobile} />
         <button
           onClick={() => !isPro && setShowUpgrade(true)}
           style={{

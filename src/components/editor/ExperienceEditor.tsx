@@ -3,9 +3,12 @@ import MonthYearPicker from '../ui/MonthYearPicker';
 import { useState } from 'react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import EmptyState from '../ui/EmptyState';
+import { useUndoToast } from '../../lib/undoToast';
 
 export default function ExperienceEditor() {
-  const { getActiveResume, addWorkExperience, updateWorkExperience, removeWorkExperience, reorderWorkExperience } = useResumeStore();
+  const { getActiveResume, addWorkExperience, updateWorkExperience, removeWorkExperience, reorderWorkExperience, restoreItemAt } = useResumeStore();
+  const showUndo = useUndoToast(s => s.show);
   const resume = getActiveResume();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [dragging, setDragging] = useState<number | null>(null);
@@ -33,10 +36,13 @@ export default function ExperienceEditor() {
       </div>
 
       {jobs.length === 0 && (
-        <div className="glass-card" style={{ padding: 24, textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>
-          <Briefcase size={28} style={{ marginBottom: 8, opacity: 0.4 }} />
-          <div style={{ fontSize: 14 }}>Noch keine Berufserfahrung eingetragen</div>
-        </div>
+        <EmptyState
+          icon={Briefcase}
+          title="Berufserfahrung hinzufügen"
+          description="Erfasse deine bisherigen Stationen — Firma, Rolle, Zeitraum und was du bewirkt hast."
+          ctaLabel="Ersten Eintrag anlegen"
+          onCta={() => addWorkExperience(resume.id)}
+        />
       )}
 
       {jobs.map((job, i) => (
@@ -88,7 +94,14 @@ export default function ExperienceEditor() {
             <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
               <button
                 className="btn-glass btn-danger btn-sm btn-icon"
-                onClick={(e) => { e.stopPropagation(); removeWorkExperience(resume.id, job.id); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const snapshot = job;
+                  const idx = i;
+                  removeWorkExperience(resume.id, job.id);
+                  const label = job.company || job.position || 'Eintrag';
+                  showUndo(`Erfahrung «${label}» gelöscht`, () => restoreItemAt(resume.id, 'workExperience', snapshot, idx));
+                }}
                 style={{ padding: 6 }}
               >
                 <Trash2 size={12} />

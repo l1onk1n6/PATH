@@ -1,8 +1,9 @@
-import { Plus, Trash2, GripVertical, X, Lock } from 'lucide-react';
+import { Plus, Trash2, GripVertical, X, Lock, LayoutList } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { UpgradeModal } from '../ui/ProGate';
 import { useState } from 'react';
+import EmptyState from '../ui/EmptyState';
 
 export default function CustomSectionEditor() {
   const { getActiveResume, addCustomSection, updateCustomSection, removeCustomSection, reorderCustomSections } = useResumeStore();
@@ -40,10 +41,13 @@ export default function CustomSectionEditor() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {sections.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '28px 16px', color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>
-          Noch keine eigenen Sektionen.<br />
-          Klicke auf „Sektion hinzufügen" um loszulegen.
-        </div>
+        <EmptyState
+          icon={LayoutList}
+          title="Eigene Sektionen"
+          description="Publikationen, Ehrenamt, Interessen, Auszeichnungen — gestalte deinen CV flexibel."
+          ctaLabel="Erste Sektion anlegen"
+          onCta={() => addCustomSection(resume.id)}
+        />
       )}
 
       {sections.map((section, sIdx) => (

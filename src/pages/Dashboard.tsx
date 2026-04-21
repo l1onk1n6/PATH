@@ -452,19 +452,53 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Empty state */}
+          {/* Empty state — guided onboarding */}
           {persons.length === 0 && !showAdd && (
-            <div className="glass-card" style={{ padding: isMobile ? '32px 20px' : '48px 24px', textAlign: 'center' }}>
-              <div style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(0,122,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                <Users size={24} style={{ color: 'var(--ios-blue)' }} />
+            <div className="glass-card animate-fade-in" style={{ padding: isMobile ? '28px 20px' : '40px 32px', textAlign: 'center', background: 'linear-gradient(135deg, rgba(0,122,255,0.08), rgba(88,86,214,0.06))', border: '1px solid rgba(0,122,255,0.18)' }}>
+              {/* Hero icon */}
+              <div style={{ width: 72, height: 72, borderRadius: 20, background: 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px', boxShadow: '0 8px 24px rgba(0,122,255,0.25)' }}>
+                <Users size={32} style={{ color: '#fff' }} />
               </div>
-              <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 700 }}>Noch keine Profile</h3>
-              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, marginBottom: 20 }}>
-                Legen Sie Ihre erste Person an und beginnen Sie mit dem Lebenslauf.
+
+              <h3 style={{ margin: '0 0 8px', fontSize: isMobile ? 20 : 24, fontWeight: 700, letterSpacing: '-0.5px' }}>
+                Willkommen bei PATH
+              </h3>
+              <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 14, marginBottom: 24, maxWidth: 420, marginLeft: 'auto', marginRight: 'auto' }}>
+                In 3 Schritten zu deinem Lebenslauf — alles synchronisiert, mehrere Mappen pro Person, native PDF-Exporte.
               </p>
-              <button className="btn-glass btn-primary" onClick={() => setShowAdd(true)}>
-                <Plus size={15} /> Erste Person anlegen
+
+              {/* Steps */}
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 10, marginBottom: 24, maxWidth: 640, margin: '0 auto 24px' }}>
+                {[
+                  { n: 1, icon: Users,    title: 'Person anlegen',    desc: 'Name + Kontaktdaten erfassen' },
+                  { n: 2, icon: FileText, title: 'Mappe gestalten',  desc: 'Werdegang, Skills, Template' },
+                  { n: 3, icon: Eye,      title: 'PDF & Teilen',     desc: 'Export oder öffentlicher Link' },
+                ].map(({ n, icon: Icon, title, desc }) => (
+                  <div key={n} style={{
+                    padding: '14px 12px', borderRadius: 12,
+                    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textAlign: 'center',
+                  }}>
+                    <div style={{ position: 'relative', marginBottom: 4 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(0,122,255,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon size={16} style={{ color: 'var(--ios-blue)' }} />
+                      </div>
+                      <div style={{ position: 'absolute', top: -4, right: -4, width: 18, height: 18, borderRadius: '50%', background: '#007AFF', color: '#fff', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {n}
+                      </div>
+                    </div>
+                    <div style={{ fontSize: 13, fontWeight: 600 }}>{title}</div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', lineHeight: 1.4 }}>{desc}</div>
+                  </div>
+                ))}
+              </div>
+
+              <button className="btn-glass btn-primary" onClick={() => setShowAdd(true)} style={{ padding: '11px 22px', fontSize: 14, fontWeight: 600 }}>
+                <Plus size={16} /> Jetzt starten
               </button>
+              <div style={{ marginTop: 10, fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                Kostenlos · 1 Person · 2 Mappen · keine Kreditkarte
+              </div>
             </div>
           )}
 
