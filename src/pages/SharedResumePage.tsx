@@ -81,7 +81,7 @@ export default function SharedResumePage() {
   const name = [firstName, lastName].filter(Boolean).join(' ') || 'Bewerbung';
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column' }}>
       {/* Shared header bar */}
       <div style={{
         padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
