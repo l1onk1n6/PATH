@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Lock, X, Sparkles, Loader2 } from 'lucide-react';
+import { Lock, X, Sparkles, Loader2, Clock } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { usePlan, PRO_FEATURES } from '../../lib/plan';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
@@ -181,6 +181,67 @@ interface ProGateProps {
 export default function ProGate({ featureId, children, badge = false }: ProGateProps) {
   const { isPro } = usePlan();
   const [showModal, setShowModal] = useState(false);
+  const [showSoon, setShowSoon] = useState(false);
+
+  // Feature existiert aber ist noch nicht ausgerollt: ausgrauen,
+  // Klick zeigt 'Bald verfügbar'. Gilt auch fuer Pro-User.
+  const feature = PRO_FEATURES.find(f => f.id === featureId);
+  const notYetAvailable = feature && feature.available === false;
+
+  if (notYetAvailable) {
+    const label = feature.label;
+    const hint = `${label} – bald verfügbar`;
+    const Overlay = badge ? (
+      <span style={{
+        position: 'absolute', top: -5, right: -16,
+        fontSize: 9, fontWeight: 700, letterSpacing: '0.04em',
+        padding: '2px 4px', borderRadius: 3,
+        background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)',
+        color: 'rgba(255,255,255,0.75)', pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 1,
+      }}>BALD</span>
+    ) : (
+      <div style={{
+        position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        gap: 6, borderRadius: 'inherit', background: 'rgba(0,0,0,0.2)',
+      }}>
+        <Clock size={12} style={{ color: 'rgba(255,255,255,0.7)' }} />
+        <span style={{
+          fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
+          padding: '3px 7px', borderRadius: 6,
+          background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)',
+          color: 'rgba(255,255,255,0.85)',
+        }}>BALD VERFÜGBAR</span>
+      </div>
+    );
+    return (
+      <>
+        {showSoon && (
+          <div onClick={() => setShowSoon(false)}
+            style={{ position: 'fixed', inset: 0, zIndex: 9500, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }}>
+            <div className="glass-card animate-scale-in" onClick={e => e.stopPropagation()}
+              style={{ padding: '24px 28px', maxWidth: 320, textAlign: 'center', background: 'rgba(14,14,22,0.97)' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(88,86,214,0.2)', border: '1px solid rgba(88,86,214,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+                <Clock size={20} style={{ color: 'rgba(255,255,255,0.85)' }} />
+              </div>
+              <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>{label} — bald verfügbar</div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', marginBottom: 16 }}>
+                {feature.description}
+              </div>
+              <button className="btn-glass btn-primary btn-sm" onClick={() => setShowSoon(false)}>Verstanden</button>
+            </div>
+          </div>
+        )}
+        <div
+          style={{ position: 'relative', display: badge ? 'inline-flex' : 'block', marginRight: badge ? 6 : 0, cursor: 'pointer' }}
+          onClick={() => setShowSoon(true)}
+          title={hint}
+        >
+          <div style={{ opacity: 0.35, pointerEvents: 'none', filter: 'grayscale(0.6)' }}>{children}</div>
+          {Overlay}
+        </div>
+      </>
+    );
+  }
 
   if (isPro) return <>{children}</>;
 
