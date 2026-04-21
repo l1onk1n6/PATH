@@ -16,6 +16,7 @@ export default function ProjectsEditor() {
   const showUndo = useUndoToast(s => s.show);
   const resume = getActiveResume();
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
+  const [expandedCert, setExpandedCert] = useState<string | null>(null);
   const [draggingP, setDraggingP] = useState<number | null>(null);
   const [dragOverP, setDragOverP] = useState<number | null>(null);
   const [draggingC, setDraggingC] = useState<number | null>(null);
@@ -195,29 +196,65 @@ export default function ProjectsEditor() {
               transition: 'opacity 0.15s, border 0.15s',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-              {isMobile && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flexShrink: 0, paddingTop: 4 }}>
-                  <button
-                    className="btn-glass btn-icon"
-                    disabled={i === 0}
-                    onClick={() => reorderCertificates(resume.id, i, i - 1)}
-                    style={{ padding: 3, opacity: i === 0 ? 0.2 : 0.6, boxShadow: 'none', background: 'transparent', border: 'none' }}
-                  >
-                    <ChevronUp size={13} />
-                  </button>
-                  <button
-                    className="btn-glass btn-icon"
-                    disabled={i === certificates.length - 1}
-                    onClick={() => reorderCertificates(resume.id, i, i + 1)}
-                    style={{ padding: 3, opacity: i === certificates.length - 1 ? 0.2 : 0.6, boxShadow: 'none', background: 'transparent', border: 'none' }}
-                  >
-                    <ChevronDown size={13} />
-                  </button>
+            <div
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+              onClick={() => setExpandedCert(expandedCert === cert.id ? null : cert.id)}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+                {isMobile ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+                    <button
+                      className="btn-glass btn-icon"
+                      disabled={i === 0}
+                      onClick={() => reorderCertificates(resume.id, i, i - 1)}
+                      style={{ padding: 3, opacity: i === 0 ? 0.2 : 0.6, boxShadow: 'none', background: 'transparent', border: 'none' }}
+                    >
+                      <ChevronUp size={13} />
+                    </button>
+                    <button
+                      className="btn-glass btn-icon"
+                      disabled={i === certificates.length - 1}
+                      onClick={() => reorderCertificates(resume.id, i, i + 1)}
+                      style={{ padding: 3, opacity: i === certificates.length - 1 ? 0.2 : 0.6, boxShadow: 'none', background: 'transparent', border: 'none' }}
+                    >
+                      <ChevronDown size={13} />
+                    </button>
+                  </div>
+                ) : (
+                  <GripVertical size={14} style={{ opacity: 0.3, flexShrink: 0, cursor: 'grab' }} />
+                )}
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div style={{ fontWeight: 600, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {cert.name || `Zertifikat ${i + 1}`}
+                  </div>
+                  {(cert.issuer || cert.date) && (
+                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {[cert.issuer, cert.date].filter(Boolean).join(' · ')}
+                    </div>
+                  )}
                 </div>
-              )}
-              {!isMobile && <GripVertical size={14} style={{ opacity: 0.3, flexShrink: 0, cursor: 'grab', marginTop: 4 }} />}
-              <div style={{ flex: 1 }}>
+              </div>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+                <button
+                  className="btn-glass btn-danger btn-sm btn-icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const snapshot = cert;
+                    const idx = i;
+                    removeCertificate(resume.id, cert.id);
+                    const label = cert.name || 'Zertifikat';
+                    showUndo(`Zertifikat «${label}» gelöscht`, () => restoreItemAt(resume.id, 'certificates', snapshot, idx));
+                  }}
+                  style={{ padding: 6 }}
+                >
+                  <Trash2 size={12} />
+                </button>
+                {expandedCert === cert.id ? <ChevronUp size={14} style={{ opacity: 0.5 }} /> : <ChevronDown size={14} style={{ opacity: 0.5 }} />}
+              </div>
+            </div>
+
+            {expandedCert === cert.id && (
+              <div style={{ marginTop: 12 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
                   <div>
                     <label className="section-label">Zertifikat</label>
@@ -239,19 +276,8 @@ export default function ProjectsEditor() {
                       onChange={(e) => updateCertificate(resume.id, cert.id, { url: e.target.value })} />
                   </div>
                 </div>
-                <div style={{ marginTop: 10, textAlign: 'right' }}>
-                  <button className="btn-glass btn-danger btn-sm" onClick={() => {
-                    const snapshot = cert;
-                    const idx = i;
-                    removeCertificate(resume.id, cert.id);
-                    const label = cert.name || 'Zertifikat';
-                    showUndo(`Zertifikat «${label}» gelöscht`, () => restoreItemAt(resume.id, 'certificates', snapshot, idx));
-                  }}>
-                    <Trash2 size={12} /> Entfernen
-                  </button>
-                </div>
               </div>
-            </div>
+            )}
           </div>
         ))}
 
