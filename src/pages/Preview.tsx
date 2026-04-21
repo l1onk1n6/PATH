@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Download, Loader2, Layers, X, FolderDown, Lock, ChevronDown, FileText, FileEdit } from 'lucide-react';
+import { AlertCircle, Download, Loader2, Layers, X, FolderDown, Lock, ChevronDown, FileText, FileEdit, Share2 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ProGate from '../components/ui/ProGate';
@@ -8,6 +8,7 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 import { usePlan, FREE_TEMPLATE_IDS } from '../lib/plan';
 import { canExportPdf, incrementPdfExport, getPdfExportCount, savePdf } from '../lib/pdfExports';
 import { renderResumePdf, renderCoverLetterPdf, buildMappePdfBytes } from '../lib/pdfRenderer';
+import ShareModal from '../components/ui/ShareModal';
 import { userError } from '../lib/userError';
 import type { Resume } from '../types/resume';
 
@@ -28,6 +29,7 @@ export default function Preview() {
   const [exportError, setExportError] = useState<string | null>(null);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const [downloadMenuOpen, setDownloadMenuOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   // Live-Vorschau: baut bei jeder Template- oder Resume-Aenderung die komplette
   // Mappe als PDF-Blob und zeigt sie in einem iframe. So sieht der User
@@ -229,6 +231,19 @@ export default function Preview() {
                 {getPdfExportCount()}/{limits.pdfExportsPerMonth} PDF
               </span>
             )}
+            {/* Share-Button — oeffentlicher Link */}
+            <button
+              className="btn-glass btn-sm"
+              onClick={() => setShareOpen(true)}
+              title={resume.shareToken ? 'Teil-Link aktiv — Klicken zum Verwalten' : 'Oeffentlichen Link teilen'}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px',
+                color: resume.shareToken ? 'var(--ios-blue)' : undefined,
+                borderColor: resume.shareToken ? 'rgba(0,122,255,0.4)' : undefined,
+              }}
+            >
+              <Share2 size={16} />{!isMobile && ' Teilen'}
+            </button>
             {/* Download Split-Button: primaere Aktion = ganze Mappe, Chevron oeffnet die Optionen */}
             <button
               className="btn-glass btn-primary btn-sm"
@@ -363,6 +378,10 @@ export default function Preview() {
             <X size={14} />
           </button>
         </div>
+      )}
+
+      {shareOpen && (
+        <ShareModal resumeId={resume.id} token={resume.shareToken} onClose={() => setShareOpen(false)} />
       )}
 
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
