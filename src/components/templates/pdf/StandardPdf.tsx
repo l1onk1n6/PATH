@@ -326,7 +326,9 @@ export function StandardPdf({ resume, variant = {} }: Props) {
     </View>
   );
 
-  const pageStyle = { fontFamily, fontSize: 10, color: text, backgroundColor: pageBg, lineHeight: 1.5 };
+  // Wichtig: paddingTop/Bottom auf der Page, nicht auf Inner-Views — nur
+  // so bekommt JEDE Seite (auch Folgeseiten bei Umbruch) Abstand zum Rand.
+  const pageStyle = { fontFamily, fontSize: 10, color: text, backgroundColor: pageBg, lineHeight: 1.5, paddingTop: 40, paddingBottom: 40 };
 
   // Banner-Header: volle Breite; Sidebar/Main darunter.
   if (headerMode === 'banner') {
@@ -335,11 +337,11 @@ export function StandardPdf({ resume, variant = {} }: Props) {
         <Page size="A4" style={pageStyle}>
           <Header inverse />
           {sidebarMode === 'none' ? (
-            <View style={{ paddingVertical: 20, paddingHorizontal: 40 }}><Main /></View>
+            <View style={{ paddingHorizontal: 40, paddingTop: 20 }}><Main /></View>
           ) : (
             <View style={{ flexDirection: sidebarMode === 'left' ? 'row' : 'row-reverse' }}>
               <Sidebar />
-              <View style={{ flex: 1, paddingVertical: 20, paddingHorizontal: 24 }}><Main /></View>
+              <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 20 }}><Main /></View>
             </View>
           )}
         </Page>
@@ -352,14 +354,14 @@ export function StandardPdf({ resume, variant = {} }: Props) {
     <Document>
       <Page size="A4" style={pageStyle}>
         {sidebarMode === 'none' ? (
-          <View style={{ paddingTop: 40, paddingHorizontal: 46, paddingBottom: 40 }}>
+          <View style={{ paddingHorizontal: 46 }}>
             <Header />
             <Main />
           </View>
         ) : (
           <View style={{ flexDirection: sidebarMode === 'left' ? 'row' : 'row-reverse' }}>
             <Sidebar />
-            <View style={{ flex: 1, paddingTop: 32, paddingHorizontal: 26, paddingBottom: 32 }}>
+            <View style={{ flex: 1, paddingHorizontal: 26 }}>
               <Header />
               <Main />
             </View>
