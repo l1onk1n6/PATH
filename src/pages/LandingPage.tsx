@@ -7,7 +7,7 @@ import {
   FileText, Sparkles, Globe, Clock, Share2, Download,
   Check, ChevronRight, ArrowRight, Star, ClipboardList, Mail, Import,
   Users, Bell, Shield, PenLine, Wand2, Brain, Languages,
-  BookOpen, Layers,
+  BookOpen, Layers, Smartphone,
 } from 'lucide-react';
 
 const FEATURES = [
@@ -561,6 +561,118 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Mobile Apps Teaser ──────────────────────────────── */}
+      <section style={{
+        padding: isMobile ? '80px 24px' : '100px 48px',
+        background: 'linear-gradient(180deg, rgba(52,199,89,0.04) 0%, rgba(0,122,255,0.05) 100%)',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+          {/* Badge */}
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 7,
+            fontSize: 12, fontWeight: 700, padding: '5px 14px', borderRadius: 99,
+            background: 'rgba(52,199,89,0.15)', border: '1px solid rgba(52,199,89,0.3)',
+            color: '#34C759', marginBottom: 24, letterSpacing: '0.06em',
+          }}>
+            <Smartphone size={12} /> DEMNÄCHST VERFÜGBAR
+          </div>
+
+          <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
+            PATH kommt auf{' '}
+            <span style={{
+              background: 'linear-gradient(135deg, #34C759 0%, #007AFF 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+            }}>
+              Android & iOS
+            </span>
+          </h2>
+          <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.5)', margin: '0 auto 52px', maxWidth: 520, lineHeight: 1.65 }}>
+            Alle deine Bewerbungsunterlagen immer dabei — bearbeiten, exportieren und teilen, direkt vom Handy.
+          </p>
+
+          {/* Platform cards */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+            gap: 20, marginBottom: 40,
+          }}>
+            {/* Android */}
+            <div style={{
+              background: 'rgba(52,199,89,0.07)',
+              border: '1px solid rgba(52,199,89,0.2)',
+              borderRadius: 24, padding: isMobile ? 28 : 36,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
+              transition: 'background 0.2s, transform 0.2s',
+            }}
+              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(52,199,89,0.12)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(52,199,89,0.07)'; (e.currentTarget as HTMLDivElement).style.transform = 'none'; }}>
+              {/* Android icon */}
+              <div style={{ width: 64, height: 64, borderRadius: 20, background: 'rgba(52,199,89,0.15)', border: '1px solid rgba(52,199,89,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <AndroidIcon />
+              </div>
+              <div>
+                <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 6 }}>Android</div>
+                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>Google Play Store</div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', textAlign: 'left' }}>
+                {['Volle Offline-Unterstützung', 'Push-Erinnerungen für Deadlines', 'Native PDF-Speicherung'].map(f => (
+                  <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
+                    <Check size={13} style={{ color: '#34C759', flexShrink: 0 }} /> {f}
+                  </div>
+                ))}
+              </div>
+              <div style={{
+                width: '100%', padding: '12px 20px', borderRadius: 12, marginTop: 4,
+                background: 'rgba(52,199,89,0.15)', border: '1px solid rgba(52,199,89,0.3)',
+                fontSize: 14, fontWeight: 600, color: '#34C759', textAlign: 'center',
+              }}>
+                Bald im Play Store
+              </div>
+            </div>
+
+            {/* iOS */}
+            <div style={{
+              background: 'rgba(0,122,255,0.07)',
+              border: '1px solid rgba(0,122,255,0.2)',
+              borderRadius: 24, padding: isMobile ? 28 : 36,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
+              transition: 'background 0.2s, transform 0.2s',
+            }}
+              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(0,122,255,0.12)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(0,122,255,0.07)'; (e.currentTarget as HTMLDivElement).style.transform = 'none'; }}>
+              {/* Apple icon */}
+              <div style={{ width: 64, height: 64, borderRadius: 20, background: 'rgba(0,122,255,0.15)', border: '1px solid rgba(0,122,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <AppleIcon />
+              </div>
+              <div>
+                <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 6 }}>iPhone & iPad</div>
+                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>Apple App Store</div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', textAlign: 'left' }}>
+                {['Nahtlose iCloud-Synchronisation', 'Face ID & Touch ID Login', 'Apple Pencil Unterstützung'].map(f => (
+                  <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
+                    <Check size={13} style={{ color: '#007AFF', flexShrink: 0 }} /> {f}
+                  </div>
+                ))}
+              </div>
+              <div style={{
+                width: '100%', padding: '12px 20px', borderRadius: 12, marginTop: 4,
+                background: 'rgba(0,122,255,0.15)', border: '1px solid rgba(0,122,255,0.3)',
+                fontSize: 14, fontWeight: 600, color: '#007AFF', textAlign: 'center',
+              }}>
+                Bald im App Store
+              </div>
+            </div>
+          </div>
+
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+            Web-App bereits jetzt kostenlos nutzbar — Apps folgen in Kürze.
+          </p>
+        </div>
+      </section>
+
       {/* ── CTA Banner ──────────────────────────────────────── */}
       <section style={{
         padding: isMobile ? '80px 24px' : '100px 48px',
@@ -640,6 +752,22 @@ export default function LandingPage() {
         html { scroll-behavior: smooth; }
       `}</style>
     </div>
+  );
+}
+
+function AndroidIcon() {
+  return (
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+      <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85a.64.64 0 0 0-.85.26l-1.86 3.22A9.96 9.96 0 0 0 12 8c-1.64 0-3.18.42-4.53 1.13L5.67 5.91a.64.64 0 0 0-.85-.26c-.3.16-.42.54-.26.85L6.4 9.48A9.96 9.96 0 0 0 2 18h20a9.96 9.96 0 0 0-4.4-8.52zM8.5 15.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm7 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" fill="#34C759"/>
+    </svg>
+  );
+}
+
+function AppleIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.37 2.83zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" fill="#007AFF"/>
+    </svg>
   );
 }
 
