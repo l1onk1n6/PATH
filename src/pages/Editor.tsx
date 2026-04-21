@@ -178,7 +178,7 @@ export default function Editor() {
             <button key={id} className="btn-glass"
               onClick={() => setActiveSection(id)}
               style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 10,
                 padding: '8px 10px', marginBottom: 2, borderRadius: 'var(--radius-sm)',
                 boxShadow: 'none',
                 background: active ? 'rgba(0,122,255,0.2)' : 'transparent',
@@ -195,7 +195,7 @@ export default function Editor() {
         {/* Übersetzen */}
         <button className="btn-glass"
           onClick={() => setShowTranslate(true)}
-          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', marginBottom: 2, borderRadius: 'var(--radius-sm)', boxShadow: 'none', background: 'transparent', border: '1px solid transparent' }}>
+          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 10, padding: '8px 10px', marginBottom: 2, borderRadius: 'var(--radius-sm)', boxShadow: 'none', background: 'transparent', border: '1px solid transparent' }}>
           <Languages size={14} style={{ opacity: 0.65 }} />
           <span style={{ fontSize: 13, opacity: 0.78 }}>Übersetzen</span>
         </button>
@@ -205,7 +205,7 @@ export default function Editor() {
           <button className="btn-glass"
             onClick={() => setActiveSection(activeSection === 'history' ? 'personal' : 'history')}
             style={{
-              width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', marginBottom: 2,
+              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 10, padding: '8px 10px', marginBottom: 2,
               borderRadius: 'var(--radius-sm)', boxShadow: 'none',
               background: activeSection === 'history' ? 'rgba(0,122,255,0.2)' : 'transparent',
               border: activeSection === 'history' ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
@@ -215,7 +215,7 @@ export default function Editor() {
           </button>
         ) : (
           <button disabled className="btn-glass"
-            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 'var(--radius-sm)', boxShadow: 'none', opacity: 0.4, cursor: 'not-allowed', background: 'transparent', border: '1px solid transparent' }}>
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 10, padding: '8px 10px', borderRadius: 'var(--radius-sm)', boxShadow: 'none', opacity: 0.4, cursor: 'not-allowed', background: 'transparent', border: '1px solid transparent' }}>
             <History size={14} />
             <span style={{ fontSize: 13, flex: 1, textAlign: 'left' }}>Versionen</span>
             <Lock size={11} />

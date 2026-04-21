@@ -741,7 +741,7 @@ export default function AccountPage() {
             <button key={id} className="btn-glass"
               onClick={() => setSection(id)}
               style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 10,
                 padding: '8px 10px', marginBottom: 2, borderRadius: 'var(--radius-sm)',
                 boxShadow: 'none',
                 background: active ? 'rgba(0,122,255,0.2)' : 'transparent',
