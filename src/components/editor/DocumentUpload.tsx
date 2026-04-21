@@ -1,8 +1,9 @@
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, File, Trash2, FileText, Image, ExternalLink, AlertCircle, Loader2 } from 'lucide-react';
+import { Upload, File, Trash2, FileText, Image, ExternalLink, AlertCircle, Loader2, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import type { UploadedDocument } from '../../types/resume';
 
 const CATEGORIES: { value: UploadedDocument['category']; label: string }[] = [
@@ -27,11 +28,14 @@ const MAX_FILE_MB = 10;
 const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
 
 export default function DocumentUpload() {
-  const { getActiveResume, uploadDocument, removeDocument, updateDocumentCategory, resumes } = useResumeStore();
+  const { getActiveResume, uploadDocument, removeDocument, updateDocumentCategory, reorderDocuments, resumes } = useResumeStore();
   const resume = getActiveResume();
   const { limits } = usePlan();
+  const isMobile = useIsMobile();
   const [sizeError, setSizeError] = useState('');
   const [uploadingCount, setUploadingCount] = useState(0);
+  const [dragging, setDragging] = useState<number | null>(null);
+  const [dragOver, setDragOver] = useState<number | null>(null);
 
   // Total used across ALL resumes (documents are per-user, not per-resume)
   const totalUsedBytes = resumes.reduce((sum, r) =>
@@ -142,9 +146,37 @@ export default function DocumentUpload() {
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {documents.map((doc) => (
-          <div key={doc.id} className="glass-card animate-scale-in" style={{ padding: '12px 16px' }}>
+        {documents.map((doc, i) => (
+          <div
+            key={doc.id}
+            className="glass-card animate-scale-in"
+            draggable={!isMobile}
+            onDragStart={!isMobile ? () => setDragging(i) : undefined}
+            onDragOver={!isMobile ? (e) => { e.preventDefault(); setDragOver(i); } : undefined}
+            onDrop={!isMobile ? () => { if (dragging !== null && dragging !== i) reorderDocuments(resume.id, dragging, i); setDragging(null); setDragOver(null); } : undefined}
+            onDragEnd={!isMobile ? () => { setDragging(null); setDragOver(null); } : undefined}
+            style={{
+              padding: '12px 16px',
+              opacity: dragging === i ? 0.5 : 1,
+              border: dragOver === i && dragging !== i ? '1px solid rgba(0,122,255,0.6)' : undefined,
+              transition: 'opacity 0.15s, border 0.15s',
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              {isMobile ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flexShrink: 0 }}>
+                  <button className="btn-glass btn-icon" disabled={i === 0} onClick={() => reorderDocuments(resume.id, i, i - 1)}
+                    style={{ padding: 3, opacity: i === 0 ? 0.2 : 0.6, boxShadow: 'none', background: 'transparent', border: 'none' }}>
+                    <ChevronUp size={13} />
+                  </button>
+                  <button className="btn-glass btn-icon" disabled={i === documents.length - 1} onClick={() => reorderDocuments(resume.id, i, i + 1)}
+                    style={{ padding: 3, opacity: i === documents.length - 1 ? 0.2 : 0.6, boxShadow: 'none', background: 'transparent', border: 'none' }}>
+                    <ChevronDown size={13} />
+                  </button>
+                </div>
+              ) : (
+                <GripVertical size={14} style={{ opacity: 0.3, flexShrink: 0, cursor: 'grab' }} />
+              )}
               <div style={{
                 width: 40, height: 40, borderRadius: 10,
                 background: 'rgba(0,122,255,0.2)',

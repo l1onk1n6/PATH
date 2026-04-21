@@ -23,35 +23,34 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 import { v4 as uuidv4 } from 'uuid';
 import { UpgradeModal } from '../components/ui/ProGate';
 import { usePlan } from '../lib/plan';
+import AtsDialog from '../components/ats/AtsDialog';
 
 const ALL_STATUSES: ApplicationStatus[] = ['entwurf', 'gesendet', 'interview', 'abgelehnt', 'angenommen'];
 
 // ── ATS button ─────────────────────────────────────────────
 function AtsButton() {
   const { isPro } = usePlan();
+  const { getActiveResume } = useResumeStore();
   const [showUpgrade, setShowUpgrade] = useState(false);
-  const [showSoon, setShowSoon] = useState(false);
+  const [showAts, setShowAts] = useState(false);
+  const noResume = !getActiveResume();
+
+  function handleClick() {
+    if (!isPro) { setShowUpgrade(true); return; }
+    if (noResume) return;
+    setShowAts(true);
+  }
 
   return (
     <>
       {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} highlightId="ats" />}
-      {showSoon && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }} onClick={() => setShowSoon(false)}>
-          <div className="glass-card animate-scale-in" style={{ padding: '24px 28px', maxWidth: 320, textAlign: 'center', background: 'rgba(14,14,22,0.97)' }} onClick={e => e.stopPropagation()}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>📊</div>
-            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>ATS-Score — bald verfügbar</div>
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 16 }}>
-              Lebenslauf gegen Stellenbeschreibung matchen & Keywords optimieren. Dieses Feature ist in Entwicklung.
-            </div>
-            <button className="btn-glass btn-primary btn-sm" onClick={() => setShowSoon(false)}>Schliessen</button>
-          </div>
-        </div>
-      )}
+      {showAts && <AtsDialog onClose={() => setShowAts(false)} />}
       <button
         className="btn-glass btn-sm"
-        onClick={() => isPro ? setShowSoon(true) : setShowUpgrade(true)}
-        style={{ gap: 5, position: 'relative' }}
-        title="ATS-Score prüfen"
+        onClick={handleClick}
+        disabled={isPro && noResume}
+        style={{ gap: 5, position: 'relative', opacity: (isPro && noResume) ? 0.5 : 1 }}
+        title={noResume ? 'Erst eine Mappe auswählen' : 'ATS-Score prüfen'}
       >
         <BarChart2 size={13} /> ATS
         {!isPro && (

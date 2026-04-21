@@ -103,6 +103,7 @@ interface ResumeStore {
   uploadDocument: (resumeId: string, file: File, category?: UploadedDocument['category']) => Promise<{ ok: boolean; error?: string }>;
   removeDocument: (resumeId: string, id: string) => void;
   updateDocumentCategory: (resumeId: string, docId: string, category: UploadedDocument['category']) => void;
+  reorderDocuments: (resumeId: string, from: number, to: number) => void;
 
   // Custom sections
   addCustomSection: (resumeId: string) => void;
@@ -566,6 +567,29 @@ export const useResumeStore = create<ResumeStore>()(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (getSupabase().from('documents') as any).update({ category }).eq('id', docId)
             .then((res: { error: unknown }) => { if (res.error) console.warn('[store] updateDocumentCategory', res.error); });
+        }
+      },
+
+      reorderDocuments: (resumeId, from, to) => {
+        // Lokale Reihenfolge sofort updaten
+        set((s) => ({
+          resumes: s.resumes.map(r => {
+            if (r.id !== resumeId) return r;
+            const arr = [...r.documents];
+            const [m] = arr.splice(from, 1);
+            arr.splice(to, 0, m);
+            // orderIndex pro Position neu setzen
+            const reindexed = arr.map((d, i) => ({ ...d, orderIndex: i }));
+            return { ...r, documents: reindexed, updatedAt: new Date().toISOString() };
+          }),
+        }));
+        // In Supabase fuer alle betroffenen Zeilen order_index nachziehen
+        const docs = get().resumes.find(r => r.id === resumeId)?.documents ?? [];
+        if (isSupabaseConfigured() && docs.length > 0) {
+          const sb = getSupabase();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          Promise.all(docs.map((d, i) => (sb.from('documents') as any).update({ order_index: i }).eq('id', d.id)))
+            .catch(e => console.warn('[store] reorderDocuments', e));
         }
       },
 

@@ -76,6 +76,8 @@ export interface UploadedDocument {
   dataUrl: string;
   uploadedAt: string;
   category: 'certificate' | 'reference' | 'portfolio' | 'other';
+  /** User-definierte Reihenfolge (0-basiert). Fallback: uploadedAt. */
+  orderIndex?: number;
 }
 
 export interface CustomSection {

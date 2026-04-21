@@ -61,7 +61,7 @@ export const PRO_FEATURES: ProFeature[] = [
   { id: 'photo',     label: '2 MB Foto-Upload',         icon: '🖼️', description: 'Grössere Profilfotos hochladen (Free: 1 MB)',                           available: true },
   // ── Coming soon ───────────────────────────────────────────
   { id: 'ai',        label: 'KI-Assistent',             icon: '✦', description: 'Anschreiben generieren & Texte mit Claude KI verbessern',               available: true },
-  { id: 'ats',       label: 'ATS-Score',                icon: '📊', description: 'Lebenslauf gegen Stellenbeschreibung prüfen & Keywords optimieren',     available: false },
+  { id: 'ats',       label: 'ATS-Score',                icon: '📊', description: 'Lebenslauf gegen Stellenbeschreibung prüfen & Keywords optimieren',     available: true  },
   { id: 'history',   label: 'CV-Versionshistorie',      icon: '🕓', description: 'Frühere Versionen wiederherstellen',                                     available: true  },
   { id: 'analytics', label: 'Link-Analytics',           icon: '📈', description: 'Sehen wer deinen geteilten Lebenslauf aufgerufen hat',                  available: false },
   { id: 'translate', label: 'Mehrsprachige CVs',        icon: '🌍', description: 'Automatische Übersetzung in jede Sprache',                              available: true },

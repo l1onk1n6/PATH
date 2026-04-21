@@ -170,7 +170,10 @@ async function signedUrlFor(path: string): Promise<string | null> {
 export async function fetchDocuments(): Promise<(UploadedDocument & { resumeId: string })[]> {
   if (!isSupabaseConfigured()) return [];
   try {
-    const { data, error } = await sb().from('documents').select('*').order('uploaded_at');
+    const { data, error } = await sb().from('documents')
+      .select('*')
+      .order('order_index', { ascending: true, nullsFirst: false })
+      .order('uploaded_at', { ascending: true });
     if (error) throw error;
     const rows = (data ?? []) as Record<string, unknown>[];
 
@@ -217,6 +220,7 @@ export async function upsertDocument(resumeId: string, doc: UploadedDocument, op
       // Nur setzen wenn wir tatsaechlich base64 haben (Altbestand / Fallback)
       data_url: path ? null : (doc.dataUrl && doc.dataUrl.startsWith('data:') ? doc.dataUrl : null),
       storage_path: path,
+      order_index: doc.orderIndex ?? null,
     });
   } catch (e) {
     console.warn('[db] upsertDocument', e);
@@ -334,5 +338,6 @@ function rowToDocument(row: Record<string, unknown>): UploadedDocument & { resum
     // Bei Altbestand (data_url gesetzt) bleibt's die base64-Data-URL.
     dataUrl: (row.data_url as string) ?? '',
     uploadedAt: row.uploaded_at as string,
+    orderIndex: typeof row.order_index === 'number' ? row.order_index : undefined,
   };
 }
