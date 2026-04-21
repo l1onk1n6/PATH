@@ -87,7 +87,16 @@ async function syncEntitlementToSupabase(info: CustomerInfo): Promise<void> {
   const entitlement = info.entitlements.active[PRO_ENTITLEMENT];
   const isPro = Boolean(entitlement);
   const currentPlan = (user.user_metadata?.plan as string | undefined) ?? 'free';
+  const currentSource = user.user_metadata?.subscription_source as string | undefined;
   const nextPlan = isPro ? 'pro' : 'free';
+
+  // Wichtig: RevenueCat darf nur Pro-Status verwalten, den es selbst gesetzt hat.
+  // Wenn der User via Stripe (Web) auf Pro ist, darf ein negativer RC-Status
+  // den Stripe-Pro nicht wegschreiben — sonst verlierst du beim ersten Android-
+  // Login deinen Web-Pro. Stripe hat seinen eigenen Webhook fuer Downgrades.
+  if (!isPro && currentSource && currentSource !== 'revenuecat') {
+    return;
+  }
 
   if (currentPlan === nextPlan) return;
 
