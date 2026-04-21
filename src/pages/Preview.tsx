@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Download, Loader2, Layers, X, FolderDown, Lock, ChevronDown, FileText } from 'lucide-react';
+import { AlertCircle, Download, Loader2, Layers, X, FolderDown, Lock, ChevronDown, FileText, FileEdit } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useResumeStore } from '../store/resumeStore';
 import ProGate from '../components/ui/ProGate';
@@ -7,7 +7,7 @@ import { TEMPLATES } from '../components/templates/templateConfig';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { usePlan, FREE_TEMPLATE_IDS } from '../lib/plan';
 import { canExportPdf, incrementPdfExport, getPdfExportCount, savePdf } from '../lib/pdfExports';
-import { renderResumePdf, buildMappePdfBytes } from '../lib/pdfRenderer';
+import { renderResumePdf, renderCoverLetterPdf, buildMappePdfBytes } from '../lib/pdfRenderer';
 import { userError } from '../lib/userError';
 import type { Resume } from '../types/resume';
 
@@ -104,6 +104,26 @@ export default function Preview() {
       await incrementPdfExport();
     } catch (err) {
       setExportError(userError('Der PDF-Export hat nicht funktioniert', err));
+    } finally { setExporting(false); }
+  };
+
+  // Export: nur Anschreiben.
+  const handleExportCoverLetter = async () => {
+    if (exporting) return;
+    if (!canExportPdf(limits.pdfExportsPerMonth)) {
+      setExportError(`PDF-Export-Limit erreicht (${limits.pdfExportsPerMonth}/Monat). Upgrade auf Pro für mehr Exporte.`);
+      return;
+    }
+    setExporting(true);
+    setExportError(null);
+    try {
+      const first = resume.personalInfo.firstName || 'Anschreiben';
+      const last = resume.personalInfo.lastName ? '_' + resume.personalInfo.lastName : '';
+      const bytes = await renderCoverLetterPdf(resume);
+      await savePdf(bytes, `${first}${last}_Anschreiben.pdf`);
+      await incrementPdfExport();
+    } catch (err) {
+      setExportError(userError('Der Anschreiben-Export hat nicht funktioniert', err));
     } finally { setExporting(false); }
   };
 
@@ -257,6 +277,12 @@ export default function Preview() {
                     style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 10px', gap: 8, marginBottom: 2, boxShadow: 'none', background: 'transparent', border: '1px solid transparent' }}>
                     <FileText size={14} style={{ opacity: 0.7 }} />
                     <span style={{ fontSize: 13 }}>Nur Lebenslauf</span>
+                  </button>
+                  <button className="btn-glass"
+                    onClick={() => { setDownloadMenuOpen(false); handleExportCoverLetter(); }}
+                    style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 10px', gap: 8, marginBottom: 2, boxShadow: 'none', background: 'transparent', border: '1px solid transparent' }}>
+                    <FileEdit size={14} style={{ opacity: 0.7 }} />
+                    <span style={{ fontSize: 13 }}>Nur Motivationsschreiben</span>
                   </button>
                   <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '4px 0' }} />
                   <ProGate featureId="password" badge>
