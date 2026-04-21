@@ -5,7 +5,7 @@
 //   LISTMONK_URL, LISTMONK_USERNAME, LISTMONK_PASSWORD
 //   INVOICE_NINJA_URL, INVOICE_NINJA_TOKEN
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const SUPABASE_URL         = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
