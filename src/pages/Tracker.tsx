@@ -297,14 +297,15 @@ export default function Tracker() {
                     </div>
                     <div>
                       <label className="section-label">Stelleninserat URL</label>
-                      <div style={{ display: 'flex', gap: 6 }}>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'stretch' }}>
                         <input className="input-glass" placeholder="https://..." value={app.url} maxLength={500}
                           onChange={(e) => updateApplication(app.id, { url: e.target.value })}
                           style={{ flex: 1 }} />
                         {app.url && (
                           <a href={app.url} target="_blank" rel="noopener noreferrer"
-                            className="btn-glass btn-icon" style={{ padding: 8, flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-                            <ExternalLink size={13} />
+                            className="btn-glass" title="Inserat öffnen"
+                            style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 12px', borderRadius: 'var(--radius-sm)' }}>
+                            <ExternalLink size={14} />
                           </a>
                         )}
                       </div>
