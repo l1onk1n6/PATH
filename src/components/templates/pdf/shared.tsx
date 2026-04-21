@@ -211,23 +211,24 @@ export function WorkEntry({
   mutedColor?: string;
   boldFont?: string;
 }) {
+  const meta = [job.company, job.location].filter(Boolean).join(' · ');
   return (
     <View wrap={false} style={{ marginBottom: 14 }}>
-      {/* Ganzer Eintrag auf einer Seite halten — kein Abriss zwischen
-          Header und Body, keine einzeln haengenden Zeilen am Seitenende. */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-        <View style={{ flex: 1, marginRight: 10 }}>
-          <Text style={{ fontSize: 11, fontFamily: boldFont, color: textColor }}>{job.position}</Text>
-          {job.company ? (
-            <Text style={{ fontSize: 10.5, color, marginTop: 1 }}>{job.company}</Text>
-          ) : null}
-        </View>
-        <View style={{ alignItems: 'flex-end' }}>
-          <Text style={{ fontSize: 9, color: mutedColor }}>{dateRange(job.startDate, job.endDate, job.current)}</Text>
-          {job.location ? <Text style={{ fontSize: 9, color: mutedColor, marginTop: 1 }}>{job.location}</Text> : null}
-        </View>
+      {/* Layout: Position links, Datum rechts (beide einzeilig).
+          Firma + Ort auf einer eigenen Subzeile links, voll ausnutzbar.
+          Beschreibung darunter — keine Kollision mehr mit der Datums-Spalte. */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
+        <Text style={{ fontSize: 11, fontFamily: boldFont, color: textColor, flex: 1, marginRight: 10 }}>
+          {job.position}
+        </Text>
+        <Text style={{ fontSize: 9, color: mutedColor, flexShrink: 0 }}>
+          {dateRange(job.startDate, job.endDate, job.current)}
+        </Text>
       </View>
-      <DescriptionBlock text={job.description} color={color} textColor={textColor} />
+      {meta ? (
+        <Text style={{ fontSize: 10, color, marginBottom: 4 }}>{meta}</Text>
+      ) : null}
+      <DescriptionBlock text={job.description} color={color} textColor={textColor} marginTop={meta ? 2 : 4} />
       {job.highlights && job.highlights.length > 0 ? (
         <View style={{ marginTop: 4 }}>
           {job.highlights.map((h, i) => (
@@ -252,20 +253,22 @@ export function EduEntry({
   boldFont?: string;
 }) {
   const hasBody = parseBulletLines(edu.description).length > 0;
+  const titleLine = [edu.degree, edu.field].filter(Boolean).join(' · ');
+  const metaRight = [dateRange(edu.startDate, edu.endDate), edu.grade ? `Note ${edu.grade}` : ''].filter(Boolean).join(' · ');
   return (
     <View wrap={false} style={{ marginBottom: 12 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <View style={{ flex: 1, marginRight: 10 }}>
-          <Text style={{ fontSize: 10.5, fontFamily: boldFont, color: textColor }}>{edu.degree}</Text>
-          {edu.field ? <Text style={{ fontSize: 10, color: alphaHex(textColor, 0.78) }}>{edu.field}</Text> : null}
-          {edu.institution ? <Text style={{ fontSize: 10, color, marginTop: 1 }}>{edu.institution}</Text> : null}
-        </View>
-        <View style={{ alignItems: 'flex-end' }}>
-          <Text style={{ fontSize: 9, color: mutedColor }}>{dateRange(edu.startDate, edu.endDate)}</Text>
-          {edu.grade ? <Text style={{ fontSize: 9, color: mutedColor, marginTop: 1 }}>Note {edu.grade}</Text> : null}
-        </View>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
+        <Text style={{ fontSize: 10.5, fontFamily: boldFont, color: textColor, flex: 1, marginRight: 10 }}>
+          {titleLine}
+        </Text>
+        {metaRight ? (
+          <Text style={{ fontSize: 9, color: mutedColor, flexShrink: 0 }}>{metaRight}</Text>
+        ) : null}
       </View>
-      {hasBody && <DescriptionBlock text={edu.description} color={color} textColor={textColor} />}
+      {edu.institution ? (
+        <Text style={{ fontSize: 10, color, marginBottom: hasBody ? 4 : 0 }}>{edu.institution}</Text>
+      ) : null}
+      {hasBody && <DescriptionBlock text={edu.description} color={color} textColor={textColor} marginTop={edu.institution ? 2 : 4} />}
     </View>
   );
 }
