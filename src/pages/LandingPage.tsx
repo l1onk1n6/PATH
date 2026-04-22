@@ -277,9 +277,8 @@ export default function LandingPage() {
 
       {/* ── Hero ────────────────────────────────────────────── */}
       <section style={{
-        minHeight: '92vh',
         display: 'flex', alignItems: 'center',
-        padding: isMobile ? '60px 24px 80px' : '80px 48px 100px',
+        padding: isMobile ? '48px 24px 64px' : '64px 48px 80px',
         maxWidth: 1200, margin: '0 auto',
         gap: isMobile ? 48 : 64,
         flexDirection: isMobile ? 'column' : 'row',
