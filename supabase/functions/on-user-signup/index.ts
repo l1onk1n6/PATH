@@ -1,4 +1,5 @@
 // Triggered via Supabase Database Webhook on auth.users INSERT
+// JWT enforcement: OFF  (wird vom DB-Webhook mit Service-Role-Key aufgerufen)
 // Setup: Supabase Dashboard → Database → Webhooks → Create Webhook
 //   Table: users  |  Schema: auth  |  Event: INSERT
 //   Type: HTTP Request → POST → [this function's URL]

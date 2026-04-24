@@ -1,0 +1,96 @@
+name: Deploy Supabase Edge Functions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/**'
+  workflow_dispatch:
+    inputs:
+      function:
+        description: 'Optional: einzelne Function deployen (leer = alle geaenderten seit letztem Push)'
+        required: false
+        default: ''
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Determine functions to deploy
+        id: pick
+        env:
+          INPUT_FN: ${{ inputs.function }}
+        run: |
+          set -euo pipefail
+          if [ -n "${INPUT_FN}" ]; then
+            if [ ! -d "supabase/functions/${INPUT_FN}" ]; then
+              echo "::error::Function nicht gefunden: supabase/functions/${INPUT_FN}"
+              exit 1
+            fi
+            echo "fns=${INPUT_FN}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Alle Functions mit Aenderungen seit letztem Push
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            changed_dirs=$(git diff --name-only HEAD^ HEAD -- 'supabase/functions/*/**' \
+              | awk -F/ '{print $3}' | sort -u || true)
+          else
+            changed_dirs=$(ls -1 supabase/functions/ 2>/dev/null || true)
+          fi
+
+          if [ -z "${changed_dirs}" ]; then
+            echo "Keine Function-Aenderungen in diesem Push."
+            echo "fns=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          {
+            echo "fns<<EOF"
+            echo "${changed_dirs}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          echo "Zu deployen:"
+          echo "${changed_dirs}"
+
+      - name: Deploy functions
+        if: ${{ steps.pick.outputs.fns != '' }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID:   ${{ secrets.SUPABASE_PROJECT_ID }}
+          FNS:                   ${{ steps.pick.outputs.fns }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_ACCESS_TOKEN:-}" ] || [ -z "${SUPABASE_PROJECT_ID:-}" ]; then
+            echo "::error::SUPABASE_ACCESS_TOKEN oder SUPABASE_PROJECT_ID nicht gesetzt"
+            exit 1
+          fi
+          echo "${FNS}" | while IFS= read -r fn; do
+            [ -z "$fn" ] && continue
+            echo ""
+            echo "───────────────────────────────────────────────────"
+            # Marker im Source fuer Functions ohne JWT-Check (Webhooks, Cron).
+            # Aktueller Marker: Kommentarzeile "// JWT enforcement: OFF"
+            if grep -q "JWT enforcement: OFF" "supabase/functions/${fn}/index.ts" 2>/dev/null; then
+              echo "▶ Deploying: $fn  (--no-verify-jwt)"
+              supabase functions deploy "$fn" \
+                --project-ref "${SUPABASE_PROJECT_ID}" \
+                --no-verify-jwt
+            else
+              echo "▶ Deploying: $fn  (JWT verified)"
+              supabase functions deploy "$fn" \
+                --project-ref "${SUPABASE_PROJECT_ID}"
+            fi
+          done
+          echo ""
+          echo "✔ Alle ausgewaehlten Functions deployed."
