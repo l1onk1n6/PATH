@@ -11,6 +11,10 @@
 //   LISTMONK_LIST_ID      = 1          (integer ID of your list)
 //   INVOICE_NINJA_URL     = https://invoiceninja.yourdomain.com
 //   INVOICE_NINJA_TOKEN   = your-api-token
+//   ADMIN_NOTIFY_EMAIL    = admin@pixmatic.ch   (optional — empty = skip)
+//   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM   (used by send-deadline-reminders — wiederverwendet)
+
+import nodemailer from 'npm:nodemailer@6'
 
 interface SupabaseWebhookPayload {
   type: 'INSERT' | 'UPDATE' | 'DELETE'
@@ -158,6 +162,56 @@ Deno.serve(async (req) => {
     }
   } else {
     results.invoiceNinja = { ok: false, note: 'not configured' }
+  }
+
+  // ── Admin Notification ──────────────────────────────────────
+  const adminEmail = Deno.env.get('ADMIN_NOTIFY_EMAIL')?.trim()
+  const smtpHost   = Deno.env.get('SMTP_HOST')
+  const smtpUser   = Deno.env.get('SMTP_USER')
+  const smtpPass   = Deno.env.get('SMTP_PASS')
+  const smtpFrom   = Deno.env.get('SMTP_FROM') ?? smtpUser
+
+  if (adminEmail && smtpHost && smtpUser && smtpPass) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host:   smtpHost,
+        port:   parseInt(Deno.env.get('SMTP_PORT') ?? '587'),
+        secure: Deno.env.get('SMTP_PORT') === '465',
+        auth: { user: smtpUser, pass: smtpPass },
+      })
+
+      const createdAt = new Date(payload.record.created_at).toLocaleString('de-CH', {
+        timeZone: 'Europe/Zurich', dateStyle: 'medium', timeStyle: 'short',
+      })
+
+      const html = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 520px; margin: 0 auto; padding: 24px; color: #1c1c1e;">
+          <h2 style="margin: 0 0 8px; font-size: 20px; color: #007AFF;">🎉 Neue PATH-Registrierung</h2>
+          <p style="margin: 0 0 20px; color: #6e6e73; font-size: 14px;">Ein neuer Nutzer hat sich gerade angemeldet.</p>
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <tr><td style="padding: 8px 0; color: #6e6e73; width: 120px;">Name</td><td style="padding: 8px 0; font-weight: 600;">${name || '—'}</td></tr>
+            <tr><td style="padding: 8px 0; color: #6e6e73;">E-Mail</td><td style="padding: 8px 0; font-weight: 600;"><a href="mailto:${email}" style="color: #007AFF; text-decoration: none;">${email}</a></td></tr>
+            <tr><td style="padding: 8px 0; color: #6e6e73;">User-ID</td><td style="padding: 8px 0; font-family: monospace; font-size: 12px;">${userId}</td></tr>
+            <tr><td style="padding: 8px 0; color: #6e6e73;">Zeitpunkt</td><td style="padding: 8px 0;">${createdAt}</td></tr>
+          </table>
+        </div>
+      `
+
+      await transporter.sendMail({
+        from:    smtpFrom,
+        to:      adminEmail,
+        subject: `Neue PATH-Registrierung: ${email}`,
+        html,
+      })
+
+      results.adminNotify = { ok: true, to: adminEmail }
+      console.log(`[on-user-signup] ✓ Admin notified: ${adminEmail}`)
+    } catch (err) {
+      results.adminNotify = { ok: false, error: String(err) }
+      console.error('[on-user-signup] Admin notify failed:', err)
+    }
+  } else {
+    results.adminNotify = { ok: false, note: 'not configured' }
   }
 
   return new Response(JSON.stringify({ userId, email, results }), {
