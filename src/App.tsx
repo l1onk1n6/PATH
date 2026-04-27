@@ -342,6 +342,21 @@ export default function App() {
     );
   }
 
+  // Pre-render mode: bypass auth and Supabase checks, render LandingPage directly.
+  // Used by scripts/prerender.mjs to inject static HTML into dist/index.html for SEO.
+  const isPrerender = new URLSearchParams(window.location.search).get('prerender') === '1';
+  if (isPrerender) {
+    return (
+      <ErrorBoundary>
+        <HashRouter>
+          <Suspense fallback={<PageSpinner />}>
+            <LandingPage />
+          </Suspense>
+        </HashRouter>
+      </ErrorBoundary>
+    );
+  }
+
   if (!isSupabaseConfigured()) {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, padding: 24, textAlign: 'center' }}>
