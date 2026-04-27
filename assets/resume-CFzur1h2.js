@@ -1,0 +1,1 @@
+var e={entwurf:`Entwurf`,gesendet:`Gesendet`,interview:`Interview`,abgelehnt:`Abgelehnt`,angenommen:`Angenommen`},t={entwurf:`rgba(255,255,255,0.3)`,gesendet:`var(--ios-blue)`,interview:`var(--ios-yellow, #FF9F0A)`,abgelehnt:`var(--ios-red)`,angenommen:`var(--ios-green)`};export{e as n,t};
