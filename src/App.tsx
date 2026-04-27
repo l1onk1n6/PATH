@@ -221,12 +221,19 @@ export default function App() {
   const { syncFromCloud } = useResumeStore();
   const [authType] = useState(() => getAuthTypeFromUrl());
 
+  // Pre-Rendering-Modus (scripts/prerender.mjs setzt ?prerender=1):
+  // direkt LandingPage statisch ausliefern, ohne Auth-Init oder Supabase-
+  // Aufrufe. Google bekommt so volles HTML beim ersten Crawl.
+  const isPrerender = typeof window !== 'undefined'
+    && new URLSearchParams(window.location.search).get('prerender') === '1';
+
   // Public shared CV route — accessible without login
   const isSharedRoute = window.location.hash.startsWith('#/shared');
 
   useEffect(() => {
+    if (isPrerender) return;
     initialize();
-  }, [initialize]);
+  }, [initialize, isPrerender]);
 
   useEffect(() => {
     if (user && !passwordRecovery) syncFromCloud();
@@ -236,13 +243,15 @@ export default function App() {
   // Pro-Entitlements pro User getrackt werden und nach (Re-)Login der Status
   // korrekt geladen wird. Web nutzt weiter Stripe → kein Init.
   useEffect(() => {
+    if (isPrerender) return;
     if (!Capacitor.isNativePlatform()) return;
     if (!user) { logOutRevenueCat(); return; }
     initRevenueCat(user.id).catch(err => console.warn('RevenueCat init failed:', err));
-  }, [user]);
+  }, [user, isPrerender]);
 
   // Process pending referral after login/signup
   useEffect(() => {
+    if (isPrerender) return;
     if (!user || !isSupabaseConfigured()) return;
     const ref = localStorage.getItem('path_ref');
     if (!ref) return;
@@ -255,7 +264,11 @@ export default function App() {
         }).catch(() => {});
       }
     });
-  }, [user]);
+  }, [user, isPrerender]);
+
+  if (isPrerender) {
+    return <HashRouter><LandingPage /></HashRouter>;
+  }
 
   if (isSharedRoute) {
     return <HashRouter><Routes><Route path="/shared" element={<SharedResumePage />} /></Routes></HashRouter>;

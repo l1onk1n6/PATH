@@ -130,6 +130,12 @@ export default function LandingPage() {
     return () => el.removeEventListener('scroll', handler);
   }, []);
 
+  // Signalisiert dem Pre-Renderer (scripts/prerender.mjs), dass das DOM
+  // vollstaendig aufgebaut ist und das HTML jetzt eingefroren werden kann.
+  useEffect(() => {
+    document.dispatchEvent(new Event('app-loaded'));
+  }, []);
+
   function scrollTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   }
