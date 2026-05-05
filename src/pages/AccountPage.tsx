@@ -430,6 +430,100 @@ function ProfileCard() {
   )
 }
 
+function EmailChangeCard() {
+  const { user, updateEmail, loading, error, clearError } = useAuthStore();
+  const [editing, setEditing] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [sent, setSent] = useState(false);
+
+  function startEdit() {
+    clearError();
+    setNewEmail(user?.email ?? '');
+    setEditing(true);
+    setSent(false);
+  }
+
+  function cancel() {
+    clearError();
+    setEditing(false);
+    setNewEmail('');
+  }
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newEmail.trim() || newEmail.trim().toLowerCase() === (user?.email ?? '').toLowerCase()) return;
+    await updateEmail(newEmail.trim());
+    if (!useAuthStore.getState().error) {
+      setSent(true);
+      setEditing(false);
+    }
+  }
+
+  return (
+    <div className="glass-card" style={{ padding: 20 }}>
+      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>E-MAIL-ADRESSE</div>
+      {sent ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ fontSize: 13, color: 'var(--ios-green)', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <CheckCircle size={14} /> Bestätigungs-E-Mail gesendet
+          </div>
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: 0, lineHeight: 1.5 }}>
+            Wir haben einen Bestätigungslink an <strong style={{ color: 'rgba(255,255,255,0.7)' }}>{newEmail}</strong> geschickt. Klicke auf den Link, um die Änderung abzuschliessen.
+          </p>
+          <button
+            className="btn-glass btn-sm"
+            onClick={() => { setSent(false); setNewEmail(''); }}
+            style={{ alignSelf: 'flex-start' }}
+          >
+            Schliessen
+          </button>
+        </div>
+      ) : editing ? (
+        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <input
+            className="input-glass"
+            type="email"
+            placeholder="neue@beispiel.de"
+            value={newEmail}
+            onChange={(e) => setNewEmail(e.target.value)}
+            required maxLength={254} autoFocus autoComplete="email"
+          />
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: 0, lineHeight: 1.5 }}>
+            Wir senden einen Bestätigungslink an die neue Adresse — die Änderung wird erst nach dem Klick aktiv.
+          </p>
+          {error && (
+            <div style={{ background: 'rgba(255,59,48,0.15)', border: '1px solid rgba(255,59,48,0.3)', borderRadius: 'var(--radius-sm)', padding: '8px 12px', fontSize: 12, color: '#ff6b6b' }}>
+              {error}
+            </div>
+          )}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              type="submit"
+              className="btn-glass btn-sm btn-primary"
+              disabled={loading || !newEmail.trim() || newEmail.trim().toLowerCase() === (user?.email ?? '').toLowerCase()}
+              style={{ gap: 6 }}
+            >
+              <Mail size={13} /> {loading ? 'Wird gesendet…' : 'Bestätigung senden'}
+            </button>
+            <button type="button" className="btn-glass btn-sm" onClick={cancel} disabled={loading}>
+              Abbrechen
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 14, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {user?.email ?? '—'}
+          </span>
+          <button className="btn-glass btn-sm" onClick={startEdit} style={{ gap: 6, flexShrink: 0 }}>
+            <Mail size={13} /> Ändern
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AccountSection() {
   const { user, signOut } = useAuthStore();
   const { persons, resumes } = useResumeStore();
@@ -437,13 +531,11 @@ function AccountSection() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <EmailChangeCard />
+
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>KONTO-DETAILS</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 14 }}>
-            <span style={{ color: 'rgba(255,255,255,0.5)' }}>E-Mail</span>
-            <span style={{ fontWeight: 500 }}>{user?.email ?? '—'}</span>
-          </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 14 }}>
             <span style={{ color: 'rgba(255,255,255,0.5)' }}>Personen</span>
             <span style={{ fontWeight: 500 }}>{persons.length}</span>

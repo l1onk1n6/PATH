@@ -66,13 +66,6 @@ export default function AuthCallbackPage({ authType }: { authType: AuthType }) {
     }
   }, [user, passwordRecovery, error, authType]);
 
-  // Auto-redirect after success (except recovery – App.tsx handles that)
-  useEffect(() => {
-    if (status === 'success' && authType !== 'recovery') {
-      // App.tsx re-renders automatically once user is set
-    }
-  }, [status, authType]);
-
   return (
     <div style={{
       minHeight: '100dvh',
