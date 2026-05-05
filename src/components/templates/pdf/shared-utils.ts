@@ -4,6 +4,25 @@ import type { Skill } from '../../../types/resume';
 //  Formatierung
 // ─────────────────────────────────────────────────────────────
 
+/** Stellt einer URL ein https://-Praefix voran, falls keines existiert. */
+export function ensureProtocol(url: string): string {
+  if (/^https?:\/\//i.test(url)) return url;
+  return `https://${url.replace(/^\/+/, '')}`;
+}
+
+/**
+ * Verkuerzt eine URL fuer kompakte Anzeige (z. B. in einer Sidebar):
+ * - strippt http(s)://www.
+ * - strippt trailing slashes
+ * Fuer linkedin.com/in/<user> bleibt der Username erhalten, das Schema-
+ * Prefix entfaellt — so passt der Link auf eine Zeile.
+ */
+export function displayUrl(url: string): string {
+  return url
+    .replace(/^https?:\/\/(www\.)?/i, '')
+    .replace(/\/+$/, '');
+}
+
 export function formatDate(dateStr: string) {
   if (!dateStr) return '';
   const [year, month] = dateStr.split('-');

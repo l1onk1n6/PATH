@@ -5,6 +5,7 @@
 import { Document, Page, View, Text, Link, Image, StyleSheet } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
 import { Section, WorkEntry, EduEntry, SkillBar, LanguageRow, CertItem, DescriptionBlock } from './shared';
+import { ensureProtocol, displayUrl } from './shared-utils';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
 export default function MinimalPdf({ resume }: { resume: Resume }) {
@@ -17,8 +18,8 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
   if (info.phone) contacts.push({ text: info.phone, href: `tel:${info.phone.replace(/\s/g, '')}` });
   const addr = [info.street, info.location].filter(Boolean).join(', ');
   if (addr) contacts.push({ text: addr });
-  if (info.website) contacts.push({ text: info.website, href: ensureProtocol(info.website) });
-  if (info.linkedin) contacts.push({ text: info.linkedin, href: ensureProtocol(info.linkedin) });
+  if (info.website) contacts.push({ text: displayUrl(info.website), href: ensureProtocol(info.website) });
+  if (info.linkedin) contacts.push({ text: displayUrl(info.linkedin), href: ensureProtocol(info.linkedin) });
 
   return (
     <Document>
@@ -98,11 +99,6 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
       </Page>
     </Document>
   );
-}
-
-function ensureProtocol(url: string): string {
-  if (/^https?:\/\//i.test(url)) return url;
-  return `https://${url.replace(/^\/+/, '')}`;
 }
 
 const styles = StyleSheet.create({

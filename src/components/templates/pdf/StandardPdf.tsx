@@ -14,7 +14,7 @@
 import { Document, Page, View, Text, Link, Image } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
 import type { HeadingStyle } from './shared-utils';
-import { alphaHex, readableOn, MUTED_COLOR, MUTED_DARK, groupSkillsByCategory, dateRange } from './shared-utils';
+import { alphaHex, readableOn, MUTED_COLOR, MUTED_DARK, groupSkillsByCategory, dateRange, ensureProtocol, displayUrl } from './shared-utils';
 import { SectionHeading, Section, WorkEntry, EduEntry, SkillBar, SkillDots, SkillChips, LanguageRow, CertItem, DescriptionBlock } from './shared';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
@@ -244,7 +244,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
       <View style={{ marginBottom: 14 }}>
         <SectionHeading color={inverse ? sidebarText : accent} kind={headingStyle}>Kontakt</SectionHeading>
         {contacts.map((c, i) => (
-          <View key={i} style={{ marginBottom: 3 }}>
+          <View key={i} style={{ marginBottom: 5 }}>
             {c.href
               ? <Link src={c.href}><Text style={{ fontSize: 9, color: alphaHex(color, 0.85) }}>{c.text}</Text></Link>
               : <Text style={{ fontSize: 9, color: alphaHex(color, 0.85) }}>{c.text}</Text>}
@@ -410,14 +410,9 @@ function buildContacts(info: Resume['personalInfo']) {
   if (info.phone) parts.push({ text: info.phone, href: `tel:${info.phone.replace(/\s/g, '')}` });
   const addr = [info.street, info.location].filter(Boolean).join(', ');
   if (addr) parts.push({ text: addr });
-  if (info.website) parts.push({ text: info.website, href: ensureProtocol(info.website) });
-  if (info.linkedin) parts.push({ text: info.linkedin, href: ensureProtocol(info.linkedin) });
+  if (info.website) parts.push({ text: displayUrl(info.website), href: ensureProtocol(info.website) });
+  if (info.linkedin) parts.push({ text: displayUrl(info.linkedin), href: ensureProtocol(info.linkedin) });
   return parts;
-}
-
-function ensureProtocol(url: string): string {
-  if (/^https?:\/\//i.test(url)) return url;
-  return `https://${url.replace(/^\/+/, '')}`;
 }
 
 function ContactInline({ c, color }: { c: { text: string; href?: string }; color: string }) {

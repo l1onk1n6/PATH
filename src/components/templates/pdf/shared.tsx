@@ -149,7 +149,7 @@ export function WorkEntry({
 }) {
   const meta = [job.company, job.location].filter(Boolean).join(' · ');
   return (
-    <View wrap={false} style={{ marginBottom: 14 }}>
+    <View wrap={false} style={{ marginBottom: 18 }}>
       {/* Layout: Position links, Datum rechts (beide einzeilig).
           Firma + Ort auf einer eigenen Subzeile links, voll ausnutzbar.
           Beschreibung darunter — keine Kollision mehr mit der Datums-Spalte. */}
@@ -192,7 +192,7 @@ export function EduEntry({
   const titleLine = [edu.degree, edu.field].filter(Boolean).join(' · ');
   const metaRight = [dateRange(edu.startDate, edu.endDate), edu.grade ? `Note ${edu.grade}` : ''].filter(Boolean).join(' · ');
   return (
-    <View wrap={false} style={{ marginBottom: 12 }}>
+    <View wrap={false} style={{ marginBottom: 14 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 }}>
         <Text style={{ fontSize: 10.5, fontFamily: boldFont, color: textColor, flex: 1, marginRight: 10 }}>
           {titleLine}
@@ -223,7 +223,7 @@ export function SkillBar({
 }) {
   const track = trackColor ?? alphaHex(textColor, 0.1);
   return (
-    <View style={{ marginBottom: 6 }}>
+    <View style={{ marginBottom: 9 }}>
       <Text style={{ fontSize: 9.5, color: textColor, marginBottom: 3, lineHeight: 1.3 }}>{skill.name}</Text>
       <View style={{ height: 3, backgroundColor: track, borderRadius: 1.5 }}>
         <View style={{ height: 3, width: `${skill.level * 20}%`, backgroundColor: color, borderRadius: 1.5 }} />
@@ -240,7 +240,7 @@ export function SkillDots({
   textColor?: string;
 }) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 7 }}>
       {/* flex: 1 + marginRight: 8 → Text umbricht sauber, Dots bleiben
           unkollidierend rechts. alignItems: center haelt Dots auf Hoehe
           der Text-Mitte (auch wenn Text ueber 2 Zeilen geht). */}
@@ -305,7 +305,7 @@ export function LanguageRow({
   mutedColor?: string;
 }) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 7 }}>
       <Text style={{ fontSize: 10, color: textColor, flex: 1, marginRight: 8, lineHeight: 1.3 }}>{lang.name}</Text>
       <Text style={{ fontSize: 9, color: mutedColor, flexShrink: 0 }}>{lang.level}</Text>
     </View>
@@ -324,7 +324,7 @@ export function CertItem({
   const resolvedLinkColor = linkColor ?? '#007AFF';
   const titleStyle = { fontSize: 10, fontFamily: boldFont, color: cert.url ? resolvedLinkColor : textColor };
   return (
-    <View style={{ marginBottom: 7 }}>
+    <View style={{ marginBottom: 11 }}>
       {cert.url ? (
         <Link src={cert.url} style={{ textDecoration: 'none' }}>
           <Text style={titleStyle}>{cert.name}</Text>

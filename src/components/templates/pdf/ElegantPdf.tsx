@@ -4,7 +4,7 @@
  */
 import { Document, Page, View, Text, Link, Image, StyleSheet } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
-import { alphaHex, dateRange, formatDate } from './shared-utils';
+import { alphaHex, dateRange, formatDate, ensureProtocol, displayUrl } from './shared-utils';
 import { DescriptionBlock } from './shared';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
@@ -35,8 +35,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
   if (info.phone) contacts.push(info.phone);
   const addr = [info.street, info.location].filter(Boolean).join(', ');
   if (addr) contacts.push(addr);
-  if (info.website) contacts.push(info.website);
-
+  if (info.website) contacts.push(displayUrl(info.website));
 
   return (
     <Document>
@@ -51,7 +50,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
           <View style={styles.topRule} />
           <Text style={styles.contacts}>{contacts.join('  ·  ')}</Text>
           {info.linkedin
-            ? <Link src={ensureProtocol(info.linkedin)}><Text style={styles.linkLine}>{info.linkedin}</Text></Link>
+            ? <Link src={ensureProtocol(info.linkedin)}><Text style={styles.linkLine}>{displayUrl(info.linkedin)}</Text></Link>
             : null}
         </View>
 
@@ -148,11 +147,6 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
       </Page>
     </Document>
   );
-}
-
-function ensureProtocol(url: string): string {
-  if (/^https?:\/\//i.test(url)) return url;
-  return `https://${url.replace(/^\/+/, '')}`;
 }
 
 const styles = StyleSheet.create({
