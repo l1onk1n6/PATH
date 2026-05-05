@@ -322,20 +322,19 @@ export function CertItem({
   linkColor?: string;
 }) {
   const resolvedLinkColor = linkColor ?? '#007AFF';
+  const titleStyle = { fontSize: 10, fontFamily: boldFont, color: cert.url ? resolvedLinkColor : textColor };
   return (
     <View style={{ marginBottom: 7 }}>
-      <Text style={{ fontSize: 10, fontFamily: boldFont, color: textColor }}>{cert.name}</Text>
+      {cert.url ? (
+        <Link src={cert.url} style={{ textDecoration: 'none' }}>
+          <Text style={titleStyle}>{cert.name}</Text>
+        </Link>
+      ) : (
+        <Text style={titleStyle}>{cert.name}</Text>
+      )}
       <Text style={{ fontSize: 9, color: mutedColor, marginTop: 1 }}>
         {cert.issuer}{cert.date ? ` · ${formatDate(cert.date)}` : ''}
       </Text>
-      {cert.url ? (
-        <Link
-          src={cert.url}
-          style={{ fontSize: 8.5, color: resolvedLinkColor, textDecoration: 'underline', marginTop: 2 }}
-        >
-          {cert.url}
-        </Link>
-      ) : null}
     </View>
   );
 }

@@ -123,19 +123,23 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
               <View style={{ flex: 1 }}>
                 <SH accent={accent}>Zertifikate</SH>
                 <View style={{ alignItems: 'center' }}>
-                  {resume.certificates.map(c => (
-                    <View key={c.id} style={{ marginBottom: 4, alignItems: 'center' }} wrap={false}>
-                      <Text style={{ fontSize: 10.5, fontFamily: 'Times-Bold' }}>{c.name}</Text>
-                      <Text style={{ fontSize: 10, color: '#555' }}>
-                        {c.issuer}{c.date ? ` — ${formatDate(c.date)}` : ''}
-                      </Text>
-                      {c.url ? (
-                        <Link src={c.url} style={{ fontSize: 8.5, color: accent, textDecoration: 'underline', marginTop: 1 }}>
-                          {c.url}
-                        </Link>
-                      ) : null}
-                    </View>
-                  ))}
+                  {resume.certificates.map(c => {
+                    const titleStyle = { fontSize: 10.5, fontFamily: 'Times-Bold', color: c.url ? accent : '#1c1c1e' };
+                    return (
+                      <View key={c.id} style={{ marginBottom: 4, alignItems: 'center' }}>
+                        {c.url ? (
+                          <Link src={c.url} style={{ textDecoration: 'none' }}>
+                            <Text style={titleStyle}>{c.name}</Text>
+                          </Link>
+                        ) : (
+                          <Text style={titleStyle}>{c.name}</Text>
+                        )}
+                        <Text style={{ fontSize: 10, color: '#555' }}>
+                          {c.issuer}{c.date ? ` — ${formatDate(c.date)}` : ''}
+                        </Text>
+                      </View>
+                    );
+                  })}
                 </View>
               </View>
             ) : null}
