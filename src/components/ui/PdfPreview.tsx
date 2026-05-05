@@ -39,6 +39,8 @@ function DesktopIframePreview({ bytes, building, error }: Props) {
   const [url, setUrl] = useState<string | null>(null);
   const currentUrlRef = useRef<string | null>(null);
 
+  // Effect: Blob-URL erzeugen + alte freigeben — Side-Effect, setState ist nötig.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!bytes) return;
     const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' });
@@ -47,6 +49,7 @@ function DesktopIframePreview({ bytes, building, error }: Props) {
     currentUrlRef.current = nextUrl;
     setUrl(nextUrl);
   }, [bytes]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => () => {
     if (currentUrlRef.current) URL.revokeObjectURL(currentUrlRef.current);

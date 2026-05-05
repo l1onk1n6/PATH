@@ -26,9 +26,12 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
   const [resendSent, setResendSent] = useState(false);
 
   // Switch to reset mode when coming from password recovery email
-  useEffect(() => {
+  // (React-Pattern: State während Render anpassen, wenn sich abhängige Prop ändert)
+  const [prevPwRecovery, setPrevPwRecovery] = useState(passwordRecovery);
+  if (passwordRecovery !== prevPwRecovery) {
+    setPrevPwRecovery(passwordRecovery);
     if (passwordRecovery) setMode('reset');
-  }, [passwordRecovery]);
+  }
 
   // Capture referral code from URL hash (e.g. /#/?ref=<uuid>)
   useEffect(() => {

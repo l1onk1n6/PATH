@@ -34,10 +34,12 @@ function AppShell() {
   const { signOut } = useAuthStore();
   const { countdown, stayLoggedIn } = useSessionTimeout(signOut);
 
-  // Close drawer on resize to desktop
-  useEffect(() => {
+  // Close drawer on resize to desktop (Adjusting State on Prop Change)
+  const [prevIsMobile, setPrevIsMobile] = useState(isMobile);
+  if (isMobile !== prevIsMobile) {
+    setPrevIsMobile(isMobile);
     if (!isMobile) setDrawerOpen(false);
-  }, [isMobile]);
+  }
 
   // Allow triggering onboarding from anywhere via custom event
   useEffect(() => {

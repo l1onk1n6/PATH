@@ -16,6 +16,8 @@ export default function SharedResumePage() {
   const [building, setBuilding] = useState(false);
   const [buildError, setBuildError] = useState<string | null>(null);
 
+  // Async-Fetch der Resume-Daten — setState auf Start/Resolve ist nötig.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!token) { setLoading(false); setNotFound(true); return; }
     fetchSharedResume(token).then((r) => {
@@ -45,6 +47,7 @@ export default function SharedResumePage() {
     })();
     return () => { cancelled = true; };
   }, [resume]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (loading) {
     return (
