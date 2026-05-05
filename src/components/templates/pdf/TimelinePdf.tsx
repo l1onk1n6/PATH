@@ -139,17 +139,21 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
             {(resume.certificates ?? []).length > 0 ? (
               <View style={{ flex: 1 }}>
                 <SectionTitle accent={accent}>Zertifikate</SectionTitle>
-                {resume.certificates.map(c => (
-                  <View key={c.id} style={{ marginBottom: 4 }} wrap={false}>
-                    <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold' }}>{c.name}</Text>
-                    <Text style={{ fontSize: 9.5, color: '#6e6e73' }}>{c.issuer}</Text>
-                    {c.url ? (
-                      <Link src={c.url} style={{ fontSize: 8.5, color: accent, textDecoration: 'underline', marginTop: 1 }}>
-                        {c.url}
-                      </Link>
-                    ) : null}
-                  </View>
-                ))}
+                {resume.certificates.map(c => {
+                  const titleStyle = { fontSize: 10, fontFamily: 'Helvetica-Bold', color: c.url ? accent : '#1c1c1e' };
+                  return (
+                    <View key={c.id} style={{ marginBottom: 4 }}>
+                      {c.url ? (
+                        <Link src={c.url} style={{ textDecoration: 'none' }}>
+                          <Text style={titleStyle}>{c.name}</Text>
+                        </Link>
+                      ) : (
+                        <Text style={titleStyle}>{c.name}</Text>
+                      )}
+                      <Text style={{ fontSize: 9.5, color: '#6e6e73' }}>{c.issuer}</Text>
+                    </View>
+                  );
+                })}
               </View>
             ) : null}
           </View>
