@@ -51,7 +51,9 @@ function PlanSection() {
   const activeShareLinks = resumes.filter(r => r.shareToken).length;
   const isGift = user?.user_metadata?.gift_pro === true;
 
-  // Detect Stripe success redirect + always refresh metadata on mount
+  // Detect Stripe success redirect + always refresh metadata on mount.
+  // Async polling — setState ist hier korrekt.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const isSuccess = location.search.includes('success=1') || location.hash.includes('success=1');
     if (isSuccess) {
@@ -80,6 +82,7 @@ function PlanSection() {
     // Bewusst on-mount-only: Stripe-Success-URL einmal beim Öffnen erkennen.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   async function handlePortal() {
     setPortalLoading(true);

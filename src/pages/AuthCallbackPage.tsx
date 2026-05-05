@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { LogoIcon } from '../components/layout/Logo';
 import { useAuthStore } from '../store/authStore';
@@ -45,26 +44,16 @@ const CONFIG: Record<AuthType, { icon: string; title: string; subtitle: string; 
 };
 
 export default function AuthCallbackPage({ authType }: { authType: AuthType }) {
-  const [status, setStatus] = useState<Status>('loading');
-  const [errorMsg, setErrorMsg] = useState('');
   const { user, passwordRecovery, error } = useAuthStore();
 
   const cfg = CONFIG[authType];
 
-  useEffect(() => {
-    if (error) {
-      setStatus('error');
-      setErrorMsg(error);
-      return;
-    }
-    if (authType === 'recovery' && passwordRecovery) {
-      setStatus('success');
-      return;
-    }
-    if (user && !passwordRecovery) {
-      setStatus('success');
-    }
-  }, [user, passwordRecovery, error, authType]);
+  const status: Status = error
+    ? 'error'
+    : (authType === 'recovery' && passwordRecovery) || (user && !passwordRecovery)
+    ? 'success'
+    : 'loading';
+  const errorMsg = error ?? '';
 
   return (
     <div style={{

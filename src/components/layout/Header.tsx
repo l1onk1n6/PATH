@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, Edit3, Menu, Sparkles, Cloud, CloudOff, Loader2, Check } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { UpgradeModal } from '../ui/ProGate';
 import { displayPersonName } from '../../lib/displayName';
 import { isSupabaseConfigured } from '../../lib/supabase';
@@ -17,18 +17,18 @@ function SaveStatusPill({ isMobile }: { isMobile?: boolean }) {
   const syncing     = useResumeStore(s => s.syncing);
   const cloudOn     = isSupabaseConfigured();
   const [justSaved, setJustSaved] = useState(false);
-  const [prevPending, setPrevPending] = useState(savePending);
+  const prevPendingRef = useRef(savePending);
 
   // Flash "Gespeichert" for 1.6s after pending falls to false
   useEffect(() => {
-    if (prevPending && !savePending) {
+    const prev = prevPendingRef.current;
+    prevPendingRef.current = savePending;
+    if (prev && !savePending) {
       setJustSaved(true);
       const t = setTimeout(() => setJustSaved(false), 1600);
-      setPrevPending(savePending);
       return () => clearTimeout(t);
     }
-    setPrevPending(savePending);
-  }, [savePending, prevPending]);
+  }, [savePending]);
 
   let Icon: typeof Cloud = Cloud;
   let text = 'Synchronisiert';

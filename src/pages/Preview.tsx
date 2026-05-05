@@ -50,6 +50,8 @@ export default function Preview() {
     docs: resume.documents?.map(d => d.id),
   }) : '';
 
+  // Async PDF-Build — setState auf Start/Error/Done ist hier korrekt.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!resume) return;
     let cancelled = false;
@@ -70,6 +72,7 @@ export default function Preview() {
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pdfKey]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!resume) {
     return (

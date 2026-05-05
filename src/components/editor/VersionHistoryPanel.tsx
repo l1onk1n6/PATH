@@ -36,6 +36,8 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
     setLoading(false);
   }, [resumeId]);
 
+  // Async DB-Fetch — setState auf Resolve ist hier korrekt.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load(); }, [load]);
 
   async function handleSave() {

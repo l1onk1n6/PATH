@@ -218,10 +218,12 @@ function MappeSwitcher(props: MappeSwitcherProps) {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef   = useRef<HTMLDivElement>(null);
 
-  // Reset focus to active person whenever panel closes
-  useEffect(() => {
+  // Reset focus to active person whenever panel closes (Adjusting State on Prop Change)
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (!open && activePerson) setFocusedPersonId(activePerson.id);
-  }, [open, activePerson]);
+  }
 
   // Compute fixed position when opening
   function openPanel() {
