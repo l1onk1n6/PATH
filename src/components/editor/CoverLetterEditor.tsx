@@ -343,7 +343,7 @@ export default function CoverLetterEditor() {
             className="btn-glass btn-sm"
             title={tpl.desc}
             onClick={() => {
-              if (cl.body.trim()) { setConfirmOverwrite('template' as any); setPendingTemplate(tpl.body); }
+              if (cl.body.trim()) { setConfirmOverwrite('template'); setPendingTemplate(tpl.body); }
               else { update('body', tpl.body); }
             }}
             style={{ gap: 5, boxShadow: 'none' }}
