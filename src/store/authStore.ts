@@ -15,6 +15,7 @@ interface AuthStore {
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  sendMagicLink: (email: string) => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
   updatePassword: (newPassword: string) => Promise<void>;
   updateName: (name: string) => Promise<void>;
@@ -110,6 +111,22 @@ export const useAuthStore = create<AuthStore>((set) => ({
       // ignore
     } finally {
       set({ user: null, session: null, passwordRecovery: false, emailUnconfirmed: false });
+    }
+  },
+
+  sendMagicLink: async (email) => {
+    set({ loading: true, error: null });
+    try {
+      const supabase = getSupabase();
+      const redirectTo = `${window.location.origin}${window.location.pathname}`;
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: redirectTo, shouldCreateUser: false },
+      });
+      if (error) throw error;
+      set({ loading: false });
+    } catch (e) {
+      set({ error: toGermanError(e), loading: false });
     }
   },
 
