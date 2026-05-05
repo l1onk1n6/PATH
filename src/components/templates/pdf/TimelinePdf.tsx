@@ -5,7 +5,7 @@
  */
 import { Document, Page, View, Text, Link, Image, StyleSheet } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
-import { alphaHex, dateRange } from './shared-utils';
+import { alphaHex, dateRange, ensureProtocol, displayUrl } from './shared-utils';
 import { DescriptionBlock } from './shared';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
@@ -50,8 +50,8 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
   if (info.phone) contacts.push({ text: info.phone, href: `tel:${info.phone.replace(/\s/g, '')}` });
   const addr = [info.street, info.location].filter(Boolean).join(', ');
   if (addr) contacts.push({ text: addr });
-  if (info.website) contacts.push({ text: info.website, href: ensureProtocol(info.website) });
-  if (info.linkedin) contacts.push({ text: info.linkedin, href: ensureProtocol(info.linkedin) });
+  if (info.website) contacts.push({ text: displayUrl(info.website), href: ensureProtocol(info.website) });
+  if (info.linkedin) contacts.push({ text: displayUrl(info.linkedin), href: ensureProtocol(info.linkedin) });
 
   return (
     <Document>
@@ -163,10 +163,6 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
   );
 }
 
-function ensureProtocol(url: string): string {
-  if (/^https?:\/\//i.test(url)) return url;
-  return `https://${url.replace(/^\/+/, '')}`;
-}
 
 const styles = StyleSheet.create({
   page: {
