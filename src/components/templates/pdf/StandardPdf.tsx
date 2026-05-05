@@ -100,11 +100,14 @@ export function StandardPdf({ resume, variant = {} }: Props) {
   const contacts = buildContacts(info);
 
   // ── Header (ueber beiden Spalten) ─────────────────────────
+  // Kontakte werden im Header NUR gezeigt, wenn keine Sidebar existiert
+  // (sonst sind sie in der Sidebar und wuerden doppelt erscheinen).
   const Header = ({ inverse = false }: { inverse?: boolean }) => {
     const color = inverse ? bannerText : text;
     const accentColor = inverse ? bannerText : accent;
     const subMuted = inverse ? alphaHex(bannerText, 0.8) : muted;
     const showPhoto = !photoInSidebar && !!info.photo;
+    const showContacts = sidebarMode === 'none';
 
     if (headerMode === 'banner') {
       return (
@@ -122,9 +125,11 @@ export function StandardPdf({ resume, variant = {} }: Props) {
               ) : null}
             </View>
           </View>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 12 }}>
-            {contacts.map((c, i) => <ContactChip key={i} c={c} color={alphaHex(bannerText, 0.9)} />)}
-          </View>
+          {showContacts ? (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 12 }}>
+              {contacts.map((c, i) => <ContactChip key={i} c={c} color={alphaHex(bannerText, 0.9)} />)}
+            </View>
+          ) : null}
         </View>
       );
     }
@@ -145,12 +150,14 @@ export function StandardPdf({ resume, variant = {} }: Props) {
           {info.title ? (
             <Text style={{ fontSize: 12, color: accentColor, marginTop: 5, lineHeight: 1.3 }}>{info.title}</Text>
           ) : null}
-          <View style={{
-            flexDirection: 'row', flexWrap: 'wrap', marginTop: 10, gap: 14,
-            justifyContent: centered ? 'center' : 'flex-start',
-          }}>
-            {contacts.map((c, i) => <ContactInline key={i} c={c} color={subMuted} />)}
-          </View>
+          {showContacts ? (
+            <View style={{
+              flexDirection: 'row', flexWrap: 'wrap', marginTop: 10, gap: 14,
+              justifyContent: centered ? 'center' : 'flex-start',
+            }}>
+              {contacts.map((c, i) => <ContactInline key={i} c={c} color={subMuted} />)}
+            </View>
+          ) : null}
         </View>
       </View>
     );
