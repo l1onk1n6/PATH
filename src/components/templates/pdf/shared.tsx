@@ -67,12 +67,15 @@ export function SectionHeading({
  *   erste wird zusammen mit dem Heading in einen wrap={false}-Block gepackt.
  */
 /**
- * Section-Wrapper. Heading wird via minPresenceAhead an die naechste Seite
- * verschoben, falls weniger als ~60pt Content darunter Platz haben — vermeidet
- * orphan-Headings ohne den heading+first-Block als wrap={false}-Unit zu
- * koppeln. Letzteres ist mit @react-pdf v4 fragil und fuehrt bei langen
- * Listen (z. B. viele Zertifikate) zu uebereinander gestapelten Items am
- * Page-Break.
+ * Section-Wrapper. Heading + erstes Eintrag werden zusammen in einer
+ * wrap={false}-Unit gehalten — vermeidet orphan-Headings am Seitenende.
+ * Die uebrigen Eintraege folgen als direkte Children des Outer-Wrappers
+ * und koennen frei spillen.
+ *
+ * Frueher (v1) gab es einen Bug, bei dem mehrere wrap={false}-Sibling-
+ * Items am Page-Break aufeinander stapelten — Ursache war jedoch
+ * flex:1 auf der Main-Spalte (in PR #17 entfernt). Mit dem Fix dort ist
+ * das heading+first-Coupling wieder unbedenklich.
  *
  * @param children ein oder mehrere Eintrags-Views (z. B. WorkEntry).
  */
@@ -85,12 +88,17 @@ export function Section({
   children: React.ReactNode;
   style?: Style;
 }) {
+  const arr = Array.isArray(children) ? children : [children];
+  const [first, ...rest] = arr.filter(Boolean);
   return (
     <View style={{ marginBottom: 14, flexDirection: 'column', ...style }}>
-      <View wrap={false} minPresenceAhead={60}>
+      <View wrap={false} minPresenceAhead={30}>
         <SectionHeading color={color} kind={kind}>{title}</SectionHeading>
+        {first}
       </View>
-      {children}
+      {rest.length > 0 ? (
+        <View style={{ flexDirection: 'column' }}>{rest}</View>
+      ) : null}
     </View>
   );
 }
