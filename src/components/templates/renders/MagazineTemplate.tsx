@@ -1,5 +1,6 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SkillBar, SafeImg } from './shared';
+import { fullName, formatDate } from './shared-utils';
+import { SkillBar, SafeImg } from './shared';
 
 export default function MagazineTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, projects } = resume;
