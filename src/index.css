@@ -103,6 +103,15 @@ body::before {
   box-shadow: var(--glass-shadow-lg), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 
+/* Opt-out fuer rein-statische Container (Auth, Setup, Info-Panels):
+   Hover-Highlight wegnehmen, da die Karte selbst nicht klickbar ist. */
+.glass-card.static,
+.glass-card.static:hover {
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
 /* ─── Buttons ─── */
 .btn-glass {
   display: inline-flex;
