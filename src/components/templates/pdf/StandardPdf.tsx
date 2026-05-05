@@ -310,7 +310,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
   );
 
   const Main = () => (
-    <View style={{ flex: 1 }}>
+    <View>
       <Summary />
       <WorkSection />
       <EduSection />
