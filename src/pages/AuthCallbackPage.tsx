@@ -61,7 +61,7 @@ export default function AuthCallbackPage({ authType }: { authType: AuthType }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: '20px 16px',
     }}>
-      <div className="glass-card animate-scale-in" style={{ width: '100%', maxWidth: 380, padding: '36px 28px', textAlign: 'center' }}>
+      <div className="glass-card static animate-scale-in" style={{ width: '100%', maxWidth: 380, padding: '36px 28px', textAlign: 'center' }}>
 
         {/* Logo */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
