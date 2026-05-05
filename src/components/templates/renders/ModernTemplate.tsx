@@ -2,21 +2,23 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
 
-export default function ModernTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
-  const color = resume.accentColor;
-  const name = fullName(resume);
+function SideLabel({ children }: { children: React.ReactNode }) {
+  return <div style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.16em', color: 'rgba(255,255,255,0.55)', marginBottom: 10, marginTop: 18 }}>{children}</div>;
+}
 
-  const SideLabel = ({ children }: { children: React.ReactNode }) => (
-    <div style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.16em', color: 'rgba(255,255,255,0.55)', marginBottom: 10, marginTop: 18 }}>{children}</div>
-  );
-
-  const MainLabel = ({ children }: { children: React.ReactNode }) => (
+function MainLabel({ children, color }: { children: React.ReactNode; color: string }) {
+  return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
       <div style={{ width: 3, height: 14, background: color, borderRadius: 2 }} />
       <span style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#1a1a2e' }}>{children}</span>
     </div>
   );
+}
+
+export default function ModernTemplate({ resume }: { resume: Resume }) {
+  const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
+  const color = resume.accentColor;
+  const name = fullName(resume);
 
   return (
     <div style={{
@@ -102,7 +104,7 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
 
         {workExperience.length > 0 && (
           <div style={{ marginBottom: 22 }}>
-            <MainLabel>Berufserfahrung</MainLabel>
+            <MainLabel color={color}>Berufserfahrung</MainLabel>
             {workExperience.map(job => (
               <div key={job.id} style={{ marginBottom: 14, paddingLeft: 14, borderLeft: '2px solid #f0f0f5' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -123,7 +125,7 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
 
         {education.length > 0 && (
           <div>
-            <MainLabel>Ausbildung</MainLabel>
+            <MainLabel color={color}>Ausbildung</MainLabel>
             {education.map(edu => (
               <div key={edu.id} style={{ marginBottom: 12, paddingLeft: 14, borderLeft: '2px solid #f0f0f5' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>

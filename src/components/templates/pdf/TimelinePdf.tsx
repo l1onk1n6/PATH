@@ -9,20 +9,8 @@ import { alphaHex, dateRange } from './shared-utils';
 import { DescriptionBlock } from './shared';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
-export default function TimelinePdf({ resume }: { resume: Resume }) {
-  const info = resume.personalInfo;
-  const accent = resume.accentColor || '#007AFF';
-  const name = [info.firstName, info.lastName].filter(Boolean).join(' ') || 'Ihr Name';
-
-  const contacts: Array<{ text: string; href?: string }> = [];
-  if (info.email) contacts.push({ text: info.email, href: `mailto:${info.email}` });
-  if (info.phone) contacts.push({ text: info.phone, href: `tel:${info.phone.replace(/\s/g, '')}` });
-  const addr = [info.street, info.location].filter(Boolean).join(', ');
-  if (addr) contacts.push({ text: addr });
-  if (info.website) contacts.push({ text: info.website, href: ensureProtocol(info.website) });
-  if (info.linkedin) contacts.push({ text: info.linkedin, href: ensureProtocol(info.linkedin) });
-
-  const SectionTitle = ({ children }: { children: string }) => (
+function SectionTitle({ children, accent }: { children: string; accent: string }) {
+  return (
     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 18, marginBottom: 12 }}>
       <Text style={{ fontFamily: 'Helvetica-Bold', fontSize: 10, color: accent, letterSpacing: 2 }}>
         {children.toUpperCase()}
@@ -30,8 +18,10 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
       <View style={{ flex: 1, height: 0.8, backgroundColor: alphaHex(accent, 0.3), marginLeft: 10 }} />
     </View>
   );
+}
 
-  const TimelineItem = ({ year, title, sub, body }: { year: string; title: string; sub?: string; body?: string }) => (
+function TimelineItem({ year, title, sub, body, accent }: { year: string; title: string; sub?: string; body?: string; accent: string }) {
+  return (
     <View style={{ flexDirection: 'row', marginBottom: 14 }} wrap={false}>
       {/* Linke Spalte: Jahr + Punkt + vertikale Linie */}
       <View style={{ width: 70, alignItems: 'flex-end', paddingRight: 12 }}>
@@ -48,6 +38,20 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
       </View>
     </View>
   );
+}
+
+export default function TimelinePdf({ resume }: { resume: Resume }) {
+  const info = resume.personalInfo;
+  const accent = resume.accentColor || '#007AFF';
+  const name = [info.firstName, info.lastName].filter(Boolean).join(' ') || 'Ihr Name';
+
+  const contacts: Array<{ text: string; href?: string }> = [];
+  if (info.email) contacts.push({ text: info.email, href: `mailto:${info.email}` });
+  if (info.phone) contacts.push({ text: info.phone, href: `tel:${info.phone.replace(/\s/g, '')}` });
+  const addr = [info.street, info.location].filter(Boolean).join(', ');
+  if (addr) contacts.push({ text: addr });
+  if (info.website) contacts.push({ text: info.website, href: ensureProtocol(info.website) });
+  if (info.linkedin) contacts.push({ text: info.linkedin, href: ensureProtocol(info.linkedin) });
 
   return (
     <Document>
@@ -72,9 +76,9 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
 
         {resume.workExperience.length > 0 ? (
           <>
-            <SectionTitle>Berufserfahrung</SectionTitle>
+            <SectionTitle accent={accent}>Berufserfahrung</SectionTitle>
             {sortWorkExperience(resume.workExperience).map(job => (
-              <TimelineItem
+              <TimelineItem accent={accent}
                 key={job.id}
                 year={dateRange(job.startDate, job.endDate, job.current) || '—'}
                 title={job.position}
@@ -87,9 +91,9 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
 
         {resume.education.length > 0 ? (
           <>
-            <SectionTitle>Ausbildung</SectionTitle>
+            <SectionTitle accent={accent}>Ausbildung</SectionTitle>
             {sortEducation(resume.education).map(edu => (
-              <TimelineItem
+              <TimelineItem accent={accent}
                 key={edu.id}
                 year={dateRange(edu.startDate, edu.endDate) || '—'}
                 title={edu.degree + (edu.field ? ` · ${edu.field}` : '')}
@@ -102,7 +106,7 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
         {/* Skills als Pills */}
         {resume.skills.length > 0 ? (
           <>
-            <SectionTitle>Fähigkeiten</SectionTitle>
+            <SectionTitle accent={accent}>Fähigkeiten</SectionTitle>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
               {resume.skills.map(s => (
                 <View key={s.id} style={{
@@ -123,7 +127,7 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
           <View style={{ flexDirection: 'row', gap: 28, marginTop: 4 }}>
             {resume.languages.length > 0 ? (
               <View style={{ flex: 1 }}>
-                <SectionTitle>Sprachen</SectionTitle>
+                <SectionTitle accent={accent}>Sprachen</SectionTitle>
                 {resume.languages.map(l => (
                   <View key={l.id} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
                     <Text style={{ fontSize: 10 }}>{l.name}</Text>
@@ -134,7 +138,7 @@ export default function TimelinePdf({ resume }: { resume: Resume }) {
             ) : null}
             {(resume.certificates ?? []).length > 0 ? (
               <View style={{ flex: 1 }}>
-                <SectionTitle>Zertifikate</SectionTitle>
+                <SectionTitle accent={accent}>Zertifikate</SectionTitle>
                 {resume.certificates.map(c => (
                   <View key={c.id} style={{ marginBottom: 4 }} wrap={false}>
                     <Text style={{ fontSize: 10, fontFamily: 'Helvetica-Bold' }}>{c.name}</Text>
