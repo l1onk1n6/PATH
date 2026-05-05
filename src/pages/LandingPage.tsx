@@ -899,22 +899,20 @@ function AppleIcon() {
 function MockAppPreview() {
   return (
     <div style={{ flex: '0 0 auto', width: 340, position: 'relative' }}>
-      {/* Glow behind card */}
+      {/* Dezenter Glow im Hintergrund — passt zum reduzierten Look */}
       <div style={{
-        position: 'absolute', inset: -40,
-        background: 'radial-gradient(ellipse at center, rgba(0,122,255,0.2) 0%, transparent 70%)',
+        position: 'absolute', inset: -32,
+        background: 'radial-gradient(ellipse at center, rgba(0,122,255,0.10) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
 
-      {/* Main card */}
+      {/* Main card — solide Calm-Surface */}
       <div style={{
-        background: 'rgba(255,255,255,0.07)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        border: '1px solid rgba(255,255,255,0.15)',
-        borderRadius: 24,
+        background: '#16161a',
+        border: '1px solid rgba(255,255,255,0.06)',
+        borderRadius: 22,
         padding: 24,
-        boxShadow: '0 24px 80px rgba(0,0,0,0.4)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
         animation: 'float 5s ease-in-out infinite',
         position: 'relative', zIndex: 1,
       }}>
@@ -925,7 +923,7 @@ function MockAppPreview() {
             <div style={{ fontSize: 13, fontWeight: 700 }}>Max Mustermann</div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Softwareentwickler</div>
           </div>
-          <div style={{ marginLeft: 'auto', fontSize: 10, padding: '3px 8px', borderRadius: 99, background: 'rgba(0,122,255,0.2)', border: '1px solid rgba(0,122,255,0.3)', color: 'var(--ios-blue)' }}>
+          <div style={{ marginLeft: 'auto', fontSize: 10, padding: '3px 8px', borderRadius: 99, background: 'rgba(0,122,255,0.15)', border: '1px solid rgba(0,122,255,0.25)', color: 'var(--ios-blue)' }}>
             Modern
           </div>
         </div>
@@ -943,8 +941,8 @@ function MockAppPreview() {
               <span>{label}</span>
               <span style={{ color }}>{pct}%</span>
             </div>
-            <div style={{ height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 2, opacity: 0.8 }} />
+            <div style={{ height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 2, opacity: 0.85 }} />
             </div>
           </div>
         ))}
@@ -952,8 +950,8 @@ function MockAppPreview() {
         {/* CTA in card */}
         <div style={{
           marginTop: 20, padding: '10px 14px', borderRadius: 12,
-          background: 'linear-gradient(135deg, rgba(0,122,255,0.25), rgba(88,86,214,0.2))',
-          border: '1px solid rgba(0,122,255,0.3)',
+          background: 'linear-gradient(135deg, rgba(0,122,255,0.18), rgba(88,86,214,0.14))',
+          border: '1px solid rgba(0,122,255,0.22)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 12,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -964,16 +962,15 @@ function MockAppPreview() {
         </div>
       </div>
 
-      {/* Floating badge */}
+      {/* Floating badge — solide statt blur */}
       <div style={{
         position: 'absolute', bottom: -16, right: -16,
-        background: 'linear-gradient(135deg, rgba(255,159,10,0.3), rgba(255,55,95,0.25))',
-        border: '1px solid rgba(255,159,10,0.4)',
+        background: '#1a1a20',
+        border: '1px solid rgba(255,159,10,0.3)',
         borderRadius: 14, padding: '10px 16px',
         display: 'flex', alignItems: 'center', gap: 6,
         fontSize: 13, fontWeight: 600,
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
         zIndex: 2,
       }}>
         <Sparkles size={13} style={{ color: '#FF9F0A' }} />
