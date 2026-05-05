@@ -78,12 +78,14 @@ export function Section({
   const arr = Array.isArray(children) ? children : [children];
   const [first, ...rest] = arr.filter(Boolean);
   return (
-    <View style={{ marginBottom: 14, ...style }}>
+    <View style={{ marginBottom: 14, flexDirection: 'column', ...style }}>
       <View wrap={false} minPresenceAhead={30}>
         <SectionHeading color={color} kind={kind}>{title}</SectionHeading>
         {first}
       </View>
-      {rest}
+      {rest.length > 0 ? (
+        <View style={{ flexDirection: 'column' }}>{rest}</View>
+      ) : null}
     </View>
   );
 }
