@@ -17,6 +17,12 @@ const ERROR_MAP: Record<string, string> = {
     'Diese E-Mail-Adresse ist bereits registriert.',
   'Email already in use':
     'Diese E-Mail-Adresse ist bereits registriert.',
+  'email_address_invalid':
+    'Diese E-Mail-Adresse ist ungültig.',
+  'A user with this email address has already been registered':
+    'Diese E-Mail-Adresse ist bereits registriert.',
+  'New email address should be different':
+    'Die neue E-Mail-Adresse muss sich von der bisherigen unterscheiden.',
 
   // Passwort
   'Password should be at least 6 characters':

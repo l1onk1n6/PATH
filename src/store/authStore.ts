@@ -18,8 +18,8 @@ interface AuthStore {
   sendMagicLink: (email: string) => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
   updatePassword: (newPassword: string) => Promise<void>;
+  updateEmail: (newEmail: string) => Promise<void>;
   updateName: (name: string) => Promise<void>;
-  deleteAccount: () => Promise<void>;
   resendConfirmation: (email: string) => Promise<void>;
   refreshUser: () => Promise<void>;
   clearError: () => void;
@@ -155,6 +155,22 @@ export const useAuthStore = create<AuthStore>((set) => ({
     }
   },
 
+  updateEmail: async (newEmail) => {
+    set({ loading: true, error: null });
+    try {
+      const supabase = getSupabase();
+      const redirectTo = `${window.location.origin}${window.location.pathname}`;
+      const { error } = await supabase.auth.updateUser(
+        { email: newEmail },
+        { emailRedirectTo: redirectTo },
+      );
+      if (error) throw error;
+      set({ loading: false });
+    } catch (e) {
+      set({ error: toGermanError(e), loading: false });
+    }
+  },
+
   updateName: async (name) => {
     set({ loading: true, error: null });
     try {
@@ -162,20 +178,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const { data, error } = await supabase.auth.updateUser({ data: { full_name: name } });
       if (error) throw error;
       set({ user: data.user, loading: false });
-    } catch (e) {
-      set({ error: toGermanError(e), loading: false });
-    }
-  },
-
-  deleteAccount: async () => {
-    set({ loading: true, error: null });
-    try {
-      const supabase = getSupabase();
-      const { error } = await supabase.rpc('delete_user');
-      if (error) throw error;
-      // Sign out after successful deletion (session is invalid anyway)
-      await supabase.auth.signOut().catch(() => {});
-      set({ user: null, session: null, loading: false });
     } catch (e) {
       set({ error: toGermanError(e), loading: false });
     }
@@ -227,7 +229,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
       if (sessionData.session) {
         set({ session: sessionData.session, user: sessionData.session.user });
       }
-    } catch { /* ignore */ }
+    } catch (e) {
+      console.warn('[auth] refreshUser failed', e);
+    }
   },
 
   clearError: () => set({ error: null }),
