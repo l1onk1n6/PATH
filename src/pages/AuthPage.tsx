@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { Mail, Lock, User, Eye, EyeOff, ShieldAlert, ArrowLeft, CheckCircle, RefreshCw } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, ShieldAlert, ArrowLeft, CheckCircle, RefreshCw, Zap } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { LogoIcon } from '../components/layout/Logo';
 import { passwordStrength, STRENGTH_LABEL, STRENGTH_COLOR, RateLimiter } from '../lib/security';
 
 const limiter = new RateLimiter(5, 300_000); // 5 min lockout
 
-type Mode = 'login' | 'register' | 'forgot' | 'reset';
+type Mode = 'login' | 'register' | 'forgot' | 'reset' | 'magic';
 
 export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: () => void; initialMode?: Mode } = {}) {
   const [mode, setMode] = useState<Mode>(initialMode);
@@ -18,10 +18,11 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
   const [showConfirmPw, setShowConfirmPw] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [resetSent, setResetSent] = useState(false);
+  const [magicSent, setMagicSent] = useState(false);
   const [pwMismatch, setPwMismatch] = useState(false);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const { signIn, signUp, sendPasswordReset, updatePassword, resendConfirmation, loading, error, clearError, passwordRecovery, emailUnconfirmed } = useAuthStore();
+  const { signIn, signUp, sendPasswordReset, sendMagicLink, updatePassword, resendConfirmation, loading, error, clearError, passwordRecovery, emailUnconfirmed } = useAuthStore();
   const [resendSent, setResendSent] = useState(false);
 
   // Switch to reset mode when coming from password recovery email
@@ -58,6 +59,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
     setPassword('');
     setConfirmPassword('');
     setResetSent(false);
+    setMagicSent(false);
     setPwMismatch(false);
   }
 
@@ -83,6 +85,9 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
     } else if (mode === 'forgot') {
       await sendPasswordReset(email);
       if (!useAuthStore.getState().error) setResetSent(true);
+    } else if (mode === 'magic') {
+      await sendMagicLink(email);
+      if (!useAuthStore.getState().error) setMagicSent(true);
     } else if (mode === 'reset') {
       if (password !== confirmPassword) { setPwMismatch(true); return; }
       if (password.length < 8) return;
@@ -257,6 +262,24 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
                 {loading ? 'Bitte warten…' : mode === 'login' ? 'Anmelden' : 'Konto erstellen'}
               </button>
             </form>
+
+            {mode === 'login' && (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '16px 0 12px' }}>
+                  <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.05em' }}>ODER</span>
+                  <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => switchMode('magic')}
+                  className="btn-glass"
+                  style={{ width: '100%', justifyContent: 'center', padding: '11px 20px', gap: 6, fontSize: 13 }}
+                >
+                  <Zap size={13} /> Mit Magic Link anmelden
+                </button>
+              </>
+            )}
           </>
         )}
 
@@ -300,6 +323,52 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
                 <button type="submit" className="btn-glass btn-primary" disabled={loading}
                   style={{ width: '100%', justifyContent: 'center', padding: '13px 20px', opacity: loading ? 0.7 : 1 }}>
                   {loading ? 'Wird gesendet…' : 'Reset-Link senden'}
+                </button>
+              </form>
+            )}
+          </>
+        )}
+
+        {/* ── Magic Link ── */}
+        {!emailUnconfirmed && mode === 'magic' && (
+          <>
+            <button onClick={() => switchMode('login')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.45)', fontSize: 13, padding: '0 0 16px', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <ArrowLeft size={14} /> Zurück zur Anmeldung
+            </button>
+
+            {magicSent ? (
+              <div style={{ textAlign: 'center', padding: '12px 0' }}>
+                <CheckCircle size={40} style={{ color: '#34c759', marginBottom: 12 }} />
+                <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>Link gesendet</h2>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, margin: '0 0 20px' }}>
+                  Wir haben dir einen Anmeldelink an <strong style={{ color: 'rgba(255,255,255,0.75)' }}>{email}</strong> geschickt. Der Link ist 60 Minuten gültig.
+                </p>
+                <button onClick={() => switchMode('login')} className="btn-glass" style={{ width: '100%', justifyContent: 'center', padding: '12px 20px' }}>
+                  Zurück zur Anmeldung
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 6px' }}>Magic Link</h2>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: '0 0 18px', lineHeight: 1.5 }}>
+                  Gib deine E-Mail-Adresse ein. Wir senden dir einen einmaligen Anmeldelink – kein Passwort nötig.
+                </p>
+
+                <div style={{ marginBottom: 16 }}>
+                  <label className="section-label"><Mail size={9} style={{ display: 'inline', marginRight: 3 }} />E-Mail</label>
+                  <input className="input-glass" type="email" placeholder="max@beispiel.de" value={email} maxLength={254}
+                    onChange={(e) => setEmail(e.target.value)} required autoFocus autoComplete="email" />
+                </div>
+
+                {error && (
+                  <div style={{ background: 'rgba(255,59,48,0.15)', border: '1px solid rgba(255,59,48,0.3)', borderRadius: 'var(--radius-sm)', padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#ff6b6b' }}>
+                    {error}
+                  </div>
+                )}
+
+                <button type="submit" className="btn-glass btn-primary" disabled={loading}
+                  style={{ width: '100%', justifyContent: 'center', padding: '13px 20px', gap: 6, opacity: loading ? 0.7 : 1 }}>
+                  <Zap size={13} /> {loading ? 'Wird gesendet…' : 'Magic Link senden'}
                 </button>
               </form>
             )}
