@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { History, Plus, RotateCcw, Trash2, Loader2, Clock, AlertCircle } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { userError } from '../../lib/userError';
@@ -24,7 +24,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
   const [showLabel, setShowLabel]   = useState(false);
   const [error, setError]           = useState<string | null>(null);
 
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     const result = await listVersions(resumeId);
@@ -34,9 +34,9 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
       setVersions(result.data);
     }
     setLoading(false);
-  }
+  }, [resumeId]);
 
-  useEffect(() => { load(); }, [resumeId]);
+  useEffect(() => { load(); }, [load]);
 
   async function handleSave() {
     if (!resume) return;
@@ -56,7 +56,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
   async function handleRestore(version: ResumeVersion) {
     if (!resume) return;
     setRestoring(version.id);
-    const { id, personId, createdAt, shareToken, reminderDays, ...restorable } = version.snapshot as any;
+    const { id: _id, personId: _personId, createdAt: _createdAt, shareToken: _shareToken, reminderDays: _reminderDays, ...restorable } = version.snapshot;
     updateResume(resumeId, restorable);
     setRestoring(null);
     setConfirmId(null);

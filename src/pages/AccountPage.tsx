@@ -77,6 +77,8 @@ function PlanSection() {
     } else {
       refreshUser();
     }
+    // Bewusst on-mount-only: Stripe-Success-URL einmal beim Öffnen erkennen.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handlePortal() {
@@ -344,7 +346,8 @@ function ProfileCard() {
   const [saved,   setSaved]   = useState(false)
   const [saveErr, setSaveErr] = useState('')
 
-  // Load profile on mount
+  // Load profile on mount / user-change. supabase ist ein Singleton (getSupabase),
+  // user re-rendert bei jeder Metadata-Änderung — wir wollen nur bei Identity-Wechsel laden.
   useEffect(() => {
     if (!supabase || !user) return
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -358,6 +361,7 @@ function ProfileCard() {
         if (data.city)    setCity(data.city)
         if (data.country) setCountry(data.country)
       })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id])
 
   async function handleSave() {

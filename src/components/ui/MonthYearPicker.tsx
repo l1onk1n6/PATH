@@ -23,7 +23,9 @@ export default function MonthYearPicker({ value, onChange, disabled, placeholder
   const [viewYear, setViewYear] = useState(parsed?.year ?? new Date().getFullYear());
   const displayText = parsed ? `${MONTHS_FULL[parsed.month]} ${parsed.year}` : '';
 
-  useEffect(() => { if (parsed) setViewYear(parsed.year); }, [value]);
+  useEffect(() => {
+    if (value) setViewYear(parseInt(value.slice(0, 4)));
+  }, [value]);
 
   // Position dropdown based on trigger's viewport rect
   function openDropdown() {
