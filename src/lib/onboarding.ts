@@ -1,3 +1,5 @@
+// localStorage-Helpers fuer den Onboarding-Status. Bewusst getrennt von der
+// Modal-Komponente, damit Fast-Refresh (HMR) sauber funktioniert.
 const ONBOARDING_KEY = 'path_onboarding_done';
 
 export function isOnboardingDone(): boolean {
