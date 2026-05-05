@@ -66,7 +66,6 @@ export default function AuthCallbackPage({ authType }: { authType: AuthType }) {
         {/* Logo */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
           <LogoIcon size={36} />
-          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, margin: '6px 0 0' }}>by pixmatic</p>
         </div>
 
         {/* Loading */}

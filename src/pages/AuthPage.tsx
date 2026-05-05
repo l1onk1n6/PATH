@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Mail, Lock, User, Eye, EyeOff, ShieldAlert, ArrowLeft, CheckCircle, RefreshCw, Zap } from 'lucide-react';
+import { Mail, Eye, EyeOff, ShieldAlert, ArrowLeft, CheckCircle, RefreshCw, Zap } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { LogoIcon } from '../components/layout/Logo';
 import { passwordStrength, STRENGTH_LABEL, STRENGTH_COLOR, RateLimiter } from '../lib/security';
@@ -122,13 +122,12 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
           <ArrowLeft size={15} /> Zurück
         </button>
       )}
-      <div className="glass-card static animate-scale-in" style={{ width: '100%', maxWidth: 380, padding: '24px 22px' }}>
+      <div className="glass-card static animate-scale-in" style={{ width: '100%', maxWidth: 340, padding: '24px 22px' }}>
 
         {/* Logo */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 18 }}>
           <div style={{ marginBottom: 8 }}><LogoIcon size={40} /></div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 2px', letterSpacing: '-0.4px' }}>Path</h1>
-          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, margin: 0 }}>by pixmatic</p>
+          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, letterSpacing: '-0.4px' }}>Path</h1>
         </div>
 
         {/* ── E-Mail bestätigen (nach Registrierung) ── */}
@@ -191,21 +190,21 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
             <form onSubmit={handleSubmit}>
               {mode === 'register' && (
                 <div style={{ marginBottom: 12 }}>
-                  <label className="section-label"><User size={9} style={{ display: 'inline', marginRight: 3 }} />Name</label>
+                  <label className="section-label">Name</label>
                   <input className="input-glass" placeholder="Max Mustermann" value={name} maxLength={100}
                     onChange={(e) => setName(e.target.value)} required autoFocus />
                 </div>
               )}
 
               <div style={{ marginBottom: 12 }}>
-                <label className="section-label"><Mail size={9} style={{ display: 'inline', marginRight: 3 }} />E-Mail</label>
+                <label className="section-label">E-Mail</label>
                 <input className="input-glass" type="email" placeholder="max@beispiel.de" value={email} maxLength={254}
                   onChange={(e) => setEmail(e.target.value)} required autoFocus={mode === 'login'}
                   autoComplete={mode === 'login' ? 'username' : 'email'} />
               </div>
 
               <div style={{ marginBottom: strength ? 6 : 8, position: 'relative' }}>
-                <label className="section-label"><Lock size={9} style={{ display: 'inline', marginRight: 3 }} />Passwort</label>
+                <label className="section-label">Passwort</label>
                 <input className="input-glass" type={showPw ? 'text' : 'password'}
                   placeholder={mode === 'register' ? 'Mindestens 8 Zeichen' : 'Passwort eingeben'}
                   value={password} onChange={(e) => setPassword(e.target.value)}
@@ -268,9 +267,9 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
 
             {mode === 'login' && (
               <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '16px 0 12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '24px 0 18px' }}>
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
-                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.05em' }}>ODER</span>
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em' }}>ODER</span>
                   <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
                 </div>
                 <button
@@ -312,7 +311,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
                 </p>
 
                 <div style={{ marginBottom: 16 }}>
-                  <label className="section-label"><Mail size={9} style={{ display: 'inline', marginRight: 3 }} />E-Mail</label>
+                  <label className="section-label">E-Mail</label>
                   <input className="input-glass" type="email" placeholder="max@beispiel.de" value={email}
                     onChange={(e) => setEmail(e.target.value)} required autoFocus />
                 </div>
@@ -358,7 +357,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
                 </p>
 
                 <div style={{ marginBottom: 16 }}>
-                  <label className="section-label"><Mail size={9} style={{ display: 'inline', marginRight: 3 }} />E-Mail</label>
+                  <label className="section-label">E-Mail</label>
                   <input className="input-glass" type="email" placeholder="max@beispiel.de" value={email} maxLength={254}
                     onChange={(e) => setEmail(e.target.value)} required autoFocus autoComplete="email" />
                 </div>
@@ -387,7 +386,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
             </p>
 
             <div style={{ marginBottom: 12, position: 'relative' }}>
-              <label className="section-label"><Lock size={9} style={{ display: 'inline', marginRight: 3 }} />Neues Passwort</label>
+              <label className="section-label">Neues Passwort</label>
               <input className="input-glass" type={showPw ? 'text' : 'password'}
                 placeholder="Mindestens 8 Zeichen" value={password}
                 onChange={(e) => { setPassword(e.target.value); setPwMismatch(false); }}
@@ -416,7 +415,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
             )}
 
             <div style={{ marginBottom: 16, position: 'relative' }}>
-              <label className="section-label"><Lock size={9} style={{ display: 'inline', marginRight: 3 }} />Passwort bestätigen</label>
+              <label className="section-label">Passwort bestätigen</label>
               <input className="input-glass" type={showConfirmPw ? 'text' : 'password'}
                 placeholder="Passwort wiederholen" value={confirmPassword}
                 onChange={(e) => { setConfirmPassword(e.target.value); setPwMismatch(false); }}
