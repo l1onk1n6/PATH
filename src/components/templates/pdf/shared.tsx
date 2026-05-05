@@ -316,7 +316,7 @@ export function CertItem({
 }) {
   const resolvedLinkColor = linkColor ?? '#007AFF';
   return (
-    <View style={{ marginBottom: 7 }} wrap={false}>
+    <View style={{ marginBottom: 7 }}>
       <Text style={{ fontSize: 10, fontFamily: boldFont, color: textColor }}>{cert.name}</Text>
       <Text style={{ fontSize: 9, color: mutedColor, marginTop: 1 }}>
         {cert.issuer}{cert.date ? ` · ${formatDate(cert.date)}` : ''}
