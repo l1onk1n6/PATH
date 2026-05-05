@@ -142,7 +142,7 @@ export default function Preview() {
     } finally { setExporting(false); }
   };
 
-  const TemplatePicker = () => (
+  const templatePicker = (
     <>
       {TEMPLATES.map((tmpl) => {
         const isSelected = resume.templateId === tmpl.id;
@@ -205,7 +205,7 @@ export default function Preview() {
       {!isMobile && (
         <aside style={{ width: 160, flexShrink: 0, overflow: 'auto' }}>
           <div className="section-label" style={{ marginBottom: 8 }}>Templates</div>
-          <TemplatePicker />
+          {templatePicker}
         </aside>
       )}
 
@@ -350,7 +350,7 @@ export default function Preview() {
                 </button>
               </div>
               <div style={{ overflowY: 'auto', padding: '12px 16px 24px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                <TemplatePicker />
+                {templatePicker}
               </div>
             </div>
           </div>

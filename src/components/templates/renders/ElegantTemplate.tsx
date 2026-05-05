@@ -2,12 +2,8 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
 
-export default function ElegantTemplate({ resume }: { resume: Resume }) {
-  const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
-  const color = resume.accentColor;
-  const name = fullName(resume);
-
-  const SectionHeading = ({ children }: { children: React.ReactNode }) => (
+function SectionHeading({ children, color }: { children: React.ReactNode; color: string }) {
+  return (
     <div style={{ marginBottom: 14 }}>
       <h2 style={{ fontFamily: '"Lora", Georgia, serif', fontSize: 13, fontWeight: 600, letterSpacing: '0.06em', color: '#2c2c2c', margin: '0 0 6px', fontStyle: 'normal' }}>{children}</h2>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -16,6 +12,12 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
       </div>
     </div>
   );
+}
+
+export default function ElegantTemplate({ resume }: { resume: Resume }) {
+  const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
+  const color = resume.accentColor;
+  const name = fullName(resume);
 
   return (
     <div style={{
@@ -62,7 +64,7 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
         <div>
           {workExperience.length > 0 && (
             <div style={{ marginBottom: 22 }}>
-              <SectionHeading>Berufserfahrung</SectionHeading>
+              <SectionHeading color={color}>Berufserfahrung</SectionHeading>
               {workExperience.map(job => (
                 <div key={job.id} style={{ marginBottom: 14 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -83,7 +85,7 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
 
           {education.length > 0 && (
             <div>
-              <SectionHeading>Ausbildung</SectionHeading>
+              <SectionHeading color={color}>Ausbildung</SectionHeading>
               {education.map(edu => (
                 <div key={edu.id} style={{ marginBottom: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -107,7 +109,7 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
         <div>
           {skills.length > 0 && (
             <div style={{ marginBottom: 20 }}>
-              <SectionHeading>Fähigkeiten</SectionHeading>
+              <SectionHeading color={color}>Fähigkeiten</SectionHeading>
               {skills.map(skill => (
                 <div key={skill.id} style={{ marginBottom: 7 }}>
                   <div style={{ fontSize: 11, fontWeight: 500, marginBottom: 3 }}>{skill.name}</div>
@@ -121,7 +123,7 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
 
           {languages.length > 0 && (
             <div style={{ marginBottom: 20 }}>
-              <SectionHeading>Sprachen</SectionHeading>
+              <SectionHeading color={color}>Sprachen</SectionHeading>
               {languages.map(lang => (
                 <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 6, borderBottom: '1px dotted #e0d8cc', paddingBottom: 5 }}>
                   <span style={{ fontStyle: 'italic' }}>{lang.name}</span>
@@ -133,7 +135,7 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
 
           {certificates.length > 0 && (
             <div>
-              <SectionHeading>Zertifikate</SectionHeading>
+              <SectionHeading color={color}>Zertifikate</SectionHeading>
               {certificates.map(cert => (
                 <div key={cert.id} style={{ marginBottom: 7 }}>
                   <div style={{ fontSize: 11, fontWeight: 600 }}>{cert.name}</div>

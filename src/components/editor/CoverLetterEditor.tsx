@@ -186,6 +186,8 @@ export default function CoverLetterEditor() {
 
   const deadlineColor = (() => {
     if (!resume.deadline) return undefined;
+    // Date.now() im Render: gewollt — Deadline-Farbe ist live-abhängig vom heutigen Datum.
+    // eslint-disable-next-line react-hooks/purity
     const diff = (new Date(resume.deadline).getTime() - Date.now()) / 86400000;
     if (diff < 0) return 'var(--ios-red)';
     if (diff <= 7) return 'var(--ios-yellow, #FF9F0A)';

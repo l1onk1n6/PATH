@@ -4,7 +4,13 @@
  * Stile abdeckt (Sidebar-Layouts, Banner-Header, Typo-Varianten, Farbschemata).
  * Ausgesprochen distinkte Stile (Elegant, Executive, Timeline, Tech) haben
  * eigene Files unter pdf/*.tsx.
+ *
+ * Hinweis: Inner-Components (Header, Main, Sidebar, Sections) teilen sich
+ * 10+ Variant-/Style-Closure-Variablen. Sie nach Modul-Scope zu lifen würde
+ * jeden Helper mit massiver Prop-Liste aufblähen ohne Verhaltensgewinn.
+ * Daher hier file-level disabled.
  */
+/* eslint-disable react-hooks/static-components */
 import { Document, Page, View, Text, Link, Image } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
 import type { HeadingStyle } from './shared-utils';

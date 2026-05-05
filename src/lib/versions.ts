@@ -21,7 +21,6 @@ export async function saveVersion(resume: Resume, label?: string): Promise<boole
   if (!user) return false;
 
   // Version without documents (large blobs, stored separately)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { documents: _docs, ...snapshot } = resume;
 
   const { error } = await table().insert({

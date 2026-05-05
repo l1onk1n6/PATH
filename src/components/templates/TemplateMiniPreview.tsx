@@ -29,7 +29,7 @@ export default function TemplateMiniPreview({ templateId, accent, height = 110 }
 
   const fontFamily = serif ? "'Times New Roman', Georgia, serif" : "'Inter', system-ui, sans-serif";
 
-  const HeaderBlock = () => {
+  const headerBlock = (() => {
     if (header === 'banner') {
       return (
         <div style={{
@@ -51,9 +51,9 @@ export default function TemplateMiniPreview({ templateId, accent, height = 110 }
         <div style={{ width: centered ? '30%' : '35%', height: 3, background: accent, borderRadius: 1 }} />
       </div>
     );
-  };
+  })();
 
-  const BodyLines = ({ color = textBlock, count = 3 }: { color?: string; count?: number }) => (
+  const bodyLines = (count = 3, color = textBlock) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '3px 5px' }}>
       {Array.from({ length: count }).map((_, i) => (
         <div key={i} style={{
@@ -63,7 +63,7 @@ export default function TemplateMiniPreview({ templateId, accent, height = 110 }
     </div>
   );
 
-  const SidebarBlock = () => (
+  const sidebarBlock = (
     <div style={{
       width: sidebarW, background: sidebarBg, flexShrink: 0,
       padding: '6px 4px', display: 'flex', flexDirection: 'column', gap: 4,
@@ -88,16 +88,16 @@ export default function TemplateMiniPreview({ templateId, accent, height = 110 }
     </div>
   );
 
-  const MainContent = () => (
+  const mainContent = (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-      <HeaderBlock />
+      {headerBlock}
       <div style={{ flex: 1, padding: '3px 2px' }}>
         {/* Section 1 */}
         <div style={{ width: '30%', height: 3.5, background: accentBlock, borderRadius: 1, margin: '3px 5px 2px' }} />
-        <BodyLines count={3} />
+        {bodyLines(3)}
         {/* Section 2 */}
         <div style={{ width: '25%', height: 3.5, background: accentBlock, borderRadius: 1, margin: '5px 5px 2px' }} />
-        <BodyLines count={2} />
+        {bodyLines(2)}
       </div>
     </div>
   );
@@ -109,9 +109,9 @@ export default function TemplateMiniPreview({ templateId, accent, height = 110 }
       fontFamily,
       boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.08)',
     }}>
-      {sidebarMode === 'left' && <SidebarBlock />}
-      <MainContent />
-      {sidebarMode === 'right' && <SidebarBlock />}
+      {sidebarMode === 'left' && sidebarBlock}
+      {mainContent}
+      {sidebarMode === 'right' && sidebarBlock}
     </div>
   );
 }

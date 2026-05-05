@@ -8,19 +8,8 @@ import { alphaHex, dateRange, formatDate } from './shared-utils';
 import { DescriptionBlock } from './shared';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
-export default function ElegantPdf({ resume }: { resume: Resume }) {
-  const info = resume.personalInfo;
-  const accent = resume.accentColor || '#1a1a2e';
-  const name = [info.firstName, info.lastName].filter(Boolean).join(' ') || 'Ihr Name';
-
-  const contacts: string[] = [];
-  if (info.email) contacts.push(info.email);
-  if (info.phone) contacts.push(info.phone);
-  const addr = [info.street, info.location].filter(Boolean).join(', ');
-  if (addr) contacts.push(addr);
-  if (info.website) contacts.push(info.website);
-
-  const SH = ({ children }: { children: string }) => (
+function SH({ children, accent }: { children: string; accent: string }) {
+  return (
     <View style={{ alignItems: 'center', marginTop: 14, marginBottom: 10 }}>
       <Text style={{
         fontFamily: 'Times-Bold', fontSize: 11, letterSpacing: 3, color: accent, textTransform: 'uppercase',
@@ -34,6 +23,20 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
       </View>
     </View>
   );
+}
+
+export default function ElegantPdf({ resume }: { resume: Resume }) {
+  const info = resume.personalInfo;
+  const accent = resume.accentColor || '#1a1a2e';
+  const name = [info.firstName, info.lastName].filter(Boolean).join(' ') || 'Ihr Name';
+
+  const contacts: string[] = [];
+  if (info.email) contacts.push(info.email);
+  if (info.phone) contacts.push(info.phone);
+  const addr = [info.street, info.location].filter(Boolean).join(', ');
+  if (addr) contacts.push(addr);
+  if (info.website) contacts.push(info.website);
+
 
   return (
     <Document>
@@ -58,7 +61,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
 
         {resume.workExperience.length > 0 ? (
           <>
-            <SH>Berufserfahrung</SH>
+            <SH accent={accent}>Berufserfahrung</SH>
             {sortWorkExperience(resume.workExperience).map(job => (
               <View key={job.id} wrap={false} style={{ marginBottom: 14 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
@@ -76,7 +79,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
 
         {resume.education.length > 0 ? (
           <>
-            <SH>Ausbildung</SH>
+            <SH accent={accent}>Ausbildung</SH>
             {sortEducation(resume.education).map(edu => (
               <View key={edu.id} style={{ marginBottom: 8 }} wrap={false}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -97,7 +100,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
             <View style={{ flex: 1 }}>
               {resume.skills.length > 0 ? (
                 <>
-                  <SH>Fähigkeiten</SH>
+                  <SH accent={accent}>Fähigkeiten</SH>
                   <Text style={{ fontSize: 10.5, lineHeight: 1.7, textAlign: 'center' }}>
                     {resume.skills.map(s => s.name).join('  ·  ')}
                   </Text>
@@ -105,7 +108,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
               ) : null}
               {resume.languages.length > 0 ? (
                 <>
-                  <SH>Sprachen</SH>
+                  <SH accent={accent}>Sprachen</SH>
                   <View style={{ alignItems: 'center' }}>
                     {resume.languages.map(l => (
                       <Text key={l.id} style={{ fontSize: 10.5, marginBottom: 2 }}>
@@ -118,7 +121,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
             </View>
             {(resume.certificates ?? []).length > 0 ? (
               <View style={{ flex: 1 }}>
-                <SH>Zertifikate</SH>
+                <SH accent={accent}>Zertifikate</SH>
                 <View style={{ alignItems: 'center' }}>
                   {resume.certificates.map(c => (
                     <View key={c.id} style={{ marginBottom: 4, alignItems: 'center' }} wrap={false}>

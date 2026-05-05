@@ -25,6 +25,9 @@ export default function UndoToaster() {
       pointerEvents: 'none', alignItems: 'center',
     }}>
       {toasts.map(t => {
+        // Date.now() im Render: gewollt — Toast-Progress aktualisiert sich
+        // bei jedem Re-Render (Parent triggert via setInterval).
+        // eslint-disable-next-line react-hooks/purity
         const elapsed  = Date.now() - t.createdAt;
         const progress = Math.max(0, Math.min(1, 1 - elapsed / t.durationMs));
         return (

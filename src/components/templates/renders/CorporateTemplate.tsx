@@ -2,21 +2,23 @@ import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
 
+function SideLabel({ children }: { children: React.ReactNode }) {
+  return <div style={{ fontSize: 8.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(255,255,255,0.5)', marginBottom: 9, marginTop: 16 }}>{children}</div>;
+}
+
+function MainHeading({ children, color }: { children: React.ReactNode; color: string }) {
+  return (
+    <div style={{ marginBottom: 12 }}>
+      <h2 style={{ fontFamily: '"Merriweather", Georgia, serif', fontSize: 11, fontWeight: 700, color: '#1e3a5f', margin: '0 0 5px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{children}</h2>
+      <div style={{ height: 2, background: color, width: 32, borderRadius: 1 }} />
+    </div>
+  );
+}
+
 export default function CorporateTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
-
-  const SideLabel = ({ children }: { children: React.ReactNode }) => (
-    <div style={{ fontSize: 8.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(255,255,255,0.5)', marginBottom: 9, marginTop: 16 }}>{children}</div>
-  );
-
-  const MainHeading = ({ children }: { children: React.ReactNode }) => (
-    <div style={{ marginBottom: 12 }}>
-      <h2 style={{ fontFamily: '"Merriweather", Georgia, serif', fontSize: 11, fontWeight: 700, color: '#1e3a5f', margin: '0 0 5px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{children}</h2>
-      <div style={{ height: 2, background: `${color}` , width: 32, borderRadius: 1 }} />
-    </div>
-  );
 
   return (
     <div style={{
@@ -91,7 +93,7 @@ export default function CorporateTemplate({ resume }: { resume: Resume }) {
 
         {workExperience.length > 0 && (
           <div style={{ marginBottom: 22 }}>
-            <MainHeading>Berufserfahrung</MainHeading>
+            <MainHeading color={color}>Berufserfahrung</MainHeading>
             {workExperience.map(job => (
               <div key={job.id} style={{ marginBottom: 14, paddingBottom: 12, borderBottom: '1px solid #f0f0f0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -111,7 +113,7 @@ export default function CorporateTemplate({ resume }: { resume: Resume }) {
 
         {education.length > 0 && (
           <div style={{ marginBottom: 22 }}>
-            <MainHeading>Ausbildung</MainHeading>
+            <MainHeading color={color}>Ausbildung</MainHeading>
             {education.map(edu => (
               <div key={edu.id} style={{ marginBottom: 10 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -131,7 +133,7 @@ export default function CorporateTemplate({ resume }: { resume: Resume }) {
 
         {certificates.length > 0 && (
           <div>
-            <MainHeading>Zertifikate</MainHeading>
+            <MainHeading color={color}>Zertifikate</MainHeading>
             {certificates.map(cert => (
               <div key={cert.id} style={{ marginBottom: 7, fontSize: 11 }}>
                 <span style={{ fontWeight: 700 }}>{cert.name}</span>
