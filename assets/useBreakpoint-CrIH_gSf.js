@@ -1,1 +1,0 @@
-import{r as e}from"./chunk-DECur_0Z.js";import{n as t}from"./jsx-runtime-CP2iHdEU.js";var n=e(t(),1);function r(e=768){let[t,r]=(0,n.useState)(()=>window.innerWidth<e);return(0,n.useEffect)(()=>{let t=()=>r(window.innerWidth<e),n=window.matchMedia(`(max-width: ${e-1}px)`);return n.addEventListener(`change`,t),()=>n.removeEventListener(`change`,t)},[e]),t}export{r as t};
