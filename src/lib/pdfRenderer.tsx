@@ -14,7 +14,8 @@ import type { Resume, TemplateId, UploadedDocument } from '../types/resume';
 import MinimalPdf from '../components/templates/pdf/MinimalPdf';
 import ElegantPdf from '../components/templates/pdf/ElegantPdf';
 import TimelinePdf from '../components/templates/pdf/TimelinePdf';
-import { StandardPdf, TEMPLATE_VARIANTS } from '../components/templates/pdf/StandardPdf';
+import { StandardPdf } from '../components/templates/pdf/StandardPdf';
+import { TEMPLATE_VARIANTS } from '../components/templates/pdf/templateVariants';
 import CoverLetterPdf from '../components/templates/pdf/CoverLetterPdf';
 import DocumentImagePdf from '../components/templates/pdf/DocumentImagePdf';
 

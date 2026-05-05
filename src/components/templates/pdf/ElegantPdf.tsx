@@ -4,7 +4,8 @@
  */
 import { Document, Page, View, Text, Link, Image, StyleSheet } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
-import { alphaHex, dateRange, formatDate, DescriptionBlock } from './shared';
+import { alphaHex, dateRange, formatDate } from './shared-utils';
+import { DescriptionBlock } from './shared';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
 export default function ElegantPdf({ resume }: { resume: Resume }) {

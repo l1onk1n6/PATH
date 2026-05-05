@@ -1,23 +1,12 @@
-import type { Resume, WorkExperience, Education, Skill } from '../../../types/resume';
+import type { WorkExperience, Education, Skill } from '../../../types/resume';
 import { sanitizePhotoUrl } from '../../../lib/security';
+import { formatDate } from './shared-utils';
 
 // Safe img wrapper — rejects non-image URLs to prevent XSS via javascript: or data: non-image URIs
 export function SafeImg({ src, alt, style }: { src: string; alt: string; style?: React.CSSProperties }) {
   const safe = sanitizePhotoUrl(src);
   if (!safe) return null;
   return <img src={safe} alt={alt} style={style} />;
-}
-
-export function formatDate(dateStr: string) {
-  if (!dateStr) return '';
-  const [year, month] = dateStr.split('-');
-  const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
-  return `${months[parseInt(month) - 1]} ${year}`;
-}
-
-export function fullName(resume: Resume) {
-  const { firstName, lastName } = resume.personalInfo;
-  return [firstName, lastName].filter(Boolean).join(' ') || 'Ihr Name';
 }
 
 export function SkillBar({ skill, color }: { skill: Skill; color: string }) {

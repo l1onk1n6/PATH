@@ -1,5 +1,5 @@
 import type { Resume } from '../types/resume';
-import { parseBulletLines } from '../components/templates/pdf/shared';
+import { parseBulletLines } from '../components/templates/pdf/shared-utils';
 
 /**
  * Sehr einfacher client-seitiger ATS-Analyzer:

@@ -1,4 +1,4 @@
-import { TEMPLATE_VARIANTS } from './pdf/StandardPdf';
+import { TEMPLATE_VARIANTS } from './pdf/templateVariants';
 import type { TemplateId } from '../../types/resume';
 
 interface Props {

@@ -18,7 +18,7 @@ import { getPdfExportCount } from '../lib/pdfExports';
 import { shareLink } from '../lib/shareLink';
 import { openExternal } from '../lib/openExternal';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
-import { resetOnboarding } from '../components/ui/OnboardingModal';
+import { resetOnboarding } from '../lib/onboarding';
 import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../store/uiStore';
 

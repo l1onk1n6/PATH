@@ -1,5 +1,6 @@
 import type { Resume } from '../../../types/resume';
-import { fullName, formatDate, SkillDots, SafeImg } from './shared';
+import { fullName, formatDate } from './shared-utils';
+import { SkillDots, SafeImg } from './shared';
 
 export default function ExecutiveTemplate({ resume }: { resume: Resume }) {
   const { personalInfo: info, workExperience, education, skills, languages } = resume;

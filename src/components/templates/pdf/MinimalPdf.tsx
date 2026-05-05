@@ -4,9 +4,7 @@
  */
 import { Document, Page, View, Text, Link, Image, StyleSheet } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
-import {
-  Section, WorkEntry, EduEntry, SkillBar, LanguageRow, CertItem, DescriptionBlock,
-} from './shared';
+import { Section, WorkEntry, EduEntry, SkillBar, LanguageRow, CertItem, DescriptionBlock } from './shared';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
 
 export default function MinimalPdf({ resume }: { resume: Resume }) {

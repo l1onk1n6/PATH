@@ -3,21 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Check, FileText, Sparkles, Share2, Bell, Wand2 } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { LogoIcon } from '../layout/Logo';
-
-const ONBOARDING_KEY = 'path_onboarding_done';
-
-export function isOnboardingDone(): boolean {
-  return localStorage.getItem(ONBOARDING_KEY) === '1';
-}
-
-export function resetOnboarding(): void {
-  localStorage.removeItem(ONBOARDING_KEY);
-  window.dispatchEvent(new CustomEvent('start-onboarding'));
-}
-
-export function markOnboardingDone() {
-  localStorage.setItem(ONBOARDING_KEY, '1');
-}
+import { markOnboardingDone } from '../../lib/onboarding';
 
 const FEATURES = [
   { icon: <FileText size={18} />, color: 'var(--ios-blue)', title: 'Bewerbungsmappen', desc: 'Erstelle für jede Stelle eine eigene Mappe mit Lebenslauf und Anschreiben.' },
