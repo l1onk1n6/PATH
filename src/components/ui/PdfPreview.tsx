@@ -12,6 +12,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 // Vite bundlet den Worker automatisch und gibt die finale URL.
 import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { useIsMobile } from '../../hooks/useBreakpoint';
+import { useT } from '../../lib/i18n';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export default function PdfPreview({ bytes, building, error }: Props) {
+  const _t = useT(); void _t;
   const isMobile = useIsMobile();
   return isMobile
     ? <MobileCanvasPreview bytes={bytes} building={building} error={error} />

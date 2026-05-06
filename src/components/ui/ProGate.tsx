@@ -5,6 +5,7 @@ import { usePlan, PRO_FEATURES } from '../../lib/plan';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
 import { presentProPaywall } from '../../lib/revenuecat';
 import { userError } from '../../lib/userError';
+import { useT } from '../../lib/i18n';
 
 // ── Checkout helper ────────────────────────────────────────
 async function startCheckout(plan: 'monthly' | 'yearly'): Promise<string | null> {
@@ -228,6 +229,7 @@ interface ProGateProps {
 }
 
 export default function ProGate({ featureId, children, badge = false }: ProGateProps) {
+  const _t = useT(); void _t;
   const { isPro } = usePlan();
   const [showModal, setShowModal] = useState(false);
   const [showSoon, setShowSoon] = useState(false);

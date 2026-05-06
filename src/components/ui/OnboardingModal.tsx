@@ -4,6 +4,7 @@ import { ArrowRight, Check, FileText, Sparkles, Share2, Bell, Wand2 } from 'luci
 import { useResumeStore } from '../../store/resumeStore';
 import { LogoIcon } from '../layout/Logo';
 import { markOnboardingDone } from '../../lib/onboarding';
+import { useT } from '../../lib/i18n';
 
 const FEATURES = [
   { icon: <FileText size={18} />, color: 'var(--ios-blue)', title: 'Bewerbungsmappen', desc: 'Erstelle für jede Stelle eine eigene Mappe mit Lebenslauf und Anschreiben.' },
@@ -74,6 +75,7 @@ interface Props {
 }
 
 export default function OnboardingModal({ onClose }: Props) {
+  const t = useT();
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
   const [creating, setCreating] = useState(false);
@@ -156,13 +158,13 @@ export default function OnboardingModal({ onClose }: Props) {
         {step === 1 && (
           <div>
             <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ios-blue)', marginBottom: 6 }}>SCHRITT 1 VON 2</div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 6px', letterSpacing: '-0.4px' }}>Wie heisst du?</h2>
-              <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', margin: 0 }}>Wir legen dein erstes Profil an.</p>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ios-blue)', marginBottom: 6 }}>{t('SCHRITT 1 VON 2')}</div>
+              <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 6px', letterSpacing: '-0.4px' }}>{t('Wie heisst du?')}</h2>
+              <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', margin: 0 }}>{t('Wir legen dein erstes Profil an.')}</p>
             </div>
             <input
               className="input-glass"
-              placeholder="Vorname Nachname"
+              placeholder={t('Vorname Nachname')}
               value={name}
               onChange={e => setName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && name.trim() && handleCreate()}
@@ -184,8 +186,8 @@ export default function OnboardingModal({ onClose }: Props) {
         {step === 2 && (
           <div>
             <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ios-blue)', marginBottom: 6 }}>SCHRITT 2 VON 2</div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 6px', letterSpacing: '-0.4px' }}>Was PATH kann</h2>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ios-blue)', marginBottom: 6 }}>{t('SCHRITT 2 VON 2')}</div>
+              <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 6px', letterSpacing: '-0.4px' }}>{t('Was PATH kann')}</h2>
               <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', margin: 0 }}>
                 Ein kurzer Überblick — du findest alles auch später wieder.
               </p>
@@ -209,7 +211,7 @@ export default function OnboardingModal({ onClose }: Props) {
             <div style={{ background: 'rgba(0,122,255,0.08)', border: '1px solid rgba(0,122,255,0.2)', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                 <Wand2 size={14} style={{ color: 'var(--ios-blue)', flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 600 }}>Mit Beispieldaten starten</span>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>{t('Mit Beispieldaten starten')}</span>
               </div>
               <p style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.45)', margin: '0 0 12px', lineHeight: 1.5 }}>
                 Sieh sofort wie dein Lebenslauf aussehen könnte — wir füllen ihn mit realistischen Musterdaten vor.

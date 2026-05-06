@@ -1,5 +1,6 @@
 import type { LucideProps } from 'lucide-react';
 import { Plus } from 'lucide-react';
+import { useT } from '../../lib/i18n';
 
 interface EmptyStateProps {
   icon: React.ComponentType<LucideProps>;
@@ -16,6 +17,7 @@ export default function EmptyState({
   icon: Icon, title, description, ctaLabel, onCta,
   secondaryCtaLabel, onSecondaryCta, compact,
 }: EmptyStateProps) {
+  const _t = useT(); void _t;
   return (
     <div
       className="glass-card animate-fade-in"

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { Check, ChevronDown } from 'lucide-react';
+import { useT } from '../../lib/i18n';
 
 interface SelectOption {
   value: string;
@@ -17,6 +18,7 @@ interface CustomSelectProps {
 }
 
 export function CustomSelect({ value, onChange, options, style, placeholder = 'Auswählen…', className }: CustomSelectProps) {
+  const _t = useT(); void _t;
   const [open, setOpen] = useState(false);
   const [focused, setFocused] = useState(false);
   const [dropdownStyle, setDropdownStyle] = useState<CSSProperties>({});
