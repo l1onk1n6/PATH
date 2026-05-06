@@ -206,6 +206,95 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Interview': 'Interview',
     'Abgelehnt': 'Rejected',
     'Angenommen': 'Accepted',
+
+    // ── AccountPage ──────────────────────────────────────
+    'PROFIL': 'PROFILE',
+    'E-MAIL-ADRESSE': 'EMAIL ADDRESS',
+    'KONTO-DETAILS': 'ACCOUNT DETAILS',
+    'APP-TOUR': 'APP TOUR',
+    'SUPPORT': 'SUPPORT',
+    'SITZUNG': 'SESSION',
+    'PASSWORT': 'PASSWORD',
+    'AKTIVE SITZUNG': 'ACTIVE SESSION',
+    'DEIN EINLADUNGSLINK': 'YOUR INVITE LINK',
+    'DEINE STATISTIK': 'YOUR STATS',
+    'RECHTLICHES': 'LEGAL',
+    'DATENVERARBEITUNG': 'DATA PROCESSING',
+    'DATEN-EXPORT (DSGVO Art. 20)': 'DATA EXPORT (GDPR Art. 20)',
+    'GEFAHRENZONE': 'DANGER ZONE',
+    'PLAN & FEATURES': 'PLAN & FEATURES',
+    'DEIN PLAN': 'YOUR PLAN',
+    'AKTIVE FEATURES': 'ACTIVE FEATURES',
+    'NUTZUNG': 'USAGE',
+    'Telefon': 'Phone',
+    'Strasse & Nr.': 'Street & no.',
+    'PLZ': 'Postal code',
+    'Ort': 'City',
+    'Land': 'Country',
+    'Konto löschen anfragen': 'Request account deletion',
+    'Daten herunterladen': 'Download data',
+    'Geteiltes hier herunterladen': 'Download shared here',
+    'Wir senden einen Link an': 'We will send a link to',
+    'zum Zurücksetzen des Passworts.': 'to reset your password.',
+    'E-Mail gesendet — bitte prüfe dein Postfach.': 'Email sent — please check your inbox.',
+    'Mitglied seit': 'Member since',
+    'Profil bearbeiten': 'Edit profile',
+    'Profil-Daten gespeichert': 'Profile data saved',
+    'Speichern fehlgeschlagen': 'Save failed',
+    'Schweiz': 'Switzerland',
+    'E-Mail ändern': 'Change email',
+    'Bestätigung senden': 'Send confirmation',
+    'Bestätigungs-E-Mail gesendet': 'Confirmation email sent',
+    'Wir haben einen Bestätigungslink an': 'We sent a confirmation link to',
+    'geschickt. Klicke auf den Link, um die Änderung abzuschliessen.':
+      'The change becomes active once you click the link.',
+    'neue@beispiel.de': 'new@example.com',
+    'Wir senden einen Bestätigungslink an die neue Adresse — die Änderung wird erst nach dem Klick aktiv.':
+      'We will send a confirmation link to the new address — the change is applied after you click it.',
+    'Ändern': 'Change',
+    'Englische Übersetzungen sind teilweise verfügbar — bestehende Stellen werden schrittweise migriert.':
+      'English translations are partially available — existing strings are migrated incrementally.',
+
+    // ── Privacy ──────────────────────────────────────────
+    'Lade alle deine Daten als JSON-Datei herunter. Dokumentenanhänge (Base64) werden aus Datenschutzgründen nicht mitexportiert.':
+      'Download all your data as a JSON file. Document attachments (Base64) are excluded for privacy reasons.',
+    'Zum Löschen deines Kontos kontaktiere uns bitte direkt — wir entfernen alle Daten innerhalb von 30 Tagen.':
+      'To delete your account, contact us directly — we will remove all data within 30 days.',
+    'Datenschutzerklärung': 'Privacy policy',
+    'Impressum': 'Imprint',
+    'AGB': 'Terms',
+    'Cookies': 'Cookies',
+
+    // ── Plan ─────────────────────────────────────────────
+    'Free': 'Free',
+    'Pro': 'Pro',
+    'Pro-Aktivierung läuft…': 'Activating Pro…',
+    'Aktivierung verzögert': 'Activation delayed',
+    'Nochmals prüfen': 'Check again',
+    'Zahlung bestätigt — warte auf Aktivierung (max. 15 Sek.)':
+      'Payment confirmed — waiting for activation (max 15 sec)',
+    'Willkommen bei PATH Pro!': 'Welcome to PATH Pro!',
+    'Dein Upgrade war erfolgreich. Alle Pro-Features sind jetzt aktiv.':
+      'Your upgrade was successful. All Pro features are active now.',
+    'Auf Pro upgraden': 'Upgrade to Pro',
+    'Abo verwalten': 'Manage subscription',
+    'Upgrade auf Pro': 'Upgrade to Pro',
+    'Verfügbar': 'Available',
+
+    // ── Security ─────────────────────────────────────────
+    'Sitzung beenden': 'End session',
+    'Du wirst nach 5 Minuten Inaktivität automatisch abgemeldet.':
+      'You will be signed out automatically after 5 minutes of inactivity.',
+    'Aktive Sitzungen': 'Active sessions',
+
+    // ── Referral ─────────────────────────────────────────
+    'Lade Freunde ein und erhalte beide einen Pro-Bonus.':
+      'Invite friends — both receive a Pro bonus.',
+    'Kopiert': 'Copied',
+    'Kopieren': 'Copy',
+    'Eingeladen': 'Invited',
+    'Erfolgreich': 'Successful',
+    'Bonus erhalten': 'Bonus received',
   },
 };
 

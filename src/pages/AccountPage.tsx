@@ -37,6 +37,9 @@ const NAV: { id: Section; label: string; icon: React.ComponentType<{ size: numbe
 // ── Section: Plan ──────────────────────────────────────────
 function PlanSection() {
   const { isPro, plan, limits } = usePlan();
+  const _t = useT();
+  void _t; // PlanSection-Migration folgt in eigenem PR
+
   const { persons, resumes } = useResumeStore();
   const totalDocMb = Math.round(
     resumes.flatMap(r => r.documents ?? []).reduce((s, d) => s + d.size, 0) / (1024 * 1024) * 10
@@ -339,7 +342,9 @@ function PlanSection() {
 const COUNTRIES = ['Schweiz', 'Deutschland', 'Österreich', 'Liechtenstein']
 
 function ProfileCard() {
-  const { user } = useAuthStore()
+  const { user } = useAuthStore();
+  const t = useT();
+
   const supabase = isSupabaseConfigured() ? getSupabase() : null
 
   const [phone,   setPhone]   = useState('')
@@ -396,33 +401,33 @@ function ProfileCard() {
 
   return (
     <div className="glass-card" style={{ padding: 20 }}>
-      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 14, opacity: 0.6 }}>PROFIL</div>
+      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 14, opacity: 0.6 }}>{t('PROFIL')}</div>
       {saveErr && <div style={{ fontSize: 12, color: '#ff6b6b', marginBottom: 10 }}>{saveErr}</div>}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <div>
-          <label className="section-label">Telefon</label>
+          <label className="section-label">{t('Telefon')}</label>
           <input className="input-glass" placeholder="+41 79 123 45 67" value={phone}
             onChange={e => setPhone(e.target.value)} style={{ width: '100%' }} />
         </div>
         <div>
-          <label className="section-label">Strasse & Nr.</label>
+          <label className="section-label">{t('Strasse & Nr.')}</label>
           <input className="input-glass" placeholder="Musterstrasse 1" value={street}
             onChange={e => setStreet(e.target.value)} style={{ width: '100%' }} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8 }}>
           <div>
-            <label className="section-label">PLZ</label>
+            <label className="section-label">{t('PLZ')}</label>
             <input className="input-glass" placeholder="8000" value={zip}
               onChange={e => setZip(e.target.value)} />
           </div>
           <div>
-            <label className="section-label">Ort</label>
+            <label className="section-label">{t('Ort')}</label>
             <input className="input-glass" placeholder="Zürich" value={city}
               onChange={e => setCity(e.target.value)} />
           </div>
         </div>
         <div>
-          <label className="section-label">Land</label>
+          <label className="section-label">{t('Land')}</label>
           <select className="input-glass" value={country} onChange={e => setCountry(e.target.value)}
             style={{ width: '100%' }}>
             {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -440,7 +445,8 @@ function ProfileCard() {
 }
 
 function EmailChangeCard() {
-  const { user, updateEmail, loading, error, clearError } = useAuthStore();
+  const { user, updateEmail, loading, error, clearError } = useAuthStore();  const t = useT();
+
   const [editing, setEditing] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [sent, setSent] = useState(false);
@@ -470,7 +476,7 @@ function EmailChangeCard() {
 
   return (
     <div className="glass-card" style={{ padding: 20 }}>
-      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>E-MAIL-ADRESSE</div>
+      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>{t('E-MAIL-ADRESSE')}</div>
       {sent ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ fontSize: 13, color: 'var(--ios-green)', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -492,13 +498,13 @@ function EmailChangeCard() {
           <input
             className="input-glass"
             type="email"
-            placeholder="neue@beispiel.de"
+            placeholder={t('neue@beispiel.de')}
             value={newEmail}
             onChange={(e) => setNewEmail(e.target.value)}
             required maxLength={254} autoFocus autoComplete="email"
           />
           <p style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.4)', margin: 0, lineHeight: 1.5 }}>
-            Wir senden einen Bestätigungslink an die neue Adresse — die Änderung wird erst nach dem Klick aktiv.
+            {t('Wir senden einen Bestätigungslink an die neue Adresse — die Änderung wird erst nach dem Klick aktiv.')}
           </p>
           {error && (
             <div style={{ background: 'rgba(255,59,48,0.15)', border: '1px solid rgba(255,59,48,0.3)', borderRadius: 'var(--radius-sm)', padding: '8px 12px', fontSize: 12, color: '#ff6b6b' }}>
@@ -570,7 +576,7 @@ function LanguageCard() {
         ))}
       </div>
       <div style={{ marginTop: 8, fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)' }}>
-        Englische Übersetzungen sind teilweise verfügbar — bestehende Stellen werden schrittweise migriert.
+        {t('Englische Übersetzungen sind teilweise verfügbar — bestehende Stellen werden schrittweise migriert.')}
       </div>
     </div>
   );
@@ -622,7 +628,8 @@ function ThemeCard() {
 }
 
 function AccountSection() {
-  const { user, signOut } = useAuthStore();
+  const { user, signOut } = useAuthStore();  const t = useT();
+
   const { persons, resumes } = useResumeStore();
   const navigate = useNavigate();
 
@@ -631,18 +638,18 @@ function AccountSection() {
       <EmailChangeCard />
 
       <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>KONTO-DETAILS</div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>{t('KONTO-DETAILS')}</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 14 }}>
-            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>Personen</span>
+            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>{t('Personen')}</span>
             <span style={{ fontWeight: 500 }}>{persons.length}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 14 }}>
-            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>Bewerbungsmappen</span>
+            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>{t('Bewerbungsmappen')}</span>
             <span style={{ fontWeight: 500 }}>{resumes.length}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 14 }}>
-            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>Mitglied seit</span>
+            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>{t('Mitglied seit')}</span>
             <span style={{ fontWeight: 500 }}>
               {user?.created_at ? new Date(user.created_at).toLocaleDateString('de-CH', { month: 'long', year: 'numeric' }) : '—'}
             </span>
@@ -657,7 +664,7 @@ function AccountSection() {
       <LanguageCard />
 
       <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>APP-TOUR</div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>{t('APP-TOUR')}</div>
         <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', marginBottom: 12 }}>
           Zeige die Einführungstour erneut an.
         </p>
@@ -671,14 +678,14 @@ function AccountSection() {
       </div>
 
       <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>SUPPORT</div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>{t('SUPPORT')}</div>
         <a href="mailto:info@pixmatic.ch" className="btn-glass" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, textDecoration: 'none', fontSize: 13, padding: '8px 14px' }}>
           <Mail size={14} /> info@pixmatic.ch
         </a>
       </div>
 
       <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>SITZUNG</div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>{t('SITZUNG')}</div>
         <button
           className="btn-glass btn-sm btn-danger"
           onClick={() => signOut()}
@@ -693,7 +700,8 @@ function AccountSection() {
 
 // ── Section: Security ──────────────────────────────────────
 function SecuritySection() {
-  const { sendPasswordReset, user, loading } = useAuthStore();
+  const { sendPasswordReset, user, loading } = useAuthStore();  const t = useT();
+
   const [sent, setSent] = useState(false);
 
   async function handleReset() {
@@ -705,7 +713,7 @@ function SecuritySection() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>PASSWORT</div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>{t('PASSWORT')}</div>
         <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', marginBottom: 12 }}>
           Wir senden einen Link an {user?.email} zum Zurücksetzen des Passworts.
         </p>
@@ -721,7 +729,7 @@ function SecuritySection() {
       </div>
 
       <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 10, opacity: 0.6 }}>AKTIVE SITZUNG</div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 10, opacity: 0.6 }}>{t('AKTIVE SITZUNG')}</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>Angemeldet als</span>
@@ -743,7 +751,8 @@ function SecuritySection() {
 
 // ── Section: Referral ──────────────────────────────────────
 function ReferralSection() {
-  const { user } = useAuthStore();
+  const { user } = useAuthStore();  const t = useT();
+
   const [copied, setCopied] = useState(false);
   const [stats, setStats] = useState<{ total: number; subscribed: number; rewarded: number } | null>(null);
 
@@ -787,7 +796,7 @@ function ReferralSection() {
       </div>
 
       <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>DEIN EINLADUNGSLINK</div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>{t('DEIN EINLADUNGSLINK')}</div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <div style={{
             flex: 1, background: 'rgba(var(--rgb-fg),0.05)', border: '1px solid rgba(var(--rgb-fg),0.1)',
@@ -806,7 +815,7 @@ function ReferralSection() {
       </div>
 
       <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>DEINE STATISTIK</div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>{t('DEINE STATISTIK')}</div>
         {stats === null ? (
           <div style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.3)' }}>Lädt…</div>
         ) : (
@@ -837,11 +846,12 @@ function ReferralSection() {
 // ── Section: Privacy ───────────────────────────────────────
 function PrivacySection() {
   const { exportGdprData } = useResumeStore();
+  const t = useT();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>RECHTLICHES</div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>{t('RECHTLICHES')}</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {[
             { label: 'Datenschutzerklärung', href: 'https://pixmatic.ch/datenschutz' },
@@ -858,7 +868,7 @@ function PrivacySection() {
       </div>
 
       <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>DATENVERARBEITUNG</div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>{t('DATENVERARBEITUNG')}</div>
         <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', lineHeight: 1.8 }}>
           <li>Deine Daten werden ausschliesslich für die App-Funktionalität verwendet</li>
           <li>Keine Weitergabe an Dritte</li>
@@ -869,9 +879,9 @@ function PrivacySection() {
       </div>
 
       <div className="glass-card" style={{ padding: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>DATEN-EXPORT (DSGVO Art. 20)</div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>{t('DATEN-EXPORT (DSGVO Art. 20)')}</div>
         <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', marginBottom: 12 }}>
-          Lade alle deine Daten als JSON-Datei herunter. Dokumentenanhänge (Base64) werden aus Datenschutzgründen nicht mitexportiert.
+          {t('Lade alle deine Daten als JSON-Datei herunter. Dokumentenanhänge (Base64) werden aus Datenschutzgründen nicht mitexportiert.')}
         </p>
         <button className="btn-glass btn-sm" onClick={exportGdprData} style={{ gap: 6 }}>
           <Download size={14} /> Daten herunterladen
@@ -884,7 +894,7 @@ function PrivacySection() {
           <AlertTriangle size={14} /> GEFAHRENZONE
         </div>
         <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', marginBottom: 12 }}>
-          Zum Löschen deines Kontos kontaktiere uns bitte direkt — wir entfernen alle Daten innerhalb von 30 Tagen.
+          {t('Zum Löschen deines Kontos kontaktiere uns bitte direkt — wir entfernen alle Daten innerhalb von 30 Tagen.')}
         </p>
         <a
           href="mailto:info@pixmatic.ch?subject=Konto löschen – PATH"
