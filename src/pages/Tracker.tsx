@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus, Trash2, ExternalLink, ChevronDown, ChevronUp, ClipboardList, Link } from 'lucide-react';
 import { useTrackerStore, type Application, type ApplicationStatus, type ApplicationType } from '../store/trackerStore';
 import { useResumeStore } from '../store/resumeStore';
+import { useT } from '../lib/i18n';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { CustomSelect } from '../components/ui/CustomSelect';
 
@@ -65,6 +66,7 @@ function sortApps(apps: Application[], sort: string) {
 }
 
 export default function Tracker() {
+  const t = useT();
   const { applications, addApplication, updateApplication, removeApplication } = useTrackerStore();
   const { resumes, persons } = useResumeStore();
   const isMobile = useIsMobile();
@@ -126,7 +128,7 @@ export default function Tracker() {
             <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ClipboardList size={18} />
             </div>
-            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>Bewerbungs-Tracker</h2>
+            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{t('Bewerbungs-Tracker')}</h2>
           </div>
           <p style={{ margin: 0, fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)' }}>
             {applications.length} Bewerbung{applications.length !== 1 ? 'en' : ''} total
@@ -187,7 +189,7 @@ export default function Tracker() {
       {applications.length === 0 && (
         <div className="glass-card" style={{ padding: '48px 24px', textAlign: 'center' }}>
           <ClipboardList size={36} style={{ margin: '0 auto 12px', opacity: 0.3, display: 'block' }} />
-          <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 6 }}>Noch keine Bewerbungen</div>
+          <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 6 }}>{t('Noch keine Bewerbungen')}</div>
           <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.4)', marginBottom: 20 }}>
             Füge deine erste Bewerbung hinzu und behalte den Überblick.
           </p>
@@ -215,7 +217,7 @@ export default function Tracker() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                       <span style={{ fontWeight: 600, fontSize: 14 }}>
-                        {app.company || <span style={{ opacity: 0.4 }}>Firma</span>}
+                        {app.company || <span style={{ opacity: 0.4 }}>{t('Firma')}</span>}
                       </span>
                       {app.position && (
                         <span style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.5)' }}>· {app.position}</span>
@@ -278,17 +280,17 @@ export default function Tracker() {
                 <div style={{ padding: '4px 14px 14px', borderTop: '1px solid rgba(var(--rgb-fg),0.07)' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10, marginBottom: 10 }}>
                     <div>
-                      <label className="section-label">Firma</label>
-                      <input className="input-glass" placeholder="z.B. Google AG" value={app.company} maxLength={150}
+                      <label className="section-label">{t('Firma')}</label>
+                      <input className="input-glass" placeholder={t('z.B. Google AG')} value={app.company} maxLength={150}
                         onChange={(e) => updateApplication(app.id, { company: e.target.value })} />
                     </div>
                     <div>
-                      <label className="section-label">Stelle</label>
-                      <input className="input-glass" placeholder="z.B. Product Manager" value={app.position} maxLength={150}
+                      <label className="section-label">{t('Stelle')}</label>
+                      <input className="input-glass" placeholder={t('z.B. Product Manager')} value={app.position} maxLength={150}
                         onChange={(e) => updateApplication(app.id, { position: e.target.value })} />
                     </div>
                     <div>
-                      <label className="section-label">Status</label>
+                      <label className="section-label">{t('Status')}</label>
                       <CustomSelect
                         value={app.status}
                         onChange={(v) => updateApplication(app.id, { status: v as ApplicationStatus })}
@@ -296,7 +298,7 @@ export default function Tracker() {
                       />
                     </div>
                     <div>
-                      <label className="section-label">Stelleninserat URL</label>
+                      <label className="section-label">{t('Stelleninserat URL')}</label>
                       <div style={{ display: 'flex', gap: 6, alignItems: 'stretch' }}>
                         <input className="input-glass" placeholder="https://..." value={app.url} maxLength={500}
                           onChange={(e) => updateApplication(app.id, { url: e.target.value })}
@@ -311,12 +313,12 @@ export default function Tracker() {
                       </div>
                     </div>
                     <div>
-                      <label className="section-label">Bewerbungsdatum</label>
+                      <label className="section-label">{t('Bewerbungsdatum')}</label>
                       <input className="input-glass" type="date" value={app.appliedDate}
                         onChange={(e) => updateApplication(app.id, { appliedDate: e.target.value })} />
                     </div>
                     <div>
-                      <label className="section-label">Deadline (optional)</label>
+                      <label className="section-label">{t('Deadline (optional)')}</label>
                       <input className="input-glass" type="date" value={app.deadline}
                         onChange={(e) => updateApplication(app.id, { deadline: e.target.value })} />
                     </div>
@@ -324,7 +326,7 @@ export default function Tracker() {
 
                   {/* Bewerbungsart pill-toggle */}
                   <div style={{ marginBottom: 10 }}>
-                    <label className="section-label">Bewerbungsart</label>
+                    <label className="section-label">{t('Bewerbungsart')}</label>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
                       {ALL_TYPES.map((t) => {
                         const isActive = appType === t;
@@ -358,9 +360,9 @@ export default function Tracker() {
 
                   {/* Notes */}
                   <div style={{ marginBottom: 10 }}>
-                    <label className="section-label">Notizen</label>
+                    <label className="section-label">{t('Notizen')}</label>
                     <textarea className="input-glass"
-                      placeholder="Kontaktperson, Gesprächsthemen, Eindrücke..."
+                      placeholder={t('Kontaktperson, Gesprächsthemen, Eindrücke...')}
                       value={app.notes} maxLength={1000} rows={3}
                       onChange={(e) => updateApplication(app.id, { notes: e.target.value })}
                       style={{ resize: 'vertical' }} />
@@ -426,7 +428,7 @@ export default function Tracker() {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700 }}>Aus Mappe importieren</h3>
+              <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700 }}>{t('Aus Mappe importieren')}</h3>
               <button className="btn-glass btn-icon" onClick={() => setShowImportModal(false)} style={{ padding: 6 }}>
                 ✕
               </button>

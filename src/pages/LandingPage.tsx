@@ -3,6 +3,7 @@ import { LogoIcon } from '../components/layout/Logo';
 import AuthPage from './AuthPage';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { openExternal } from '../lib/openExternal';
+import { useT } from '../lib/i18n';
 import {
   FileText, Sparkles, Globe, Clock, Share2, Download,
   Check, ChevronRight, ArrowRight, Star, ClipboardList, Mail, Import,
@@ -106,6 +107,7 @@ function useCountdown(deadline: Date) {
 }
 
 export default function LandingPage() {
+  const t = useT();
   const [showAuth, setShowAuth] = useState<false | 'login' | 'register'>(false);
   const [scrolled, setScrolled] = useState(false);
   const isMobile = useIsMobile();
@@ -246,7 +248,7 @@ export default function LandingPage() {
 
           {/* Countdown */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.45)', flexShrink: 0 }}>Noch</span>
+            <span style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.45)', flexShrink: 0 }}>{t('Noch')}</span>
             {[
               [countdown.days,    'd'],
               [countdown.hours,   'h'],
@@ -547,7 +549,7 @@ export default function LandingPage() {
           <blockquote style={{ fontSize: isMobile ? 20 : 26, fontWeight: 600, margin: '0 0 20px', lineHeight: 1.4, letterSpacing: '-0.3px' }}>
             "Endlich eine Bewerbungs-App die nicht aussieht wie aus den 90ern — und trotzdem in der Schweiz funktioniert."
           </blockquote>
-          <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.4)' }}>Zufriedener Nutzer aus Zürich</div>
+          <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.4)' }}>{t('Zufriedener Nutzer aus Zürich')}</div>
         </div>
       </section>
 
@@ -604,7 +606,7 @@ export default function LandingPage() {
               </div>
               <div>
                 <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 6 }}>Android</div>
-                <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)', lineHeight: 1.5 }}>Google Play Store</div>
+                <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)', lineHeight: 1.5 }}>{t('Google Play Store')}</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', textAlign: 'left' }}>
                 {['Volle Offline-Unterstützung', 'Push-Erinnerungen für Deadlines', 'Native PDF-Speicherung'].map(f => (
@@ -638,7 +640,7 @@ export default function LandingPage() {
               </div>
               <div>
                 <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 6 }}>iPhone & iPad</div>
-                <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)', lineHeight: 1.5 }}>Apple App Store</div>
+                <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)', lineHeight: 1.5 }}>{t('Apple App Store')}</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', textAlign: 'left' }}>
                 {['Nahtlose iCloud-Synchronisation', 'Face ID & Touch ID Login', 'Apple Pencil Unterstützung'].map(f => (
@@ -746,6 +748,7 @@ export default function LandingPage() {
 }
 
 function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegister: () => void }) {
+  const t = useT();
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('yearly');
   const isYearly = billing === 'yearly';
 
@@ -787,7 +790,7 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
           <div style={{ marginBottom: 28 }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(var(--rgb-fg),0.5)', marginBottom: 8, letterSpacing: '0.06em' }}>KOSTENLOS</div>
             <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-1px' }}>CHF 0</div>
-            <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 4 }}>Für immer kostenlos</div>
+            <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 4 }}>{t('Für immer kostenlos')}</div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
             {FREE_FEATURES.map(f => (
@@ -844,7 +847,7 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
                   CHF 5
                   <span style={{ fontSize: 18, fontWeight: 500, color: 'rgba(var(--rgb-fg),0.5)', letterSpacing: 0 }}> / Monat</span>
                 </div>
-                <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 4 }}>Jederzeit kündbar</div>
+                <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 4 }}>{t('Jederzeit kündbar')}</div>
               </>
             )}
           </div>
@@ -897,6 +900,7 @@ function AppleIcon() {
 }
 
 function MockAppPreview() {
+  const t = useT();
   return (
     <div style={{ flex: '0 0 auto', width: 340, position: 'relative' }}>
       {/* Dezenter Glow im Hintergrund — passt zum reduzierten Look */}
@@ -921,7 +925,7 @@ function MockAppPreview() {
           <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #34C759, #00C7BE)', flexShrink: 0 }} />
           <div>
             <div style={{ fontSize: 13, fontWeight: 700 }}>Max Mustermann</div>
-            <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)' }}>Softwareentwickler</div>
+            <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)' }}>{t('Softwareentwickler')}</div>
           </div>
           <div style={{ marginLeft: 'auto', fontSize: 10, padding: '3px 8px', borderRadius: 99, background: 'rgba(0,122,255,0.15)', border: '1px solid rgba(0,122,255,0.25)', color: 'var(--ios-blue)' }}>
             Modern
