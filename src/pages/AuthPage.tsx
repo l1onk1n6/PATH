@@ -3,12 +3,14 @@ import { Mail, Eye, EyeOff, ShieldAlert, ArrowLeft, CheckCircle, RefreshCw, Zap 
 import { useAuthStore } from '../store/authStore';
 import { LogoIcon } from '../components/layout/Logo';
 import { passwordStrength, STRENGTH_LABEL, STRENGTH_COLOR, RateLimiter } from '../lib/security';
+import { useT } from '../lib/i18n';
 
 const limiter = new RateLimiter(5, 300_000); // 5 min lockout
 
 type Mode = 'login' | 'register' | 'forgot' | 'reset' | 'magic';
 
 export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: () => void; initialMode?: Mode } = {}) {
+  const t = useT();
   const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -184,7 +186,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
                   borderBottom: mode === m ? '2px solid var(--ios-blue)' : '2px solid transparent',
                   marginBottom: -1,
                 }}>
-                  {m === 'login' ? 'Anmelden' : 'Registrieren'}
+                  {m === 'login' ? t('Anmelden') : t('Registrieren')}
                 </button>
               ))}
             </div>
@@ -241,7 +243,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
                     background: 'none', border: 'none', cursor: 'pointer',
                     color: 'rgba(var(--rgb-fg),0.4)', fontSize: 12, padding: 0,
                   }}>
-                    Passwort vergessen?
+                    {t('Passwort vergessen?')}
                   </button>
                 </div>
               )}
@@ -263,7 +265,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
               <button type="submit" className="btn-glass btn-primary"
                 disabled={loading || isLocked || (mode === 'register' && password.length < 8)}
                 style={{ width: '100%', justifyContent: 'center', padding: '13px 20px', opacity: (loading || isLocked) ? 0.7 : 1 }}>
-                {loading ? 'Bitte warten…' : mode === 'login' ? 'Anmelden' : 'Konto erstellen'}
+                {loading ? t('Bitte warten…') : mode === 'login' ? t('Anmelden') : t('Konto erstellen')}
               </button>
             </form>
 
@@ -271,7 +273,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
               <>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '24px 0 18px' }}>
                   <div style={{ flex: 1, height: 1, background: 'rgba(var(--rgb-fg),0.08)' }} />
-                  <span style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.3)', letterSpacing: '0.08em' }}>ODER</span>
+                  <span style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.3)', letterSpacing: '0.08em' }}>{t('ODER')}</span>
                   <div style={{ flex: 1, height: 1, background: 'rgba(var(--rgb-fg),0.08)' }} />
                 </div>
                 <button
@@ -280,7 +282,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
                   className="btn-glass"
                   style={{ width: '100%', justifyContent: 'center', padding: '11px 20px', gap: 6, fontSize: 13 }}
                 >
-                  <Zap size={14} /> Mit Magic Link anmelden
+                  <Zap size={14} /> {t('Mit Magic Link anmelden')}
                 </button>
               </>
             )}
