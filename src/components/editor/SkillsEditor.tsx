@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useResumeStore } from '../../store/resumeStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import EmptyState from '../ui/EmptyState';
+import SkillNameInput from '../ui/SkillNameInput';
 import { useUndoToast } from '../../lib/undoToast';
 import type { Language } from '../../types/resume';
 
@@ -92,11 +93,11 @@ export default function SkillsEditor() {
                 ) : (
                   <GripVertical size={14} style={{ opacity: 0.3, flexShrink: 0, cursor: 'grab' }} />
                 )}
-                <input
-                  className="input-glass"
+                <SkillNameInput
                   placeholder="Fähigkeit (z.B. React, Python...)"
                   value={skill.name} maxLength={80}
-                  onChange={(e) => updateSkill(resume.id, skill.id, { name: e.target.value })}
+                  onChange={(name) => updateSkill(resume.id, skill.id, { name })}
+                  onPick={(s) => updateSkill(resume.id, skill.id, { name: s.name, category: skill.category || s.category })}
                   style={{ flex: 2, fontSize: 13, padding: '8px 10px' }}
                 />
                 <input
