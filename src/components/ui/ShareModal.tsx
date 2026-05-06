@@ -52,7 +52,7 @@ export default function ShareModal({ resumeId, token, onClose }: Props) {
 
         {!shareUrl ? (
           <>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 14 }}>
+            <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', marginBottom: 14 }}>
               Erstelle einen öffentlichen Link — der Lebenslauf ist ohne Login einsehbar.
             </p>
             {atShareLimit ? (

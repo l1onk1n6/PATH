@@ -46,17 +46,17 @@ export default function SetupPage() {
         <h1 style={{ textAlign: 'center', fontSize: 22, fontWeight: 700, margin: '0 0 8px', letterSpacing: '-0.4px' }}>
           Supabase konfigurieren
         </h1>
-        <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.5)', fontSize: 14, marginBottom: 28, lineHeight: 1.5 }}>
+        <p style={{ textAlign: 'center', color: 'rgba(var(--rgb-fg),0.5)', fontSize: 14, marginBottom: 28, lineHeight: 1.5 }}>
           Verbinden Sie Ihr eigenes Supabase-Projekt für sichere Cloud-Synchronisation.
         </p>
 
         {/* Instructions */}
         <div className="glass-card" style={{ padding: '12px 16px', marginBottom: 24, borderRadius: 'var(--radius-sm)' }}>
           <div className="section-label" style={{ marginBottom: 8 }}>So richten Sie Supabase ein</div>
-          <ol style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 2 }}>
+          <ol style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: 'rgba(var(--rgb-fg),0.6)', lineHeight: 2 }}>
             <li>Kostenloses Konto auf <a href="https://supabase.com" target="_blank" rel="noreferrer" style={{ color: 'var(--ios-blue)' }}>supabase.com</a> erstellen</li>
             <li>Neues Projekt anlegen</li>
-            <li>SQL Editor → <code style={{ background: 'rgba(255,255,255,0.1)', padding: '1px 5px', borderRadius: 4 }}>supabase/schema.sql</code> ausführen</li>
+            <li>SQL Editor → <code style={{ background: 'rgba(var(--rgb-fg),0.1)', padding: '1px 5px', borderRadius: 4 }}>supabase/schema.sql</code> ausführen</li>
             <li>Settings → API → URL & anon key kopieren</li>
           </ol>
           <a

@@ -65,11 +65,11 @@ function CompletenessBar({ score }: { score: number }) {
   const color = completenessColor(score);
   return (
     <div title={`Vollständigkeit: ${score}%`} style={{ marginBottom: 10 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 11, color: 'rgba(var(--rgb-fg),0.45)' }}>
         <span>Vollständigkeit</span>
         <span style={{ color, fontWeight: 600 }}>{score}%</span>
       </div>
-      <div style={{ height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+      <div style={{ height: 4, borderRadius: 2, background: 'rgba(var(--rgb-fg),0.1)', overflow: 'hidden' }}>
         <div style={{
           height: '100%', width: `${score}%`, borderRadius: 2,
           background: color,
@@ -206,7 +206,7 @@ export default function Dashboard() {
         const itemStyle: React.CSSProperties = {
           display: 'flex', alignItems: 'center', gap: 10, width: '100%',
           padding: '10px 13px', fontSize: 13, background: 'none', border: 'none',
-          color: 'rgba(255,255,255,0.85)', cursor: 'pointer', borderRadius: 8,
+          color: 'rgba(var(--rgb-fg),0.85)', cursor: 'pointer', borderRadius: 8,
           fontFamily: 'var(--font-sf)', textDecoration: 'none', textAlign: 'left',
           transition: 'background 0.12s',
         };
@@ -223,13 +223,13 @@ export default function Dashboard() {
                 backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
                 borderRadius: 14, padding: '6px',
                 border: '1px solid rgba(99,140,255,0.18)',
-                boxShadow: '0 12px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)',
+                boxShadow: '0 12px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(var(--rgb-fg),0.06)',
                 animation: 'scaleIn 0.15s cubic-bezier(0.34,1.56,0.64,1) both',
               }}>
-              <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', padding: '6px 12px 4px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(var(--rgb-fg),0.35)', padding: '6px 12px 4px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                 {mr.name || 'Bewerbungsmappe'}
               </div>
-              <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '4px 0' }} />
+              <div style={{ height: 1, background: 'rgba(var(--rgb-fg),0.07)', margin: '4px 0' }} />
               {([
                 { icon: Share2, label: mr.shareToken ? 'Link teilen ·  aktiv' : 'Link teilen', color: mr.shareToken ? 'var(--ios-blue)' : undefined,
                   action: () => { setShareModalResumeId(mr.id); setMenuOpenResumeId(null); } },
@@ -238,8 +238,8 @@ export default function Dashboard() {
                 { icon: Copy, label: 'Duplizieren',
                   action: () => { duplicateResume(mr.id); setMenuOpenResumeId(null); } },
               ] as { icon: React.ComponentType<{size:number}>, label: string, color?: string, action: () => void }[]).map(({ icon: Icon, label, color, action }) => (
-                <button key={label} style={{ ...itemStyle, color: color ?? 'rgba(255,255,255,0.85)' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.07)')}
+                <button key={label} style={{ ...itemStyle, color: color ?? 'rgba(var(--rgb-fg),0.85)' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(var(--rgb-fg),0.07)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'none')}
                   onClick={action}>
                   <Icon size={14} /> {label}
@@ -248,7 +248,7 @@ export default function Dashboard() {
               {mr.jobUrl && (
                 <a href={safeUrl(mr.jobUrl)} target="_blank" rel="noopener noreferrer"
                   style={itemStyle}
-                  onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)')}
+                  onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(var(--rgb-fg),0.07)')}
                   onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'none')}
                   onClick={() => setMenuOpenResumeId(null)}>
                   <ExternalLink size={14} /> Stelle öffnen
@@ -256,7 +256,7 @@ export default function Dashboard() {
               )}
               {mpResumes > 1 && (
                 <>
-                  <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '4px 0' }} />
+                  <div style={{ height: 1, background: 'rgba(var(--rgb-fg),0.07)', margin: '4px 0' }} />
                   <button style={{ ...itemStyle, color: 'var(--ios-red)' }}
                     onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,59,48,0.1)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'none')}
@@ -297,7 +297,7 @@ export default function Dashboard() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
               <div>
                 <div style={{ fontSize: isMobile ? 20 : 26, fontWeight: 700, letterSpacing: '-1px' }}>{value}</div>
-                <div style={{ fontSize: isMobile ? 10 : 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{label}</div>
+                <div style={{ fontSize: isMobile ? 10 : 12, color: 'rgba(var(--rgb-fg),0.5)', marginTop: 2 }}>{label}</div>
               </div>
               <div style={{
                 width: isMobile ? 32 : 40, height: isMobile ? 32 : 40, borderRadius: isMobile ? 8 : 12,
@@ -383,7 +383,7 @@ export default function Dashboard() {
               <h3 style={{ margin: '0 0 8px', fontSize: isMobile ? 20 : 24, fontWeight: 700, letterSpacing: '-0.5px' }}>
                 Willkommen bei PATH
               </h3>
-              <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 14, marginBottom: 24, maxWidth: 420, marginLeft: 'auto', marginRight: 'auto' }}>
+              <p style={{ color: 'rgba(var(--rgb-fg),0.55)', fontSize: 14, marginBottom: 24, maxWidth: 420, marginLeft: 'auto', marginRight: 'auto' }}>
                 In 3 Schritten zu deinem Lebenslauf — alles synchronisiert, mehrere Mappen pro Person, native PDF-Exporte.
               </p>
 
@@ -396,7 +396,7 @@ export default function Dashboard() {
                 ].map(({ n, icon: Icon, title, desc }) => (
                   <div key={n} style={{
                     padding: '14px 12px', borderRadius: 12,
-                    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                    background: 'rgba(var(--rgb-fg),0.04)', border: '1px solid rgba(var(--rgb-fg),0.08)',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textAlign: 'center',
                   }}>
                     <div style={{ position: 'relative', marginBottom: 4 }}>
@@ -408,7 +408,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div style={{ fontSize: 13, fontWeight: 600 }}>{title}</div>
-                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', lineHeight: 1.4 }}>{desc}</div>
+                    <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.45)', lineHeight: 1.4 }}>{desc}</div>
                   </div>
                 ))}
               </div>
@@ -416,7 +416,7 @@ export default function Dashboard() {
               <button className="btn-glass btn-primary" onClick={() => setShowAdd(true)} style={{ padding: '11px 22px', fontSize: 14, fontWeight: 600 }}>
                 <Plus size={16} /> Jetzt starten
               </button>
-              <div style={{ marginTop: 10, fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+              <div style={{ marginTop: 10, fontSize: 11, color: 'rgba(var(--rgb-fg),0.35)' }}>
                 Kostenlos · 1 Person · 2 Mappen · keine Kreditkarte
               </div>
             </div>
@@ -469,9 +469,9 @@ export default function Dashboard() {
                         )}
                       </div>
                       {isPersonFrozen ? (
-                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>Upgrade auf Pro zum Bearbeiten</div>
+                        <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.35)', marginTop: 2 }}>Upgrade auf Pro zum Bearbeiten</div>
                       ) : personResumes[0]?.personalInfo.title ? (
-                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {personResumes[0].personalInfo.title}
                         </div>
                       ) : null}
@@ -494,7 +494,7 @@ export default function Dashboard() {
                       const frozen = frozenResumeIds.has(r.id);
                       const statusColor = APPLICATION_STATUS_COLORS[r.status ?? 'entwurf'];
                       const deadlineDiff = r.deadline ? (new Date(r.deadline).getTime() - Date.now()) / 86400000 : null;
-                      const deadlineColor = deadlineDiff === null ? undefined : deadlineDiff < 0 ? 'var(--ios-red)' : deadlineDiff <= 7 ? '#FF9F0A' : 'rgba(255,255,255,0.4)';
+                      const deadlineColor = deadlineDiff === null ? undefined : deadlineDiff < 0 ? 'var(--ios-red)' : deadlineDiff <= 7 ? '#FF9F0A' : 'rgba(var(--rgb-fg),0.4)';
 
                       if (renamingResumeId === r.id && !frozen && !isPersonFrozen) {
                         return (
@@ -516,10 +516,10 @@ export default function Dashboard() {
                           padding: '9px 12px', borderRadius: 10, fontSize: 14,
                           border: frozen
                             ? '1px solid rgba(255,159,10,0.25)'
-                            : `1px solid ${isActiveResume ? 'rgba(0,122,255,0.5)' : 'rgba(255,255,255,0.1)'}`,
+                            : `1px solid ${isActiveResume ? 'rgba(0,122,255,0.5)' : 'rgba(var(--rgb-fg),0.1)'}`,
                           background: frozen
                             ? 'rgba(255,159,10,0.05)'
-                            : isActiveResume ? 'rgba(0,122,255,0.12)' : 'rgba(255,255,255,0.05)',
+                            : isActiveResume ? 'rgba(0,122,255,0.12)' : 'rgba(var(--rgb-fg),0.05)',
                           cursor: frozen ? 'default' : 'pointer',
                           opacity: frozen ? 0.7 : 1,
                         }}
@@ -559,7 +559,7 @@ export default function Dashboard() {
                                 </div>
                               )}
                               {frozen && (
-                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
+                                <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.35)', marginTop: 2 }}>
                                   Upgrade auf Pro zum Bearbeiten
                                 </div>
                               )}
@@ -614,7 +614,7 @@ export default function Dashboard() {
                       />
                     ) : !isPersonFrozen ? (
                       <div title="Neue Bewerbungsmappe"
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, fontSize: 13, border: '1px dashed rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.03)', cursor: 'pointer', opacity: 0.6, color: 'rgba(255,255,255,0.6)' }}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, fontSize: 13, border: '1px dashed rgba(var(--rgb-fg),0.2)', background: 'rgba(var(--rgb-fg),0.03)', cursor: 'pointer', opacity: 0.6, color: 'rgba(var(--rgb-fg),0.6)' }}
                         onClick={(e) => { e.stopPropagation(); setAddingResumeForPersonId(person.id); setNewResumeName(''); }}>
                         <FolderPlus size={15} /> Neue Bewerbungsmappe
                       </div>
@@ -653,7 +653,7 @@ export default function Dashboard() {
           </div>
 
           {searchQuery && filteredPersons.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '32px 0', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
+            <div style={{ textAlign: 'center', padding: '32px 0', color: 'rgba(var(--rgb-fg),0.4)', fontSize: 14 }}>
               Keine Ergebnisse für „{searchQuery}"
             </div>
           )}

@@ -131,10 +131,10 @@ export default function LinkedInImportDialog({ onClose }: Props) {
             </svg>
             <div>
               <div style={{ fontWeight: 700, fontSize: 15 }}>LinkedIn importieren</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>Schritt {step} von 2 · KI-gestützt</div>
+              <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 1 }}>Schritt {step} von 2 · KI-gestützt</div>
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', padding: 4 }}>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(var(--rgb-fg),0.5)', padding: 4 }}>
             <X size={18} />
           </button>
         </div>
@@ -142,19 +142,19 @@ export default function LinkedInImportDialog({ onClose }: Props) {
         {step === 1 && (
           <>
             {/* Desktop instructions */}
-            <div style={{ padding: '12px 14px', borderRadius: 10, background: 'rgba(10,102,194,0.08)', border: '1px solid rgba(10,102,194,0.2)', fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, marginBottom: 10 }}>
+            <div style={{ padding: '12px 14px', borderRadius: 10, background: 'rgba(10,102,194,0.08)', border: '1px solid rgba(10,102,194,0.2)', fontSize: 13, color: 'rgba(var(--rgb-fg),0.7)', lineHeight: 1.6, marginBottom: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: '#fff', fontWeight: 600 }}>
                 <Monitor size={14} /> Desktop
               </div>
               <ol style={{ margin: 0, padding: '0 0 0 18px', display: 'flex', flexDirection: 'column', gap: 3 }}>
                 <li>Öffne dein LinkedIn-Profil im Browser</li>
-                <li>Drücke <kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '1px 5px', borderRadius: 4, fontSize: 11 }}>Ctrl+A</kbd> dann <kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '1px 5px', borderRadius: 4, fontSize: 11 }}>Ctrl+C</kbd></li>
+                <li>Drücke <kbd style={{ background: 'rgba(var(--rgb-fg),0.1)', padding: '1px 5px', borderRadius: 4, fontSize: 11 }}>Ctrl+A</kbd> dann <kbd style={{ background: 'rgba(var(--rgb-fg),0.1)', padding: '1px 5px', borderRadius: 4, fontSize: 11 }}>Ctrl+C</kbd></li>
                 <li>Füge den Text unten ein</li>
               </ol>
             </div>
 
             {/* Mobile instructions */}
-            <div style={{ padding: '12px 14px', borderRadius: 10, background: 'rgba(255,159,10,0.06)', border: '1px solid rgba(255,159,10,0.2)', fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, marginBottom: 16 }}>
+            <div style={{ padding: '12px 14px', borderRadius: 10, background: 'rgba(255,159,10,0.06)', border: '1px solid rgba(255,159,10,0.2)', fontSize: 13, color: 'rgba(var(--rgb-fg),0.7)', lineHeight: 1.6, marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: '#FF9F0A', fontWeight: 600 }}>
                 <Smartphone size={14} /> Mobile
               </div>
@@ -182,7 +182,7 @@ export default function LinkedInImportDialog({ onClose }: Props) {
             </div>
 
             {!text.trim() && !error && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'rgba(var(--rgb-fg),0.4)', marginBottom: 12 }}>
                 <AlertCircle size={12} /> Füge den kopierten LinkedIn-Text ein, um fortzufahren.
               </div>
             )}
@@ -206,7 +206,7 @@ export default function LinkedInImportDialog({ onClose }: Props) {
           <>
             <div style={{ padding: '12px 14px', borderRadius: 10, background: 'rgba(52,199,89,0.08)', border: '1px solid rgba(52,199,89,0.2)', fontSize: 13, marginBottom: 16 }}>
               <strong style={{ color: '#34C759', display: 'block', marginBottom: 8 }}>✓ KI hat extrahiert</strong>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 5, color: 'rgba(255,255,255,0.75)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5, color: 'rgba(var(--rgb-fg),0.75)' }}>
                 {(parsed.firstName || parsed.lastName) && (
                   <div style={{ display: 'flex', gap: 8 }}>
                     <span style={{ opacity: 0.5, minWidth: 110 }}>Name:</span>
@@ -246,7 +246,7 @@ export default function LinkedInImportDialog({ onClose }: Props) {
               </div>
             )}
 
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: '0 0 16px', lineHeight: 1.55 }}>
+            <p style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.4)', margin: '0 0 16px', lineHeight: 1.55 }}>
               Die Daten werden zu deinem aktuellen Lebenslauf hinzugefügt (bestehende Einträge bleiben erhalten).
             </p>
 

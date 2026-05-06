@@ -60,8 +60,8 @@ export default function PersonalInfoEditor() {
           <label style={{ cursor: 'pointer' }}>
             <div style={{
               width: 80, height: 80, borderRadius: '50%',
-              background: info.photo ? 'transparent' : 'rgba(255,255,255,0.1)',
-              border: '2px solid rgba(255,255,255,0.2)',
+              background: info.photo ? 'transparent' : 'rgba(var(--rgb-fg),0.1)',
+              border: '2px solid rgba(var(--rgb-fg),0.2)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               overflow: 'hidden', transition: '0.2s',
               cursor: 'pointer',
@@ -69,7 +69,7 @@ export default function PersonalInfoEditor() {
               {info.photo ? (
                 <img src={info.photo} alt="Foto" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>
+                <div style={{ textAlign: 'center', color: 'rgba(var(--rgb-fg),0.4)' }}>
                   <Camera size={20} />
                   <div style={{ fontSize: 9, marginTop: 3 }}>Foto</div>
                 </div>

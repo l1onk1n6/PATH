@@ -154,7 +154,7 @@ export default function Preview() {
             className="glass-card"
             style={{
               padding: 10,
-              border: isSelected ? `2px solid ${resume.accentColor}` : '1px solid rgba(255,255,255,0.12)',
+              border: isSelected ? `2px solid ${resume.accentColor}` : '1px solid rgba(var(--rgb-fg),0.12)',
               background: isSelected ? `${resume.accentColor}1a` : undefined,
               opacity: locked ? 0.55 : 1,
               position: 'relative',
@@ -215,7 +215,7 @@ export default function Preview() {
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: isMobile ? '8px 12px' : '10px 16px',
-          borderBottom: '1px solid rgba(255,255,255,0.1)', flexShrink: 0, gap: 8,
+          borderBottom: '1px solid rgba(var(--rgb-fg),0.1)', flexShrink: 0, gap: 8,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {isMobile && (
@@ -229,7 +229,7 @@ export default function Preview() {
               </button>
             )}
             {previewBuilding && (
-              <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'rgba(var(--rgb-fg),0.5)' }}>
                 <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />
                 Vorschau aktualisieren…
               </span>
@@ -238,7 +238,7 @@ export default function Preview() {
 
           <div style={{ display: 'flex', gap: 6, alignItems: 'center', position: 'relative' }}>
             {!isMobile && limits.pdfExportsPerMonth !== Infinity && (
-              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: 10, color: 'rgba(var(--rgb-fg),0.35)', whiteSpace: 'nowrap' }}>
                 {getPdfExportCount()}/{limits.pdfExportsPerMonth} PDF
               </span>
             )}
@@ -287,7 +287,7 @@ export default function Preview() {
                   position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 50,
                   minWidth: 220, padding: 6,
                   background: 'rgba(14,14,22,0.97)',
-                  border: '1px solid rgba(255,255,255,0.12)',
+                  border: '1px solid rgba(var(--rgb-fg),0.12)',
                   borderRadius: 'var(--radius-sm)',
                   backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
                   boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
@@ -310,7 +310,7 @@ export default function Preview() {
                     <FileEdit size={14} style={{ opacity: 0.7 }} />
                     <span style={{ fontSize: 13 }}>Nur Motivationsschreiben</span>
                   </button>
-                  <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '4px 0' }} />
+                  <div style={{ height: 1, background: 'rgba(var(--rgb-fg),0.08)', margin: '4px 0' }} />
                   <ProGate featureId="password" badge>
                     <button className="btn-glass"
                       onClick={() => { setDownloadMenuOpen(false); /* Pro-Feature, handler kommt noch */ }}
@@ -343,7 +343,7 @@ export default function Preview() {
             maxHeight: '70vh', display: 'flex', flexDirection: 'column',
           }}>
             <div className="glass" style={{ borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0', overflow: 'hidden', display: 'flex', flexDirection: 'column', maxHeight: '70vh' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 12px', flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 12px', flexShrink: 0, borderBottom: '1px solid rgba(var(--rgb-fg),0.1)' }}>
                 <span style={{ fontWeight: 700, fontSize: 16 }}>Templates</span>
                 <button className="btn-glass btn-icon btn-sm" onClick={() => setTemplatePickerOpen(false)} style={{ padding: 6 }}>
                   <X size={16} />

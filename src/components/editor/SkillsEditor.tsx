@@ -55,9 +55,9 @@ export default function SkillsEditor() {
 
         {skills.length > 0 && (
           <div style={{ display: 'flex', gap: 10, paddingLeft: isMobile ? 32 : 22, paddingRight: 38, marginBottom: 4 }}>
-            <span style={{ flex: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>Fähigkeit</span>
-            <span style={{ flex: 1, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>Kategorie</span>
-            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', minWidth: 114 }}>Niveau</span>
+            <span style={{ flex: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>Fähigkeit</span>
+            <span style={{ flex: 1, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>Kategorie</span>
+            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)', minWidth: 114 }}>Niveau</span>
           </div>
         )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -114,14 +114,14 @@ export default function SkillsEditor() {
                       title={LEVEL_LABELS[lvl - 1]}
                       style={{
                         width: 16, height: 16, borderRadius: '50%',
-                        background: skill.level >= lvl ? LEVEL_COLORS[skill.level - 1] : 'rgba(255,255,255,0.15)',
+                        background: skill.level >= lvl ? LEVEL_COLORS[skill.level - 1] : 'rgba(var(--rgb-fg),0.15)',
                         border: 'none', cursor: 'pointer', transition: '0.2s',
                         transform: skill.level >= lvl ? 'scale(1.15)' : 'scale(1)',
                       }}
                     />
                   ))}
                 </div>
-                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', minWidth: 70 }}>
+                <span style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.45)', minWidth: 70 }}>
                   {LEVEL_LABELS[skill.level - 1]}
                 </span>
                 <button
@@ -160,8 +160,8 @@ export default function SkillsEditor() {
 
         {languages.length > 0 && (
           <div style={{ display: 'flex', gap: 10, paddingLeft: isMobile ? 32 : 22, paddingRight: 38, marginBottom: 4 }}>
-            <span style={{ flex: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>Sprache</span>
-            <span style={{ flex: 1, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)' }}>Niveau</span>
+            <span style={{ flex: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>Sprache</span>
+            <span style={{ flex: 1, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>Niveau</span>
             <span style={{ width: 166, flexShrink: 0 }} />
           </div>
         )}

@@ -153,7 +153,7 @@ function AppShell() {
               <ShieldAlert size={22} style={{ color: '#FF9500' }} />
             </div>
             <h2 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 8px' }}>Sitzung läuft ab</h2>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: '0 0 20px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', margin: '0 0 20px', lineHeight: 1.5 }}>
               Du wirst in <strong style={{ color: '#FF9500' }}>{countdown} Sekunden</strong> automatisch abgemeldet.
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
@@ -183,13 +183,13 @@ function AppShell() {
         justifyContent: 'space-between',
         alignItems: 'center',
         fontSize: 11,
-        color: 'rgba(255,255,255,0.2)',
+        color: 'rgba(var(--rgb-fg),0.2)',
         flexShrink: 0,
         userSelect: 'none',
       }}>
         <span>by pixmatic · v{APP_VERSION}</span>
         {(savePending || syncing) ? (
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'rgba(255,255,255,0.35)' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'rgba(var(--rgb-fg),0.35)' }}>
             <Loader size={11} style={{ animation: 'spin 1s linear infinite' }} />
             Speichert…
           </span>
@@ -281,7 +281,7 @@ export default function App() {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, padding: 24, textAlign: 'center' }}>
         <span style={{ fontSize: 32 }}>⚙️</span>
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, maxWidth: 320 }}>
+        <p style={{ color: 'rgba(var(--rgb-fg),0.5)', fontSize: 14, maxWidth: 320 }}>
           App nicht konfiguriert.<br />Bitte VITE_SUPABASE_URL und VITE_SUPABASE_ANON_KEY als GitHub Secrets setzen.
         </p>
       </div>
@@ -292,7 +292,7 @@ export default function App() {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
         <Loader2 size={28} style={{ animation: 'spin 1s linear infinite', color: 'var(--ios-blue)' }} />
-        <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>Verbinde…</span>
+        <span style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)' }}>Verbinde…</span>
         <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
       </div>
     );

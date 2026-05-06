@@ -103,7 +103,7 @@ function ReminderPanel({ resumeId, deadline, reminderDays, onClose }: {
         E-Mail-Reminder vor Frist
       </div>
       {!deadline && (
-        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 10 }}>
+        <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.4)', marginBottom: 10 }}>
           Zuerst eine Bewerbungsfrist setzen.
         </div>
       )}
@@ -254,7 +254,7 @@ export default function CoverLetterEditor() {
               </div>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 15 }}>Bestehenden Text überschreiben?</div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
+                <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.45)', marginTop: 2 }}>
                   {confirmOverwrite === 'generate'
                     ? 'Der KI-Assistent ersetzt deinen aktuellen Anschreiben-Text.'
                     : confirmOverwrite === 'template'
@@ -263,7 +263,7 @@ export default function CoverLetterEditor() {
                 </div>
               </div>
             </div>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: '0 0 20px', lineHeight: 1.55 }}>
+            <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', margin: '0 0 20px', lineHeight: 1.55 }}>
               Dein bestehender Text wird unwiderruflich ersetzt. Möchtest du fortfahren?
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -421,8 +421,8 @@ export default function CoverLetterEditor() {
       {/* AI panel — directly above body */}
       <div className="glass-card" style={{
         padding: 0, overflow: 'hidden',
-        border: showAiPanel ? '1px solid rgba(255,159,10,0.35)' : '1px solid rgba(255,255,255,0.1)',
-        background: showAiPanel ? 'rgba(255,159,10,0.04)' : 'rgba(255,255,255,0.04)',
+        border: showAiPanel ? '1px solid rgba(255,159,10,0.35)' : '1px solid rgba(var(--rgb-fg),0.1)',
+        background: showAiPanel ? 'rgba(255,159,10,0.04)' : 'rgba(var(--rgb-fg),0.04)',
         marginBottom: -10,
       }}>
         <button
@@ -432,8 +432,8 @@ export default function CoverLetterEditor() {
           }}
           onClick={() => isPro ? setShowAiPanel(v => !v) : setShowUpgrade(true)}
         >
-          <Sparkles size={14} style={{ color: isPro ? '#FF9F0A' : 'rgba(255,255,255,0.4)' }} />
-          <span style={{ fontSize: 13, fontWeight: 600, flex: 1, textAlign: 'left', color: isPro ? '#FF9F0A' : 'rgba(255,255,255,0.5)' }}>
+          <Sparkles size={14} style={{ color: isPro ? '#FF9F0A' : 'rgba(var(--rgb-fg),0.4)' }} />
+          <span style={{ fontSize: 13, fontWeight: 600, flex: 1, textAlign: 'left', color: isPro ? '#FF9F0A' : 'rgba(var(--rgb-fg),0.5)' }}>
             KI-Assistent — Anschreiben generieren
           </span>
           {!isPro && (

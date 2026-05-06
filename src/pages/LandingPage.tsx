@@ -162,7 +162,7 @@ export default function LandingPage() {
         background: scrolled ? 'rgba(8,15,30,0.92)' : 'rgba(8,15,30,0.55)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        borderBottom: '1px solid rgba(var(--rgb-fg),0.08)',
         transition: 'background 0.3s',
       }}>
         {/* Logo */}
@@ -174,11 +174,11 @@ export default function LandingPage() {
 
         {/* Nav links – desktop only */}
         {!isMobile && (
-          <div style={{ display: 'flex', gap: 32, fontSize: 14, color: 'rgba(255,255,255,0.65)' }}>
+          <div style={{ display: 'flex', gap: 32, fontSize: 14, color: 'rgba(var(--rgb-fg),0.65)' }}>
             {[['features', 'Features'], ['how', 'So funktioniert\'s'], ['pricing', 'Preise']].map(([id, label]) => (
               <button key={id} onClick={() => scrollTo(id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: 'inherit', padding: 0, transition: 'color 0.2s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.65)')}>
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(var(--rgb-fg),0.65)')}>
                 {label}
               </button>
             ))}
@@ -189,11 +189,11 @@ export default function LandingPage() {
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <button onClick={() => setShowAuth('login')} style={{
             background: 'none', border: 'none', cursor: 'pointer',
-            color: 'rgba(255,255,255,0.65)', fontSize: 14, padding: '8px 14px',
+            color: 'rgba(var(--rgb-fg),0.65)', fontSize: 14, padding: '8px 14px',
             borderRadius: 10, transition: 'color 0.2s',
           }}
             onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.65)')}>
+            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(var(--rgb-fg),0.65)')}>
             Anmelden
           </button>
           <button onClick={() => setShowAuth('register')} style={{
@@ -224,14 +224,14 @@ export default function LandingPage() {
             <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: 'rgba(255,159,10,0.25)', border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', letterSpacing: '0.06em', flexShrink: 0 }}>
               LAUNCH-ANGEBOT
             </span>
-            <span style={{ fontSize: isMobile ? 13 : 14, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>
+            <span style={{ fontSize: isMobile ? 13 : 14, fontWeight: 600, color: 'rgba(var(--rgb-fg),0.9)' }}>
               50% Rabatt im ersten Monat —{' '}
               <span style={{ color: '#FF9F0A' }}>CHF 2.50 statt CHF 5</span>
             </span>
             <span style={{
               fontSize: 12, fontWeight: 800, letterSpacing: '0.06em',
               padding: '3px 10px', borderRadius: 7,
-              background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
+              background: 'rgba(var(--rgb-fg),0.1)', border: '1px solid rgba(var(--rgb-fg),0.2)',
               color: '#fff', fontFamily: 'monospace', cursor: 'default',
             }}
               title="Gutschein-Code kopieren"
@@ -242,11 +242,11 @@ export default function LandingPage() {
           </div>
 
           {/* Divider */}
-          {!isMobile && <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.15)' }} />}
+          {!isMobile && <div style={{ width: 1, height: 20, background: 'rgba(var(--rgb-fg),0.15)' }} />}
 
           {/* Countdown */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', flexShrink: 0 }}>Noch</span>
+            <span style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.45)', flexShrink: 0 }}>Noch</span>
             {[
               [countdown.days,    'd'],
               [countdown.hours,   'h'],
@@ -261,7 +261,7 @@ export default function LandingPage() {
                 }}>
                   {String(val).padStart(2, '0')}
                 </span>
-                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginRight: 4 }}>{unit}</span>
+                <span style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)', marginRight: 4 }}>{unit}</span>
               </span>
             ))}
           </div>
@@ -322,7 +322,7 @@ export default function LandingPage() {
           <p style={{
             margin: '0 0 36px',
             fontSize: isMobile ? 16 : 18,
-            color: 'rgba(255,255,255,0.6)',
+            color: 'rgba(var(--rgb-fg),0.6)',
             lineHeight: 1.65,
             maxWidth: 480,
           }}>
@@ -346,21 +346,21 @@ export default function LandingPage() {
             </button>
             <button onClick={() => scrollTo('pricing')} style={{
               display: 'flex', alignItems: 'center', gap: 8,
-              background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+              background: 'rgba(var(--rgb-fg),0.08)', border: '1px solid rgba(var(--rgb-fg),0.15)',
               borderRadius: 14, cursor: 'pointer',
-              color: 'rgba(255,255,255,0.8)', fontSize: 16, fontWeight: 500,
+              color: 'rgba(var(--rgb-fg),0.8)', fontSize: 16, fontWeight: 500,
               padding: '14px 28px',
               transition: 'background 0.2s, transform 0.2s',
             }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.13)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.transform = 'none'; }}>
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(var(--rgb-fg),0.13)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(var(--rgb-fg),0.08)'; e.currentTarget.style.transform = 'none'; }}>
               Preise ansehen
             </button>
           </div>
 
           <div style={{ display: 'flex', gap: 20, marginTop: 28, flexWrap: 'wrap' }}>
             {['Kostenlos starten', 'Keine Kreditkarte nötig', 'DSGVO-konform'].map(t => (
-              <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>
+              <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)' }}>
                 <Check size={14} style={{ color: '#34C759', flexShrink: 0 }} /> {t}
               </div>
             ))}
@@ -373,9 +373,9 @@ export default function LandingPage() {
 
       {/* ── Stats bar ───────────────────────────────────────── */}
       <div style={{
-        borderTop: '1px solid rgba(255,255,255,0.07)',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
-        background: 'rgba(255,255,255,0.03)',
+        borderTop: '1px solid rgba(var(--rgb-fg),0.07)',
+        borderBottom: '1px solid rgba(var(--rgb-fg),0.07)',
+        background: 'rgba(var(--rgb-fg),0.03)',
         padding: '28px 48px',
       }}>
         <div style={{
@@ -391,7 +391,7 @@ export default function LandingPage() {
           ].map(([val, label]) => (
             <div key={label} style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.5px', color: '#fff' }}>{val}</div>
-              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>{label}</div>
+              <div style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 4 }}>{label}</div>
             </div>
           ))}
         </div>
@@ -403,7 +403,7 @@ export default function LandingPage() {
           <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
             Alles was du brauchst
           </h2>
-          <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.5)', margin: 0, maxWidth: 520, marginInline: 'auto', lineHeight: 1.6 }}>
+          <p style={{ fontSize: 17, color: 'rgba(var(--rgb-fg),0.5)', margin: 0, maxWidth: 520, marginInline: 'auto', lineHeight: 1.6 }}>
             Von der ersten Idee bis zum fertigen PDF — PATH begleitet dich durch den gesamten Bewerbungsprozess.
           </p>
         </div>
@@ -415,14 +415,14 @@ export default function LandingPage() {
         }}>
           {FEATURES.map(({ icon: Icon, color, title, desc }) => (
             <div key={title} style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'rgba(var(--rgb-fg),0.04)',
+              border: '1px solid rgba(var(--rgb-fg),0.08)',
               borderRadius: 20, padding: 28,
               transition: 'background 0.2s, border-color 0.2s, transform 0.2s',
               cursor: 'default',
             }}
-              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.07)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.04)'; (e.currentTarget as HTMLDivElement).style.transform = 'none'; }}>
+              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(var(--rgb-fg),0.07)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(var(--rgb-fg),0.04)'; (e.currentTarget as HTMLDivElement).style.transform = 'none'; }}>
               <div style={{
                 width: 44, height: 44, borderRadius: 12, marginBottom: 18,
                 background: `${color}22`, border: `1px solid ${color}44`,
@@ -431,7 +431,7 @@ export default function LandingPage() {
                 <Icon size={20} style={{ color }} />
               </div>
               <h3 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 10px' }}>{title}</h3>
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', margin: 0, lineHeight: 1.6 }}>{desc}</p>
+              <p style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)', margin: 0, lineHeight: 1.6 }}>{desc}</p>
             </div>
           ))}
         </div>
@@ -441,8 +441,8 @@ export default function LandingPage() {
       <section style={{
         padding: isMobile ? '80px 24px' : '100px 48px',
         background: 'linear-gradient(180deg, rgba(175,82,222,0.04) 0%, rgba(0,122,255,0.04) 100%)',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        borderTop: '1px solid rgba(var(--rgb-fg),0.06)',
+        borderBottom: '1px solid rgba(var(--rgb-fg),0.06)',
       }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
@@ -452,7 +452,7 @@ export default function LandingPage() {
             <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
               KI übernimmt die schwere Arbeit
             </h2>
-            <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.5)', margin: 0, maxWidth: 520, marginInline: 'auto', lineHeight: 1.6 }}>
+            <p style={{ fontSize: 17, color: 'rgba(var(--rgb-fg),0.5)', margin: 0, maxWidth: 520, marginInline: 'auto', lineHeight: 1.6 }}>
               Claude AI – eines der leistungsfähigsten Sprachmodelle der Welt – ist direkt in PATH integriert.
             </p>
           </div>
@@ -474,7 +474,7 @@ export default function LandingPage() {
                     <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{title}</h3>
                     <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 99, background: 'rgba(175,82,222,0.25)', color: '#CF9FFF', letterSpacing: '0.04em', flexShrink: 0 }}>{badge}</span>
                   </div>
-                  <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', margin: 0, lineHeight: 1.65 }}>{desc}</p>
+                  <p style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.55)', margin: 0, lineHeight: 1.65 }}>{desc}</p>
                 </div>
               </div>
             ))}
@@ -485,16 +485,16 @@ export default function LandingPage() {
       {/* ── How it works ────────────────────────────────────── */}
       <section id="how" style={{
         padding: isMobile ? '80px 24px' : '100px 48px',
-        background: 'rgba(255,255,255,0.02)',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        background: 'rgba(var(--rgb-fg),0.02)',
+        borderTop: '1px solid rgba(var(--rgb-fg),0.06)',
+        borderBottom: '1px solid rgba(var(--rgb-fg),0.06)',
       }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 60 }}>
             <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
               In 4 Schritten zur Bewerbung
             </h2>
-            <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.5)', margin: 0, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 17, color: 'rgba(var(--rgb-fg),0.5)', margin: 0, lineHeight: 1.6 }}>
               Einfach und schnell — ohne komplizierte Software.
             </p>
           </div>
@@ -524,7 +524,7 @@ export default function LandingPage() {
                   {num}
                 </div>
                 <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>{title}</h3>
-                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', margin: 0, lineHeight: 1.6 }}>{desc}</p>
+                <p style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)', margin: 0, lineHeight: 1.6 }}>{desc}</p>
               </div>
             ))}
           </div>
@@ -537,8 +537,8 @@ export default function LandingPage() {
       {/* ── Testimonials / Trust ────────────────────────────── */}
       <section style={{
         padding: isMobile ? '60px 24px' : '80px 48px',
-        background: 'rgba(255,255,255,0.02)',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
+        background: 'rgba(var(--rgb-fg),0.02)',
+        borderTop: '1px solid rgba(var(--rgb-fg),0.06)',
       }}>
         <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 3, marginBottom: 20 }}>
@@ -547,7 +547,7 @@ export default function LandingPage() {
           <blockquote style={{ fontSize: isMobile ? 20 : 26, fontWeight: 600, margin: '0 0 20px', lineHeight: 1.4, letterSpacing: '-0.3px' }}>
             "Endlich eine Bewerbungs-App die nicht aussieht wie aus den 90ern — und trotzdem in der Schweiz funktioniert."
           </blockquote>
-          <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)' }}>Zufriedener Nutzer aus Zürich</div>
+          <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.4)' }}>Zufriedener Nutzer aus Zürich</div>
         </div>
       </section>
 
@@ -555,8 +555,8 @@ export default function LandingPage() {
       <section style={{
         padding: isMobile ? '80px 24px' : '100px 48px',
         background: 'linear-gradient(180deg, rgba(52,199,89,0.04) 0%, rgba(0,122,255,0.05) 100%)',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        borderTop: '1px solid rgba(var(--rgb-fg),0.06)',
+        borderBottom: '1px solid rgba(var(--rgb-fg),0.06)',
       }}>
         <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
           {/* Badge */}
@@ -578,7 +578,7 @@ export default function LandingPage() {
               Android & iOS
             </span>
           </h2>
-          <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.5)', margin: '0 auto 52px', maxWidth: 520, lineHeight: 1.65 }}>
+          <p style={{ fontSize: 17, color: 'rgba(var(--rgb-fg),0.5)', margin: '0 auto 52px', maxWidth: 520, lineHeight: 1.65 }}>
             Alle deine Bewerbungsunterlagen immer dabei — bearbeiten, exportieren und teilen, direkt vom Handy.
           </p>
 
@@ -604,11 +604,11 @@ export default function LandingPage() {
               </div>
               <div>
                 <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 6 }}>Android</div>
-                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>Google Play Store</div>
+                <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)', lineHeight: 1.5 }}>Google Play Store</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', textAlign: 'left' }}>
                 {['Volle Offline-Unterstützung', 'Push-Erinnerungen für Deadlines', 'Native PDF-Speicherung'].map(f => (
-                  <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
+                  <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'rgba(var(--rgb-fg),0.65)' }}>
                     <Check size={14} style={{ color: '#34C759', flexShrink: 0 }} /> {f}
                   </div>
                 ))}
@@ -638,11 +638,11 @@ export default function LandingPage() {
               </div>
               <div>
                 <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 6 }}>iPhone & iPad</div>
-                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>Apple App Store</div>
+                <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)', lineHeight: 1.5 }}>Apple App Store</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', textAlign: 'left' }}>
                 {['Nahtlose iCloud-Synchronisation', 'Face ID & Touch ID Login', 'Apple Pencil Unterstützung'].map(f => (
-                  <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
+                  <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'rgba(var(--rgb-fg),0.65)' }}>
                     <Check size={14} style={{ color: '#007AFF', flexShrink: 0 }} /> {f}
                   </div>
                 ))}
@@ -657,7 +657,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+          <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.3)', margin: 0 }}>
             Web-App bereits jetzt kostenlos nutzbar — Apps folgen in Kürze.
           </p>
         </div>
@@ -678,7 +678,7 @@ export default function LandingPage() {
               Traumstelle?
             </span>
           </h2>
-          <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.55)', margin: '0 0 36px', lineHeight: 1.6 }}>
+          <p style={{ fontSize: 17, color: 'rgba(var(--rgb-fg),0.55)', margin: '0 0 36px', lineHeight: 1.6 }}>
             Erstelle in wenigen Minuten einen Lebenslauf, der überzeugt. Kostenlos, ohne Kreditkarte.
           </p>
           <button onClick={() => setShowAuth('register')} style={{
@@ -694,7 +694,7 @@ export default function LandingPage() {
             onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 8px 40px rgba(0,122,255,0.35)'; }}>
             Jetzt kostenlos starten <ChevronRight size={20} />
           </button>
-          <div style={{ marginTop: 20, fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>
+          <div style={{ marginTop: 20, fontSize: 13, color: 'rgba(var(--rgb-fg),0.3)' }}>
             Kein Abo nötig · Jederzeit kündbar · DSGVO-konform
           </div>
         </div>
@@ -703,14 +703,14 @@ export default function LandingPage() {
       {/* ── Footer ──────────────────────────────────────────── */}
       <footer style={{
         padding: isMobile ? '36px 24px' : '48px 48px',
-        borderTop: '1px solid rgba(255,255,255,0.08)',
+        borderTop: '1px solid rgba(var(--rgb-fg),0.08)',
         background: 'rgba(0,0,0,0.2)',
       }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <LogoIcon size={24} />
             <span style={{ fontWeight: 700, fontSize: 15 }}>PATH</span>
-            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>by pixmatic</span>
+            <span style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.3)' }}>by pixmatic</span>
           </div>
 
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
@@ -720,15 +720,15 @@ export default function LandingPage() {
               ['mailto:info@pixmatic.ch', 'Kontakt'],
             ].map(([href, label]) => (
               <button key={label} type="button" onClick={() => openExternal(href)}
-                style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', transition: 'color 0.2s' }}
-                onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.8)')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
+                style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.4)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', transition: 'color 0.2s' }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'rgba(var(--rgb-fg),0.8)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(var(--rgb-fg),0.4)')}>
                 {label}
               </button>
             ))}
           </div>
 
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>
+          <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.25)' }}>
             © {new Date().getFullYear()} pixmatic. Alle Rechte vorbehalten.
           </div>
         </div>
@@ -755,12 +755,12 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
         <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
           Transparent & fair
         </h2>
-        <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.5)', margin: '0 0 28px', lineHeight: 1.6 }}>
+        <p style={{ fontSize: 17, color: 'rgba(var(--rgb-fg),0.5)', margin: '0 0 28px', lineHeight: 1.6 }}>
           Kostenlos starten, bei Bedarf upgraden. Jederzeit kündbar.
         </p>
 
         {/* Billing Toggle */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: 'rgba(255,255,255,0.06)', borderRadius: 12, padding: 4, border: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 0, background: 'rgba(var(--rgb-fg),0.06)', borderRadius: 12, padding: 4, border: '1px solid rgba(var(--rgb-fg),0.1)' }}>
           {(['monthly', 'yearly'] as const).map((b) => (
             <button
               key={b}
@@ -769,7 +769,7 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
                 padding: '8px 20px', borderRadius: 9, border: 'none', cursor: 'pointer',
                 fontSize: 14, fontWeight: 600, transition: 'all 0.15s',
                 background: billing === b ? 'rgba(0,122,255,0.85)' : 'transparent',
-                color: billing === b ? '#fff' : 'rgba(255,255,255,0.5)',
+                color: billing === b ? '#fff' : 'rgba(var(--rgb-fg),0.5)',
                 display: 'flex', alignItems: 'center', gap: 7,
               }}
             >
@@ -783,27 +783,27 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
 
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 24, alignItems: 'start' }}>
         {/* Free */}
-        <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, padding: 36 }}>
+        <div style={{ background: 'rgba(var(--rgb-fg),0.04)', border: '1px solid rgba(var(--rgb-fg),0.1)', borderRadius: 24, padding: 36 }}>
           <div style={{ marginBottom: 28 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginBottom: 8, letterSpacing: '0.06em' }}>KOSTENLOS</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(var(--rgb-fg),0.5)', marginBottom: 8, letterSpacing: '0.06em' }}>KOSTENLOS</div>
             <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-1px' }}>CHF 0</div>
-            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>Für immer kostenlos</div>
+            <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 4 }}>Für immer kostenlos</div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
             {FREE_FEATURES.map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14 }}>
-                <Check size={15} style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }} />
-                <span style={{ color: 'rgba(255,255,255,0.65)' }}>{f}</span>
+                <Check size={15} style={{ color: 'rgba(var(--rgb-fg),0.35)', flexShrink: 0 }} />
+                <span style={{ color: 'rgba(var(--rgb-fg),0.65)' }}>{f}</span>
               </div>
             ))}
           </div>
           <button onClick={onRegister} style={{
             width: '100%', padding: '13px 20px', borderRadius: 12,
-            background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+            background: 'rgba(var(--rgb-fg),0.08)', border: '1px solid rgba(var(--rgb-fg),0.15)',
             color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s',
           }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.13)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}>
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(var(--rgb-fg),0.13)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(var(--rgb-fg),0.08)')}>
             Kostenlos starten
           </button>
         </div>
@@ -822,7 +822,7 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
           <div style={{ marginBottom: 28 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <Sparkles size={14} style={{ color: '#FF9F0A' }} />
-              <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.06em' }}>PATH PRO</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(var(--rgb-fg),0.7)', letterSpacing: '0.06em' }}>PATH PRO</div>
             </div>
 
             {isYearly ? (
@@ -830,9 +830,9 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
                   <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-1px' }}>
                     CHF 49
-                    <span style={{ fontSize: 18, fontWeight: 500, color: 'rgba(255,255,255,0.5)', letterSpacing: 0 }}> / Jahr</span>
+                    <span style={{ fontSize: 18, fontWeight: 500, color: 'rgba(var(--rgb-fg),0.5)', letterSpacing: 0 }}> / Jahr</span>
                   </div>
-                  <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', textDecoration: 'line-through' }}>CHF 60</span>
+                  <span style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.35)', textDecoration: 'line-through' }}>CHF 60</span>
                 </div>
                 <div style={{ fontSize: 14, color: '#34C759', marginTop: 4, fontWeight: 600 }}>
                   CHF 4.08 / Monat · 2 Monate gratis
@@ -842,9 +842,9 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
               <>
                 <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-1px' }}>
                   CHF 5
-                  <span style={{ fontSize: 18, fontWeight: 500, color: 'rgba(255,255,255,0.5)', letterSpacing: 0 }}> / Monat</span>
+                  <span style={{ fontSize: 18, fontWeight: 500, color: 'rgba(var(--rgb-fg),0.5)', letterSpacing: 0 }}> / Monat</span>
                 </div>
-                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>Jederzeit kündbar</div>
+                <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 4 }}>Jederzeit kündbar</div>
               </>
             )}
           </div>
@@ -871,7 +871,7 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
             <Sparkles size={15} /> {isYearly ? 'Jetzt starten — CHF 49 / Jahr' : 'Jetzt PATH Pro holen'}
           </button>
 
-          <div style={{ textAlign: 'center', marginTop: 12, fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
+          <div style={{ textAlign: 'center', marginTop: 12, fontSize: 12, color: 'rgba(var(--rgb-fg),0.3)' }}>
             Sichere Zahlung via Stripe · Keine versteckten Kosten
           </div>
         </div>
@@ -909,7 +909,7 @@ function MockAppPreview() {
       {/* Main card — solide Calm-Surface */}
       <div style={{
         background: '#16161a',
-        border: '1px solid rgba(255,255,255,0.06)',
+        border: '1px solid rgba(var(--rgb-fg),0.06)',
         borderRadius: 22,
         padding: 24,
         boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
@@ -921,7 +921,7 @@ function MockAppPreview() {
           <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #34C759, #00C7BE)', flexShrink: 0 }} />
           <div>
             <div style={{ fontSize: 13, fontWeight: 700 }}>Max Mustermann</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Softwareentwickler</div>
+            <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)' }}>Softwareentwickler</div>
           </div>
           <div style={{ marginLeft: 'auto', fontSize: 10, padding: '3px 8px', borderRadius: 99, background: 'rgba(0,122,255,0.15)', border: '1px solid rgba(0,122,255,0.25)', color: 'var(--ios-blue)' }}>
             Modern
@@ -937,11 +937,11 @@ function MockAppPreview() {
           { label: 'Anschreiben', pct: 45, color: '#AF52DE' },
         ].map(({ label, pct, color }) => (
           <div key={label} style={{ marginBottom: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 5, color: 'rgba(255,255,255,0.6)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 5, color: 'rgba(var(--rgb-fg),0.6)' }}>
               <span>{label}</span>
               <span style={{ color }}>{pct}%</span>
             </div>
-            <div style={{ height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+            <div style={{ height: 4, borderRadius: 2, background: 'rgba(var(--rgb-fg),0.06)', overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 2, opacity: 0.85 }} />
             </div>
           </div>
@@ -958,7 +958,7 @@ function MockAppPreview() {
             <Download size={14} style={{ color: '#007AFF' }} />
             <span>PDF exportieren</span>
           </div>
-          <ArrowRight size={14} style={{ color: 'rgba(255,255,255,0.4)' }} />
+          <ArrowRight size={14} style={{ color: 'rgba(var(--rgb-fg),0.4)' }} />
         </div>
       </div>
 

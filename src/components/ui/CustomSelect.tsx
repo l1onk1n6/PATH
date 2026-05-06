@@ -87,7 +87,7 @@ export function CustomSelect({ value, onChange, options, style, placeholder = 'A
         background: 'rgba(16,16,30,0.97)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.15)',
+        border: '1px solid rgba(var(--rgb-fg),0.15)',
         borderRadius: 10,
         overflow: 'auto',
         maxHeight: 260,
@@ -118,10 +118,10 @@ export function CustomSelect({ value, onChange, options, style, placeholder = 'A
               margin: '2px 4px',
               borderRadius: 7,
               transition: 'background 0.1s',
-              color: isSelected ? '#fff' : 'rgba(255,255,255,0.85)',
+              color: isSelected ? '#fff' : 'rgba(var(--rgb-fg),0.85)',
             }}
             onMouseEnter={(e) => {
-              if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.08)';
+              if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'rgba(var(--rgb-fg),0.08)';
             }}
             onMouseLeave={(e) => {
               if (!isSelected) (e.currentTarget as HTMLDivElement).style.background = 'transparent';
@@ -148,7 +148,7 @@ export function CustomSelect({ value, onChange, options, style, placeholder = 'A
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <span style={{ color: hasValue ? undefined : 'rgba(255,255,255,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, textAlign: 'left' }}>
+        <span style={{ color: hasValue ? undefined : 'rgba(var(--rgb-fg),0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, textAlign: 'left' }}>
           {displayLabel}
         </span>
         <ChevronDown

@@ -153,7 +153,7 @@ export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
 };
 
 export const APPLICATION_STATUS_COLORS: Record<ApplicationStatus, string> = {
-  entwurf:    'rgba(255,255,255,0.3)',
+  entwurf:    'rgba(var(--rgb-fg),0.3)',
   gesendet:   'var(--ios-blue)',
   interview:  'var(--ios-yellow, #FF9F0A)',
   abgelehnt:  'var(--ios-red)',

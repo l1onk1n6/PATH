@@ -22,8 +22,8 @@ export default function EmptyState({
       style={{
         padding: compact ? '24px 20px' : '36px 24px',
         textAlign: 'center',
-        border: '1px dashed rgba(255,255,255,0.14)',
-        background: 'linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
+        border: '1px dashed rgba(var(--rgb-fg),0.14)',
+        background: 'linear-gradient(180deg, rgba(var(--rgb-fg),0.03), rgba(var(--rgb-fg),0.01))',
       }}
     >
       <div style={{
@@ -37,14 +37,14 @@ export default function EmptyState({
 
       <h4 style={{
         margin: '0 0 6px', fontSize: compact ? 14 : 15, fontWeight: 600,
-        color: 'rgba(255,255,255,0.85)',
+        color: 'rgba(var(--rgb-fg),0.85)',
       }}>
         {title}
       </h4>
 
       {description && (
         <p style={{
-          margin: '0 auto', fontSize: 12, color: 'rgba(255,255,255,0.5)',
+          margin: '0 auto', fontSize: 12, color: 'rgba(var(--rgb-fg),0.5)',
           maxWidth: 340, lineHeight: 1.5, marginBottom: (ctaLabel || secondaryCtaLabel) ? 16 : 0,
         }}>
           {description}
