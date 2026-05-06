@@ -418,6 +418,98 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Drag & Drop oder Pfeiltasten zum Sortieren': 'Drag & drop or arrow keys to reorder',
     'Eintrag löschen?': 'Delete entry?',
     'Eintrag duplizieren': 'Duplicate entry',
+
+    // ── Modals: Onboarding ───────────────────────────────
+    'Willkommen bei PATH': 'Welcome to PATH',
+    'Dein persönlicher Bewerbungsassistent.': 'Your personal application assistant.',
+    'Lass uns in 2 Minuten alles einrichten.': 'Let\'s set everything up in 2 minutes.',
+    'Loslegen': 'Get started',
+    'Überspringen': 'Skip',
+    'SCHRITT 1 VON 2': 'STEP 1 OF 2',
+    'SCHRITT 2 VON 2': 'STEP 2 OF 2',
+    'Wie heisst du?': 'What\'s your name?',
+    'Wir legen dein erstes Profil an.': 'We\'ll create your first profile.',
+    'Profil anlegen': 'Create profile',
+    'Erstelle…': 'Creating…',
+    'Was PATH kann': 'What PATH can do',
+    'Mit Beispieldaten starten': 'Start with sample data',
+    'Empfohlen — du kannst alle Daten später bearbeiten':
+      'Recommended — you can edit everything later',
+    'Mit leerer Mappe starten': 'Start with empty application',
+    'Erstelle für jede Stelle eine eigene Mappe mit Lebenslauf und Anschreiben.':
+      'Create a separate application with resume and cover letter for each job.',
+    'KI-Unterstützung': 'AI Support',
+    'Lass dir Anschreiben generieren, Texte verbessern und in andere Sprachen übersetzen.':
+      'Generate cover letters, improve texts and translate to other languages.',
+    'Link teilen & Export': 'Share link & export',
+    'Teile deinen Lebenslauf als Link oder exportiere ihn als professionelles PDF.':
+      'Share your resume as a link or export it as a professional PDF.',
+    'Deadline-Reminder': 'Deadline reminders',
+    'Verpasse keine Bewerbungsfrist — erhalte Erinnerungen per E-Mail.':
+      'Never miss a deadline — receive email reminders.',
+
+    // ── Modals: Upgrade / ProGate ────────────────────────
+    'Pro freischalten': 'Unlock Pro',
+    'Diese Funktion ist Teil von PATH Pro.': 'This feature is part of PATH Pro.',
+    'Was du mit Pro bekommst': 'What you get with Pro',
+    'Unbegrenzte Bewerbungsmappen': 'Unlimited applications',
+    'Unbegrenzte Personen': 'Unlimited people',
+    'Versionshistorie': 'Version history',
+    'KI-Anschreiben generieren': 'AI cover letter generation',
+    'KI-Übersetzungen': 'AI translations',
+    'ATS-Score-Analyse': 'ATS score analysis',
+    'Premium-Templates': 'Premium templates',
+    'CHF': 'CHF',
+    '/ Monat': '/ month',
+    '/ Jahr': '/ year',
+    'Monatlich': 'Monthly',
+    'Jährlich': 'Yearly',
+    'sparen': 'save',
+    'Jederzeit kündbar.': 'Cancel anytime.',
+    'Jetzt Upgraden': 'Upgrade now',
+    'Vielleicht später': 'Maybe later',
+    'Wird geladen…': 'Loading…',
+
+    // ── Modals: ShareModal ───────────────────────────────
+    'Lebenslauf teilen': 'Share resume',
+    'Erstelle einen öffentlichen Link — der Lebenslauf ist ohne Login einsehbar.':
+      'Create a public link — the resume is viewable without sign-in.',
+    'Link generieren': 'Generate link',
+    'Link deaktivieren': 'Deactivate link',
+    'Aufruf': 'view',
+    'Aufrufe': 'views',
+    'Noch nicht aufgerufen': 'Not viewed yet',
+    'Share-Link-Limit erreicht': 'Share link limit reached',
+    'Deaktiviere einen anderen Link oder upgrade auf Pro.': 'Deactivate another link or upgrade to Pro.',
+
+    // ── Modals: Shortcuts Help ───────────────────────────
+    'Tastatur-Kürzel': 'Keyboard shortcuts',
+    'Diese Hilfe anzeigen': 'Show this help',
+    'Sidebar einklappen / ausklappen': 'Collapse / expand sidebar',
+    'Tipp: Drücke': 'Tip: press',
+    'jederzeit, um diese Liste zu öffnen.': 'anytime to open this list.',
+
+    // ── Modals: ATS Dialog ───────────────────────────────
+    'ATS-Score': 'ATS score',
+    'Stellenbeschreibung einfügen': 'Paste job description',
+    'Füge die Stellenbeschreibung ein, um deinen ATS-Score zu prüfen.':
+      'Paste the job description to check your ATS score.',
+    'Score berechnen': 'Calculate score',
+    'Score wird berechnet…': 'Calculating score…',
+    'Sehr gute Übereinstimmung': 'Very good match',
+    'Solide Übereinstimmung': 'Solid match',
+    'Mittlere Übereinstimmung': 'Average match',
+    'Niedrige Übereinstimmung': 'Low match',
+    'Gefundene Schlüsselwörter': 'Matched keywords',
+    'Fehlende Schlüsselwörter': 'Missing keywords',
+    'Tipps': 'Tips',
+
+    // ── Modals: Translate ────────────────────────────────
+    'In andere Sprache übersetzen': 'Translate to another language',
+    'Zielsprache': 'Target language',
+    'Übersetzen…': 'Translating…',
+    'Lebenslauf übersetzen': 'Translate resume',
+    'Anschreiben übersetzen': 'Translate cover letter',
   },
 };
 

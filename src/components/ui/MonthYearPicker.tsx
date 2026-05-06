@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { useT } from '../../lib/i18n';
 
 const MONTHS_SHORT = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
 const MONTHS_FULL  = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export default function MonthYearPicker({ value, onChange, disabled, placeholder = 'Monat / Jahr', style }: Props) {
+  const _t = useT(); void _t;
   const [open, setOpen]         = useState(false);
   const [dropPos, setDropPos]   = useState<{ top: number; left: number; width: number } | null>(null);
   const triggerRef              = useRef<HTMLButtonElement>(null);

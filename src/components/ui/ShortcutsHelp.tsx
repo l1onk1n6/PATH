@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import type { Shortcut } from '../../hooks/useGlobalShortcuts';
+import { useT } from '../../lib/i18n';
 
 interface Props {
   shortcuts: Shortcut[];
@@ -22,6 +23,7 @@ function formatCombo(combo: string): string {
 }
 
 export default function ShortcutsHelp({ shortcuts, onClose }: Props) {
+  const t = useT();
   return (
     <div
       onClick={onClose}
@@ -38,7 +40,7 @@ export default function ShortcutsHelp({ shortcuts, onClose }: Props) {
         style={{ width: '100%', maxWidth: 460, padding: '24px 24px 18px' }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>Tastatur-Kürzel</h2>
+          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>{t('Tastatur-Kürzel')}</h2>
           <button
             onClick={onClose}
             style={{

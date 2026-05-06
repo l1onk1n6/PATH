@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { RotateCcw, X } from 'lucide-react';
 import { useUndoToast } from '../../lib/undoToast';
+import { useT } from '../../lib/i18n';
 
 export default function UndoToaster() {
+  const _t = useT(); void _t;
   const toasts   = useUndoToast(s => s.toasts);
   const dismiss  = useUndoToast(s => s.dismiss);
   const [, tick] = useState(0);

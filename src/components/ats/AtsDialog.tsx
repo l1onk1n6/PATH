@@ -3,12 +3,14 @@ import { X, BarChart2, CheckCircle, AlertCircle, Loader2, Sparkles } from 'lucid
 import { useResumeStore } from '../../store/resumeStore';
 import { analyzeAts, type AtsAnalysis } from '../../lib/atsAnalyzer';
 import { displayPersonName } from '../../lib/displayName';
+import { useT } from '../../lib/i18n';
 
 interface Props {
   onClose: () => void;
 }
 
 export default function AtsDialog({ onClose }: Props) {
+  const t = useT();
   const { getActiveResume, getActivePerson } = useResumeStore();
   const resume = getActiveResume();
   const person = getActivePerson();
@@ -49,7 +51,7 @@ export default function AtsDialog({ onClose }: Props) {
               <BarChart2 size={18} style={{ color: 'var(--ios-blue)' }} />
             </div>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 700 }}>ATS-Score</div>
+              <div style={{ fontSize: 16, fontWeight: 700 }}>{t('ATS-Score')}</div>
               <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.5)', marginTop: 2 }}>
                 {personName} · {resume?.name || 'Bewerbungsmappe'}
               </div>

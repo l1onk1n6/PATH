@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { shareLink } from '../../lib/shareLink';
+import { useT } from '../../lib/i18n';
 
 function relativeTime(iso: string): string {
   const diff = Math.max(0, Date.now() - new Date(iso).getTime());
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export default function ShareModal({ resumeId, token, onClose }: Props) {
+  const t = useT();
   const { setShareToken, resumes } = useResumeStore();
   const { limits } = usePlan();
   const [copied, setCopied] = useState(false);
@@ -61,7 +63,7 @@ export default function ShareModal({ resumeId, token, onClose }: Props) {
         style={{ padding: 20, width: 340, maxWidth: '90vw', zIndex: 9001, background: 'rgba(14,14,22,0.97)' }}
         onClick={(e) => e.stopPropagation()}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-          <div style={{ fontWeight: 700, fontSize: 15 }}>Lebenslauf teilen</div>
+          <div style={{ fontWeight: 700, fontSize: 15 }}>{t('Lebenslauf teilen')}</div>
           <button className="btn-glass btn-icon" onClick={onClose} style={{ padding: 5 }}>
             <X size={14} />
           </button>

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { searchSkills, type SkillSuggestion } from '../../lib/skillsLibrary';
+import { useT } from '../../lib/i18n';
 
 interface Props {
   value: string;
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export default function SkillNameInput({ value, onChange, onPick, placeholder, maxLength, style, className = 'input-glass' }: Props) {
+  const _t = useT(); void _t;
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null);
