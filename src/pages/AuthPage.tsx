@@ -154,7 +154,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
                 }}
                 style={{ width: '100%', justifyContent: 'center', padding: '11px 20px', marginBottom: 12, gap: 6, opacity: loading ? 0.7 : 1 }}
               >
-                <RefreshCw size={13} /> E-Mail erneut senden
+                <RefreshCw size={14} /> E-Mail erneut senden
               </button>
             )}
             {error && (
@@ -171,16 +171,18 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
         {/* ── Login / Register tabs ── */}
         {!emailUnconfirmed && (mode === 'login' || mode === 'register') && (
           <>
-            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.06)', borderRadius: 'var(--radius-full)', padding: 3, marginBottom: 16 }}>
+            <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 18 }}>
               {(['login', 'register'] as const).map((m) => (
                 <button key={m} onClick={() => switchMode(m)} style={{
-                  flex: 1, borderRadius: 'var(--radius-full)', padding: '9px 0',
-                  background: mode === m ? 'rgba(255,255,255,0.14)' : 'transparent',
+                  flex: 1, padding: '10px 0',
+                  background: 'transparent',
                   border: 'none', fontSize: 14, fontWeight: mode === m ? 600 : 400,
-                  color: mode === m ? '#fff' : 'rgba(255,255,255,0.5)',
+                  color: mode === m ? '#fff' : 'rgba(255,255,255,0.45)',
                   cursor: 'pointer', fontFamily: 'var(--font-sf)',
-                  transition: 'all 0.2s', whiteSpace: 'nowrap', overflow: 'hidden',
-                  boxShadow: mode === m ? '0 1px 4px rgba(0,0,0,0.2)' : 'none',
+                  transition: 'color 150ms ease-out',
+                  whiteSpace: 'nowrap',
+                  borderBottom: mode === m ? '2px solid var(--ios-blue)' : '2px solid transparent',
+                  marginBottom: -1,
                 }}>
                   {m === 'login' ? 'Anmelden' : 'Registrieren'}
                 </button>
@@ -278,7 +280,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
                   className="btn-glass"
                   style={{ width: '100%', justifyContent: 'center', padding: '11px 20px', gap: 6, fontSize: 13 }}
                 >
-                  <Zap size={13} /> Mit Magic Link anmelden
+                  <Zap size={14} /> Mit Magic Link anmelden
                 </button>
               </>
             )}
@@ -370,7 +372,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
 
                 <button type="submit" className="btn-glass btn-primary" disabled={loading}
                   style={{ width: '100%', justifyContent: 'center', padding: '13px 20px', gap: 6, opacity: loading ? 0.7 : 1 }}>
-                  <Zap size={13} /> {loading ? 'Wird gesendet…' : 'Magic Link senden'}
+                  <Zap size={14} /> {loading ? 'Wird gesendet…' : 'Magic Link senden'}
                 </button>
               </form>
             )}

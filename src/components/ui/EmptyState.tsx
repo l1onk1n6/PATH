@@ -55,7 +55,7 @@ export default function EmptyState({
         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
           {ctaLabel && onCta && (
             <button className="btn-glass btn-primary btn-sm" onClick={onCta} style={{ padding: '8px 16px' }}>
-              <Plus size={13} /> {ctaLabel}
+              <Plus size={14} /> {ctaLabel}
             </button>
           )}
           {secondaryCtaLabel && onSecondaryCta && (

@@ -128,7 +128,7 @@ export function CustomSelect({ value, onChange, options, style, placeholder = 'A
             }}
           >
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{opt.label}</span>
-            {isSelected && <Check size={13} style={{ flexShrink: 0, color: '#007AFF' }} />}
+            {isSelected && <Check size={14} style={{ flexShrink: 0, color: '#007AFF' }} />}
           </div>
         );
       })}

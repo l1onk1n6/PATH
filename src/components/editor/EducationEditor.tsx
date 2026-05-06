@@ -31,7 +31,7 @@ export default function EducationEditor() {
           )}
         </div>
         <button className="btn-glass btn-primary btn-sm" onClick={() => addEducation(resume.id)}>
-          <Plus size={13} /> Hinzufügen
+          <Plus size={14} /> Hinzufügen
         </button>
       </div>
 

@@ -208,7 +208,7 @@ export default function OnboardingModal({ onClose }: Props) {
             {/* Sample data card */}
             <div style={{ background: 'rgba(0,122,255,0.08)', border: '1px solid rgba(0,122,255,0.2)', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                <Wand2 size={13} style={{ color: 'var(--ios-blue)', flexShrink: 0 }} />
+                <Wand2 size={14} style={{ color: 'var(--ios-blue)', flexShrink: 0 }} />
                 <span style={{ fontSize: 13, fontWeight: 600 }}>Mit Beispieldaten starten</span>
               </div>
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: '0 0 12px', lineHeight: 1.5 }}>
@@ -216,13 +216,13 @@ export default function OnboardingModal({ onClose }: Props) {
               </p>
               <button className="btn-glass btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '11px', fontWeight: 700, fontSize: 13, gap: 7 }}
                 onClick={() => finish(true)}>
-                <Wand2 size={13} /> Beispieldaten laden & starten
+                <Wand2 size={14} /> Beispieldaten laden & starten
               </button>
             </div>
 
             <button className="btn-glass" style={{ width: '100%', justifyContent: 'center', padding: '11px', gap: 7, fontSize: 13 }}
               onClick={() => finish(false)}>
-              <Check size={13} /> Ohne Beispieldaten starten
+              <Check size={14} /> Ohne Beispieldaten starten
             </button>
 
             <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 12, fontFamily: 'var(--font-sf)', width: '100%' }}>

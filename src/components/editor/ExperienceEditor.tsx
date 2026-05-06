@@ -31,7 +31,7 @@ export default function ExperienceEditor() {
           )}
         </div>
         <button className="btn-glass btn-primary btn-sm" onClick={() => addWorkExperience(resume.id)}>
-          <Plus size={13} /> Hinzufügen
+          <Plus size={14} /> Hinzufügen
         </button>
       </div>
 

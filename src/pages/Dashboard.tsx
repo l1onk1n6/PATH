@@ -51,7 +51,7 @@ function AtsButton() {
         style={{ gap: 5, position: 'relative', opacity: (isPro && noResume) ? 0.5 : 1 }}
         title={noResume ? 'Erst eine Mappe auswählen' : 'ATS-Score prüfen'}
       >
-        <BarChart2 size={13} /> ATS
+        <BarChart2 size={14} /> ATS
         {!isPro && (
           <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 4px', borderRadius: 3, background: 'linear-gradient(135deg, #FF9F0A, #FF375F)', color: '#fff', marginLeft: 2 }}>PRO</span>
         )}
@@ -315,10 +315,10 @@ export default function Dashboard() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 8, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <button className="btn-glass btn-sm" style={{ background: 'rgba(0,122,255,0.2)', border: '1px solid rgba(0,122,255,0.4)' }}>
-            <List size={13} /> Liste
+            <List size={14} /> Liste
           </button>
           <button className="btn-glass btn-sm" onClick={() => navigate('/tracker')}>
-            <ClipboardList size={13} /> Tracker
+            <ClipboardList size={14} /> Tracker
           </button>
           <AtsButton />
         </div>
@@ -339,7 +339,7 @@ export default function Dashboard() {
           {/* Search bar */}
           {persons.length > 1 && (
             <div style={{ position: 'relative', marginBottom: 12 }}>
-              <Search size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', opacity: 0.4, pointerEvents: 'none' }} />
+              <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', opacity: 0.4, pointerEvents: 'none' }} />
               <input
                 className="input-glass"
                 placeholder="Personen oder Mappen suchen…"
@@ -553,7 +553,7 @@ export default function Dashboard() {
                               {!frozen && r.deadline && (
                                 <div style={{ display: 'flex', gap: 8, marginTop: 3, alignItems: 'center' }}>
                                   <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, color: deadlineColor }}>
-                                    <Clock size={11} />
+                                    <Clock size={12} />
                                     {deadlineDiff! < 0 ? 'Abgelaufen' : `${Math.ceil(deadlineDiff!)} Tage`}
                                   </span>
                                 </div>
@@ -627,18 +627,18 @@ export default function Dashboard() {
                   <div style={{ display: 'flex', gap: 8 }}>
                     {isPersonFrozen ? (
                       <button className="btn-glass btn-sm" style={{ flex: 1, opacity: 0.5, cursor: 'not-allowed', color: '#FF9F0A' }} disabled>
-                        <Lock size={13} /> Eingefroren
+                        <Lock size={14} /> Eingefroren
                       </button>
                     ) : (
                       <button className="btn-glass btn-primary btn-sm" style={{ flex: 1 }}
                         onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); navigate('/editor'); }}>
-                        <Edit3 size={13} /> Bearbeiten
+                        <Edit3 size={14} /> Bearbeiten
                       </button>
                     )}
                     {!isPersonFrozen && (
                       <button className="btn-glass btn-sm"
                         onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); navigate('/preview'); }}>
-                        <Eye size={13} /> {!isMobile && 'Vorschau'}
+                        <Eye size={14} /> {!isMobile && 'Vorschau'}
                       </button>
                     )}
                     <button className="btn-glass btn-danger btn-icon"

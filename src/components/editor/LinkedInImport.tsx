@@ -196,7 +196,7 @@ export default function LinkedInImportDialog({ onClose }: Props) {
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
               <button className="btn-glass" onClick={onClose} style={{ fontSize: 13 }}>Abbrechen</button>
               <button className="btn-glass btn-primary" onClick={handleParse} disabled={!text.trim() || loading} style={{ fontSize: 13, gap: 6 }}>
-                {loading ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> KI analysiert…</> : 'Importieren'}
+                {loading ? <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> KI analysiert…</> : 'Importieren'}
               </button>
             </div>
           </>
@@ -254,7 +254,7 @@ export default function LinkedInImportDialog({ onClose }: Props) {
               <button className="btn-glass" onClick={() => setStep(1)} style={{ fontSize: 13 }}>Zurück</button>
               <button className="btn-glass" onClick={onClose} style={{ fontSize: 13 }}>Abbrechen</button>
               <button className="btn-glass btn-primary" onClick={handleApply} disabled={done} style={{ fontSize: 13, gap: 6 }}>
-                {done ? <><Check size={13} /> Übernommen!</> : 'Übernehmen'}
+                {done ? <><Check size={14} /> Übernommen!</> : 'Übernehmen'}
               </button>
             </div>
           </>

@@ -98,7 +98,7 @@ export default function CustomSectionEditor() {
                     }}
                     style={{ padding: 6, marginTop: 2, flexShrink: 0, opacity: 0.5 }}
                   >
-                    <X size={13} />
+                    <X size={14} />
                   </button>
                 )}
               </div>
