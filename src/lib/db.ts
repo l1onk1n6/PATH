@@ -302,6 +302,8 @@ function rowToResume(row: Record<string, unknown>): Resume {
     documents: [],
     customSections: (row.custom_sections as Resume['customSections']) ?? [],
     shareToken: (row.share_token as string) ?? undefined,
+    shareViews: typeof row.share_views === 'number' ? row.share_views : undefined,
+    lastViewedAt: (row.last_viewed_at as string) ?? undefined,
     reminderDays: (row.reminder_days as number[]) ?? [],
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
@@ -320,6 +322,13 @@ export async function fetchSharedResume(token: string): Promise<Resume | null> {
       .maybeSingle();
     if (error || !data) return null;
     const resume = rowToResume(data as Record<string, unknown>);
+
+    // Aufruf-Zaehler erhoehen — fire-and-forget, nicht blockierend.
+    // RPC ist SECURITY DEFINER und damit auch fuer anon-Besucher erlaubt.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (sb() as any).rpc('increment_share_view', { token }).then(({ error: rpcErr }: { error: unknown }) => {
+      if (rpcErr) console.warn('[db] increment_share_view', rpcErr);
+    });
 
     // Dokumente des geteilten Resumes zusaetzlich laden (RLS erlaubt SELECT
     // fuer Docs deren Resume einen share_token hat).
