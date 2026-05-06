@@ -6,6 +6,7 @@ import EmptyState from '../ui/EmptyState';
 import SkillNameInput from '../ui/SkillNameInput';
 import { useUndoToast } from '../../lib/undoToast';
 import type { Language } from '../../types/resume';
+import { useT } from '../../lib/i18n';
 
 const SKILL_LEVELS = [1, 2, 3, 4, 5];
 const LEVEL_LABELS = ['Grundlagen', 'Grundkenntnisse', 'Fortgeschritten', 'Fachkundig', 'Experte'];
@@ -14,6 +15,7 @@ const LEVEL_COLORS = ['#FF3B30', '#FF9500', '#FFCC00', '#34C759', '#007AFF'];
 const LANG_LEVELS: Language['level'][] = ['Grundkenntnisse', 'Fortgeschritten', 'Fließend', 'Muttersprache'];
 
 export default function SkillsEditor() {
+  const t = useT();
   const {
     getActiveResume,
     addSkill, updateSkill, removeSkill, reorderSkills,
@@ -57,8 +59,8 @@ export default function SkillsEditor() {
         {skills.length > 0 && (
           <div style={{ display: 'flex', gap: 10, paddingLeft: isMobile ? 32 : 22, paddingRight: 38, marginBottom: 4 }}>
             <span style={{ flex: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>Fähigkeit</span>
-            <span style={{ flex: 1, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>Kategorie</span>
-            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)', minWidth: 114 }}>Niveau</span>
+            <span style={{ flex: 1, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>{t('Kategorie')}</span>
+            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)', minWidth: 114 }}>{t('Niveau')}</span>
           </div>
         )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -94,7 +96,7 @@ export default function SkillsEditor() {
                   <GripVertical size={14} style={{ opacity: 0.3, flexShrink: 0, cursor: 'grab' }} />
                 )}
                 <SkillNameInput
-                  placeholder="Fähigkeit (z.B. React, Python...)"
+                  placeholder={t('Fähigkeit (z.B. React, Python...)')}
                   value={skill.name} maxLength={80}
                   onChange={(name) => updateSkill(resume.id, skill.id, { name })}
                   onPick={(s) => updateSkill(resume.id, skill.id, { name: s.name, category: skill.category || s.category })}
@@ -102,7 +104,7 @@ export default function SkillsEditor() {
                 />
                 <input
                   className="input-glass"
-                  placeholder="Kategorie"
+                  placeholder={t('Kategorie')}
                   value={skill.category} maxLength={50}
                   onChange={(e) => updateSkill(resume.id, skill.id, { category: e.target.value })}
                   style={{ flex: 1, fontSize: 13, padding: '8px 10px' }}
@@ -162,7 +164,7 @@ export default function SkillsEditor() {
         {languages.length > 0 && (
           <div style={{ display: 'flex', gap: 10, paddingLeft: isMobile ? 32 : 22, paddingRight: 38, marginBottom: 4 }}>
             <span style={{ flex: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>Sprache</span>
-            <span style={{ flex: 1, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>Niveau</span>
+            <span style={{ flex: 1, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>{t('Niveau')}</span>
             <span style={{ width: 166, flexShrink: 0 }} />
           </div>
         )}

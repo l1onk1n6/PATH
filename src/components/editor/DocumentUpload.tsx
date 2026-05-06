@@ -5,6 +5,7 @@ import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import type { UploadedDocument } from '../../types/resume';
+import { useT } from '../../lib/i18n';
 
 const CATEGORIES: { value: UploadedDocument['category']; label: string }[] = [
   { value: 'certificate', label: 'Zertifikat' },
@@ -28,6 +29,7 @@ const MAX_FILE_MB = 10;
 const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
 
 export default function DocumentUpload() {
+  const _t = useT(); void _t;
   const { getActiveResume, uploadDocument, removeDocument, updateDocumentCategory, reorderDocuments, resumes } = useResumeStore();
   const resume = getActiveResume();
   const { limits } = usePlan();

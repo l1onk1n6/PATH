@@ -6,8 +6,10 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 import EmptyState from '../ui/EmptyState';
 import { useUndoToast } from '../../lib/undoToast';
 import { sortWorkExperience } from '../../lib/sortByDate';
+import { useT } from '../../lib/i18n';
 
 export default function ExperienceEditor() {
+  const t = useT();
   const { getActiveResume, addWorkExperience, updateWorkExperience, removeWorkExperience, restoreItemAt } = useResumeStore();
   const showUndo = useUndoToast(s => s.show);
   const resume = getActiveResume();
@@ -95,18 +97,18 @@ export default function ExperienceEditor() {
             <div style={{ marginTop: 14 }}>
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10, marginBottom: 10 }}>
                 <div>
-                  <label className="section-label">Position</label>
-                  <input className="input-glass" placeholder="z.B. Senior Developer" value={job.position} maxLength={150}
+                  <label className="section-label">{t('Position')}</label>
+                  <input className="input-glass" placeholder={t('z.B. Senior Developer')} value={job.position} maxLength={150}
                     onChange={(e) => updateWorkExperience(resume.id, job.id, { position: e.target.value })} />
                 </div>
                 <div>
                   <label className="section-label">Unternehmen</label>
-                  <input className="input-glass" placeholder="z.B. Tech GmbH" value={job.company} maxLength={150}
+                  <input className="input-glass" placeholder={t('z.B. Tech GmbH')} value={job.company} maxLength={150}
                     onChange={(e) => updateWorkExperience(resume.id, job.id, { company: e.target.value })} />
                 </div>
                 <div>
-                  <label className="section-label">Standort</label>
-                  <input className="input-glass" placeholder="Berlin" value={job.location} maxLength={100}
+                  <label className="section-label">{t('Standort')}</label>
+                  <input className="input-glass" placeholder={t('Berlin')} value={job.location} maxLength={100}
                     onChange={(e) => updateWorkExperience(resume.id, job.id, { location: e.target.value })} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 18 }}>
@@ -117,11 +119,11 @@ export default function ExperienceEditor() {
                   </label>
                 </div>
                 <div>
-                  <label className="section-label">Von</label>
+                  <label className="section-label">{t('Von')}</label>
                   <MonthYearPicker value={job.startDate} onChange={(v) => updateWorkExperience(resume.id, job.id, { startDate: v })} />
                 </div>
                 <div>
-                  <label className="section-label">Bis</label>
+                  <label className="section-label">{t('Bis')}</label>
                   <MonthYearPicker value={job.endDate} disabled={job.current} onChange={(v) => updateWorkExperience(resume.id, job.id, { endDate: v })} />
                 </div>
               </div>
