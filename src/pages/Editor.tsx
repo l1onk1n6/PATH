@@ -11,6 +11,7 @@ import { useUIStore } from '../store/uiStore';
 import type { EditorSection } from '../types/resume';
 import type { LucideProps } from 'lucide-react';
 import { getSectionOrder, setSectionOrder, moveSection } from '../lib/sectionOrder';
+import { useT } from '../lib/i18n';
 import PersonalInfoEditor from '../components/editor/PersonalInfoEditor';
 import CoverLetterEditor from '../components/editor/CoverLetterEditor';
 import ExperienceEditor from '../components/editor/ExperienceEditor';
@@ -39,6 +40,7 @@ const SECTIONS: { id: EditorSection; label: string; short: string; icon: React.C
 export default function Editor() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const t = useT();
   const { getActiveResume, getActivePerson, activeSection, setActiveSection, resumes, renameResume } = useResumeStore();
   const { limits } = usePlan();
   const { showTranslate, setShowTranslate } = useUIStore();
@@ -161,7 +163,7 @@ export default function Editor() {
                 display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
               }}>
                 <Icon size={14} style={{ opacity: isActive ? 1 : 0.55 }} />
-                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, opacity: isActive ? 1 : 0.65 }}>{short}</span>
+                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, opacity: isActive ? 1 : 0.65 }}>{t(short)}</span>
               </button>
             );
           })}
@@ -203,7 +205,7 @@ export default function Editor() {
                   cursor: reordering ? 'default' : 'pointer',
                 }}>
                 <Icon size={14} style={{ opacity: active ? 1 : 0.65 }} />
-                <span style={{ fontSize: 13, fontWeight: active ? 600 : 500, opacity: active ? 1 : 0.78 }}>{label}</span>
+                <span style={{ fontSize: 13, fontWeight: active ? 600 : 500, opacity: active ? 1 : 0.78 }}>{t(label)}</span>
               </button>
               {reordering && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 1, flexShrink: 0 }}>
@@ -249,7 +251,7 @@ export default function Editor() {
             border: reordering ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
           }}>
           <ArrowUpDown size={14} style={{ opacity: reordering ? 1 : 0.65 }} />
-          <span style={{ fontSize: 13, opacity: 0.78 }}>{reordering ? 'Fertig' : 'Reihenfolge'}</span>
+          <span style={{ fontSize: 13, opacity: 0.78 }}>{reordering ? t('Fertig') : t('Reihenfolge')}</span>
         </button>
 
         {/* Übersetzen */}
@@ -257,7 +259,7 @@ export default function Editor() {
           onClick={() => setShowTranslate(true)}
           style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 10, padding: '8px 10px', marginBottom: 2, borderRadius: 'var(--radius-sm)', boxShadow: 'none', background: 'transparent', border: '1px solid transparent' }}>
           <Languages size={14} style={{ opacity: 0.65 }} />
-          <span style={{ fontSize: 13, opacity: 0.78 }}>Übersetzen</span>
+          <span style={{ fontSize: 13, opacity: 0.78 }}>{t('Übersetzen')}</span>
         </button>
 
         {/* Versionen (Pro) */}
@@ -271,13 +273,13 @@ export default function Editor() {
               border: activeSection === 'history' ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
             }}>
             <History size={14} style={{ opacity: activeSection === 'history' ? 1 : 0.65 }} />
-            <span style={{ fontSize: 13, opacity: 0.78 }}>Versionen</span>
+            <span style={{ fontSize: 13, opacity: 0.78 }}>{t('Versionen')}</span>
           </button>
         ) : (
           <button disabled className="btn-glass"
             style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 10, padding: '8px 10px', borderRadius: 'var(--radius-sm)', boxShadow: 'none', opacity: 0.4, cursor: 'not-allowed', background: 'transparent', border: '1px solid transparent' }}>
             <History size={14} />
-            <span style={{ fontSize: 13, flex: 1, textAlign: 'left' }}>Versionen</span>
+            <span style={{ fontSize: 13, flex: 1, textAlign: 'left' }}>{t('Versionen')}</span>
             <Lock size={12} />
           </button>
         )}
@@ -298,7 +300,7 @@ export default function Editor() {
                         <currentSection.icon size={15} />
                       </div>
                     )}
-                    <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{currentSection?.label}</h2>
+                    <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{currentSection ? t(currentSection.label) : ''}</h2>
                   </div>
                   <MappeRename
                     renaming={renaming}

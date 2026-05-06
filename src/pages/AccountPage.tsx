@@ -20,7 +20,7 @@ import { openExternal } from '../lib/openExternal';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 import { resetOnboarding } from '../lib/onboarding';
 import { getStoredTheme, setStoredTheme, type Theme as ThemeChoice } from '../lib/theme';
-import { useI18n } from '../lib/i18n';
+import { useI18n, useT } from '../lib/i18n';
 import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../store/uiStore';
 
@@ -536,6 +536,7 @@ function EmailChangeCard() {
 function LanguageCard() {
   const locale = useI18n(s => s.locale);
   const setLocale = useI18n(s => s.setLocale);
+  const t = useT();
 
   const options: { id: 'de' | 'en'; label: string }[] = [
     { id: 'de', label: 'Deutsch' },
@@ -544,7 +545,7 @@ function LanguageCard() {
 
   return (
     <div className="glass-card" style={{ padding: 20 }}>
-      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>SPRACHE</div>
+      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>{t('Sprache').toUpperCase()}</div>
       <div style={{ display: 'flex', gap: 6 }}>
         {options.map(opt => (
           <button
@@ -577,10 +578,11 @@ function LanguageCard() {
 
 function ThemeCard() {
   const [theme, setTheme] = useState<ThemeChoice>(() => getStoredTheme());
+  const t = useT();
 
-  function choose(t: ThemeChoice) {
-    setTheme(t);
-    setStoredTheme(t);
+  function choose(c: ThemeChoice) {
+    setTheme(c);
+    setStoredTheme(c);
   }
 
   const options: { id: ThemeChoice; label: string }[] = [
@@ -591,7 +593,7 @@ function ThemeCard() {
 
   return (
     <div className="glass-card" style={{ padding: 20 }}>
-      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>ERSCHEINUNGSBILD</div>
+      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>{t('Erscheinungsbild').toUpperCase()}</div>
       <div style={{ display: 'flex', gap: 6 }}>
         {options.map(opt => (
           <button
@@ -611,7 +613,7 @@ function ThemeCard() {
               transition: 'all 150ms ease-out',
             }}
           >
-            {opt.label}
+            {t(opt.label)}
           </button>
         ))}
       </div>
@@ -900,6 +902,7 @@ function PrivacySection() {
 export default function AccountPage() {
   const { accountSection: section, setAccountSection: setSection } = useUIStore();
   const isMobile = useIsMobile();
+  const t = useT();
 
   const renderSection = () => {
     switch (section) {
@@ -927,7 +930,7 @@ export default function AccountPage() {
                   border: isActive ? '1px solid rgba(0,122,255,0.45)' : '1px solid rgba(var(--rgb-fg),0.1)',
                 }}>
                 <Icon size={14} />
-                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400 }}>{label}</span>
+                <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400 }}>{t(label)}</span>
               </button>
             );
           })}
@@ -956,7 +959,7 @@ export default function AccountPage() {
                 border: active ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
               }}>
               <Icon size={14} />
-              <span style={{ fontSize: 13, fontWeight: active ? 600 : 500, opacity: active ? 1 : 0.78 }}>{label}</span>
+              <span style={{ fontSize: 13, fontWeight: active ? 600 : 500, opacity: active ? 1 : 0.78 }}>{t(label)}</span>
             </button>
           );
         })}
