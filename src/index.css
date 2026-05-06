@@ -17,10 +17,10 @@
 
   --font-sf: -apple-system, "SF Pro Display", "SF Pro Text", BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
 
-  --radius-sm: 12px;
-  --radius-md: 16px;
-  --radius-lg: 22px;
-  --radius-xl: 28px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
   --radius-full: 9999px;
 }
 
@@ -40,16 +40,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 15% 50%, rgba(88, 86, 214, 0.08) 0%, transparent 55%),
-    radial-gradient(ellipse at 85% 15%, rgba(0, 122, 255, 0.07) 0%, transparent 55%);
-  pointer-events: none;
-  z-index: 0;
-}
 
 #root {
   position: relative;
@@ -265,10 +255,10 @@ input[type="month"].input-glass::-webkit-calendar-picker-indicator:hover {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
-.animate-slide-left { animation: slideInLeft 0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
-.animate-scale-in { animation: scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
-.animate-slide-up { animation: slideUp 0.28s cubic-bezier(0.34,1.56,0.64,1) both; }
+.animate-fade-in { animation: fadeIn 0.25s ease-out both; }
+.animate-slide-left { animation: slideInLeft 0.22s ease-out both; }
+.animate-scale-in { animation: scaleIn 0.2s ease-out both; }
+.animate-slide-up { animation: slideUp 0.2s ease-out both; }
 .animate-section-in { animation: sectionIn 0.22s ease-out both; }
 
 /* ─── Misc ─── */

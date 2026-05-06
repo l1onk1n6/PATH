@@ -290,7 +290,7 @@ export default function CoverLetterEditor() {
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
         <div>
           <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
-            <Link size={11} /> Stellenausschreibung URL
+            <Link size={12} /> Stellenausschreibung URL
           </label>
           <input
             className="input-glass"
@@ -302,7 +302,7 @@ export default function CoverLetterEditor() {
         </div>
         <div>
           <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
-            <Calendar size={11} /> Bewerbungsfrist
+            <Calendar size={12} /> Bewerbungsfrist
           </label>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
             <input
@@ -319,7 +319,7 @@ export default function CoverLetterEditor() {
                 title="Deadline-Reminder"
                 onClick={() => isPro ? setShowReminder(v => !v) : setShowUpgrade(true)}
               >
-                {(resume.reminderDays?.length ?? 0) > 0 ? <Bell size={13} /> : <BellOff size={13} />}
+                {(resume.reminderDays?.length ?? 0) > 0 ? <Bell size={14} /> : <BellOff size={14} />}
               </button>
             </ProGate>
           </div>
@@ -366,8 +366,8 @@ export default function CoverLetterEditor() {
               style={{ fontSize: 11, gap: 5, background: trackerAdded ? 'rgba(52,199,89,0.15)' : undefined, border: trackerAdded ? '1px solid rgba(52,199,89,0.3)' : undefined, color: trackerAdded ? '#34C759' : undefined }}
             >
               {trackerAdded
-                ? <><Check size={11} /> Hinzugefügt</>
-                : <><ClipboardList size={11} /> Zu Tracker</>}
+                ? <><Check size={12} /> Hinzugefügt</>
+                : <><ClipboardList size={12} /> Zu Tracker</>}
             </button>
           )}
         </div>
@@ -500,8 +500,8 @@ export default function CoverLetterEditor() {
             title={!isPro ? 'Pro-Feature' : 'Text mit KI verbessern'}
           >
             {improvingBody
-              ? <><Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> Verbessert…</>
-              : <><Wand2 size={11} /> Verbessern{!isPro && ' ✦'}</>}
+              ? <><Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> Verbessert…</>
+              : <><Wand2 size={12} /> Verbessern{!isPro && ' ✦'}</>}
           </button>
         </div>
         <textarea

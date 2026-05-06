@@ -146,7 +146,7 @@ export default function Editor() {
                 border: isActive ? '1px solid rgba(0,122,255,0.45)' : '1px solid rgba(255,255,255,0.1)',
                 display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
               }}>
-                <Icon size={13} style={{ opacity: isActive ? 1 : 0.55 }} />
+                <Icon size={14} style={{ opacity: isActive ? 1 : 0.55 }} />
                 <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400, opacity: isActive ? 1 : 0.65 }}>{short}</span>
               </button>
             );
@@ -220,7 +220,7 @@ export default function Editor() {
             style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 10, padding: '8px 10px', borderRadius: 'var(--radius-sm)', boxShadow: 'none', opacity: 0.4, cursor: 'not-allowed', background: 'transparent', border: '1px solid transparent' }}>
             <History size={14} />
             <span style={{ fontSize: 13, flex: 1, textAlign: 'left' }}>Versionen</span>
-            <Lock size={11} />
+            <Lock size={12} />
           </button>
         )}
       </aside>
@@ -302,7 +302,7 @@ function MappeRename({ renaming, value, currentName, onValueChange, onStart, onC
       title="Bewerbungsmappe umbenennen"
       style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', maxWidth: '100%' }}
     >
-      <Pencil size={13} style={{ opacity: 0.6, flexShrink: 0 }} />
+      <Pencil size={14} style={{ opacity: 0.6, flexShrink: 0 }} />
       <span style={{ fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {currentName || 'Bewerbungsmappe'}
       </span>

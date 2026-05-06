@@ -133,7 +133,7 @@ export default function DocumentUpload() {
 
       {sizeError && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--ios-red)', marginBottom: 12 }}>
-          <AlertCircle size={13} /> {sizeError}
+          <AlertCircle size={14} /> {sizeError}
         </div>
       )}
 
@@ -167,11 +167,11 @@ export default function DocumentUpload() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flexShrink: 0 }}>
                   <button className="btn-glass btn-icon" disabled={i === 0} onClick={() => reorderDocuments(resume.id, i, i - 1)}
                     style={{ padding: 3, opacity: i === 0 ? 0.2 : 0.6, boxShadow: 'none', background: 'transparent', border: 'none' }}>
-                    <ChevronUp size={13} />
+                    <ChevronUp size={14} />
                   </button>
                   <button className="btn-glass btn-icon" disabled={i === documents.length - 1} onClick={() => reorderDocuments(resume.id, i, i + 1)}
                     style={{ padding: 3, opacity: i === documents.length - 1 ? 0.2 : 0.6, boxShadow: 'none', background: 'transparent', border: 'none' }}>
-                    <ChevronDown size={13} />
+                    <ChevronDown size={14} />
                   </button>
                 </div>
               ) : (
@@ -213,7 +213,7 @@ export default function DocumentUpload() {
                 style={{ padding: 7, color: '#fff', display: 'flex', alignItems: 'center' }}
                 title="Herunterladen"
               >
-                <ExternalLink size={13} />
+                <ExternalLink size={14} />
               </a>
 
               <button
@@ -222,7 +222,7 @@ export default function DocumentUpload() {
                 style={{ padding: 7 }}
                 title="Entfernen"
               >
-                <Trash2 size={13} />
+                <Trash2 size={14} />
               </button>
             </div>
           </div>

@@ -220,7 +220,7 @@ function PlanSection() {
                 }}
                 title="Kündigung läuft über das Abo-Portal"
               >
-                <XCircle size={11} /> Abo kündigen
+                <XCircle size={12} /> Abo kündigen
               </button>
             </div>
           ) : !isPro ? (
@@ -240,7 +240,7 @@ function PlanSection() {
         </div>
         {portalError && (
           <div style={{ marginTop: 10, fontSize: 12, color: 'var(--ios-red)', display: 'flex', alignItems: 'flex-start', gap: 6 }}>
-            <AlertTriangle size={13} style={{ flexShrink: 0, marginTop: 1 }} /> {portalError}
+            <AlertTriangle size={14} style={{ flexShrink: 0, marginTop: 1 }} /> {portalError}
           </div>
         )}
 
@@ -428,8 +428,8 @@ function ProfileCard() {
         </div>
         <button className="btn-glass btn-sm btn-primary" onClick={handleSave}
           disabled={saving} style={{ alignSelf: 'flex-end', gap: 6, marginTop: 4 }}>
-          {saving ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> :
-           saved  ? <CheckCircle size={13} style={{ color: '#34c759' }} /> : null}
+          {saving ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> :
+           saved  ? <CheckCircle size={14} style={{ color: '#34c759' }} /> : null}
           {saved ? 'Gespeichert' : 'Speichern'}
         </button>
       </div>
@@ -510,7 +510,7 @@ function EmailChangeCard() {
               disabled={loading || !newEmail.trim() || newEmail.trim().toLowerCase() === (user?.email ?? '').toLowerCase()}
               style={{ gap: 6 }}
             >
-              <Mail size={13} /> {loading ? 'Wird gesendet…' : 'Bestätigung senden'}
+              <Mail size={14} /> {loading ? 'Wird gesendet…' : 'Bestätigung senden'}
             </button>
             <button type="button" className="btn-glass btn-sm" onClick={cancel} disabled={loading}>
               Abbrechen
@@ -523,7 +523,7 @@ function EmailChangeCard() {
             {user?.email ?? '—'}
           </span>
           <button className="btn-glass btn-sm" onClick={startEdit} style={{ gap: 6, flexShrink: 0 }}>
-            <Mail size={13} /> Ändern
+            <Mail size={14} /> Ändern
           </button>
         </div>
       )}
@@ -572,14 +572,14 @@ function AccountSection() {
           onClick={() => { resetOnboarding(); navigate('/'); }}
           style={{ gap: 6 }}
         >
-          <PlayCircle size={13} /> Tour neu starten
+          <PlayCircle size={14} /> Tour neu starten
         </button>
       </div>
 
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>SUPPORT</div>
         <a href="mailto:info@pixmatic.ch" className="btn-glass" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, textDecoration: 'none', fontSize: 13, padding: '8px 14px' }}>
-          <Mail size={13} /> info@pixmatic.ch
+          <Mail size={14} /> info@pixmatic.ch
         </a>
       </div>
 
@@ -590,7 +590,7 @@ function AccountSection() {
           onClick={() => signOut()}
           style={{ gap: 6 }}
         >
-          <LogOut size={13} /> Abmelden
+          <LogOut size={14} /> Abmelden
         </button>
       </div>
     </div>
@@ -621,7 +621,7 @@ function SecuritySection() {
           </div>
         ) : (
           <button className="btn-glass btn-sm" onClick={handleReset} disabled={loading} style={{ gap: 6 }}>
-            <KeyRound size={13} /> Passwort zurücksetzen
+            <KeyRound size={14} /> Passwort zurücksetzen
           </button>
         )}
       </div>
@@ -704,8 +704,8 @@ function ReferralSection() {
           </div>
           <button className="btn-glass btn-sm" onClick={copyLink} style={{ gap: 6, flexShrink: 0 }}>
             {copied
-              ? <Check size={13} style={{ color: 'var(--ios-green)' }} />
-              : <Copy size={13} />}
+              ? <Check size={14} style={{ color: 'var(--ios-green)' }} />
+              : <Copy size={14} />}
             {copied ? 'Kopiert!' : 'Kopieren'}
           </button>
         </div>
@@ -757,7 +757,7 @@ function PrivacySection() {
               className="btn-glass"
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', fontSize: 13, width: '100%', textAlign: 'left' }}>
               {label}
-              <ExternalLink size={13} style={{ opacity: 0.5 }} />
+              <ExternalLink size={14} style={{ opacity: 0.5 }} />
             </button>
           ))}
         </div>
@@ -780,14 +780,14 @@ function PrivacySection() {
           Lade alle deine Daten als JSON-Datei herunter. Dokumentenanhänge (Base64) werden aus Datenschutzgründen nicht mitexportiert.
         </p>
         <button className="btn-glass btn-sm" onClick={exportGdprData} style={{ gap: 6 }}>
-          <Download size={13} /> Daten herunterladen
+          <Download size={14} /> Daten herunterladen
         </button>
       </div>
 
 
       <div className="glass-card" style={{ padding: 20, border: '1px solid rgba(255,59,48,0.2)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 600, marginBottom: 8, color: 'var(--ios-red)', opacity: 0.9 }}>
-          <AlertTriangle size={13} /> GEFAHRENZONE
+          <AlertTriangle size={14} /> GEFAHRENZONE
         </div>
         <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 12 }}>
           Zum Löschen deines Kontos kontaktiere uns bitte direkt — wir entfernen alle Daten innerhalb von 30 Tagen.
@@ -797,7 +797,7 @@ function PrivacySection() {
           className="btn-glass btn-danger"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 8, textDecoration: 'none', fontSize: 13, padding: '8px 14px' }}
         >
-          <Trash2 size={13} /> Konto löschen anfragen
+          <Trash2 size={14} /> Konto löschen anfragen
         </a>
       </div>
     </div>
@@ -834,7 +834,7 @@ export default function AccountPage() {
                   background: isActive ? 'linear-gradient(135deg, rgba(0,122,255,0.3), rgba(88,86,214,0.25))' : 'rgba(255,255,255,0.07)',
                   border: isActive ? '1px solid rgba(0,122,255,0.45)' : '1px solid rgba(255,255,255,0.1)',
                 }}>
-                <Icon size={13} />
+                <Icon size={14} />
                 <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400 }}>{label}</span>
               </button>
             );

@@ -64,7 +64,7 @@ export default function UndoToaster() {
               aria-label="Schliessen"
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', padding: 4, display: 'flex' }}
             >
-              <X size={13} />
+              <X size={14} />
             </button>
             {/* Progress bar */}
             <div style={{

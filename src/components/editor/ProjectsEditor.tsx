@@ -47,7 +47,7 @@ export default function ProjectsEditor() {
             Projekte ({projects.length})
           </div>
           <button className="btn-glass btn-primary btn-sm" onClick={() => addProject(resume.id)}>
-            <Plus size={13} /> Hinzufügen
+            <Plus size={14} /> Hinzufügen
           </button>
         </div>
 
@@ -80,7 +80,7 @@ export default function ProjectsEditor() {
                       onClick={() => reorderProjects(resume.id, i, i - 1)}
                       style={{ padding: 3, opacity: i === 0 ? 0.2 : 0.6, boxShadow: 'none', background: 'transparent', border: 'none' }}
                     >
-                      <ChevronUp size={13} />
+                      <ChevronUp size={14} />
                     </button>
                     <button
                       className="btn-glass btn-icon"
@@ -88,7 +88,7 @@ export default function ProjectsEditor() {
                       onClick={() => reorderProjects(resume.id, i, i + 1)}
                       style={{ padding: 3, opacity: i === projects.length - 1 ? 0.2 : 0.6, boxShadow: 'none', background: 'transparent', border: 'none' }}
                     >
-                      <ChevronDown size={13} />
+                      <ChevronDown size={14} />
                     </button>
                   </div>
                 ) : (
@@ -182,7 +182,7 @@ export default function ProjectsEditor() {
             Zertifikate ({certificates.length})
           </div>
           <button className="btn-glass btn-primary btn-sm" onClick={() => addCertificate(resume.id)}>
-            <Plus size={13} /> Hinzufügen
+            <Plus size={14} /> Hinzufügen
           </button>
         </div>
 
@@ -215,7 +215,7 @@ export default function ProjectsEditor() {
                       onClick={() => reorderCertificates(resume.id, i, i - 1)}
                       style={{ padding: 3, opacity: i === 0 ? 0.2 : 0.6, boxShadow: 'none', background: 'transparent', border: 'none' }}
                     >
-                      <ChevronUp size={13} />
+                      <ChevronUp size={14} />
                     </button>
                     <button
                       className="btn-glass btn-icon"
@@ -223,7 +223,7 @@ export default function ProjectsEditor() {
                       onClick={() => reorderCertificates(resume.id, i, i + 1)}
                       style={{ padding: 3, opacity: i === certificates.length - 1 ? 0.2 : 0.6, boxShadow: 'none', background: 'transparent', border: 'none' }}
                     >
-                      <ChevronDown size={13} />
+                      <ChevronDown size={14} />
                     </button>
                   </div>
                 ) : (

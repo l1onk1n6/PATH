@@ -172,7 +172,7 @@ export default function Preview() {
                 background: resume.accentColor,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Check size={11} color="#fff" strokeWidth={3} />
+                <Check size={12} color="#fff" strokeWidth={3} />
               </div>
             )}
           </div>

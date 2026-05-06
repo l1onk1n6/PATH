@@ -183,8 +183,8 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
                       style={{ fontSize: 11, gap: 4, background: 'rgba(0,122,255,0.2)', border: '1px solid rgba(0,122,255,0.4)' }}
                     >
                       {restoring === v.id
-                        ? <Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} />
-                        : <RotateCcw size={11} />}
+                        ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />
+                        : <RotateCcw size={12} />}
                       Bestätigen
                     </button>
                     <button className="btn-glass btn-sm" onClick={() => setConfirmId(null)} style={{ fontSize: 11 }}>
@@ -199,7 +199,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
                       title="Wiederherstellen"
                       style={{ padding: '6px 8px' }}
                     >
-                      <RotateCcw size={13} />
+                      <RotateCcw size={14} />
                     </button>
                     <button
                       className="btn-glass btn-sm btn-danger"
@@ -207,7 +207,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
                       title="Löschen"
                       style={{ padding: '6px 8px' }}
                     >
-                      <Trash2 size={13} />
+                      <Trash2 size={14} />
                     </button>
                   </>
                 )}

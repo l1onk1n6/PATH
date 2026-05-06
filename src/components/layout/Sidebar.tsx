@@ -147,7 +147,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         {!isPro ? (
           <button onClick={() => setShowUpgrade(true)} className="btn-glass"
             style={{ width: '100%', justifyContent: 'center', padding: '8px 12px', background: 'linear-gradient(135deg, rgba(255,159,10,0.12), rgba(255,55,95,0.1))', border: '1px solid rgba(255,159,10,0.25)', boxShadow: 'none', fontSize: 12, gap: 7 }}>
-            <Sparkles size={13} style={{ color: '#FF9F0A' }} />
+            <Sparkles size={14} style={{ color: '#FF9F0A' }} />
             <span style={{ fontWeight: 600, color: '#FF9F0A' }}>Auf Pro upgraden</span>
           </button>
         ) : (
@@ -157,7 +157,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         )}
         <button className="btn-glass btn-sm" onClick={() => signOut()}
           style={{ width: '100%', justifyContent: 'center', padding: '8px 10px', boxShadow: 'none', fontSize: 12 }}>
-          <LogOut size={13} /> Abmelden
+          <LogOut size={14} /> Abmelden
         </button>
       </div>
     </aside>
@@ -420,7 +420,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
                             title="Mappe löschen"
                             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 5, opacity: 0.28, color: 'inherit', flexShrink: 0, display: 'flex' }}
                           >
-                            <Trash2 size={11} />
+                            <Trash2 size={12} />
                           </button>
                         )}
                       </div>
@@ -457,7 +457,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
                   cursor: 'pointer', color: 'rgba(255,255,255,0.5)', fontSize: 12, padding: '0 8px',
                 }}
               >
-                <Plus size={13} /> Neue Person
+                <Plus size={14} /> Neue Person
               </button>
             )}
 
@@ -473,7 +473,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
                 fontSize: 12, padding: '0 8px',
               }}
             >
-              <FilePlus size={13} /> Neue Mappe
+              <FilePlus size={14} /> Neue Mappe
             </button>
           </div>
         </div>

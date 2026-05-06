@@ -297,7 +297,7 @@ export default function LandingPage() {
             background: 'rgba(175,82,222,0.15)', border: '1px solid rgba(175,82,222,0.3)',
             color: '#CF9FFF', marginBottom: 28, letterSpacing: '0.04em',
           }}>
-            <Sparkles size={11} /> KI-gestützte Bewerbungsmappe
+            <Sparkles size={12} /> KI-gestützte Bewerbungsmappe
           </div>
 
           <h1 style={{
@@ -361,7 +361,7 @@ export default function LandingPage() {
           <div style={{ display: 'flex', gap: 20, marginTop: 28, flexWrap: 'wrap' }}>
             {['Kostenlos starten', 'Keine Kreditkarte nötig', 'DSGVO-konform'].map(t => (
               <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>
-                <Check size={13} style={{ color: '#34C759', flexShrink: 0 }} /> {t}
+                <Check size={14} style={{ color: '#34C759', flexShrink: 0 }} /> {t}
               </div>
             ))}
           </div>
@@ -447,7 +447,7 @@ export default function LandingPage() {
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 12, fontWeight: 700, padding: '5px 14px', borderRadius: 99, background: 'rgba(175,82,222,0.15)', border: '1px solid rgba(175,82,222,0.3)', color: '#CF9FFF', marginBottom: 20, letterSpacing: '0.06em' }}>
-              <Brain size={13} /> POWERED BY CLAUDE AI
+              <Brain size={14} /> POWERED BY CLAUDE AI
             </div>
             <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
               KI übernimmt die schwere Arbeit
@@ -609,7 +609,7 @@ export default function LandingPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', textAlign: 'left' }}>
                 {['Volle Offline-Unterstützung', 'Push-Erinnerungen für Deadlines', 'Native PDF-Speicherung'].map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
-                    <Check size={13} style={{ color: '#34C759', flexShrink: 0 }} /> {f}
+                    <Check size={14} style={{ color: '#34C759', flexShrink: 0 }} /> {f}
                   </div>
                 ))}
               </div>
@@ -643,7 +643,7 @@ export default function LandingPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', textAlign: 'left' }}>
                 {['Nahtlose iCloud-Synchronisation', 'Face ID & Touch ID Login', 'Apple Pencil Unterstützung'].map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
-                    <Check size={13} style={{ color: '#007AFF', flexShrink: 0 }} /> {f}
+                    <Check size={14} style={{ color: '#007AFF', flexShrink: 0 }} /> {f}
                   </div>
                 ))}
               </div>
@@ -955,10 +955,10 @@ function MockAppPreview() {
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 12,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Download size={13} style={{ color: '#007AFF' }} />
+            <Download size={14} style={{ color: '#007AFF' }} />
             <span>PDF exportieren</span>
           </div>
-          <ArrowRight size={13} style={{ color: 'rgba(255,255,255,0.4)' }} />
+          <ArrowRight size={14} style={{ color: 'rgba(255,255,255,0.4)' }} />
         </div>
       </div>
 
@@ -973,7 +973,7 @@ function MockAppPreview() {
         boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
         zIndex: 2,
       }}>
-        <Sparkles size={13} style={{ color: '#FF9F0A' }} />
+        <Sparkles size={14} style={{ color: '#FF9F0A' }} />
         KI-Assistent aktiv
       </div>
     </div>

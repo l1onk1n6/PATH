@@ -151,7 +151,7 @@ export default function MonthYearPicker({ value, onChange, disabled, placeholder
         <span style={{ color: displayText ? '#fff' : 'rgba(255,255,255,0.35)', fontSize: 14 }}>
           {displayText || placeholder}
         </span>
-        <ChevronDown size={13} style={{ opacity: 0.45, flexShrink: 0, transition: 'transform 0.15s', transform: open ? 'rotate(180deg)' : 'none' }} />
+        <ChevronDown size={14} style={{ opacity: 0.45, flexShrink: 0, transition: 'transform 0.15s', transform: open ? 'rotate(180deg)' : 'none' }} />
       </button>
 
       {dropdown}
