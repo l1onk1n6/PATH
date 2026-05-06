@@ -5,7 +5,7 @@ import {
   Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp,
   FolderPlus, Pencil, Copy, Search, ExternalLink, Clock,
   Share2, CheckCircle, List, X, BarChart2,
-  Lock, MoreHorizontal, ClipboardList,
+  Lock, MoreHorizontal, ClipboardList, CheckSquare, Square,
 } from 'lucide-react';
 
 function safeUrl(url: string) {
@@ -94,6 +94,8 @@ export default function Dashboard() {
   const [newName, setNewName] = useState('');
   const [showAdd, setShowAdd] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [bulkMode, setBulkMode] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [addingResumeForPersonId, setAddingResumeForPersonId] = useState<string | null>(null);
   const [newResumeName, setNewResumeName] = useState('');
 
@@ -158,8 +160,42 @@ export default function Dashboard() {
 
   const shareResume = shareModalResumeId ? resumes.find(r => r.id === shareModalResumeId) : null;
 
+  function bulkDelete() {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    if (!confirm(`${ids.length} Bewerbungsmappe${ids.length === 1 ? '' : 'n'} wirklich löschen?`)) return;
+    ids.forEach(id => deleteResume(id));
+    setSelected(new Set());
+    setBulkMode(false);
+  }
+
   return (
     <div className="animate-fade-in" style={{ height: '100%', overflow: 'auto', padding: isMobile ? '0 0 16px' : undefined }}>
+
+      {/* Bulk-Aktion-Bar */}
+      {bulkMode && selected.size > 0 && (
+        <div style={{
+          position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 300, padding: '10px 14px', borderRadius: 14,
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-strong)',
+          boxShadow: 'var(--shadow-card-hover)',
+          display: 'flex', alignItems: 'center', gap: 12,
+          fontSize: 13,
+        }}>
+          <span style={{ fontWeight: 600 }}>{selected.size} ausgewählt</span>
+          <button className="btn-glass btn-sm btn-danger" onClick={bulkDelete} style={{ gap: 6 }}>
+            <Trash2 size={14} /> Löschen
+          </button>
+          <button
+            className="btn-glass btn-sm"
+            onClick={() => { setSelected(new Set()); setBulkMode(false); }}
+            style={{ gap: 6 }}
+          >
+            <X size={14} /> Abbrechen
+          </button>
+        </div>
+      )}
 
       {/* Limit error toast */}
       {limitError && (
@@ -323,6 +359,14 @@ export default function Dashboard() {
           <AtsButton />
         </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <button
+            className="btn-glass btn-sm"
+            onClick={() => { setBulkMode(v => !v); setSelected(new Set()); }}
+            title="Mehrere Mappen auswählen"
+            style={bulkMode ? { background: 'rgba(0,122,255,0.18)', border: '1px solid rgba(0,122,255,0.4)' } : undefined}
+          >
+            {bulkMode ? <CheckSquare size={14} /> : <Square size={14} />} {!isMobile && 'Auswählen'}
+          </button>
           <button
             className="btn-glass btn-primary btn-sm"
             style={{ flexShrink: 0, opacity: persons.length >= limits.persons ? 0.5 : 1 }}
@@ -511,30 +555,46 @@ export default function Dashboard() {
                         );
                       }
 
+                      const isSelected = selected.has(r.id);
                       return (
                         <div key={r.id} style={{
                           padding: '9px 12px', borderRadius: 10, fontSize: 14,
                           border: frozen
                             ? '1px solid rgba(255,159,10,0.25)'
-                            : `1px solid ${isActiveResume ? 'rgba(0,122,255,0.5)' : 'rgba(var(--rgb-fg),0.1)'}`,
+                            : `1px solid ${(bulkMode && isSelected) ? 'rgba(0,122,255,0.55)' : isActiveResume ? 'rgba(0,122,255,0.5)' : 'rgba(var(--rgb-fg),0.1)'}`,
                           background: frozen
                             ? 'rgba(255,159,10,0.05)'
-                            : isActiveResume ? 'rgba(0,122,255,0.12)' : 'rgba(var(--rgb-fg),0.05)',
+                            : (bulkMode && isSelected) ? 'rgba(0,122,255,0.16)' : isActiveResume ? 'rgba(0,122,255,0.12)' : 'rgba(var(--rgb-fg),0.05)',
                           cursor: frozen ? 'default' : 'pointer',
                           opacity: frozen ? 0.7 : 1,
                         }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (!frozen && !isPersonFrozen) { setActivePerson(person.id); setActiveResume(r.id); }
+                            if (frozen || isPersonFrozen) return;
+                            if (bulkMode) {
+                              setSelected(prev => {
+                                const next = new Set(prev);
+                                if (next.has(r.id)) next.delete(r.id);
+                                else next.add(r.id);
+                                return next;
+                              });
+                              return;
+                            }
+                            setActivePerson(person.id); setActiveResume(r.id);
                           }}>
 
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            {bulkMode && !frozen && (
+                              isSelected
+                                ? <CheckSquare size={14} style={{ color: 'var(--ios-blue)', flexShrink: 0 }} />
+                                : <Square size={14} style={{ color: 'rgba(var(--rgb-fg),0.4)', flexShrink: 0 }} />
+                            )}
                             {/* Frozen icon or status dot */}
                             {frozen
                               ? <Lock size={12} style={{ color: '#FF9F0A', flexShrink: 0 }} />
                               : <span title={`Status: ${APPLICATION_STATUS_LABELS[r.status ?? 'entwurf']} – klicken zum Ändern`}
                                   style={{ width: 11, height: 11, borderRadius: '50%', background: statusColor, flexShrink: 0, cursor: 'pointer' }}
-                                  onClick={(e) => { e.stopPropagation(); setStatusMenuResumeId(r.id); }} />
+                                  onClick={(e) => { e.stopPropagation(); if (!bulkMode) setStatusMenuResumeId(r.id); }} />
                             }
                             <FileText size={15} style={{ opacity: 0.6, flexShrink: 0 }} />
 
