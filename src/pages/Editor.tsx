@@ -3,13 +3,14 @@ import { useState } from 'react';
 import {
   User, Briefcase, GraduationCap, Zap, FolderOpen,
   Upload, Palette, AlertCircle, FileEdit, LayoutList, Lock,
-  Pencil, Check, X, Languages, History,
+  Pencil, Check, X, Languages, History, ArrowUp, ArrowDown, ArrowUpDown,
 } from 'lucide-react';
 import { useResumeStore } from '../store/resumeStore';
 import { usePlan } from '../lib/plan';
 import { useUIStore } from '../store/uiStore';
 import type { EditorSection } from '../types/resume';
 import type { LucideProps } from 'lucide-react';
+import { getSectionOrder, setSectionOrder, moveSection } from '../lib/sectionOrder';
 import PersonalInfoEditor from '../components/editor/PersonalInfoEditor';
 import CoverLetterEditor from '../components/editor/CoverLetterEditor';
 import ExperienceEditor from '../components/editor/ExperienceEditor';
@@ -47,6 +48,19 @@ export default function Editor() {
   // Inline-Umbenennen der aktuellen Bewerbungsmappe.
   const [renaming, setRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState('');
+
+  // Section-Reordering (Editor-Sidebar). Persistiert in localStorage.
+  const knownSectionIds = SECTIONS.map(s => s.id);
+  const [sectionOrder, setSectionOrderState] = useState<EditorSection[]>(() => getSectionOrder(knownSectionIds));
+  const [reordering, setReordering] = useState(false);
+  function move(id: EditorSection, delta: number) {
+    const next = moveSection(sectionOrder, id, delta);
+    setSectionOrderState(next);
+    setSectionOrder(next);
+  }
+  const orderedSections = sectionOrder
+    .map(id => SECTIONS.find(s => s.id === id))
+    .filter(Boolean) as typeof SECTIONS;
   const startRename = () => { if (resume) { setRenameValue(resume.name ?? ''); setRenaming(true); } };
   const commitRename = () => {
     if (resume && renameValue.trim()) renameResume(resume.id, renameValue.trim());
@@ -137,7 +151,7 @@ export default function Editor() {
           display: 'flex', overflowX: 'auto', gap: 6, paddingBottom: 8,
           flexShrink: 0, scrollbarWidth: 'none', msOverflowStyle: 'none',
         }}>
-          {SECTIONS.map(({ id, short, icon: Icon }) => {
+          {orderedSections.map(({ id, short, icon: Icon }) => {
             const isActive = activeSection === id;
             return (
               <button key={id} className="btn-glass" onClick={() => setActiveSection(id)} style={{
@@ -174,25 +188,69 @@ export default function Editor() {
 
       {/* Links: Rail mit Editor-Sektionen + Aktionen */}
       <aside className="glass" style={{ width: 210, flexShrink: 0, borderRadius: 'var(--radius-lg)', overflow: 'auto', padding: 8 }}>
-        {SECTIONS.map(({ id, label, icon: Icon }) => {
+        {orderedSections.map(({ id, label, icon: Icon }, i) => {
           const active = activeSection === id && activeSection !== 'history';
           return (
-            <button key={id} className="btn-glass"
-              onClick={() => setActiveSection(id)}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 10,
-                padding: '8px 10px', marginBottom: 2, borderRadius: 'var(--radius-sm)',
-                boxShadow: 'none',
-                background: active ? 'rgba(0,122,255,0.2)' : 'transparent',
-                border: active ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
-              }}>
-              <Icon size={14} style={{ opacity: active ? 1 : 0.65 }} />
-              <span style={{ fontSize: 13, fontWeight: active ? 600 : 500, opacity: active ? 1 : 0.78 }}>{label}</span>
-            </button>
+            <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 2, marginBottom: 2 }}>
+              <button className="btn-glass"
+                onClick={() => { if (!reordering) setActiveSection(id); }}
+                style={{
+                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 10,
+                  padding: '8px 10px', borderRadius: 'var(--radius-sm)',
+                  boxShadow: 'none',
+                  background: active ? 'rgba(0,122,255,0.2)' : 'transparent',
+                  border: active ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
+                  cursor: reordering ? 'default' : 'pointer',
+                }}>
+                <Icon size={14} style={{ opacity: active ? 1 : 0.65 }} />
+                <span style={{ fontSize: 13, fontWeight: active ? 600 : 500, opacity: active ? 1 : 0.78 }}>{label}</span>
+              </button>
+              {reordering && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 1, flexShrink: 0 }}>
+                  <button
+                    onClick={() => move(id, -1)}
+                    disabled={i === 0}
+                    title="Nach oben"
+                    style={{
+                      background: 'rgba(var(--rgb-fg),0.06)', border: '1px solid var(--border-subtle)',
+                      borderRadius: 4, padding: 1, cursor: i === 0 ? 'not-allowed' : 'pointer',
+                      opacity: i === 0 ? 0.3 : 0.85, color: 'rgba(var(--rgb-fg),0.85)',
+                    }}
+                  >
+                    <ArrowUp size={11} />
+                  </button>
+                  <button
+                    onClick={() => move(id, 1)}
+                    disabled={i === orderedSections.length - 1}
+                    title="Nach unten"
+                    style={{
+                      background: 'rgba(var(--rgb-fg),0.06)', border: '1px solid var(--border-subtle)',
+                      borderRadius: 4, padding: 1, cursor: i === orderedSections.length - 1 ? 'not-allowed' : 'pointer',
+                      opacity: i === orderedSections.length - 1 ? 0.3 : 0.85, color: 'rgba(var(--rgb-fg),0.85)',
+                    }}
+                  >
+                    <ArrowDown size={11} />
+                  </button>
+                </div>
+              )}
+            </div>
           );
         })}
 
         <div style={{ height: 1, background: 'rgba(var(--rgb-fg),0.08)', margin: '6px 4px' }} />
+
+        {/* Reihenfolge anpassen */}
+        <button className="btn-glass"
+          onClick={() => setReordering(v => !v)}
+          style={{
+            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 10,
+            padding: '8px 10px', marginBottom: 2, borderRadius: 'var(--radius-sm)', boxShadow: 'none',
+            background: reordering ? 'rgba(0,122,255,0.2)' : 'transparent',
+            border: reordering ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent',
+          }}>
+          <ArrowUpDown size={14} style={{ opacity: reordering ? 1 : 0.65 }} />
+          <span style={{ fontSize: 13, opacity: 0.78 }}>{reordering ? 'Fertig' : 'Reihenfolge'}</span>
+        </button>
 
         {/* Übersetzen */}
         <button className="btn-glass"
