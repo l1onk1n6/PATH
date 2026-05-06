@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { History, Plus, RotateCcw, Trash2, Loader2, Clock, AlertCircle } from 'lucide-react';
+import { History, Plus, RotateCcw, Trash2, Loader2, Clock, AlertCircle, GitCompare } from 'lucide-react';
 import { useResumeStore } from '../../store/resumeStore';
 import { userError } from '../../lib/userError';
 import {
   saveVersion, listVersions, deleteVersion,
   relativeTime, type ResumeVersion,
 } from '../../lib/versions';
+import VersionDiffModal from './VersionDiffModal';
 
 interface Props {
   resumeId: string;
@@ -20,6 +21,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
   const [saving, setSaving]         = useState(false);
   const [restoring, setRestoring]   = useState<string | null>(null);
   const [confirmId, setConfirmId]   = useState<string | null>(null);
+  const [diffVersion, setDiffVersion] = useState<ResumeVersion | null>(null);
   const [labelInput, setLabelInput] = useState('');
   const [showLabel, setShowLabel]   = useState(false);
   const [error, setError]           = useState<string | null>(null);
@@ -195,6 +197,14 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
                   <>
                     <button
                       className="btn-glass btn-sm"
+                      onClick={() => setDiffVersion(v)}
+                      title="Mit aktuellem Stand vergleichen"
+                      style={{ padding: '6px 8px' }}
+                    >
+                      <GitCompare size={14} />
+                    </button>
+                    <button
+                      className="btn-glass btn-sm"
                       onClick={() => setConfirmId(v.id)}
                       title="Wiederherstellen"
                       style={{ padding: '6px 8px' }}
@@ -218,6 +228,10 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
       )}
 
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+
+      {diffVersion && resume && (
+        <VersionDiffModal version={diffVersion} current={resume} onClose={() => setDiffVersion(null)} />
+      )}
     </div>
   );
 }
