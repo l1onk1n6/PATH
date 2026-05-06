@@ -10,6 +10,7 @@ import { UpgradeModal } from '../ui/ProGate';
 import { getSupabase, isSupabaseConfigured } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 import { useTrackerStore } from '../../store/trackerStore';
+import { useT } from '../../lib/i18n';
 
 // Parse multiline recipient string into structured address fields.
 // Adressen werden als 4 fixe Zeilen gespeichert (Firma / Person / Strasse / Ort)
@@ -131,6 +132,7 @@ function ReminderPanel({ resumeId, deadline, reminderDays, onClose }: {
 }
 
 export default function CoverLetterEditor() {
+  const t = useT();
   const { getActiveResume, updateCoverLetter, updateResume } = useResumeStore();
   const { isPro } = usePlan();
   const resume = getActiveResume();
@@ -396,7 +398,7 @@ export default function CoverLetterEditor() {
             />
             <input
               className="input-glass"
-              placeholder="PLZ / Ort"
+              placeholder={t('PLZ / Ort')}
               value={addr.city} maxLength={100}
               onChange={e => updateAddr('city', e.target.value)}
               style={{ fontSize: 13 }}
@@ -491,7 +493,7 @@ export default function CoverLetterEditor() {
 
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-          <label style={{ fontSize: 12, fontWeight: 600, opacity: 0.7 }}>Anschreiben-Text</label>
+          <label style={{ fontSize: 12, fontWeight: 600, opacity: 0.7 }}>{t('Anschreiben-Text')}</label>
           <button
             className="btn-glass btn-sm"
             style={{ fontSize: 11, gap: 5, opacity: !isPro || !cl.body.trim() ? 0.45 : 1 }}

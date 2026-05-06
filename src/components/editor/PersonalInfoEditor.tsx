@@ -5,8 +5,10 @@ import { validatePhotoFile, sanitizePhotoUrl } from '../../lib/security';
 import { usePlan } from '../../lib/plan';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import LinkedInImportDialog from './LinkedInImport';
+import { useT } from '../../lib/i18n';
 
 export default function PersonalInfoEditor() {
+  const t = useT();
   const { getActiveResume, updatePersonalInfo } = useResumeStore();
   const { limits } = usePlan();
   const resume = getActiveResume();
@@ -93,13 +95,13 @@ export default function PersonalInfoEditor() {
             keinen Leerraum darunter hat. Desktop: alles in einem 2-Spalten-Grid. */}
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <div>
-            <label className="section-label">Vorname</label>
-            <input className="input-glass" placeholder="Max" value={info.firstName} maxLength={50}
+            <label className="section-label">{t('Vorname')}</label>
+            <input className="input-glass" placeholder={t('Max')} value={info.firstName} maxLength={50}
               onChange={(e) => update('firstName', e.target.value)} />
           </div>
           <div>
-            <label className="section-label">Nachname</label>
-            <input className="input-glass" placeholder="Mustermann" value={info.lastName} maxLength={50}
+            <label className="section-label">{t('Nachname')}</label>
+            <input className="input-glass" placeholder={t('Mustermann')} value={info.lastName} maxLength={50}
               onChange={(e) => update('lastName', e.target.value)} />
           </div>
           {!isMobile && (
@@ -107,7 +109,7 @@ export default function PersonalInfoEditor() {
               <label className="section-label">
                 <FileText size={10} style={{ display: 'inline', marginRight: 4 }} />Berufsbezeichnung
               </label>
-              <input className="input-glass" placeholder="z.B. Senior Software Engineer" value={info.title} maxLength={100}
+              <input className="input-glass" placeholder={t('z.B. Senior Software Engineer')} value={info.title} maxLength={100}
                 onChange={(e) => update('title', e.target.value)} />
             </div>
           )}
@@ -120,7 +122,7 @@ export default function PersonalInfoEditor() {
           <label className="section-label">
             <FileText size={10} style={{ display: 'inline', marginRight: 4 }} />Berufsbezeichnung
           </label>
-          <input className="input-glass" placeholder="z.B. Senior Software Engineer" value={info.title} maxLength={100}
+          <input className="input-glass" placeholder={t('z.B. Senior Software Engineer')} value={info.title} maxLength={100}
             onChange={(e) => update('title', e.target.value)} />
         </div>
       )}
@@ -141,52 +143,52 @@ export default function PersonalInfoEditor() {
           <label className="section-label">
             <Phone size={9} style={{ display: 'inline', marginRight: 3 }} />Telefon
           </label>
-          <input className="input-glass" type="tel" placeholder="+49 123 456789" value={info.phone} maxLength={30}
+          <input className="input-glass" type="tel" placeholder={t('+49 123 456789')} value={info.phone} maxLength={30}
             onChange={(e) => update('phone', e.target.value)} />
         </div>
         <div style={{ gridColumn: isMobile ? 'auto' : 'span 2' }}>
           <label className="section-label">
             <MapPin size={9} style={{ display: 'inline', marginRight: 3 }} />Strasse und Hausnummer
           </label>
-          <input className="input-glass" placeholder="Musterstrasse 12" value={info.street ?? ''} maxLength={150}
+          <input className="input-glass" placeholder={t('Musterstrasse 12')} value={info.street ?? ''} maxLength={150}
             onChange={(e) => update('street', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
             <MapPin size={9} style={{ display: 'inline', marginRight: 3 }} />Ort / PLZ
           </label>
-          <input className="input-glass" placeholder="8000 Zürich" value={info.location} maxLength={100}
+          <input className="input-glass" placeholder={t('8000 Zürich')} value={info.location} maxLength={100}
             onChange={(e) => update('location', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
             <Globe size={9} style={{ display: 'inline', marginRight: 3 }} />Website
           </label>
-          <input className="input-glass" placeholder="www.beispiel.de" value={info.website} maxLength={300}
+          <input className="input-glass" placeholder={t('www.beispiel.de')} value={info.website} maxLength={300}
             onChange={(e) => update('website', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
             <Link2 size={9} style={{ display: 'inline', marginRight: 3 }} />LinkedIn
           </label>
-          <input className="input-glass" placeholder="linkedin.com/in/max" value={info.linkedin} maxLength={200}
+          <input className="input-glass" placeholder={t('linkedin.com/in/max')} value={info.linkedin} maxLength={200}
             onChange={(e) => update('linkedin', e.target.value)} />
         </div>
         <div>
           <label className="section-label">
             <Link2 size={9} style={{ display: 'inline', marginRight: 3 }} />GitHub
           </label>
-          <input className="input-glass" placeholder="github.com/max" value={info.github} maxLength={200}
+          <input className="input-glass" placeholder={t('github.com/max')} value={info.github} maxLength={200}
             onChange={(e) => update('github', e.target.value)} />
         </div>
       </div>
 
       {/* Summary */}
       <div>
-        <label className="section-label">Kurzzusammenfassung / Profil</label>
+        <label className="section-label">{t('Kurzzusammenfassung / Profil')}</label>
         <textarea
           className="input-glass"
-          placeholder="Kurze Beschreibung Ihrer Berufserfahrung, Stärken und Ziele..."
+          placeholder={t('Kurze Beschreibung Ihrer Berufserfahrung, Stärken und Ziele...')}
           value={info.summary}
           onChange={(e) => update('summary', e.target.value)}
           maxLength={800}

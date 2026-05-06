@@ -2,6 +2,7 @@ import { X, Plus, Minus, Pencil } from 'lucide-react';
 import type { Resume } from '../../types/resume';
 import type { ResumeVersion } from '../../lib/versions';
 import { computeDiff } from '../../lib/versionDiff';
+import { useT } from '../../lib/i18n';
 
 interface Props {
   version: ResumeVersion;
@@ -15,6 +16,7 @@ function truncate(s: string, max = 80): string {
 }
 
 export default function VersionDiffModal({ version, current, onClose }: Props) {
+  const _t = useT(); void _t;
   const diff = computeDiff(version.snapshot as Resume, current);
 
   return (

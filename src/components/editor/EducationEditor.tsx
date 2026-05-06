@@ -6,8 +6,10 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 import EmptyState from '../ui/EmptyState';
 import { useUndoToast } from '../../lib/undoToast';
 import { sortEducation } from '../../lib/sortByDate';
+import { useT } from '../../lib/i18n';
 
 export default function EducationEditor() {
+  const t = useT();
   const { getActiveResume, addEducation, updateEducation, removeEducation, restoreItemAt } = useResumeStore();
   const showUndo = useUndoToast(s => s.show);
   const resume = getActiveResume();
@@ -95,8 +97,8 @@ export default function EducationEditor() {
             <div style={{ marginTop: 14 }}>
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10, marginBottom: 10 }}>
                 <div>
-                  <label className="section-label">Abschluss</label>
-                  <input className="input-glass" placeholder="z.B. Bachelor of Science" value={edu.degree} maxLength={150}
+                  <label className="section-label">{t('Abschluss')}</label>
+                  <input className="input-glass" placeholder={t('z.B. Bachelor of Science')} value={edu.degree} maxLength={150}
                     onChange={(e) => updateEducation(resume.id, edu.id, { degree: e.target.value })} />
                 </div>
                 <div>
@@ -110,16 +112,16 @@ export default function EducationEditor() {
                     onChange={(e) => updateEducation(resume.id, edu.id, { institution: e.target.value })} />
                 </div>
                 <div>
-                  <label className="section-label">Standort</label>
-                  <input className="input-glass" placeholder="Berlin" value={edu.location} maxLength={100}
+                  <label className="section-label">{t('Standort')}</label>
+                  <input className="input-glass" placeholder={t('Berlin')} value={edu.location} maxLength={100}
                     onChange={(e) => updateEducation(resume.id, edu.id, { location: e.target.value })} />
                 </div>
                 <div>
-                  <label className="section-label">Von</label>
+                  <label className="section-label">{t('Von')}</label>
                   <MonthYearPicker value={edu.startDate} onChange={(v) => updateEducation(resume.id, edu.id, { startDate: v })} />
                 </div>
                 <div>
-                  <label className="section-label">Bis</label>
+                  <label className="section-label">{t('Bis')}</label>
                   <MonthYearPicker value={edu.endDate} onChange={(v) => updateEducation(resume.id, edu.id, { endDate: v })} />
                 </div>
                 <div>

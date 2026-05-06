@@ -4,8 +4,10 @@ import { usePlan } from '../../lib/plan';
 import { UpgradeModal } from '../ui/ProGate';
 import { useState } from 'react';
 import EmptyState from '../ui/EmptyState';
+import { useT } from '../../lib/i18n';
 
 export default function CustomSectionEditor() {
+  const _t = useT(); void _t;
   const { getActiveResume, addCustomSection, updateCustomSection, removeCustomSection, reorderCustomSections } = useResumeStore();
   const { limits } = usePlan();
   const [showUpgrade, setShowUpgrade] = useState(false);

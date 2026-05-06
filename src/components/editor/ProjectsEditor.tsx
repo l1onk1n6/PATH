@@ -5,8 +5,10 @@ import { useResumeStore } from '../../store/resumeStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import EmptyState from '../ui/EmptyState';
 import { useUndoToast } from '../../lib/undoToast';
+import { useT } from '../../lib/i18n';
 
 export default function ProjectsEditor() {
+  const t = useT();
   const {
     getActiveResume,
     addProject, updateProject, removeProject, reorderProjects,
@@ -119,21 +121,21 @@ export default function ProjectsEditor() {
               <div style={{ marginTop: 12 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10, marginBottom: 10 }}>
                   <div>
-                    <label className="section-label">Projektname</label>
+                    <label className="section-label">{t('Projektname')}</label>
                     <input className="input-glass" placeholder="z.B. E-Commerce App" value={project.name} maxLength={150}
                       onChange={(e) => updateProject(resume.id, project.id, { name: e.target.value })} />
                   </div>
                   <div>
-                    <label className="section-label">URL</label>
+                    <label className="section-label">{t('URL')}</label>
                     <input className="input-glass" placeholder="github.com/..." value={project.url} maxLength={300}
                       onChange={(e) => updateProject(resume.id, project.id, { url: e.target.value })} />
                   </div>
                   <div>
-                    <label className="section-label">Von</label>
+                    <label className="section-label">{t('Von')}</label>
                     <MonthYearPicker value={project.startDate} onChange={(v) => updateProject(resume.id, project.id, { startDate: v })} />
                   </div>
                   <div>
-                    <label className="section-label">Bis</label>
+                    <label className="section-label">{t('Bis')}</label>
                     <MonthYearPicker value={project.endDate} onChange={(v) => updateProject(resume.id, project.id, { endDate: v })} />
                   </div>
                   <div style={{ gridColumn: isMobile ? 'auto' : 'span 2' }}>
@@ -145,7 +147,7 @@ export default function ProjectsEditor() {
                   </div>
                 </div>
                 <div>
-                  <label className="section-label">Beschreibung</label>
+                  <label className="section-label">{t('Beschreibung')}</label>
                   <textarea className="input-glass"
                     placeholder={'Pro Zeile ein Stichpunkt:\nAufbau einer REST-API mit 12 Endpunkten\nReduzierung der Ladezeit um 60%'}
                     value={project.description} maxLength={1000}
@@ -268,16 +270,16 @@ export default function ProjectsEditor() {
                       onChange={(e) => updateCertificate(resume.id, cert.id, { name: e.target.value })} />
                   </div>
                   <div>
-                    <label className="section-label">Aussteller</label>
+                    <label className="section-label">{t('Aussteller')}</label>
                     <input className="input-glass" placeholder="z.B. Amazon Web Services" value={cert.issuer} maxLength={150}
                       onChange={(e) => updateCertificate(resume.id, cert.id, { issuer: e.target.value })} />
                   </div>
                   <div>
-                    <label className="section-label">Datum</label>
+                    <label className="section-label">{t('Datum')}</label>
                     <MonthYearPicker value={cert.date} onChange={(v) => updateCertificate(resume.id, cert.id, { date: v })} placeholder="Monat / Jahr" />
                   </div>
                   <div>
-                    <label className="section-label">URL</label>
+                    <label className="section-label">{t('URL')}</label>
                     <input className="input-glass" placeholder="Zertifikat-Link" value={cert.url} maxLength={300}
                       onChange={(e) => updateCertificate(resume.id, cert.id, { url: e.target.value })} />
                   </div>

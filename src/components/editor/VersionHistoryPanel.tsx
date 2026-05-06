@@ -7,12 +7,14 @@ import {
   relativeTime, type ResumeVersion,
 } from '../../lib/versions';
 import VersionDiffModal from './VersionDiffModal';
+import { useT } from '../../lib/i18n';
 
 interface Props {
   resumeId: string;
 }
 
 export default function VersionHistoryPanel({ resumeId }: Props) {
+  const _t = useT(); void _t;
   const { resumes, updateResume } = useResumeStore();
   const resume = resumes.find(r => r.id === resumeId);
 

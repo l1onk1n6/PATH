@@ -3,6 +3,7 @@ import { X, Loader2, Check, AlertCircle, Smartphone, Monitor } from 'lucide-reac
 import { useResumeStore } from '../../store/resumeStore';
 import { getSupabase } from '../../lib/supabase';
 import { userError } from '../../lib/userError';
+import { useT } from '../../lib/i18n';
 
 interface ParsedData {
   firstName?: string;
@@ -32,6 +33,7 @@ interface Props {
 }
 
 export default function LinkedInImportDialog({ onClose }: Props) {
+  const _t = useT(); void _t;
   const [step, setStep]     = useState<1 | 2>(1);
   const [text, setText]     = useState('');
   const [parsed, setParsed] = useState<ParsedData | null>(null);
