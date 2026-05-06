@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { useEffect, useState, useMemo } from 'react';
+import { HashRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { initRevenueCat, logOutRevenueCat } from './lib/revenuecat';
 import { Loader2, Cloud, Loader, ShieldAlert } from 'lucide-react';
 import { useSessionTimeout } from './hooks/useSessionTimeout';
+import { useGlobalShortcuts, type Shortcut } from './hooks/useGlobalShortcuts';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 import Dashboard from './pages/Dashboard';
@@ -22,14 +23,17 @@ import { useIsMobile } from './hooks/useBreakpoint';
 import OnboardingModal from './components/ui/OnboardingModal';
 import { isOnboardingDone } from './lib/onboarding';
 import UndoToaster from './components/ui/UndoToaster';
+import ShortcutsHelp from './components/ui/ShortcutsHelp';
 
 const APP_VERSION = '1.8.0';
 
 function AppShell() {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => !isOnboardingDone());
+  const [showShortcuts, setShowShortcuts] = useState(false);
   const { savePending, syncing } = useResumeStore();
   const { signOut } = useAuthStore();
   const { countdown, stayLoggedIn } = useSessionTimeout(signOut);
@@ -47,6 +51,19 @@ function AppShell() {
     window.addEventListener('start-onboarding', handler);
     return () => window.removeEventListener('start-onboarding', handler);
   }, []);
+
+  const shortcuts: Shortcut[] = useMemo(() => [
+    { combo: 'd', description: 'Dashboard', handler: () => navigate('/') },
+    { combo: 'e', description: 'Editor', handler: () => navigate('/editor') },
+    { combo: 'p', description: 'Vorschau', handler: () => navigate('/preview') },
+    { combo: 't', description: 'Tracker', handler: () => navigate('/tracker') },
+    { combo: 'a', description: 'Konto', handler: () => navigate('/account') },
+    { combo: 'mod+b', description: 'Sidebar einklappen / ausklappen', handler: () => setSidebarCollapsed(v => !v) },
+    { combo: '?', description: 'Diese Hilfe anzeigen', handler: () => setShowShortcuts(true) },
+    { combo: 'escape', description: 'Schliessen', handler: () => setShowShortcuts(false) },
+  ], [navigate]);
+
+  useGlobalShortcuts(shortcuts);
 
   return (
     <div style={{
@@ -134,6 +151,11 @@ function AppShell() {
       {/* ── Onboarding ────────────────────────────────────── */}
       {showOnboarding && (
         <OnboardingModal onClose={() => setShowOnboarding(false)} />
+      )}
+
+      {/* ── Shortcuts-Hilfe ──────────────────────────────── */}
+      {showShortcuts && (
+        <ShortcutsHelp shortcuts={shortcuts.filter(s => s.combo !== 'escape')} onClose={() => setShowShortcuts(false)} />
       )}
 
       {/* ── Undo-Toaster (global) ─────────────────────────── */}
