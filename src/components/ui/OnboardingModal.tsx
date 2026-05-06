@@ -127,7 +127,7 @@ export default function OnboardingModal({ onClose }: Props) {
       <div className="glass-card animate-scale-in" style={{
         width: '100%', maxWidth: 440, padding: '32px 28px',
         background: 'rgba(16,16,28,0.98)',
-        border: '1px solid rgba(255,255,255,0.1)',
+        border: '1px solid rgba(var(--rgb-fg),0.1)',
         boxShadow: '0 24px 60px rgba(0,0,0,0.6)',
       }}>
 
@@ -138,7 +138,7 @@ export default function OnboardingModal({ onClose }: Props) {
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 8px', letterSpacing: '-0.5px' }}>
               Willkommen bei PATH
             </h1>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', margin: '0 0 28px', lineHeight: 1.6 }}>
+            <p style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)', margin: '0 0 28px', lineHeight: 1.6 }}>
               Dein persönlicher Bewerbungsassistent.<br />
               Lass uns in 2 Minuten alles einrichten.
             </p>
@@ -146,7 +146,7 @@ export default function OnboardingModal({ onClose }: Props) {
               onClick={goNext}>
               Loslegen <ArrowRight size={16} />
             </button>
-            <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 12, fontFamily: 'var(--font-sf)' }}>
+            <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(var(--rgb-fg),0.3)', fontSize: 12, fontFamily: 'var(--font-sf)' }}>
               Überspringen
             </button>
           </div>
@@ -158,7 +158,7 @@ export default function OnboardingModal({ onClose }: Props) {
             <div style={{ marginBottom: 20 }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ios-blue)', marginBottom: 6 }}>SCHRITT 1 VON 2</div>
               <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 6px', letterSpacing: '-0.4px' }}>Wie heisst du?</h2>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: 0 }}>Wir legen dein erstes Profil an.</p>
+              <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', margin: 0 }}>Wir legen dein erstes Profil an.</p>
             </div>
             <input
               className="input-glass"
@@ -174,7 +174,7 @@ export default function OnboardingModal({ onClose }: Props) {
               onClick={handleCreate}>
               {creating ? 'Erstelle…' : <>Profil anlegen <ArrowRight size={15} /></>}
             </button>
-            <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 12, fontFamily: 'var(--font-sf)', width: '100%' }}>
+            <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(var(--rgb-fg),0.3)', fontSize: 12, fontFamily: 'var(--font-sf)', width: '100%' }}>
               Überspringen
             </button>
           </div>
@@ -186,7 +186,7 @@ export default function OnboardingModal({ onClose }: Props) {
             <div style={{ marginBottom: 20 }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ios-blue)', marginBottom: 6 }}>SCHRITT 2 VON 2</div>
               <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 6px', letterSpacing: '-0.4px' }}>Was PATH kann</h2>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+              <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', margin: 0 }}>
                 Ein kurzer Überblick — du findest alles auch später wieder.
               </p>
             </div>
@@ -199,7 +199,7 @@ export default function OnboardingModal({ onClose }: Props) {
                   </div>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{f.title}</div>
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 }}>{f.desc}</div>
+                    <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.45)', lineHeight: 1.5 }}>{f.desc}</div>
                   </div>
                 </div>
               ))}
@@ -211,7 +211,7 @@ export default function OnboardingModal({ onClose }: Props) {
                 <Wand2 size={14} style={{ color: 'var(--ios-blue)', flexShrink: 0 }} />
                 <span style={{ fontSize: 13, fontWeight: 600 }}>Mit Beispieldaten starten</span>
               </div>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: '0 0 12px', lineHeight: 1.5 }}>
+              <p style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.45)', margin: '0 0 12px', lineHeight: 1.5 }}>
                 Sieh sofort wie dein Lebenslauf aussehen könnte — wir füllen ihn mit realistischen Musterdaten vor.
               </p>
               <button className="btn-glass btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '11px', fontWeight: 700, fontSize: 13, gap: 7 }}
@@ -225,7 +225,7 @@ export default function OnboardingModal({ onClose }: Props) {
               <Check size={14} /> Ohne Beispieldaten starten
             </button>
 
-            <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 12, fontFamily: 'var(--font-sf)', width: '100%' }}>
+            <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(var(--rgb-fg),0.3)', fontSize: 12, fontFamily: 'var(--font-sf)', width: '100%' }}>
               Schliessen
             </button>
           </div>
@@ -234,7 +234,7 @@ export default function OnboardingModal({ onClose }: Props) {
         {step > 0 && (
           <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 20 }}>
             {[1, 2].map(s => (
-              <div key={s} style={{ width: s === step ? 20 : 6, height: 6, borderRadius: 3, background: s === step ? 'var(--ios-blue)' : 'rgba(255,255,255,0.15)', transition: 'all 0.3s' }} />
+              <div key={s} style={{ width: s === step ? 20 : 6, height: 6, borderRadius: 3, background: s === step ? 'var(--ios-blue)' : 'rgba(var(--rgb-fg),0.15)', transition: 'all 0.3s' }} />
             ))}
           </div>
         )}

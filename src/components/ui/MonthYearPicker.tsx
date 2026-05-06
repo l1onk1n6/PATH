@@ -79,19 +79,19 @@ export default function MonthYearPicker({ value, onChange, disabled, placeholder
         WebkitBackdropFilter: 'blur(24px)',
         borderRadius: 14,
         padding: '10px 10px 8px',
-        border: '1px solid rgba(255,255,255,0.1)',
+        border: '1px solid rgba(var(--rgb-fg),0.1)',
         boxShadow: '0 12px 40px rgba(0,0,0,0.65)',
       }}
     >
       {/* Year row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <button type="button" onClick={() => setViewYear(y => y - 1)}
-          style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.07)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(var(--rgb-fg),0.1)', background: 'rgba(var(--rgb-fg),0.07)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <ChevronLeft size={14} />
         </button>
         <span style={{ fontWeight: 700, fontSize: 16, letterSpacing: '-0.3px', color: '#fff' }}>{viewYear}</span>
         <button type="button" onClick={() => setViewYear(y => y + 1)}
-          style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.07)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(var(--rgb-fg),0.1)', background: 'rgba(var(--rgb-fg),0.07)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <ChevronRight size={14} />
         </button>
       </div>
@@ -104,10 +104,10 @@ export default function MonthYearPicker({ value, onChange, disabled, placeholder
             <button key={m} type="button" onClick={() => pick(i)}
               style={{
                 padding: '9px 0', fontSize: 12, fontWeight: sel ? 700 : 400,
-                borderRadius: 9, border: sel ? 'none' : '1px solid rgba(255,255,255,0.06)',
+                borderRadius: 9, border: sel ? 'none' : '1px solid rgba(var(--rgb-fg),0.06)',
                 cursor: 'pointer', transition: 'all 0.12s',
-                background: sel ? 'var(--ios-blue)' : 'rgba(255,255,255,0.05)',
-                color: sel ? '#fff' : 'rgba(255,255,255,0.75)',
+                background: sel ? 'var(--ios-blue)' : 'rgba(var(--rgb-fg),0.05)',
+                color: sel ? '#fff' : 'rgba(var(--rgb-fg),0.75)',
                 boxShadow: sel ? '0 2px 8px rgba(0,122,255,0.4)' : 'none',
                 fontFamily: 'var(--font-sf)',
               }}>
@@ -118,7 +118,7 @@ export default function MonthYearPicker({ value, onChange, disabled, placeholder
       </div>
 
       {/* Footer */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, paddingTop: 8, borderTop: '1px solid rgba(var(--rgb-fg),0.07)' }}>
         <button type="button"
           style={{ fontSize: 12, color: 'var(--ios-red)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 2px', fontFamily: 'var(--font-sf)' }}
           onClick={() => { onChange(''); setOpen(false); }}>
@@ -148,7 +148,7 @@ export default function MonthYearPicker({ value, onChange, disabled, placeholder
           opacity: disabled ? 0.4 : 1,
         }}
       >
-        <span style={{ color: displayText ? '#fff' : 'rgba(255,255,255,0.35)', fontSize: 14 }}>
+        <span style={{ color: displayText ? '#fff' : 'rgba(var(--rgb-fg),0.35)', fontSize: 14 }}>
           {displayText || placeholder}
         </span>
         <ChevronDown size={14} style={{ opacity: 0.45, flexShrink: 0, transition: 'transform 0.15s', transform: open ? 'rotate(180deg)' : 'none' }} />

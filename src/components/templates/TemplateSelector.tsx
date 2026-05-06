@@ -51,7 +51,7 @@ export default function TemplateSelector() {
                   padding: 12,
                   border: isSelected
                     ? `2px solid ${resume.accentColor}`
-                    : '1px solid rgba(255,255,255,0.15)',
+                    : '1px solid rgba(var(--rgb-fg),0.15)',
                   boxShadow: isSelected
                     ? `0 0 0 1px ${resume.accentColor}40, 0 8px 24px rgba(0,0,0,0.2)`
                     : 'var(--glass-shadow)',
@@ -80,7 +80,7 @@ export default function TemplateSelector() {
 
                 {/* Info */}
                 <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 3 }}>{tmpl.name}</div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginBottom: 6, lineHeight: 1.3 }}>
+                <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.5)', marginBottom: 6, lineHeight: 1.3 }}>
                   {tmpl.description}
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
@@ -107,7 +107,7 @@ export default function TemplateSelector() {
               background: color,
               border: resume.accentColor === color
                 ? '3px solid #fff'
-                : '2px solid rgba(255,255,255,0.2)',
+                : '2px solid rgba(var(--rgb-fg),0.2)',
               cursor: 'pointer',
               transition: 'all 0.15s',
               transform: resume.accentColor === color ? 'scale(1.2)' : 'scale(1)',
@@ -123,7 +123,7 @@ export default function TemplateSelector() {
           <div style={{
             width: 28, height: 28, borderRadius: '50%',
             background: 'conic-gradient(red, yellow, green, blue, red)',
-            border: '2px solid rgba(255,255,255,0.3)',
+            border: '2px solid rgba(var(--rgb-fg),0.3)',
             cursor: 'pointer',
           }} />
           <input

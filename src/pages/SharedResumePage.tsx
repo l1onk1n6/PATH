@@ -53,7 +53,7 @@ export default function SharedResumePage() {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
         <Loader2 size={28} style={{ animation: 'spin 1s linear infinite', color: 'var(--ios-blue)' }} />
-        <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }}>Bewerbungsmappe wird geladen…</span>
+        <span style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)' }}>Bewerbungsmappe wird geladen…</span>
         <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
       </div>
     );
@@ -64,7 +64,7 @@ export default function SharedResumePage() {
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, padding: 24, textAlign: 'center' }}>
         <AlertCircle size={40} style={{ opacity: 0.4 }} />
         <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>Bewerbungsmappe nicht gefunden</h2>
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, maxWidth: 320 }}>
+        <p style={{ color: 'rgba(var(--rgb-fg),0.5)', fontSize: 14, maxWidth: 320 }}>
           Dieser Link ist ungültig oder wurde deaktiviert.
         </p>
       </div>

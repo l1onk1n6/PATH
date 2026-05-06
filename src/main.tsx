@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { logError } from './lib/errorLog'
+import { initTheme } from './lib/theme'
 
 // Uncaught Promise-Rejections + globale window-Errors mitloggen, damit wir auch
 // Faelle sehen, die nicht in einem ErrorBoundary landen (z. B. async Handler).
@@ -15,8 +16,9 @@ if (typeof window !== 'undefined') {
     void logError('Unhandled window error', e.error ?? e.message);
   });
 
-  // Cleanup: orphaned localStorage-Eintrag aus dem Theme-Preview-Toggle.
-  localStorage.removeItem('path-theme');
+  // Theme (Dark/Light/System) anwenden bevor React rendert,
+  // damit kein Flash von falschem Theme entsteht.
+  initTheme();
 }
 
 createRoot(document.getElementById('root')!).render(

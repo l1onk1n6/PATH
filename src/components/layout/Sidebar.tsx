@@ -46,10 +46,10 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
           <LogoIcon size={32} />
         </div>
         <button className="btn-glass btn-icon" onClick={onToggleCollapse} title="Seitenleiste einblenden"
-          style={{ padding: 8, marginBottom: 8, boxShadow: 'none', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+          style={{ padding: 8, marginBottom: 8, boxShadow: 'none', background: 'rgba(var(--rgb-fg),0.06)', border: '1px solid rgba(var(--rgb-fg),0.1)' }}>
           <PanelLeftOpen size={15} />
         </button>
-        <div style={{ width: '70%', height: 1, background: 'rgba(255,255,255,0.1)', margin: '4px 0 8px' }} />
+        <div style={{ width: '70%', height: 1, background: 'rgba(var(--rgb-fg),0.1)', margin: '4px 0 8px' }} />
         {[
           { path: '/',        icon: LayoutDashboard, label: 'Dashboard' },
           { path: '/editor',  icon: FileText,        label: 'Editor' },
@@ -142,7 +142,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
       <div style={{ flex: 1 }} />
 
       {/* Bottom: Pro-Badge + Logout */}
-      <div style={{ paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ paddingTop: 8, borderTop: '1px solid rgba(var(--rgb-fg),0.08)', display: 'flex', flexDirection: 'column', gap: 6 }}>
         {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} />}
         {!isPro ? (
           <button onClick={() => setShowUpgrade(true)} className="btn-glass"
@@ -274,8 +274,8 @@ function MappeSwitcher(props: MappeSwitcherProps) {
         style={{
           width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
           borderRadius: 'var(--radius-sm)', boxShadow: 'none', textAlign: 'left',
-          background: open ? 'rgba(0,122,255,0.12)' : 'rgba(255,255,255,0.06)',
-          border: open ? '1px solid rgba(0,122,255,0.35)' : '1px solid rgba(255,255,255,0.12)',
+          background: open ? 'rgba(0,122,255,0.12)' : 'rgba(var(--rgb-fg),0.06)',
+          border: open ? '1px solid rgba(0,122,255,0.35)' : '1px solid rgba(var(--rgb-fg),0.12)',
         }}
       >
         {personAvatar(headerName, headerPhoto, 32, false)}
@@ -283,7 +283,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
           <div style={{ fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {headerName}
           </div>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {headerSub}
           </div>
         </div>
@@ -300,7 +300,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
           zIndex: 9999,
           borderRadius: 'var(--radius-sm)',
           background: 'rgba(8,10,20,0.94)',
-          border: '1px solid rgba(255,255,255,0.13)',
+          border: '1px solid rgba(var(--rgb-fg),0.13)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
           boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
@@ -316,11 +316,11 @@ function MappeSwitcher(props: MappeSwitcherProps) {
             {/* Left: persons list */}
             <div style={{
               width: LEFT_W, flexShrink: 0,
-              borderRight: '1px solid rgba(255,255,255,0.09)',
+              borderRight: '1px solid rgba(var(--rgb-fg),0.09)',
               overflowY: 'auto', padding: '6px 5px',
             }}>
               {persons.length === 0 && (
-                <div style={{ padding: '24px 8px', textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
+                <div style={{ padding: '24px 8px', textAlign: 'center', color: 'rgba(var(--rgb-fg),0.35)', fontSize: 12 }}>
                   Noch keine Person.
                 </div>
               )}
@@ -339,7 +339,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
                       width: '100%', display: 'flex', alignItems: 'center', gap: 8,
                       padding: '8px 8px', marginBottom: 3,
                       borderRadius: 'var(--radius-sm)', boxShadow: 'none',
-                      background: isFocused ? 'rgba(0,122,255,0.18)' : 'rgba(255,255,255,0.03)',
+                      background: isFocused ? 'rgba(0,122,255,0.18)' : 'rgba(var(--rgb-fg),0.03)',
                       border: isFocused ? '1px solid rgba(0,122,255,0.38)' : '1px solid transparent',
                       opacity: isFrozenP ? 0.55 : 1, cursor: 'pointer',
                       justifyContent: 'flex-start',
@@ -351,7 +351,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
                         {dname}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
-                        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>{personResumes.length} {personResumes.length === 1 ? 'Mappe' : 'Mappen'}</span>
+                        <span style={{ fontSize: 10, color: 'rgba(var(--rgb-fg),0.4)' }}>{personResumes.length} {personResumes.length === 1 ? 'Mappe' : 'Mappen'}</span>
                         {isFrozenP && <Lock size={9} style={{ color: '#FF9F0A', flexShrink: 0 }} />}
                       </div>
                     </div>
@@ -363,7 +363,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
             {/* Right: Mappen of focused person */}
             <div style={{ flex: 1, overflowY: 'auto', padding: '6px 5px', minWidth: 0 }}>
               {!focusedPerson ? (
-                <div style={{ padding: '24px 8px', textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
+                <div style={{ padding: '24px 8px', textAlign: 'center', color: 'rgba(var(--rgb-fg),0.35)', fontSize: 12 }}>
                   Person auswählen
                 </div>
               ) : (
@@ -371,13 +371,13 @@ function MappeSwitcher(props: MappeSwitcherProps) {
                   {/* Section header */}
                   <div style={{
                     fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase',
-                    color: 'rgba(255,255,255,0.3)', padding: '4px 8px 8px',
+                    color: 'rgba(var(--rgb-fg),0.3)', padding: '4px 8px 8px',
                   }}>
                     Mappen
                   </div>
 
                   {focusedResumes.length === 0 && (
-                    <div style={{ padding: '12px 8px', textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
+                    <div style={{ padding: '12px 8px', textAlign: 'center', color: 'rgba(var(--rgb-fg),0.35)', fontSize: 12 }}>
                       Keine Mappen vorhanden
                     </div>
                   )}
@@ -400,8 +400,8 @@ function MappeSwitcher(props: MappeSwitcherProps) {
                           style={{
                             flex: 1, justifyContent: 'flex-start', padding: '9px 10px',
                             borderRadius: 'var(--radius-sm)', boxShadow: 'none', gap: 8, minWidth: 0,
-                            background: isActiveR ? 'rgba(0,122,255,0.2)' : 'rgba(255,255,255,0.04)',
-                            border: isActiveR ? '1px solid rgba(0,122,255,0.4)' : '1px solid rgba(255,255,255,0.07)',
+                            background: isActiveR ? 'rgba(0,122,255,0.2)' : 'rgba(var(--rgb-fg),0.04)',
+                            border: isActiveR ? '1px solid rgba(0,122,255,0.4)' : '1px solid rgba(var(--rgb-fg),0.07)',
                             opacity: isResumeFrozen ? 0.5 : 1,
                             cursor: isResumeFrozen ? 'default' : 'pointer',
                           }}
@@ -432,10 +432,10 @@ function MappeSwitcher(props: MappeSwitcherProps) {
           </div>
 
           {/* ── Footer ── */}
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.09)', display: 'flex', alignItems: 'stretch', minHeight: 42 }}>
+          <div style={{ borderTop: '1px solid rgba(var(--rgb-fg),0.09)', display: 'flex', alignItems: 'stretch', minHeight: 42 }}>
             {/* + Neue Person */}
             {addingPerson ? (
-              <div style={{ width: LEFT_W, flexShrink: 0, display: 'flex', gap: 4, padding: '5px 6px', borderRight: '1px solid rgba(255,255,255,0.09)' }}>
+              <div style={{ width: LEFT_W, flexShrink: 0, display: 'flex', gap: 4, padding: '5px 6px', borderRight: '1px solid rgba(var(--rgb-fg),0.09)' }}>
                 <input
                   className="input-glass"
                   placeholder="Name..."
@@ -453,8 +453,8 @@ function MappeSwitcher(props: MappeSwitcherProps) {
                 onClick={() => setAddingPerson(true)}
                 style={{
                   width: LEFT_W, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                  background: 'none', border: 'none', borderRight: '1px solid rgba(255,255,255,0.09)',
-                  cursor: 'pointer', color: 'rgba(255,255,255,0.5)', fontSize: 12, padding: '0 8px',
+                  background: 'none', border: 'none', borderRight: '1px solid rgba(var(--rgb-fg),0.09)',
+                  cursor: 'pointer', color: 'rgba(var(--rgb-fg),0.5)', fontSize: 12, padding: '0 8px',
                 }}
               >
                 <Plus size={14} /> Neue Person
@@ -469,7 +469,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
                 flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
                 background: 'none', border: 'none',
                 cursor: focusedPerson && !focusedFrozen ? 'pointer' : 'default',
-                color: focusedPerson && !focusedFrozen ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)',
+                color: focusedPerson && !focusedFrozen ? 'rgba(var(--rgb-fg),0.5)' : 'rgba(var(--rgb-fg),0.2)',
                 fontSize: 12, padding: '0 8px',
               }}
             >

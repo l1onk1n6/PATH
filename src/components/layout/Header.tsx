@@ -32,12 +32,12 @@ function SaveStatusPill({ isMobile }: { isMobile?: boolean }) {
 
   let Icon: typeof Cloud = Cloud;
   let text = 'Synchronisiert';
-  let color = 'rgba(255,255,255,0.45)';
+  let color = 'rgba(var(--rgb-fg),0.45)';
   let bg = 'transparent';
   let border = '1px solid transparent';
 
   if (!cloudOn) {
-    Icon = CloudOff; text = 'Lokal'; color = 'rgba(255,255,255,0.4)';
+    Icon = CloudOff; text = 'Lokal'; color = 'rgba(var(--rgb-fg),0.4)';
   } else if (syncing) {
     Icon = Loader2; text = 'Synchronisiert…'; color = '#007AFF';
     bg = 'rgba(0,122,255,0.1)'; border = '1px solid rgba(0,122,255,0.25)';
@@ -123,7 +123,7 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
             {title}
           </h1>
           {!isMobile && (
-            <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <p style={{ margin: 0, fontSize: 12, color: 'rgba(var(--rgb-fg),0.5)', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {subtitle}
             </p>
           )}
@@ -140,11 +140,11 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
             fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', cursor: isPro ? 'default' : 'pointer',
             background: isPro
               ? 'linear-gradient(135deg, rgba(255,159,10,0.25), rgba(255,55,95,0.2))'
-              : 'rgba(255,255,255,0.08)',
+              : 'rgba(var(--rgb-fg),0.08)',
             border: isPro
               ? '1px solid rgba(255,159,10,0.4)'
-              : '1px solid rgba(255,255,255,0.15)',
-            color: isPro ? '#FF9F0A' : 'rgba(255,255,255,0.45)',
+              : '1px solid rgba(var(--rgb-fg),0.15)',
+            color: isPro ? '#FF9F0A' : 'rgba(var(--rgb-fg),0.45)',
           }}
           title={isPro ? 'PATH Pro — alle Features aktiv' : 'Upgrade auf PATH Pro'}
         >

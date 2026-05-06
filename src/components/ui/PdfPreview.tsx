@@ -164,7 +164,7 @@ function MobileCanvasPreview({ bytes, building, error }: Props) {
 
 function SpinnerOverlay({ label }: { label?: string }) {
   return (
-    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, color: 'rgba(255,255,255,0.7)', pointerEvents: 'none' }}>
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, color: 'rgba(var(--rgb-fg),0.7)', pointerEvents: 'none' }}>
       <Loader2 size={22} style={{ animation: 'spin 1s linear infinite' }} />
       {label ? <span style={{ fontSize: 13 }}>{label}</span> : null}
     </div>
@@ -174,7 +174,7 @@ function SpinnerOverlay({ label }: { label?: string }) {
 function ErrorOverlay({ message }: { message: string }) {
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, textAlign: 'center' }}>
-      <div style={{ maxWidth: 360, color: 'rgba(255,255,255,0.85)' }}>
+      <div style={{ maxWidth: 360, color: 'rgba(var(--rgb-fg),0.85)' }}>
         <AlertCircle size={28} style={{ opacity: 0.7, marginBottom: 10 }} />
         <p style={{ fontSize: 13, lineHeight: 1.5 }}>{message}</p>
       </div>

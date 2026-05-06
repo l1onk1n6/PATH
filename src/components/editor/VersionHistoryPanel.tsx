@@ -73,14 +73,14 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 0 }}>
 
       {/* Header */}
-      <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+      <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(var(--rgb-fg),0.1)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <History size={15} />
           </div>
           <div>
             <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>Versionshistorie</h2>
-            <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+            <p style={{ margin: 0, fontSize: 12, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 2 }}>
               Bis zu 20 gespeicherte Versionen pro Mappe
             </p>
           </div>
@@ -92,7 +92,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
         <div style={{
           display: 'flex', alignItems: 'flex-start', gap: 8, padding: '10px 12px',
           background: 'rgba(255,59,48,0.12)', border: '1px solid rgba(255,59,48,0.3)',
-          borderRadius: 10, marginBottom: 16, fontSize: 12, color: 'rgba(255,255,255,0.75)',
+          borderRadius: 10, marginBottom: 16, fontSize: 12, color: 'rgba(var(--rgb-fg),0.75)',
         }}>
           <AlertCircle size={14} style={{ color: '#FF3B30', flexShrink: 0, marginTop: 1 }} />
           <span>{error}</span>
@@ -133,11 +133,11 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
 
       {/* Version list */}
       {loading ? (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: 8, color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: 8, color: 'rgba(var(--rgb-fg),0.3)', fontSize: 13 }}>
           <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Lädt…
         </div>
       ) : versions.length === 0 && !error ? (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'rgba(255,255,255,0.3)' }}>
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: 'rgba(var(--rgb-fg),0.3)' }}>
           <Clock size={32} style={{ margin: '0 auto 12px', opacity: 0.4 }} />
           <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Noch keine Versionen gespeichert</div>
           <div style={{ fontSize: 12 }}>Speichere manuell eine Version um Änderungen festzuhalten.</div>
@@ -153,21 +153,21 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
               {/* Index badge */}
               <div style={{
                 width: 28, height: 28, borderRadius: 8, flexShrink: 0,
-                background: i === 0 ? 'rgba(0,122,255,0.2)' : 'rgba(255,255,255,0.06)',
-                border: i === 0 ? '1px solid rgba(0,122,255,0.3)' : '1px solid rgba(255,255,255,0.08)',
+                background: i === 0 ? 'rgba(0,122,255,0.2)' : 'rgba(var(--rgb-fg),0.06)',
+                border: i === 0 ? '1px solid rgba(0,122,255,0.3)' : '1px solid rgba(var(--rgb-fg),0.08)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 11, fontWeight: 700,
-                color: i === 0 ? 'var(--ios-blue)' : 'rgba(255,255,255,0.4)',
+                color: i === 0 ? 'var(--ios-blue)' : 'rgba(var(--rgb-fg),0.4)',
               }}>
                 {versions.length - i}
               </div>
 
               {/* Info */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: v.label ? 600 : 400, color: v.label ? '#fff' : 'rgba(255,255,255,0.65)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: 13, fontWeight: v.label ? 600 : 400, color: v.label ? '#fff' : 'rgba(var(--rgb-fg),0.65)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {v.label ?? 'Version'}
                 </div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
+                <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.35)', marginTop: 2 }}>
                   {relativeTime(v.created_at)} · {new Date(v.created_at).toLocaleString('de-CH', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>

@@ -19,6 +19,7 @@ import { shareLink } from '../lib/shareLink';
 import { openExternal } from '../lib/openExternal';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 import { resetOnboarding } from '../lib/onboarding';
+import { getStoredTheme, setStoredTheme, type Theme as ThemeChoice } from '../lib/theme';
 import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../store/uiStore';
 
@@ -129,7 +130,7 @@ function PlanSection() {
           <CheckCircle size={18} style={{ color: 'var(--ios-green)', flexShrink: 0 }} />
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ios-green)' }}>Willkommen bei PATH Pro!</div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>Dein Upgrade war erfolgreich. Alle Pro-Features sind jetzt aktiv.</div>
+            <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.6)', marginTop: 2 }}>Dein Upgrade war erfolgreich. Alle Pro-Features sind jetzt aktiv.</div>
           </div>
         </div>
       )}
@@ -140,7 +141,7 @@ function PlanSection() {
           <Loader2 size={18} style={{ color: 'var(--ios-blue)', flexShrink: 0, animation: 'spin 1s linear infinite' }} />
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ios-blue)' }}>Pro wird aktiviert…</div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>Zahlung bestätigt — warte auf Aktivierung (max. 15 Sek.)</div>
+            <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.5)', marginTop: 2 }}>Zahlung bestätigt — warte auf Aktivierung (max. 15 Sek.)</div>
           </div>
         </div>
       )}
@@ -151,7 +152,7 @@ function PlanSection() {
           <AlertTriangle size={18} style={{ color: '#FF9F0A', flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#FF9F0A' }}>Aktivierung verzögert</div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>Zahlung war erfolgreich. Lade die Seite in einer Minute neu oder kontaktiere uns.</div>
+            <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.5)', marginTop: 2 }}>Zahlung war erfolgreich. Lade die Seite in einer Minute neu oder kontaktiere uns.</div>
           </div>
           <button className="btn-glass btn-sm" onClick={() => { setWebhookFailed(false); setWebhookPending(true); let a = 0; const p = async () => { await refreshUser(); a++; const { user: u } = useAuthStore.getState(); if (u?.user_metadata?.plan === 'pro') { setWebhookPending(false); setShowSuccess(true); } else if (a < 4) { setTimeout(p, 3000); } else { setWebhookPending(false); setWebhookFailed(true); } }; setTimeout(p, 1000); }} style={{ fontSize: 11, padding: '6px 10px', flexShrink: 0 }}>
             Nochmals prüfen
@@ -168,9 +169,9 @@ function PlanSection() {
                 padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 800,
                 background: isPro
                   ? 'linear-gradient(135deg, rgba(255,159,10,0.3), rgba(255,55,95,0.25))'
-                  : 'rgba(255,255,255,0.1)',
-                border: isPro ? '1px solid rgba(255,159,10,0.5)' : '1px solid rgba(255,255,255,0.2)',
-                color: isPro ? '#FF9F0A' : 'rgba(255,255,255,0.6)',
+                  : 'rgba(var(--rgb-fg),0.1)',
+                border: isPro ? '1px solid rgba(255,159,10,0.5)' : '1px solid rgba(var(--rgb-fg),0.2)',
+                color: isPro ? '#FF9F0A' : 'rgba(var(--rgb-fg),0.6)',
               }}>
                 {isPro ? '✦ PRO' : 'FREE'}
               </span>
@@ -183,7 +184,7 @@ function PlanSection() {
                 </span>
               )}
             </div>
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
+            <div style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', marginTop: 2 }}>
               {isPro ? 'Alle Features freigeschaltet' : 'Grundfunktionen — kostenlos'}
             </div>
             {isPro && !isGift && (() => {
@@ -191,7 +192,7 @@ function PlanSection() {
               if (!ts) return null;
               const date = new Date(ts * 1000).toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
               return (
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 4 }}>
+                <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.3)', marginTop: 4 }}>
                   Verlängert am {date}
                 </div>
               );
@@ -213,7 +214,7 @@ function PlanSection() {
                 disabled={portalLoading}
                 style={{
                   background: 'none', border: 'none', padding: 0,
-                  fontSize: 11, color: 'rgba(255,255,255,0.45)',
+                  fontSize: 11, color: 'rgba(var(--rgb-fg),0.45)',
                   cursor: portalLoading ? 'default' : 'pointer',
                   display: 'flex', alignItems: 'center', gap: 4,
                   textDecoration: 'underline', textUnderlineOffset: 3,
@@ -267,8 +268,8 @@ function PlanSection() {
             return (
               <div key={label} style={{ marginBottom: 10 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                  <span style={{ color: 'rgba(255,255,255,0.6)' }}>{label}</span>
-                  <span style={{ fontWeight: 600, color: enabled ? 'var(--ios-green)' : 'rgba(255,255,255,0.3)' }}>
+                  <span style={{ color: 'rgba(var(--rgb-fg),0.6)' }}>{label}</span>
+                  <span style={{ fontWeight: 600, color: enabled ? 'var(--ios-green)' : 'rgba(var(--rgb-fg),0.3)' }}>
                     {enabled ? '✓ Aktiv' : '—'}
                   </span>
                 </div>
@@ -279,13 +280,13 @@ function PlanSection() {
           return (
             <div key={label} style={{ marginBottom: 10 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
-                <span style={{ color: 'rgba(255,255,255,0.6)' }}>{label}</span>
-                <span style={{ fontWeight: 600, color: used !== null ? color : 'rgba(255,255,255,0.5)' }}>
+                <span style={{ color: 'rgba(var(--rgb-fg),0.6)' }}>{label}</span>
+                <span style={{ fontWeight: 600, color: used !== null ? color : 'rgba(var(--rgb-fg),0.5)' }}>
                   {used !== null ? `${used} / ${maxDisplay}` : maxDisplay}
                 </span>
               </div>
               {used !== null && max !== Infinity && (
-                <div style={{ height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.1)' }}>
+                <div style={{ height: 3, borderRadius: 2, background: 'rgba(var(--rgb-fg),0.1)' }}>
                   <div style={{ height: '100%', width: `${Math.min(100, pct * 100)}%`, borderRadius: 2, background: color, transition: 'width 0.3s' }} />
                 </div>
               )}
@@ -307,17 +308,17 @@ function PlanSection() {
                   background: status === 'active'
                     ? 'rgba(52,199,89,0.15)'
                     : status === 'soon'
-                    ? 'rgba(255,255,255,0.05)'
+                    ? 'rgba(var(--rgb-fg),0.05)'
                     : 'rgba(255,159,10,0.12)',
                   border: status === 'active'
                     ? '1px solid rgba(52,199,89,0.3)'
                     : status === 'soon'
-                    ? '1px solid rgba(255,255,255,0.08)'
+                    ? '1px solid rgba(var(--rgb-fg),0.08)'
                     : '1px solid rgba(255,159,10,0.25)',
                   color: status === 'active'
                     ? 'var(--ios-green)'
                     : status === 'soon'
-                    ? 'rgba(255,255,255,0.22)'
+                    ? 'rgba(var(--rgb-fg),0.22)'
                     : '#FF9F0A',
                 }}>
                   {status === 'active' ? '✓ Aktiv' : status === 'soon' ? 'Bald' : 'PRO'}
@@ -474,8 +475,8 @@ function EmailChangeCard() {
           <div style={{ fontSize: 13, color: 'var(--ios-green)', display: 'flex', alignItems: 'center', gap: 6 }}>
             <CheckCircle size={14} /> Bestätigungs-E-Mail gesendet
           </div>
-          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: 0, lineHeight: 1.5 }}>
-            Wir haben einen Bestätigungslink an <strong style={{ color: 'rgba(255,255,255,0.7)' }}>{newEmail}</strong> geschickt. Klicke auf den Link, um die Änderung abzuschliessen.
+          <p style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.45)', margin: 0, lineHeight: 1.5 }}>
+            Wir haben einen Bestätigungslink an <strong style={{ color: 'rgba(var(--rgb-fg),0.7)' }}>{newEmail}</strong> geschickt. Klicke auf den Link, um die Änderung abzuschliessen.
           </p>
           <button
             className="btn-glass btn-sm"
@@ -495,7 +496,7 @@ function EmailChangeCard() {
             onChange={(e) => setNewEmail(e.target.value)}
             required maxLength={254} autoFocus autoComplete="email"
           />
-          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: 0, lineHeight: 1.5 }}>
+          <p style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.4)', margin: 0, lineHeight: 1.5 }}>
             Wir senden einen Bestätigungslink an die neue Adresse — die Änderung wird erst nach dem Klick aktiv.
           </p>
           {error && (
@@ -531,6 +532,50 @@ function EmailChangeCard() {
   );
 }
 
+function ThemeCard() {
+  const [theme, setTheme] = useState<ThemeChoice>(() => getStoredTheme());
+
+  function choose(t: ThemeChoice) {
+    setTheme(t);
+    setStoredTheme(t);
+  }
+
+  const options: { id: ThemeChoice; label: string }[] = [
+    { id: 'system', label: 'System' },
+    { id: 'dark', label: 'Dunkel' },
+    { id: 'light', label: 'Hell' },
+  ];
+
+  return (
+    <div className="glass-card" style={{ padding: 20 }}>
+      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>ERSCHEINUNGSBILD</div>
+      <div style={{ display: 'flex', gap: 6 }}>
+        {options.map(opt => (
+          <button
+            key={opt.id}
+            onClick={() => choose(opt.id)}
+            style={{
+              flex: 1,
+              padding: '10px 12px',
+              fontSize: 13,
+              fontWeight: theme === opt.id ? 600 : 400,
+              borderRadius: 'var(--radius-sm)',
+              border: theme === opt.id ? '1px solid var(--ios-blue)' : '1px solid var(--border-default)',
+              background: theme === opt.id ? 'rgba(0,122,255,0.12)' : 'var(--bg-btn)',
+              color: theme === opt.id ? 'var(--ios-blue)' : 'rgba(var(--rgb-fg), 0.85)',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-sf)',
+              transition: 'all 150ms ease-out',
+            }}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function AccountSection() {
   const { user, signOut } = useAuthStore();
   const { persons, resumes } = useResumeStore();
@@ -544,15 +589,15 @@ function AccountSection() {
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>KONTO-DETAILS</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 14 }}>
-            <span style={{ color: 'rgba(255,255,255,0.5)' }}>Personen</span>
+            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>Personen</span>
             <span style={{ fontWeight: 500 }}>{persons.length}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 14 }}>
-            <span style={{ color: 'rgba(255,255,255,0.5)' }}>Bewerbungsmappen</span>
+            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>Bewerbungsmappen</span>
             <span style={{ fontWeight: 500 }}>{resumes.length}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 14 }}>
-            <span style={{ color: 'rgba(255,255,255,0.5)' }}>Mitglied seit</span>
+            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>Mitglied seit</span>
             <span style={{ fontWeight: 500 }}>
               {user?.created_at ? new Date(user.created_at).toLocaleDateString('de-CH', { month: 'long', year: 'numeric' }) : '—'}
             </span>
@@ -562,9 +607,11 @@ function AccountSection() {
 
       <ProfileCard />
 
+      <ThemeCard />
+
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>APP-TOUR</div>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
+        <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', marginBottom: 12 }}>
           Zeige die Einführungstour erneut an.
         </p>
         <button
@@ -612,7 +659,7 @@ function SecuritySection() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>PASSWORT</div>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
+        <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', marginBottom: 12 }}>
           Wir senden einen Link an {user?.email} zum Zurücksetzen des Passworts.
         </p>
         {sent ? (
@@ -630,11 +677,11 @@ function SecuritySection() {
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 10, opacity: 0.6 }}>AKTIVE SITZUNG</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ color: 'rgba(255,255,255,0.5)' }}>Angemeldet als</span>
+            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>Angemeldet als</span>
             <span style={{ fontWeight: 500 }}>{user?.email ?? '—'}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ color: 'rgba(255,255,255,0.5)' }}>Letzte Anmeldung</span>
+            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>Letzte Anmeldung</span>
             <span style={{ fontWeight: 500 }}>
               {user?.last_sign_in_at
                 ? new Date(user.last_sign_in_at).toLocaleString('de-CH', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -687,7 +734,7 @@ function ReferralSection() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div className="glass-card" style={{ padding: 20, background: 'rgba(0,122,255,0.06)', border: '1px solid rgba(0,122,255,0.2)' }}>
         <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>Freunde einladen, 1 Monat gratis</div>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', lineHeight: 1.65, margin: 0 }}>
+        <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.55)', lineHeight: 1.65, margin: 0 }}>
           Teile deinen persönlichen Link. Wenn sich jemand über deinen Link registriert und ein Pro-Abo abschliesst, bekommst du automatisch CHF 5.00 auf dein Konto gutgeschrieben.
         </p>
       </div>
@@ -696,9 +743,9 @@ function ReferralSection() {
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>DEIN EINLADUNGSLINK</div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <div style={{
-            flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+            flex: 1, background: 'rgba(var(--rgb-fg),0.05)', border: '1px solid rgba(var(--rgb-fg),0.1)',
             borderRadius: 8, padding: '9px 12px', fontSize: 12, fontFamily: 'monospace',
-            color: 'rgba(255,255,255,0.55)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            color: 'rgba(var(--rgb-fg),0.55)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {refLink}
           </div>
@@ -714,7 +761,7 @@ function ReferralSection() {
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>DEINE STATISTIK</div>
         {stats === null ? (
-          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>Lädt…</div>
+          <div style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.3)' }}>Lädt…</div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
             {[
@@ -724,13 +771,13 @@ function ReferralSection() {
             ].map(({ label, value }) => (
               <div key={label} style={{
                 textAlign: 'center', padding: '14px 8px',
-                background: 'rgba(255,255,255,0.04)', borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'rgba(var(--rgb-fg),0.04)', borderRadius: 10,
+                border: '1px solid rgba(var(--rgb-fg),0.08)',
               }}>
-                <div style={{ fontSize: 26, fontWeight: 700, color: value > 0 ? 'var(--ios-green)' : 'rgba(255,255,255,0.45)' }}>
+                <div style={{ fontSize: 26, fontWeight: 700, color: value > 0 ? 'var(--ios-green)' : 'rgba(var(--rgb-fg),0.45)' }}>
                   {value}
                 </div>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>{label}</div>
+                <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 4 }}>{label}</div>
               </div>
             ))}
           </div>
@@ -765,7 +812,7 @@ function PrivacySection() {
 
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>DATENVERARBEITUNG</div>
-        <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.8 }}>
+        <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', lineHeight: 1.8 }}>
           <li>Deine Daten werden ausschliesslich für die App-Funktionalität verwendet</li>
           <li>Keine Weitergabe an Dritte</li>
           <li>Speicherung auf Supabase-Servern (EU/Schweiz)</li>
@@ -776,7 +823,7 @@ function PrivacySection() {
 
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>DATEN-EXPORT (DSGVO Art. 20)</div>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
+        <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', marginBottom: 12 }}>
           Lade alle deine Daten als JSON-Datei herunter. Dokumentenanhänge (Base64) werden aus Datenschutzgründen nicht mitexportiert.
         </p>
         <button className="btn-glass btn-sm" onClick={exportGdprData} style={{ gap: 6 }}>
@@ -789,7 +836,7 @@ function PrivacySection() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 600, marginBottom: 8, color: 'var(--ios-red)', opacity: 0.9 }}>
           <AlertTriangle size={14} /> GEFAHRENZONE
         </div>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 12 }}>
+        <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', marginBottom: 12 }}>
           Zum Löschen deines Kontos kontaktiere uns bitte direkt — wir entfernen alle Daten innerhalb von 30 Tagen.
         </p>
         <a
@@ -831,8 +878,8 @@ export default function AccountPage() {
             return (
               <button key={id} className="btn-glass btn-nav" onClick={() => setSection(id)}
                 style={{ flexShrink: 0, padding: '8px 12px', borderRadius: 'var(--radius-sm)', boxShadow: 'none', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6,
-                  background: isActive ? 'linear-gradient(135deg, rgba(0,122,255,0.3), rgba(88,86,214,0.25))' : 'rgba(255,255,255,0.07)',
-                  border: isActive ? '1px solid rgba(0,122,255,0.45)' : '1px solid rgba(255,255,255,0.1)',
+                  background: isActive ? 'linear-gradient(135deg, rgba(0,122,255,0.3), rgba(88,86,214,0.25))' : 'rgba(var(--rgb-fg),0.07)',
+                  border: isActive ? '1px solid rgba(0,122,255,0.45)' : '1px solid rgba(var(--rgb-fg),0.1)',
                 }}>
                 <Icon size={14} />
                 <span style={{ fontSize: 12, fontWeight: isActive ? 600 : 400 }}>{label}</span>
@@ -871,7 +918,7 @@ export default function AccountPage() {
       </aside>
 
       <div className="glass" style={{ flex: 1, overflow: 'auto', borderRadius: 'var(--radius-lg)', padding: '20px 28px 20px 22px' }}>
-        <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(var(--rgb-fg),0.1)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {current && (
               <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(0,122,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

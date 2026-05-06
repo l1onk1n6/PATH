@@ -135,7 +135,7 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
             </div>
             <div>
               <div style={{ fontWeight: 700, fontSize: 15 }}>Lebenslauf übersetzen</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Alle Textfelder werden übersetzt</div>
+              <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)' }}>Alle Textfelder werden übersetzt</div>
             </div>
           </div>
           <button className="btn-glass btn-icon" onClick={onClose} style={{ padding: 6 }}><X size={14} /></button>
@@ -156,8 +156,8 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
                     onClick={() => setLanguage(lang)}
                     style={{
                       fontSize: 12,
-                      background: language === lang ? 'rgba(0,122,255,0.25)' : 'rgba(255,255,255,0.07)',
-                      border: language === lang ? '1px solid rgba(0,122,255,0.5)' : '1px solid rgba(255,255,255,0.12)',
+                      background: language === lang ? 'rgba(0,122,255,0.25)' : 'rgba(var(--rgb-fg),0.07)',
+                      border: language === lang ? '1px solid rgba(0,122,255,0.5)' : '1px solid rgba(var(--rgb-fg),0.12)',
                     }}>
                     {lang}
                   </button>
@@ -166,8 +166,8 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
                   onClick={() => setLanguage('Andere…')}
                   style={{
                     fontSize: 12,
-                    background: language === 'Andere…' ? 'rgba(0,122,255,0.25)' : 'rgba(255,255,255,0.07)',
-                    border: language === 'Andere…' ? '1px solid rgba(0,122,255,0.5)' : '1px solid rgba(255,255,255,0.12)',
+                    background: language === 'Andere…' ? 'rgba(0,122,255,0.25)' : 'rgba(var(--rgb-fg),0.07)',
+                    border: language === 'Andere…' ? '1px solid rgba(0,122,255,0.5)' : '1px solid rgba(var(--rgb-fg),0.12)',
                   }}>
                   Andere…
                 </button>
@@ -178,7 +178,7 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
               )}
             </div>
 
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 16, padding: '8px 12px', background: 'rgba(255,255,255,0.04)', borderRadius: 8 }}>
+            <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.4)', marginBottom: 16, padding: '8px 12px', background: 'rgba(var(--rgb-fg),0.04)', borderRadius: 8 }}>
               Übersetzt: Zusammenfassung, Berufserfahrung, Ausbildung, Projekte, eigene Sektionen, Anschreiben.
               Namen, Daten und Kontaktdaten bleiben unverändert.
             </div>

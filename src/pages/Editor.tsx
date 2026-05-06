@@ -63,7 +63,7 @@ export default function Editor() {
       <div className="glass-card animate-fade-in" style={{ padding: '48px 32px', textAlign: 'center', margin: 'auto' }}>
         <AlertCircle size={40} style={{ margin: '0 auto 16px', opacity: 0.5 }} />
         <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 600 }}>Kein Lebenslauf ausgewählt</h3>
-        <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 20 }}>
+        <p style={{ color: 'rgba(var(--rgb-fg),0.5)', marginBottom: 20 }}>
           Wählen Sie eine Person in der Seitenleiste oder legen Sie eine neue an.
         </p>
         <button className="btn-glass btn-primary" onClick={() => navigate('/')}>
@@ -98,7 +98,7 @@ export default function Editor() {
           <Lock size={24} style={{ color: '#FF9F0A' }} />
         </div>
         <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 700 }}>Mappe eingefroren</h3>
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, marginBottom: 20 }}>
+        <p style={{ color: 'rgba(var(--rgb-fg),0.5)', fontSize: 13, marginBottom: 20 }}>
           «{resume.name || 'Bewerbungsmappe'}» überschreitet dein Free-Limit von {limits.resumes} Mappen.
           Upgrade auf Pro oder lösche andere Mappen um diese wieder zu bearbeiten.
         </p>
@@ -142,8 +142,8 @@ export default function Editor() {
             return (
               <button key={id} className="btn-glass" onClick={() => setActiveSection(id)} style={{
                 flexShrink: 0, padding: '8px 12px', borderRadius: 'var(--radius-sm)', boxShadow: 'none',
-                background: isActive ? 'linear-gradient(135deg, rgba(0,122,255,0.3), rgba(88,86,214,0.25))' : 'rgba(255,255,255,0.07)',
-                border: isActive ? '1px solid rgba(0,122,255,0.45)' : '1px solid rgba(255,255,255,0.1)',
+                background: isActive ? 'linear-gradient(135deg, rgba(0,122,255,0.3), rgba(88,86,214,0.25))' : 'rgba(var(--rgb-fg),0.07)',
+                border: isActive ? '1px solid rgba(0,122,255,0.45)' : '1px solid rgba(var(--rgb-fg),0.1)',
                 display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
               }}>
                 <Icon size={14} style={{ opacity: isActive ? 1 : 0.55 }} />
@@ -192,7 +192,7 @@ export default function Editor() {
           );
         })}
 
-        <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '6px 4px' }} />
+        <div style={{ height: 1, background: 'rgba(var(--rgb-fg),0.08)', margin: '6px 4px' }} />
 
         {/* Übersetzen */}
         <button className="btn-glass"
@@ -232,7 +232,7 @@ export default function Editor() {
             <VersionHistoryPanel resumeId={resume.id} />
           ) : (
             <>
-              <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+              <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: '1px solid rgba(var(--rgb-fg),0.1)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between', flexWrap: 'wrap' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                     {currentSection?.icon && (

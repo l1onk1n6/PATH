@@ -79,7 +79,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
               </div>
               <span style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.3px' }}>PATH Pro</span>
             </div>
-            <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>
+            <p style={{ margin: 0, fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)' }}>
               Alle Funktionen für professionelle Bewerbungen
             </p>
           </div>
@@ -92,8 +92,8 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
         {!Capacitor.isNativePlatform() && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 0, marginBottom: 20,
-            background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: 3,
-            border: '1px solid rgba(255,255,255,0.1)',
+            background: 'rgba(var(--rgb-fg),0.06)', borderRadius: 10, padding: 3,
+            border: '1px solid rgba(var(--rgb-fg),0.1)',
           }}>
             {(['monthly', 'yearly'] as const).map((p) => {
               const active = plan === p;
@@ -105,7 +105,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
                     flex: 1, padding: '8px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
                     fontSize: 13, fontWeight: 600, transition: 'all 0.15s',
                     background: active ? 'linear-gradient(135deg, rgba(255,159,10,0.35), rgba(255,55,95,0.28))' : 'transparent',
-                    color: active ? '#fff' : 'rgba(255,255,255,0.45)',
+                    color: active ? '#fff' : 'rgba(var(--rgb-fg),0.45)',
                     boxShadow: active ? '0 2px 8px rgba(0,0,0,0.25)' : 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
                   }}
@@ -144,28 +144,28 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
                 <span style={{ fontSize: 15, flexShrink: 0, lineHeight: 1.4 }}>{f.icon}</span>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 1 }}>{f.label}</div>
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>{f.description}</div>
+                  <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.45)' }}>{f.description}</div>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Coming soon */}
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', padding: '2px 4px', marginBottom: 8 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(var(--rgb-fg),0.35)', textTransform: 'uppercase', padding: '2px 4px', marginBottom: 8 }}>
             ⏳ In Entwicklung
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 6 }}>
             {PRO_FEATURES.filter(f => !f.available).map((f) => (
               <div key={f.id} style={{
                 display: 'flex', alignItems: 'flex-start', gap: 10, padding: '9px 12px', borderRadius: 10,
-                background: f.id === highlightId ? 'rgba(255,159,10,0.12)' : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${f.id === highlightId ? 'rgba(255,159,10,0.3)' : 'rgba(255,255,255,0.07)'}`,
+                background: f.id === highlightId ? 'rgba(255,159,10,0.12)' : 'rgba(var(--rgb-fg),0.04)',
+                border: `1px solid ${f.id === highlightId ? 'rgba(255,159,10,0.3)' : 'rgba(var(--rgb-fg),0.07)'}`,
                 opacity: 0.7,
               }}>
                 <span style={{ fontSize: 15, flexShrink: 0, lineHeight: 1.4 }}>{f.icon}</span>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 1 }}>{f.label}</div>
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{f.description}</div>
+                  <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)' }}>{f.description}</div>
                 </div>
               </div>
             ))}
@@ -205,7 +205,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
             </p>
           )}
 
-          <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>
+          <p style={{ margin: 0, fontSize: 11, color: 'rgba(var(--rgb-fg),0.3)', textAlign: 'center' }}>
             {Capacitor.isNativePlatform()
               ? 'Abrechnung über Google Play · Jederzeit kündbar'
               : plan === 'yearly'
@@ -245,20 +245,20 @@ export default function ProGate({ featureId, children, badge = false }: ProGateP
         position: 'absolute', top: -5, right: -16,
         fontSize: 9, fontWeight: 700, letterSpacing: '0.04em',
         padding: '2px 4px', borderRadius: 3,
-        background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)',
-        color: 'rgba(255,255,255,0.75)', pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 1,
+        background: 'rgba(var(--rgb-fg),0.12)', border: '1px solid rgba(var(--rgb-fg),0.18)',
+        color: 'rgba(var(--rgb-fg),0.75)', pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 1,
       }}>BALD</span>
     ) : (
       <div style={{
         position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
         gap: 6, borderRadius: 'inherit', background: 'rgba(0,0,0,0.2)',
       }}>
-        <Clock size={12} style={{ color: 'rgba(255,255,255,0.7)' }} />
+        <Clock size={12} style={{ color: 'rgba(var(--rgb-fg),0.7)' }} />
         <span style={{
           fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
           padding: '3px 7px', borderRadius: 6,
-          background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)',
-          color: 'rgba(255,255,255,0.85)',
+          background: 'rgba(var(--rgb-fg),0.12)', border: '1px solid rgba(var(--rgb-fg),0.18)',
+          color: 'rgba(var(--rgb-fg),0.85)',
         }}>BALD VERFÜGBAR</span>
       </div>
     );
@@ -270,10 +270,10 @@ export default function ProGate({ featureId, children, badge = false }: ProGateP
             <div className="glass-card animate-scale-in" onClick={e => e.stopPropagation()}
               style={{ padding: '24px 28px', maxWidth: 320, textAlign: 'center', background: 'rgba(14,14,22,0.97)' }}>
               <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(88,86,214,0.2)', border: '1px solid rgba(88,86,214,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-                <Clock size={20} style={{ color: 'rgba(255,255,255,0.85)' }} />
+                <Clock size={20} style={{ color: 'rgba(var(--rgb-fg),0.85)' }} />
               </div>
               <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>{label} — bald verfügbar</div>
-              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', marginBottom: 16 }}>
+              <div style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.55)', marginBottom: 16 }}>
                 {feature.description}
               </div>
               <button className="btn-glass btn-primary btn-sm" onClick={() => setShowSoon(false)}>Verstanden</button>
@@ -331,7 +331,7 @@ export default function ProGate({ featureId, children, badge = false }: ProGateP
           gap: 6, borderRadius: 'inherit',
           background: 'rgba(0,0,0,0.15)',
         }}>
-          <Lock size={12} style={{ color: 'rgba(255,255,255,0.7)' }} />
+          <Lock size={12} style={{ color: 'rgba(var(--rgb-fg),0.7)' }} />
           <span style={{
             fontSize: 10, fontWeight: 800, letterSpacing: '0.08em',
             padding: '3px 7px', borderRadius: 6,

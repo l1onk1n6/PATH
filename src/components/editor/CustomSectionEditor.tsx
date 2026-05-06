@@ -23,7 +23,7 @@ export default function CustomSectionEditor() {
         </div>
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Eigene Sektionen</div>
-          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', maxWidth: 280 }}>
+          <div style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', maxWidth: 280 }}>
             Erstelle eigene Abschnitte wie Projekte, Publikationen oder Zertifikate — mit PATH Pro.
           </div>
         </div>

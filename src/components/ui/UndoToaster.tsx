@@ -39,13 +39,13 @@ export default function UndoToaster() {
               padding: '10px 12px 10px 16px',
               borderRadius: 12,
               background: 'rgba(18,20,30,0.96)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              border: '1px solid rgba(var(--rgb-fg),0.12)',
               backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
               boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
               minWidth: 320, maxWidth: '92vw', position: 'relative', overflow: 'hidden',
             }}
           >
-            <div style={{ flex: 1, fontSize: 13, color: 'rgba(255,255,255,0.9)' }}>
+            <div style={{ flex: 1, fontSize: 13, color: 'rgba(var(--rgb-fg),0.9)' }}>
               {t.message}
             </div>
             <button
@@ -62,7 +62,7 @@ export default function UndoToaster() {
             <button
               onClick={() => dismiss(t.id)}
               aria-label="Schliessen"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', padding: 4, display: 'flex' }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(var(--rgb-fg),0.4)', padding: 4, display: 'flex' }}
             >
               <X size={14} />
             </button>
