@@ -1,9 +1,23 @@
 import { useState } from 'react';
-import { Share2, X, CheckCircle } from 'lucide-react';
+import { Share2, X, CheckCircle, Eye, Clock } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { shareLink } from '../../lib/shareLink';
+
+function relativeTime(iso: string): string {
+  const diff = Math.max(0, Date.now() - new Date(iso).getTime());
+  const min = Math.round(diff / 60_000);
+  if (min < 1) return 'gerade eben';
+  if (min < 60) return `vor ${min} Min.`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `vor ${h} Std.`;
+  const d = Math.round(h / 24);
+  if (d < 30) return `vor ${d} Tagen`;
+  const mo = Math.round(d / 30);
+  if (mo < 12) return `vor ${mo} Monaten`;
+  return `vor ${Math.round(mo / 12)} Jahren`;
+}
 
 interface Props {
   resumeId: string;
@@ -17,6 +31,9 @@ export default function ShareModal({ resumeId, token, onClose }: Props) {
   const [copied, setCopied] = useState(false);
 
   const shareUrl = token ? `${window.location.origin}${window.location.pathname}#/shared?t=${token}` : null;
+  const resume = resumes.find(r => r.id === resumeId);
+  const views = resume?.shareViews ?? 0;
+  const lastViewedAt = resume?.lastViewedAt;
   const activeShareCount = resumes.filter(r => r.shareToken && r.id !== resumeId).length;
   const atShareLimit = !token && activeShareCount >= limits.shareLinks;
 
@@ -78,6 +95,23 @@ export default function ShareModal({ resumeId, token, onClose }: Props) {
                 {copied ? <CheckCircle size={14} /> : 'Kopieren'}
               </button>
             </div>
+
+            {/* Analytics */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              gap: 12, padding: '10px 12px', marginBottom: 12,
+              background: 'var(--bg-btn)', border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-sm)', fontSize: 12,
+              color: 'rgba(var(--rgb-fg), 0.75)',
+            }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Eye size={14} /> {views} Aufruf{views === 1 ? '' : 'e'}
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'rgba(var(--rgb-fg), 0.55)' }}>
+                <Clock size={14} /> {lastViewedAt ? relativeTime(lastViewedAt) : 'Noch nicht aufgerufen'}
+              </span>
+            </div>
+
             <button className="btn-glass btn-danger" style={{ width: '100%', fontSize: 12 }} onClick={disable}>
               Link deaktivieren
             </button>
