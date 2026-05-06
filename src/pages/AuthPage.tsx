@@ -138,13 +138,13 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
             <div style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(0,122,255,0.12)', border: '1px solid rgba(0,122,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               <Mail size={26} style={{ color: 'var(--ios-blue)' }} />
             </div>
-            <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>E-Mail bestätigen</h2>
+            <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>{t('E-Mail bestätigen')}</h2>
             <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', lineHeight: 1.6, margin: '0 0 20px' }}>
-              Wir haben dir eine Bestätigungs-E-Mail geschickt.<br />Bitte klicke auf den Link in der E-Mail.
+              {t('Wir haben dir eine Bestätigungs-E-Mail geschickt.')}<br />{t('Bitte klicke auf den Link in der E-Mail.')}
             </p>
             {resendSent ? (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 13, color: '#34c759', marginBottom: 16 }}>
-                <CheckCircle size={14} /> E-Mail erneut gesendet!
+                <CheckCircle size={14} /> {t('E-Mail erneut gesendet!')}
               </div>
             ) : (
               <button
@@ -156,7 +156,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
                 }}
                 style={{ width: '100%', justifyContent: 'center', padding: '11px 20px', marginBottom: 12, gap: 6, opacity: loading ? 0.7 : 1 }}
               >
-                <RefreshCw size={14} /> E-Mail erneut senden
+                <RefreshCw size={14} /> {t('E-Mail erneut senden')}
               </button>
             )}
             {error && (
@@ -165,7 +165,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
               </div>
             )}
             <button onClick={() => { clearError(); switchMode('login'); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(var(--rgb-fg),0.35)', fontSize: 12 }}>
-              Zurück zur Anmeldung
+              {t('Zurück zur Anmeldung')}
             </button>
           </div>
         )}
@@ -194,23 +194,23 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
             <form onSubmit={handleSubmit}>
               {mode === 'register' && (
                 <div style={{ marginBottom: 12 }}>
-                  <label className="section-label">Name</label>
-                  <input className="input-glass" placeholder="Max Mustermann" value={name} maxLength={100}
+                  <label className="section-label">{t('Name')}</label>
+                  <input className="input-glass" placeholder={t('Max Mustermann')} value={name} maxLength={100}
                     onChange={(e) => setName(e.target.value)} required autoFocus />
                 </div>
               )}
 
               <div style={{ marginBottom: 12 }}>
-                <label className="section-label">E-Mail</label>
-                <input className="input-glass" type="email" placeholder="max@beispiel.de" value={email} maxLength={254}
+                <label className="section-label">{t('E-Mail')}</label>
+                <input className="input-glass" type="email" placeholder={t('max@beispiel.de')} value={email} maxLength={254}
                   onChange={(e) => setEmail(e.target.value)} required autoFocus={mode === 'login'}
                   autoComplete={mode === 'login' ? 'username' : 'email'} />
               </div>
 
               <div style={{ marginBottom: strength ? 6 : 8, position: 'relative' }}>
-                <label className="section-label">Passwort</label>
+                <label className="section-label">{t('Passwort')}</label>
                 <input className="input-glass" type={showPw ? 'text' : 'password'}
-                  placeholder={mode === 'register' ? 'Mindestens 8 Zeichen' : 'Passwort eingeben'}
+                  placeholder={mode === 'register' ? t('Mindestens 8 Zeichen') : t('Passwort eingeben')}
                   value={password} onChange={(e) => setPassword(e.target.value)}
                   required minLength={mode === 'register' ? 8 : 1} maxLength={128}
                   autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
@@ -232,7 +232,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
                       background: STRENGTH_COLOR[strength], transition: 'width 0.3s, background 0.3s',
                     }} />
                   </div>
-                  <span style={{ fontSize: 11, color: STRENGTH_COLOR[strength] }}>Passwortstärke: {STRENGTH_LABEL[strength]}</span>
+                  <span style={{ fontSize: 11, color: STRENGTH_COLOR[strength] }}>{t('Passwortstärke')}: {STRENGTH_LABEL[strength]}</span>
                 </div>
               )}
 
@@ -293,30 +293,30 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
         {!emailUnconfirmed && mode === 'forgot' && (
           <>
             <button onClick={() => switchMode('login')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(var(--rgb-fg),0.45)', fontSize: 13, padding: '0 0 16px', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <ArrowLeft size={14} /> Zurück zur Anmeldung
+              <ArrowLeft size={14} /> {t('Zurück zur Anmeldung')}
             </button>
 
             {resetSent ? (
               <div style={{ textAlign: 'center', padding: '12px 0' }}>
                 <CheckCircle size={40} style={{ color: '#34c759', marginBottom: 12 }} />
-                <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>E-Mail gesendet</h2>
+                <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>{t('E-Mail gesendet')}</h2>
                 <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', lineHeight: 1.6, margin: '0 0 20px' }}>
-                  Wir haben dir einen Link zum Zurücksetzen deines Passworts geschickt. Bitte prüfe dein Postfach.
+                  {t('Wir haben dir einen Link zum Zurücksetzen deines Passworts geschickt. Bitte prüfe dein Postfach.')}
                 </p>
                 <button onClick={() => switchMode('login')} className="btn-glass" style={{ width: '100%', justifyContent: 'center', padding: '12px 20px' }}>
-                  Zurück zur Anmeldung
+                  {t('Zurück zur Anmeldung')}
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
-                <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 6px' }}>Passwort zurücksetzen</h2>
+                <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 6px' }}>{t('Passwort zurücksetzen')}</h2>
                 <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', margin: '0 0 18px', lineHeight: 1.5 }}>
-                  Gib deine E-Mail-Adresse ein. Wir senden dir einen Link zum Zurücksetzen.
+                  {t('Gib deine E-Mail-Adresse ein. Wir senden dir einen Link zum Zurücksetzen.')}
                 </p>
 
                 <div style={{ marginBottom: 16 }}>
-                  <label className="section-label">E-Mail</label>
-                  <input className="input-glass" type="email" placeholder="max@beispiel.de" value={email}
+                  <label className="section-label">{t('E-Mail')}</label>
+                  <input className="input-glass" type="email" placeholder={t('max@beispiel.de')} value={email}
                     onChange={(e) => setEmail(e.target.value)} required autoFocus />
                 </div>
 
@@ -328,7 +328,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
 
                 <button type="submit" className="btn-glass btn-primary" disabled={loading}
                   style={{ width: '100%', justifyContent: 'center', padding: '13px 20px', opacity: loading ? 0.7 : 1 }}>
-                  {loading ? 'Wird gesendet…' : 'Reset-Link senden'}
+                  {loading ? t('Wird gesendet…') : t('Reset-Link senden')}
                 </button>
               </form>
             )}
@@ -339,30 +339,30 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
         {!emailUnconfirmed && mode === 'magic' && (
           <>
             <button onClick={() => switchMode('login')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(var(--rgb-fg),0.45)', fontSize: 13, padding: '0 0 16px', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <ArrowLeft size={14} /> Zurück zur Anmeldung
+              <ArrowLeft size={14} /> {t('Zurück zur Anmeldung')}
             </button>
 
             {magicSent ? (
               <div style={{ textAlign: 'center', padding: '12px 0' }}>
                 <CheckCircle size={40} style={{ color: '#34c759', marginBottom: 12 }} />
-                <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>Link gesendet</h2>
+                <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>{t('Link gesendet')}</h2>
                 <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', lineHeight: 1.6, margin: '0 0 20px' }}>
                   Wir haben dir einen Anmeldelink an <strong style={{ color: 'rgba(var(--rgb-fg),0.75)' }}>{email}</strong> geschickt. Der Link ist 60 Minuten gültig.
                 </p>
                 <button onClick={() => switchMode('login')} className="btn-glass" style={{ width: '100%', justifyContent: 'center', padding: '12px 20px' }}>
-                  Zurück zur Anmeldung
+                  {t('Zurück zur Anmeldung')}
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
-                <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 6px' }}>Magic Link</h2>
+                <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 6px' }}>{t('Magic Link')}</h2>
                 <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', margin: '0 0 18px', lineHeight: 1.5 }}>
-                  Gib deine E-Mail-Adresse ein. Wir senden dir einen einmaligen Anmeldelink – kein Passwort nötig.
+                  {t('Gib deine E-Mail-Adresse ein. Wir senden dir einen einmaligen Anmeldelink – kein Passwort nötig.')}
                 </p>
 
                 <div style={{ marginBottom: 16 }}>
-                  <label className="section-label">E-Mail</label>
-                  <input className="input-glass" type="email" placeholder="max@beispiel.de" value={email} maxLength={254}
+                  <label className="section-label">{t('E-Mail')}</label>
+                  <input className="input-glass" type="email" placeholder={t('max@beispiel.de')} value={email} maxLength={254}
                     onChange={(e) => setEmail(e.target.value)} required autoFocus autoComplete="email" />
                 </div>
 
@@ -374,7 +374,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
 
                 <button type="submit" className="btn-glass btn-primary" disabled={loading}
                   style={{ width: '100%', justifyContent: 'center', padding: '13px 20px', gap: 6, opacity: loading ? 0.7 : 1 }}>
-                  <Zap size={14} /> {loading ? 'Wird gesendet…' : 'Magic Link senden'}
+                  <Zap size={14} /> {loading ? t('Wird gesendet…') : t('Magic Link senden')}
                 </button>
               </form>
             )}
@@ -384,15 +384,15 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
         {/* ── Neues Passwort setzen (nach Klick auf Reset-Link) ── */}
         {!emailUnconfirmed && mode === 'reset' && (
           <form onSubmit={handleSubmit}>
-            <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 6px' }}>Neues Passwort</h2>
+            <h2 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 6px' }}>{t('Neues Passwort')}</h2>
             <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', margin: '0 0 18px', lineHeight: 1.5 }}>
-              Wähle ein neues Passwort für dein Konto.
+              {t('Wähle ein neues Passwort für dein Konto.')}
             </p>
 
             <div style={{ marginBottom: 12, position: 'relative' }}>
-              <label className="section-label">Neues Passwort</label>
+              <label className="section-label">{t('Neues Passwort')}</label>
               <input className="input-glass" type={showPw ? 'text' : 'password'}
-                placeholder="Mindestens 8 Zeichen" value={password}
+                placeholder={t('Mindestens 8 Zeichen')} value={password}
                 onChange={(e) => { setPassword(e.target.value); setPwMismatch(false); }}
                 required minLength={8} autoFocus autoComplete="new-password" style={{ paddingRight: 42 }} />
               <button type="button" onClick={() => setShowPw(!showPw)} style={{
@@ -413,15 +413,15 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
                   }} />
                 </div>
                 <span style={{ fontSize: 11, color: STRENGTH_COLOR[passwordStrength(password)] }}>
-                  Passwortstärke: {STRENGTH_LABEL[passwordStrength(password)]}
+                  {t('Passwortstärke')}: {STRENGTH_LABEL[passwordStrength(password)]}
                 </span>
               </div>
             )}
 
             <div style={{ marginBottom: 16, position: 'relative' }}>
-              <label className="section-label">Passwort bestätigen</label>
+              <label className="section-label">{t('Passwort bestätigen')}</label>
               <input className="input-glass" type={showConfirmPw ? 'text' : 'password'}
-                placeholder="Passwort wiederholen" value={confirmPassword}
+                placeholder={t('Passwort wiederholen')} value={confirmPassword}
                 onChange={(e) => { setConfirmPassword(e.target.value); setPwMismatch(false); }}
                 required autoComplete="new-password"
                 style={{ paddingRight: 42, borderColor: pwMismatch ? 'rgba(255,59,48,0.6)' : undefined }} />
@@ -435,7 +435,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
 
             {pwMismatch && (
               <div style={{ background: 'rgba(255,59,48,0.15)', border: '1px solid rgba(255,59,48,0.3)', borderRadius: 'var(--radius-sm)', padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#ff6b6b' }}>
-                Die Passwörter stimmen nicht überein.
+                {t('Die Passwörter stimmen nicht überein.')}
               </div>
             )}
 
@@ -447,7 +447,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
 
             <button type="submit" className="btn-glass btn-primary" disabled={loading || password.length < 8}
               style={{ width: '100%', justifyContent: 'center', padding: '13px 20px', opacity: loading ? 0.7 : 1 }}>
-              {loading ? 'Wird gespeichert…' : 'Passwort speichern'}
+              {loading ? t('Wird gespeichert…') : t('Passwort speichern')}
             </button>
           </form>
         )}

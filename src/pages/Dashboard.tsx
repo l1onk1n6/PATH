@@ -21,6 +21,7 @@ import { calcCompleteness, completenessColor } from '../lib/completeness';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { UpgradeModal } from '../components/ui/ProGate';
 import { usePlan } from '../lib/plan';
+import { useT } from '../lib/i18n';
 import AtsDialog from '../components/ats/AtsDialog';
 import ShareModal from '../components/ui/ShareModal';
 
@@ -28,12 +29,12 @@ const ALL_STATUSES: ApplicationStatus[] = ['entwurf', 'gesendet', 'interview', '
 
 // ── ATS button ─────────────────────────────────────────────
 // ── Completeness bar ───────────────────────────────────────
-function CompletenessBar({ score }: { score: number }) {
+function CompletenessBar({ score, label }: { score: number; label: string }) {
   const color = completenessColor(score);
   return (
-    <div title={`Vollständigkeit: ${score}%`} style={{ marginBottom: 10 }}>
+    <div title={`${label}: ${score}%`} style={{ marginBottom: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 11, color: 'rgba(var(--rgb-fg),0.45)' }}>
-        <span>Vollständigkeit</span>
+        <span>{label}</span>
         <span style={{ color, fontWeight: 600 }}>{score}%</span>
       </div>
       <div style={{ height: 4, borderRadius: 2, background: 'rgba(var(--rgb-fg),0.1)', overflow: 'hidden' }}>
@@ -51,6 +52,7 @@ function CompletenessBar({ score }: { score: number }) {
 export default function Dashboard() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const t = useT();
   const { limits, isPro } = usePlan();
   const {
     persons, resumes, addPerson, deletePerson, setActivePerson, activePersonId,
@@ -132,7 +134,7 @@ export default function Dashboard() {
   function bulkDelete() {
     const ids = Array.from(selected);
     if (ids.length === 0) return;
-    if (!confirm(`${ids.length} Bewerbungsmappe${ids.length === 1 ? '' : 'n'} wirklich löschen?`)) return;
+    if (!confirm(`${ids.length} ${ids.length === 1 ? t('Bewerbungsmappe') : t('Bewerbungsmappen')} ${t('wirklich löschen?')}`)) return;
     ids.forEach(id => deleteResume(id));
     setSelected(new Set());
     setBulkMode(false);
@@ -152,16 +154,16 @@ export default function Dashboard() {
           display: 'flex', alignItems: 'center', gap: 12,
           fontSize: 13,
         }}>
-          <span style={{ fontWeight: 600 }}>{selected.size} ausgewählt</span>
+          <span style={{ fontWeight: 600 }}>{selected.size} {t('ausgewählt')}</span>
           <button className="btn-glass btn-sm btn-danger" onClick={bulkDelete} style={{ gap: 6 }}>
-            <Trash2 size={14} /> Löschen
+            <Trash2 size={14} /> {t('Löschen')}
           </button>
           <button
             className="btn-glass btn-sm"
             onClick={() => { setSelected(new Set()); setBulkMode(false); }}
             style={{ gap: 6 }}
           >
-            <X size={14} /> Abbrechen
+            <X size={14} /> {t('Abbrechen')}
           </button>
         </div>
       )}
@@ -192,7 +194,7 @@ export default function Dashboard() {
         <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)' }} onClick={() => setStatusMenuResumeId(null)}>
           <div onClick={(e) => e.stopPropagation()} className="glass-card animate-scale-in"
             style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 101, padding: 16, minWidth: 200, background: 'rgba(14,14,22,0.97)' }}>
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, opacity: 0.7 }}>Status setzen</div>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, opacity: 0.7 }}>{t('Status: ').replace(': ', '')}</div>
             {ALL_STATUSES.map(s => (
               <button key={s} className="btn-glass"
                 style={{ width: '100%', justifyContent: 'flex-start', marginBottom: 6, gap: 10, fontSize: 13 }}
@@ -236,17 +238,17 @@ export default function Dashboard() {
                 animation: 'scaleIn 0.15s cubic-bezier(0.34,1.56,0.64,1) both',
               }}>
               <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(var(--rgb-fg),0.35)', padding: '6px 12px 4px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                {mr.name || 'Bewerbungsmappe'}
+                {mr.name || t('Bewerbungsmappe')}
               </div>
               <div style={{ height: 1, background: 'rgba(var(--rgb-fg),0.07)', margin: '4px 0' }} />
               {([
                 { icon: Share2, label: mr.shareToken ? 'Link teilen ·  aktiv' : 'Link teilen', color: mr.shareToken ? 'var(--ios-blue)' : undefined,
                   action: () => { setShareModalResumeId(mr.id); setMenuOpenResumeId(null); } },
-                { icon: Pencil, label: 'Umbenennen',
-                  action: () => { setRenamingResumeId(mr.id); setRenameValue(mr.name || 'Bewerbungsmappe'); setMenuOpenResumeId(null); } },
-                { icon: Copy, label: 'Duplizieren',
+                { icon: Pencil, label: t('Umbenennen'),
+                  action: () => { setRenamingResumeId(mr.id); setRenameValue(mr.name || t('Bewerbungsmappe')); setMenuOpenResumeId(null); } },
+                { icon: Copy, label: t('Duplizieren'),
                   action: () => { duplicateResume(mr.id); setMenuOpenResumeId(null); } },
-                { icon: BarChart2, label: 'ATS-Score prüfen',
+                { icon: BarChart2, label: t('ATS-Score prüfen'),
                   action: () => {
                     setMenuOpenResumeId(null);
                     if (!isPro) { setShowAtsUpgrade(true); return; }
@@ -277,7 +279,7 @@ export default function Dashboard() {
                   <button style={{ ...itemStyle, color: 'var(--ios-red)' }}
                     onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,59,48,0.1)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-                    onClick={() => { if (confirm(`"${mr.name || 'Bewerbungsmappe'}" löschen?`)) deleteResume(mr.id); setMenuOpenResumeId(null); }}>
+                    onClick={() => { if (confirm(`"${mr.name || t('Bewerbungsmappe')}" löschen?`)) deleteResume(mr.id); setMenuOpenResumeId(null); }}>
                     <Trash2 size={14} /> Löschen
                   </button>
                 </>
@@ -337,7 +339,7 @@ export default function Dashboard() {
             title="Mehrere Mappen auswählen"
             style={bulkMode ? { background: 'rgba(0,122,255,0.18)', border: '1px solid rgba(0,122,255,0.4)' } : undefined}
           >
-            {bulkMode ? <CheckSquare size={14} /> : <Square size={14} />} {!isMobile && 'Auswählen'}
+            {bulkMode ? <CheckSquare size={14} /> : <Square size={14} />} {!isMobile && t('Auswählen')}
           </button>
           <button
             className="btn-glass btn-primary btn-sm"
@@ -345,7 +347,7 @@ export default function Dashboard() {
             onClick={() => { if (persons.length >= limits.persons) { clearLimitError(); } else { setShowAdd(true); } }}
             title={persons.length >= limits.persons ? `Limit erreicht (${limits.persons} Personen)` : undefined}
           >
-            <Plus size={14} /> {!isMobile && 'Neue '}Person
+            <Plus size={14} /> {!isMobile && t('Neue ')}{t('Person')}
           </button>
         </div>
       </div>
@@ -358,7 +360,7 @@ export default function Dashboard() {
               <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', opacity: 0.4, pointerEvents: 'none' }} />
               <input
                 className="input-glass"
-                placeholder="Personen oder Mappen suchen…"
+                placeholder={t("Personen oder Mappen suchen…")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{ width: '100%', paddingLeft: 30, fontSize: 13 }}
@@ -369,7 +371,7 @@ export default function Dashboard() {
           {/* Add person form */}
           {showAdd && (
             <div className="glass-card animate-scale-in" style={{ padding: isMobile ? 14 : 20, marginBottom: 14 }}>
-              <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 600 }}>Neue Person anlegen</h3>
+              <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 600 }}>{t('Neue Person anlegen')}</h3>
               <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 8 }}>
                 <input
                   className="input-glass"
@@ -381,8 +383,8 @@ export default function Dashboard() {
                   style={{ flex: 1 }}
                 />
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button className="btn-glass btn-primary" onClick={handleAdd} style={{ flex: 1 }}>Erstellen</button>
-                  <button className="btn-glass" onClick={() => { setShowAdd(false); setNewName(''); }}>Abbruch</button>
+                  <button className="btn-glass btn-primary" onClick={handleAdd} style={{ flex: 1 }}>{t('Erstellen')}</button>
+                  <button className="btn-glass" onClick={() => { setShowAdd(false); setNewName(''); }}>{t('Abbruch')}</button>
                 </div>
               </div>
             </div>
@@ -406,9 +408,9 @@ export default function Dashboard() {
               {/* Steps */}
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 10, marginBottom: 24, maxWidth: 640, margin: '0 auto 24px' }}>
                 {[
-                  { n: 1, icon: Users,    title: 'Person anlegen',    desc: 'Name + Kontaktdaten erfassen' },
-                  { n: 2, icon: FileText, title: 'Mappe gestalten',  desc: 'Werdegang, Skills, Template' },
-                  { n: 3, icon: Eye,      title: 'PDF & Teilen',     desc: 'Export oder öffentlicher Link' },
+                  { n: 1, icon: Users,    title: t('Person anlegen'),    desc: t('Name + Kontaktdaten erfassen') },
+                  { n: 2, icon: FileText, title: t('Mappe gestalten'),  desc: t('Werdegang, Skills, Template') },
+                  { n: 3, icon: Eye,      title: t('PDF & Teilen'),     desc: t('Export oder öffentlicher Link') },
                 ].map(({ n, icon: Icon, title, desc }) => (
                   <div key={n} style={{
                     padding: '14px 12px', borderRadius: 12,
@@ -574,7 +576,7 @@ export default function Dashboard() {
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
                                 <span style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: frozen ? '#FF9F0A' : isActiveResume ? 'var(--ios-blue)' : undefined }}>
-                                  {r.name || 'Bewerbungsmappe'}
+                                  {r.name || t('Bewerbungsmappe')}
                                 </span>
                                 {frozen && (
                                   <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(255,159,10,0.2)', border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', flexShrink: 0 }}>
@@ -586,7 +588,7 @@ export default function Dashboard() {
                                 <div style={{ display: 'flex', gap: 8, marginTop: 3, alignItems: 'center' }}>
                                   <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, color: deadlineColor }}>
                                     <Clock size={12} />
-                                    {deadlineDiff! < 0 ? 'Abgelaufen' : `${Math.ceil(deadlineDiff!)} Tage`}
+                                    {deadlineDiff! < 0 ? t('Abgelaufen') : `${Math.ceil(deadlineDiff!)} Tage`}
                                   </span>
                                 </div>
                               )}
@@ -625,7 +627,7 @@ export default function Dashboard() {
                           {/* Completeness bar — only for active resumes */}
                           {!frozen && (
                             <div style={{ marginTop: 8 }}>
-                              <CompletenessBar score={completeness.score} />
+                              <CompletenessBar score={completeness.score} label={t('Vollständigkeit')} />
                             </div>
                           )}
                         </div>
@@ -670,7 +672,7 @@ export default function Dashboard() {
                     {!isPersonFrozen && (
                       <button className="btn-glass btn-sm"
                         onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); navigate('/preview'); }}>
-                        <Eye size={14} /> {!isMobile && 'Vorschau'}
+                        <Eye size={14} /> {!isMobile && t('Vorschau')}
                       </button>
                     )}
                     <button className="btn-glass btn-danger btn-icon"
