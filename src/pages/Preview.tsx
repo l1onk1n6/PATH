@@ -42,12 +42,15 @@ export default function Preview() {
   // Key-String, der sich nur bei sichtbaren Aenderungen aendert. Verhindert,
   // dass innere React-State-Updates (z. B. Template-Picker-Open) das PDF
   // unnoetig neu bauen.
+  // WICHTIG: Alle Felder rein, die in irgendeinem PDF-Template sichtbar
+  // werden — sonst bleibt die Vorschau stale (z. B. Doc-Category-Label
+  // wird gerendert, also muss eine Aenderung den Rebuild ausloesen).
   const pdfKey = resume ? JSON.stringify({
     t: resume.templateId, c: resume.accentColor,
     pi: resume.personalInfo, w: resume.workExperience, e: resume.education,
     s: resume.skills, l: resume.languages, p: resume.projects, cert: resume.certificates,
     cl: resume.coverLetter, cs: resume.customSections,
-    docs: resume.documents?.map(d => d.id),
+    docs: resume.documents?.map(d => `${d.id}|${d.category}|${d.name}|${d.size}|${d.uploadedAt}`),
   }) : '';
 
   // Async PDF-Build — setState auf Start/Error/Done ist hier korrekt.
