@@ -20,6 +20,7 @@ import { openExternal } from '../lib/openExternal';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 import { resetOnboarding } from '../lib/onboarding';
 import { getStoredTheme, setStoredTheme, type Theme as ThemeChoice } from '../lib/theme';
+import { useI18n } from '../lib/i18n';
 import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../store/uiStore';
 
@@ -532,6 +533,48 @@ function EmailChangeCard() {
   );
 }
 
+function LanguageCard() {
+  const locale = useI18n(s => s.locale);
+  const setLocale = useI18n(s => s.setLocale);
+
+  const options: { id: 'de' | 'en'; label: string }[] = [
+    { id: 'de', label: 'Deutsch' },
+    { id: 'en', label: 'English' },
+  ];
+
+  return (
+    <div className="glass-card" style={{ padding: 20 }}>
+      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>SPRACHE</div>
+      <div style={{ display: 'flex', gap: 6 }}>
+        {options.map(opt => (
+          <button
+            key={opt.id}
+            onClick={() => setLocale(opt.id)}
+            style={{
+              flex: 1,
+              padding: '10px 12px',
+              fontSize: 13,
+              fontWeight: locale === opt.id ? 600 : 400,
+              borderRadius: 'var(--radius-sm)',
+              border: locale === opt.id ? '1px solid var(--ios-blue)' : '1px solid var(--border-default)',
+              background: locale === opt.id ? 'rgba(0,122,255,0.12)' : 'var(--bg-btn)',
+              color: locale === opt.id ? 'var(--ios-blue)' : 'rgba(var(--rgb-fg), 0.85)',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-sf)',
+              transition: 'all 150ms ease-out',
+            }}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+      <div style={{ marginTop: 8, fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)' }}>
+        Englische Übersetzungen sind teilweise verfügbar — bestehende Stellen werden schrittweise migriert.
+      </div>
+    </div>
+  );
+}
+
 function ThemeCard() {
   const [theme, setTheme] = useState<ThemeChoice>(() => getStoredTheme());
 
@@ -608,6 +651,8 @@ function AccountSection() {
       <ProfileCard />
 
       <ThemeCard />
+
+      <LanguageCard />
 
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>APP-TOUR</div>
