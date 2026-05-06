@@ -12,6 +12,7 @@ import ShareModal from '../components/ui/ShareModal';
 import PdfPreview from '../components/ui/PdfPreview';
 import { userError } from '../lib/userError';
 import type { Resume } from '../types/resume';
+import { useT } from '../lib/i18n';
 
 function buildFilename(resume: Resume): string {
   const first = resume.personalInfo.firstName || '';
@@ -21,6 +22,7 @@ function buildFilename(resume: Resume): string {
 }
 
 export default function Preview() {
+  const t = useT();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { getActiveResume, setTemplate } = useResumeStore();
@@ -81,8 +83,8 @@ export default function Preview() {
     return (
       <div className="glass-card animate-fade-in" style={{ padding: '48px 32px', textAlign: 'center', margin: 'auto' }}>
         <AlertCircle size={40} style={{ margin: '0 auto 16px', opacity: 0.5 }} />
-        <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 600 }}>Kein Lebenslauf ausgewählt</h3>
-        <button className="btn-glass btn-primary" onClick={() => navigate('/')}>Zum Dashboard</button>
+        <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 600 }}>{t('Kein Lebenslauf ausgewählt')}</h3>
+        <button className="btn-glass btn-primary" onClick={() => navigate('/')}>{t('Zum Dashboard')}</button>
       </div>
     );
   }
@@ -207,7 +209,7 @@ export default function Preview() {
       {/* Desktop: Template-Sidebar */}
       {!isMobile && (
         <aside style={{ width: 160, flexShrink: 0, overflow: 'auto' }}>
-          <div className="section-label" style={{ marginBottom: 8 }}>Templates</div>
+          <div className="section-label" style={{ marginBottom: 8 }}>{t('Templates')}</div>
           {templatePicker}
         </aside>
       )}
@@ -299,19 +301,19 @@ export default function Preview() {
                     onClick={() => { setDownloadMenuOpen(false); handleExportMappe(); }}
                     style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 10px', gap: 8, marginBottom: 2, boxShadow: 'none', background: 'transparent', border: '1px solid transparent' }}>
                     <FolderDown size={14} style={{ opacity: 0.7 }} />
-                    <span style={{ fontSize: 13 }}>Ganze Mappe</span>
+                    <span style={{ fontSize: 13 }}>{t('Ganze Mappe')}</span>
                   </button>
                   <button className="btn-glass"
                     onClick={() => { setDownloadMenuOpen(false); handleExport(); }}
                     style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 10px', gap: 8, marginBottom: 2, boxShadow: 'none', background: 'transparent', border: '1px solid transparent' }}>
                     <FileText size={14} style={{ opacity: 0.7 }} />
-                    <span style={{ fontSize: 13 }}>Nur Lebenslauf</span>
+                    <span style={{ fontSize: 13 }}>{t('Nur Lebenslauf')}</span>
                   </button>
                   <button className="btn-glass"
                     onClick={() => { setDownloadMenuOpen(false); handleExportCoverLetter(); }}
                     style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 10px', gap: 8, marginBottom: 2, boxShadow: 'none', background: 'transparent', border: '1px solid transparent' }}>
                     <FileEdit size={14} style={{ opacity: 0.7 }} />
-                    <span style={{ fontSize: 13 }}>Nur Motivationsschreiben</span>
+                    <span style={{ fontSize: 13 }}>{t('Nur Motivationsschreiben')}</span>
                   </button>
                   <div style={{ height: 1, background: 'rgba(var(--rgb-fg),0.08)', margin: '4px 0' }} />
                   <ProGate featureId="password" badge>
@@ -319,7 +321,7 @@ export default function Preview() {
                       onClick={() => { setDownloadMenuOpen(false); /* Pro-Feature, handler kommt noch */ }}
                       style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 10px', gap: 8, boxShadow: 'none', background: 'transparent', border: '1px solid transparent' }}>
                       <Lock size={14} style={{ opacity: 0.7 }} />
-                      <span style={{ fontSize: 13 }}>Mit Passwort…</span>
+                      <span style={{ fontSize: 13 }}>{t('Mit Passwort…')}</span>
                     </button>
                   </ProGate>
                 </div>
@@ -347,7 +349,7 @@ export default function Preview() {
           }}>
             <div className="glass" style={{ borderRadius: 'var(--radius-xl) var(--radius-xl) 0 0', overflow: 'hidden', display: 'flex', flexDirection: 'column', maxHeight: '70vh' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 12px', flexShrink: 0, borderBottom: '1px solid rgba(var(--rgb-fg),0.1)' }}>
-                <span style={{ fontWeight: 700, fontSize: 16 }}>Templates</span>
+                <span style={{ fontWeight: 700, fontSize: 16 }}>{t('Templates')}</span>
                 <button className="btn-glass btn-icon btn-sm" onClick={() => setTemplatePickerOpen(false)} style={{ padding: 6 }}>
                   <X size={16} />
                 </button>
