@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   Users, Plus, Edit3, Trash2, FileText, Eye, TrendingUp,
   FolderPlus, Pencil, Copy, Search, ExternalLink, Clock,
-  Share2, CheckCircle, List, X, BarChart2,
-  Lock, MoreHorizontal, ClipboardList, CheckSquare, Square,
+  Share2, CheckCircle, X, BarChart2,
+  Lock, MoreHorizontal, CheckSquare, Square,
 } from 'lucide-react';
 
 function safeUrl(url: string) {
@@ -27,39 +27,6 @@ import ShareModal from '../components/ui/ShareModal';
 const ALL_STATUSES: ApplicationStatus[] = ['entwurf', 'gesendet', 'interview', 'abgelehnt', 'angenommen'];
 
 // ── ATS button ─────────────────────────────────────────────
-function AtsButton() {
-  const { isPro } = usePlan();
-  const { getActiveResume } = useResumeStore();
-  const [showUpgrade, setShowUpgrade] = useState(false);
-  const [showAts, setShowAts] = useState(false);
-  const noResume = !getActiveResume();
-
-  function handleClick() {
-    if (!isPro) { setShowUpgrade(true); return; }
-    if (noResume) return;
-    setShowAts(true);
-  }
-
-  return (
-    <>
-      {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} highlightId="ats" />}
-      {showAts && <AtsDialog onClose={() => setShowAts(false)} />}
-      <button
-        className="btn-glass btn-sm"
-        onClick={handleClick}
-        disabled={isPro && noResume}
-        style={{ gap: 5, position: 'relative', opacity: (isPro && noResume) ? 0.5 : 1 }}
-        title={noResume ? 'Erst eine Mappe auswählen' : 'ATS-Score prüfen'}
-      >
-        <BarChart2 size={14} /> ATS
-        {!isPro && (
-          <span style={{ fontSize: 8, fontWeight: 800, padding: '1px 4px', borderRadius: 3, background: 'linear-gradient(135deg, #FF9F0A, #FF375F)', color: '#fff', marginLeft: 2 }}>PRO</span>
-        )}
-      </button>
-    </>
-  );
-}
-
 // ── Completeness bar ───────────────────────────────────────
 function CompletenessBar({ score }: { score: number }) {
   const color = completenessColor(score);
@@ -84,7 +51,7 @@ function CompletenessBar({ score }: { score: number }) {
 export default function Dashboard() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { limits } = usePlan();
+  const { limits, isPro } = usePlan();
   const {
     persons, resumes, addPerson, deletePerson, setActivePerson, activePersonId,
     addResume, deleteResume, setActiveResume, renameResume, duplicateResume, setResumeStatus,
@@ -105,6 +72,8 @@ export default function Dashboard() {
   const [statusMenuResumeId, setStatusMenuResumeId] = useState<string | null>(null);
   const [shareModalResumeId, setShareModalResumeId] = useState<string | null>(null);
   const [menuOpenResumeId, setMenuOpenResumeId] = useState<string | null>(null);
+  const [atsForResumeId, setAtsForResumeId] = useState<string | null>(null);
+  const [showAtsUpgrade, setShowAtsUpgrade] = useState(false);
   const [menuPos, setMenuPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
   const menuBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
@@ -197,6 +166,10 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* ATS-Dialog (per-Mappe) */}
+      {atsForResumeId && <AtsDialog onClose={() => setAtsForResumeId(null)} />}
+      {showAtsUpgrade && <UpgradeModal highlightId="ats" onClose={() => setShowAtsUpgrade(false)} />}
+
       {/* Limit error toast */}
       {limitError && (
         <div style={{
@@ -273,6 +246,14 @@ export default function Dashboard() {
                   action: () => { setRenamingResumeId(mr.id); setRenameValue(mr.name || 'Bewerbungsmappe'); setMenuOpenResumeId(null); } },
                 { icon: Copy, label: 'Duplizieren',
                   action: () => { duplicateResume(mr.id); setMenuOpenResumeId(null); } },
+                { icon: BarChart2, label: 'ATS-Score prüfen',
+                  action: () => {
+                    setMenuOpenResumeId(null);
+                    if (!isPro) { setShowAtsUpgrade(true); return; }
+                    if (mp) setActivePerson(mp.id);
+                    setActiveResume(mr.id);
+                    setAtsForResumeId(mr.id);
+                  } },
               ] as { icon: React.ComponentType<{size:number}>, label: string, color?: string, action: () => void }[]).map(({ icon: Icon, label, color, action }) => (
                 <button key={label} style={{ ...itemStyle, color: color ?? 'rgba(var(--rgb-fg),0.85)' }}
                   onMouseEnter={e => (e.currentTarget.style.background = 'rgba(var(--rgb-fg),0.07)')}
@@ -348,16 +329,7 @@ export default function Dashboard() {
 
 
       {/* Section header + controls */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 8, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <button className="btn-glass btn-sm" style={{ background: 'rgba(0,122,255,0.2)', border: '1px solid rgba(0,122,255,0.4)' }}>
-            <List size={14} /> Liste
-          </button>
-          <button className="btn-glass btn-sm" onClick={() => navigate('/tracker')}>
-            <ClipboardList size={14} /> Tracker
-          </button>
-          <AtsButton />
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 10, gap: 8, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           <button
             className="btn-glass btn-sm"
