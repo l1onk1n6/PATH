@@ -13,6 +13,7 @@ import { LogoFull, LogoIcon } from './Logo';
 import { usePlan } from '../../lib/plan';
 import { UpgradeModal } from '../ui/ProGate';
 import { displayPersonName } from '../../lib/displayName';
+import { useT } from '../../lib/i18n';
 import type { Person, Resume } from '../../types/resume';
 
 interface SidebarProps {
@@ -25,6 +26,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
+  const t = useT();
 
   const { signOut } = useAuthStore();
   const { isPro, limits } = usePlan();
@@ -51,11 +53,11 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         </button>
         <div style={{ width: '70%', height: 1, background: 'rgba(var(--rgb-fg),0.1)', margin: '4px 0 8px' }} />
         {[
-          { path: '/',        icon: LayoutDashboard, label: 'Dashboard' },
-          { path: '/editor',  icon: FileText,        label: 'Editor' },
-          { path: '/preview', icon: Eye,             label: 'Vorschau' },
-          { path: '/tracker', icon: ClipboardList,   label: 'Tracker' },
-          { path: '/account', icon: UserCircle,      label: 'Konto' },
+          { path: '/',        icon: LayoutDashboard, label: t('Dashboard') },
+          { path: '/editor',  icon: FileText,        label: t('Editor') },
+          { path: '/preview', icon: Eye,             label: t('Vorschau') },
+          { path: '/tracker', icon: ClipboardList,   label: t('Tracker') },
+          { path: '/account', icon: UserCircle,      label: t('Konto') },
         ].map(({ path, icon: Icon, label }) => (
           <button key={path} onClick={() => go(path)} className="btn-glass btn-icon" title={label}
             style={{ padding: 10, boxShadow: 'none', background: isActive(path) ? 'rgba(0,122,255,0.2)' : 'transparent', border: isActive(path) ? '1px solid rgba(0,122,255,0.35)' : '1px solid transparent' }}>
@@ -123,11 +125,11 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
       {/* Flat navigation */}
       <nav style={{ marginTop: 12, marginBottom: 8 }}>
         {[
-          { path: '/',        icon: LayoutDashboard, label: 'Dashboard' },
-          { path: '/editor',  icon: FileEdit,        label: 'Editor' },
-          { path: '/preview', icon: Eye,             label: 'Vorschau' },
-          { path: '/tracker', icon: ClipboardList,   label: 'Tracker' },
-          { path: '/account', icon: UserCircle,      label: 'Konto' },
+          { path: '/',        icon: LayoutDashboard, label: t('Dashboard') },
+          { path: '/editor',  icon: FileEdit,        label: t('Editor') },
+          { path: '/preview', icon: Eye,             label: t('Vorschau') },
+          { path: '/tracker', icon: ClipboardList,   label: t('Tracker') },
+          { path: '/account', icon: UserCircle,      label: t('Konto') },
         ].map(({ path, icon: Icon, label }) => {
           const act = isActive(path);
           return (
