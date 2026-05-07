@@ -161,7 +161,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
             )}
             {error && (
               <div style={{ background: 'rgba(255,59,48,0.15)', border: '1px solid rgba(255,59,48,0.3)', borderRadius: 'var(--radius-sm)', padding: '10px 14px', fontSize: 13, color: '#ff6b6b', marginBottom: 12 }}>
-                {error}
+                {t(error)}
               </div>
             )}
             <button onClick={() => { clearError(); switchMode('login'); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(var(--rgb-fg),0.35)', fontSize: 12 }}>
@@ -258,7 +258,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
 
               {error && !isLocked && (
                 <div style={{ background: 'rgba(255,59,48,0.15)', border: '1px solid rgba(255,59,48,0.3)', borderRadius: 'var(--radius-sm)', padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#ff6b6b' }}>
-                  {error}
+                  {t(error)}
                 </div>
               )}
 
@@ -322,7 +322,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
 
                 {error && (
                   <div style={{ background: 'rgba(255,59,48,0.15)', border: '1px solid rgba(255,59,48,0.3)', borderRadius: 'var(--radius-sm)', padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#ff6b6b' }}>
-                    {error}
+                    {t(error)}
                   </div>
                 )}
 
@@ -368,7 +368,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
 
                 {error && (
                   <div style={{ background: 'rgba(255,59,48,0.15)', border: '1px solid rgba(255,59,48,0.3)', borderRadius: 'var(--radius-sm)', padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#ff6b6b' }}>
-                    {error}
+                    {t(error)}
                   </div>
                 )}
 
@@ -441,7 +441,7 @@ export default function AuthPage({ onBack, initialMode = 'login' }: { onBack?: (
 
             {error && (
               <div style={{ background: 'rgba(255,59,48,0.15)', border: '1px solid rgba(255,59,48,0.3)', borderRadius: 'var(--radius-sm)', padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#ff6b6b' }}>
-                {error}
+                {t(error)}
               </div>
             )}
 
