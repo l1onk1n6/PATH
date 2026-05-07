@@ -167,8 +167,8 @@ export default function ProjectsEditor() {
             compact
             icon={FolderOpen}
             title={t("Projekte hinzufügen")}
-            description="Nebenprojekte, Open Source, Praktika — alles was dich auszeichnet."
-            ctaLabel="Projekt anlegen"
+            description={t('Nebenprojekte, Open Source, Praktika — alles was dich auszeichnet.')}
+            ctaLabel={t('Projekt anlegen')}
             onCta={() => addProject(resume.id)}
           />
         )}
@@ -294,8 +294,8 @@ export default function ProjectsEditor() {
             compact
             icon={Award}
             title={t("Zertifikate hinzufügen")}
-            description="Abschlüsse, Weiterbildungen, Online-Kurse."
-            ctaLabel="Zertifikat anlegen"
+            description={t('Abschlüsse, Weiterbildungen, Online-Kurse.')}
+            ctaLabel={t('Zertifikat anlegen')}
             onCta={() => addCertificate(resume.id)}
           />
         )}

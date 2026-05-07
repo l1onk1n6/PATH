@@ -41,8 +41,8 @@ export default function EducationEditor() {
         <EmptyState
           icon={GraduationCap}
           title={t("Ausbildung hinzufügen")}
-          description="Schule, Lehre, Studium — alles was zu deinem Bildungsweg gehört."
-          ctaLabel="Ersten Eintrag anlegen"
+          description={t('Schule, Lehre, Studium — alles was zu deinem Bildungsweg gehört.')}
+          ctaLabel={t('Ersten Eintrag anlegen')}
           onCta={() => addEducation(resume.id)}
         />
       )}
