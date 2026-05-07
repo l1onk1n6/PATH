@@ -1,7 +1,9 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
+import { useT } from '../../../lib/i18n';
 
 export default function AcademicTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, certificates, projects } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -21,21 +23,21 @@ export default function AcademicTemplate({ resume }: { resume: Resume }) {
 
       {info.summary && (
         <section style={{ marginBottom: 16 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `1px solid ${color}`, paddingBottom: 3, marginBottom: 8 }}>Kurzprofil</h2>
+          <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `1px solid ${color}`, paddingBottom: 3, marginBottom: 8 }}>{t("Kurzprofil")}</h2>
           <p style={{ fontSize: 11, color: '#444', lineHeight: 1.7 }}>{info.summary}</p>
         </section>
       )}
 
       {education.length > 0 && (
         <section style={{ marginBottom: 16 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `1px solid ${color}`, paddingBottom: 3, marginBottom: 8 }}>Akademischer Werdegang</h2>
+          <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `1px solid ${color}`, paddingBottom: 3, marginBottom: 8 }}>{t("Akademischer Werdegang")}</h2>
           {education.map(edu => (
             <div key={edu.id} style={{ marginBottom: 10 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div>
                   <strong style={{ fontSize: 12 }}>{edu.degree}{edu.field ? `, ${edu.field}` : ''}</strong><br />
                   <span style={{ fontSize: 11, color: '#444', fontStyle: 'italic' }}>{edu.institution}{edu.location ? `, ${edu.location}` : ''}</span>
-                  {edu.grade && <span style={{ fontSize: 10, color: '#666' }}> · Note: {edu.grade}</span>}
+                  {edu.grade && <span style={{ fontSize: 10, color: '#666' }}> · {t('Note')}: {edu.grade}</span>}
                 </div>
                 <div style={{ fontSize: 10, color: '#888', textAlign: 'right' }}>
                   {formatDate(edu.startDate)} – {formatDate(edu.endDate)}
@@ -49,7 +51,7 @@ export default function AcademicTemplate({ resume }: { resume: Resume }) {
 
       {workExperience.length > 0 && (
         <section style={{ marginBottom: 16 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `1px solid ${color}`, paddingBottom: 3, marginBottom: 8 }}>Beruflicher Werdegang</h2>
+          <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `1px solid ${color}`, paddingBottom: 3, marginBottom: 8 }}>{t("Beruflicher Werdegang")}</h2>
           {workExperience.map(job => (
             <div key={job.id} style={{ marginBottom: 10 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -57,7 +59,7 @@ export default function AcademicTemplate({ resume }: { resume: Resume }) {
                   <strong style={{ fontSize: 12 }}>{job.position}</strong><br />
                   <span style={{ fontSize: 11, fontStyle: 'italic', color: '#444' }}>{job.company}{job.location ? `, ${job.location}` : ''}</span>
                 </div>
-                <div style={{ fontSize: 10, color: '#888' }}>{formatDate(job.startDate)} – {job.current ? 'Heute' : formatDate(job.endDate)}</div>
+                <div style={{ fontSize: 10, color: '#888' }}>{formatDate(job.startDate)} – {job.current ? t('heute') : formatDate(job.endDate)}</div>
               </div>
               {job.description && <p style={{ fontSize: 10, color: '#555', marginTop: 4, lineHeight: 1.5 }}>{job.description}</p>}
             </div>
@@ -67,7 +69,7 @@ export default function AcademicTemplate({ resume }: { resume: Resume }) {
 
       {projects.length > 0 && (
         <section style={{ marginBottom: 16 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `1px solid ${color}`, paddingBottom: 3, marginBottom: 8 }}>Forschung & Projekte</h2>
+          <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `1px solid ${color}`, paddingBottom: 3, marginBottom: 8 }}>{t("Forschung & Projekte")}</h2>
           {projects.map(proj => (
             <div key={proj.id} style={{ marginBottom: 8 }}>
               <strong style={{ fontSize: 11 }}>{proj.name}</strong>
@@ -80,7 +82,7 @@ export default function AcademicTemplate({ resume }: { resume: Resume }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         {skills.length > 0 && (
           <section>
-            <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `1px solid ${color}`, paddingBottom: 3, marginBottom: 8 }}>Fähigkeiten</h2>
+            <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `1px solid ${color}`, paddingBottom: 3, marginBottom: 8 }}>{t("Fähigkeiten")}</h2>
             <div style={{ fontSize: 11, color: '#444', lineHeight: 1.8 }}>
               {skills.map(sk => sk.name).join(' · ')}
             </div>
@@ -88,7 +90,7 @@ export default function AcademicTemplate({ resume }: { resume: Resume }) {
         )}
         {certificates.length > 0 && (
           <section>
-            <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `1px solid ${color}`, paddingBottom: 3, marginBottom: 8 }}>Zertifikate</h2>
+            <h2 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: `1px solid ${color}`, paddingBottom: 3, marginBottom: 8 }}>{t("Zertifikate")}</h2>
             {certificates.map(cert => (
               <div key={cert.id} style={{ fontSize: 11, marginBottom: 4, color: '#444' }}>
                 {cert.name} – {cert.issuer} ({formatDate(cert.date)})
