@@ -200,8 +200,8 @@ export default function OnboardingModal({ onClose }: Props) {
                     {f.icon}
                   </div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{f.title}</div>
-                    <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.45)', lineHeight: 1.5 }}>{f.desc}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{t(f.title)}</div>
+                    <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.45)', lineHeight: 1.5 }}>{t(f.desc)}</div>
                   </div>
                 </div>
               ))}
