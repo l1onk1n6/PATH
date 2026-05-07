@@ -7,27 +7,29 @@
  * bekommt eine verstaendliche deutsche Meldung mit Kontakt-Hinweis.
  */
 import { logError } from './errorLog';
+import { tr } from './i18n';
 
 export const SUPPORT_EMAIL = 'info@pixmatic.ch';
 
-const CONTACT_HINT = `Falls das Problem bestehen bleibt, melde dich bitte bei uns unter ${SUPPORT_EMAIL}.`;
+function contactHint(): string {
+  return tr('Falls das Problem bestehen bleibt, melde dich bitte bei uns unter {email}.')
+    .replace('{email}', SUPPORT_EMAIL);
+}
 
 /**
  * Baut eine benutzerfreundliche Fehlermeldung aus einem Handlungs-Label.
  * Der eigentliche Fehler wird automatisch auf die Konsole geschrieben und
- * nach Supabase gelogged \xE2\x80\x94 aber nicht im UI gezeigt.
+ * nach Supabase gelogged — aber nicht im UI gezeigt.
  *
  * @example
  *   setExportError(userError('Der PDF-Export hat nicht funktioniert', err));
- *   // => "Der PDF-Export hat nicht funktioniert. Bitte versuche es erneut.
- *   //     Falls das Problem bestehen bleibt, melde dich bitte bei uns
- *   //     unter info@pixmatic.ch."
  */
 export function userError(message: string, err?: unknown): string {
   if (err !== undefined) console.error('[userError]', message, err);
   void logError(message, err);
-  const base = message.endsWith('.') ? message : `${message}.`;
-  return `${base} Bitte versuche es erneut. ${CONTACT_HINT}`;
+  const translated = tr(message);
+  const base = translated.endsWith('.') ? translated : `${translated}.`;
+  return `${base} ${tr('Bitte versuche es erneut.')} ${contactHint()}`;
 }
 
 /**
@@ -37,6 +39,7 @@ export function userError(message: string, err?: unknown): string {
 export function userErrorNoRetry(message: string, err?: unknown): string {
   if (err !== undefined) console.error('[userError]', message, err);
   void logError(message, err);
-  const base = message.endsWith('.') ? message : `${message}.`;
-  return `${base} ${CONTACT_HINT}`;
+  const translated = tr(message);
+  const base = translated.endsWith('.') ? translated : `${translated}.`;
+  return `${base} ${contactHint()}`;
 }
