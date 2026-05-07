@@ -609,6 +609,27 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Was du mit Pro bekommst': 'What you get with Pro',
     'Unbegrenzte Bewerbungsmappen': 'Unlimited applications',
     'Unbegrenzte Personen': 'Unlimited people',
+    // ── Cover Letter Editor ──────────────────────────────
+    'Bestehenden Text überschreiben?': 'Overwrite existing text?',
+    'Der KI-Assistent ersetzt deinen aktuellen Anschreiben-Text.':
+      'The AI assistant will replace your current cover letter text.',
+    'Die Vorlage ersetzt deinen aktuellen Anschreiben-Text.':
+      'The template will replace your current cover letter text.',
+    'Der verbesserte Text ersetzt deinen aktuellen Anschreiben-Text.':
+      'The improved text will replace your current cover letter text.',
+    'Dein bestehender Text wird unwiderruflich ersetzt. Möchtest du fortfahren?':
+      'Your existing text will be replaced irreversibly. Continue?',
+    'Ja, überschreiben': 'Yes, overwrite',
+    'Frist abgelaufen': 'Deadline passed',
+    'Empfänger / Adresse': 'Recipient / address',
+    'Firmenname (z.B. Muster AG)': 'Company name (e.g. Sample Inc.)',
+    'Abteilung / Ansprechperson (optional)': 'Department / contact person (optional)',
+    'Strasse und Nr.': 'Street and number',
+    'Bewerbung als Senior Developer – Ihre Ausschreibung vom 01.04.2026':
+      'Application for Senior Developer – your posting from 01/04/2026',
+    'Unternehmen': 'Company',
+    'Stellenbeschreibung hier einfügen…': 'Paste job description here…',
+
     // ── LinkedIn Import ──────────────────────────────────
     'LinkedIn importieren': 'Import from LinkedIn',
     'Schritt {n} von 2 · KI-gestützt': 'Step {n} of 2 · AI-powered',

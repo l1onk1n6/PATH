@@ -65,6 +65,7 @@ const REMINDER_OPTIONS = [
 function ReminderPanel({ resumeId, deadline, reminderDays, onClose }: {
   resumeId: string; deadline: string; reminderDays: number[]; onClose: () => void;
 }) {
+  const t = useT();
   const { updateResume } = useResumeStore();
   const { session } = useAuthStore();
   const [selected, setSelected] = useState<number[]>(reminderDays ?? []);
@@ -120,10 +121,10 @@ function ReminderPanel({ resumeId, deadline, reminderDays, onClose }: {
       </div>
       {error && <div style={{ fontSize: 11, color: 'var(--ios-red)', marginBottom: 8 }}>{error}</div>}
       <div style={{ display: 'flex', gap: 6 }}>
-        <button className="btn-glass btn-sm" onClick={onClose} style={{ fontSize: 12 }}>Abbrechen</button>
+        <button className="btn-glass btn-sm" onClick={onClose} style={{ fontSize: 12 }}>{t('Abbrechen')}</button>
         <button className="btn-glass btn-primary btn-sm" onClick={save} disabled={saving || !deadline}
           style={{ fontSize: 12, gap: 5 }}>
-          {saved ? <><Check size={12} /> Gespeichert</> : saving ? <><Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> Speichern…</> : 'Speichern'}
+          {saved ? <><Check size={12} /> {t('Gespeichert')}</> : saving ? <><Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> {t('Speichern…')}</> : t('Speichern')}
         </button>
       </div>
       <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
@@ -255,22 +256,22 @@ export default function CoverLetterEditor() {
                 <AlertTriangle size={18} style={{ color: '#FF9F0A' }} />
               </div>
               <div>
-                <div style={{ fontWeight: 700, fontSize: 15 }}>Bestehenden Text überschreiben?</div>
+                <div style={{ fontWeight: 700, fontSize: 15 }}>{t('Bestehenden Text überschreiben?')}</div>
                 <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.45)', marginTop: 2 }}>
                   {confirmOverwrite === 'generate'
-                    ? 'Der KI-Assistent ersetzt deinen aktuellen Anschreiben-Text.'
+                    ? t('Der KI-Assistent ersetzt deinen aktuellen Anschreiben-Text.')
                     : confirmOverwrite === 'template'
-                    ? 'Die Vorlage ersetzt deinen aktuellen Anschreiben-Text.'
-                    : 'Der verbesserte Text ersetzt deinen aktuellen Anschreiben-Text.'}
+                    ? t('Die Vorlage ersetzt deinen aktuellen Anschreiben-Text.')
+                    : t('Der verbesserte Text ersetzt deinen aktuellen Anschreiben-Text.')}
                 </div>
               </div>
             </div>
             <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', margin: '0 0 20px', lineHeight: 1.55 }}>
-              Dein bestehender Text wird unwiderruflich ersetzt. Möchtest du fortfahren?
+              {t('Dein bestehender Text wird unwiderruflich ersetzt. Möchtest du fortfahren?')}
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
               <button className="btn-glass" style={{ flex: 1 }} onClick={() => setConfirmOverwrite(null)}>
-                Abbrechen
+                {t('Abbrechen')}
               </button>
               <button
                 className="btn-glass"
@@ -281,7 +282,7 @@ export default function CoverLetterEditor() {
                   else doImproveBody();
                 }}
               >
-                Ja, überschreiben
+                {t('Ja, überschreiben')}
               </button>
             </div>
           </div>
@@ -326,7 +327,7 @@ export default function CoverLetterEditor() {
             </ProGate>
           </div>
           {resume.deadline && deadlineColor === 'var(--ios-red)' && (
-            <div style={{ fontSize: 11, color: 'var(--ios-red)', marginTop: 4 }}>Frist abgelaufen</div>
+            <div style={{ fontSize: 11, color: 'var(--ios-red)', marginTop: 4 }}>{t('Frist abgelaufen')}</div>
           )}
           {showReminder && (
             <ReminderPanel
@@ -360,7 +361,7 @@ export default function CoverLetterEditor() {
       {/* Structured address */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-          <label style={{ fontSize: 12, fontWeight: 600, opacity: 0.7 }}>Empfänger / Adresse</label>
+          <label style={{ fontSize: 12, fontWeight: 600, opacity: 0.7 }}>{t('Empfänger / Adresse')}</label>
           {addr.company && (
             <button
               className="btn-glass btn-sm"
@@ -376,14 +377,14 @@ export default function CoverLetterEditor() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <input
             className="input-glass"
-            placeholder="Firmenname (z.B. Muster AG)"
+            placeholder={t('Firmenname (z.B. Muster AG)')}
             value={addr.company} maxLength={150}
             onChange={e => updateAddr('company', e.target.value)}
             style={{ fontSize: 13 }}
           />
           <input
             className="input-glass"
-            placeholder="Abteilung / Ansprechperson (optional)"
+            placeholder={t('Abteilung / Ansprechperson (optional)')}
             value={addr.dept} maxLength={150}
             onChange={e => updateAddr('dept', e.target.value)}
             style={{ fontSize: 13 }}
@@ -391,7 +392,7 @@ export default function CoverLetterEditor() {
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 6 }}>
             <input
               className="input-glass"
-              placeholder="Strasse und Nr."
+              placeholder={t('Strasse und Nr.')}
               value={addr.street} maxLength={150}
               onChange={e => updateAddr('street', e.target.value)}
               style={{ fontSize: 13 }}
@@ -413,7 +414,7 @@ export default function CoverLetterEditor() {
         </label>
         <input
           className="input-glass"
-          placeholder="Bewerbung als Senior Developer – Ihre Ausschreibung vom 01.04.2026"
+          placeholder={t('Bewerbung als Senior Developer – Ihre Ausschreibung vom 01.04.2026')}
           value={cl.subject}
           onChange={(e) => update('subject', e.target.value)}
           style={{ width: '100%' }}
@@ -454,12 +455,12 @@ export default function CoverLetterEditor() {
             )}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <div>
-                <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Stelle</label>
+                <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>{t('Stelle')}</label>
                 <input className="input-glass" placeholder={resume.personalInfo.title || 'z.B. Software Engineer'} value={aiJobTitle}
                   onChange={e => setAiJobTitle(e.target.value)} style={{ width: '100%', fontSize: 13 }} />
               </div>
               <div>
-                <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>Unternehmen</label>
+                <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>{t('Unternehmen')}</label>
                 <input className="input-glass" placeholder={addr.company || 'z.B. Acme AG'} value={aiCompany}
                   onChange={e => setAiCompany(e.target.value)} style={{ width: '100%', fontSize: 13 }} />
               </div>
@@ -468,7 +469,7 @@ export default function CoverLetterEditor() {
               <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>
                 Stellenbeschreibung (optional, für bessere Ergebnisse)
               </label>
-              <textarea className="input-glass" placeholder="Stellenbeschreibung hier einfügen…" value={aiJobDesc}
+              <textarea className="input-glass" placeholder={t('Stellenbeschreibung hier einfügen…')} value={aiJobDesc}
                 onChange={e => setAiJobDesc(e.target.value)} rows={4}
                 style={{ width: '100%', resize: 'vertical', fontSize: 13 }} />
             </div>
