@@ -607,6 +607,9 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Über mich': 'About me',
     'Profil': 'Profile',
     'Kenntnisse': 'Skills & knowledge',
+    'Mappe eingefroren': 'Application frozen',
+    'Android': 'Android',
+    'Max Mustermann': 'Jane Doe',
     'Was PATH kann': 'What PATH can do',
     'Mit Beispieldaten starten': 'Start with sample data',
     'Empfohlen — du kannst alle Daten später bearbeiten':
