@@ -94,7 +94,7 @@ export default function ShareModal({ resumeId, token, onClose }: Props) {
                 style={{ flex: 1, fontSize: 11 }}
               />
               <button className="btn-glass btn-primary" onClick={copy} style={{ flexShrink: 0, padding: '0 12px' }}>
-                {copied ? <CheckCircle size={14} /> : 'Kopieren'}
+                {copied ? <CheckCircle size={14} /> : t('Kopieren')}
               </button>
             </div>
 

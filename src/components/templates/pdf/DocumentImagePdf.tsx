@@ -5,6 +5,7 @@
  */
 import { Document, Page, View, Text, Image } from '@react-pdf/renderer';
 import type { UploadedDocument } from '../../../types/resume';
+import { tr } from '../../../lib/i18n';
 
 const CATEGORY_LABEL: Record<UploadedDocument['category'], string> = {
   certificate: 'Zertifikat',
@@ -19,7 +20,7 @@ export default function DocumentImagePdf({ doc }: { doc: UploadedDocument }) {
       <Page size="A4" style={{ paddingTop: 32, paddingBottom: 32, paddingLeft: 40, paddingRight: 40, backgroundColor: '#fff', fontFamily: 'Helvetica' }}>
         <View style={{ marginBottom: 12, borderBottomWidth: 0.5, borderBottomColor: '#ddd', borderBottomStyle: 'solid', paddingBottom: 8 }}>
           <Text style={{ fontSize: 8, letterSpacing: 2, color: '#888', textTransform: 'uppercase' }}>
-            {CATEGORY_LABEL[doc.category] ?? 'Dokument'}
+            {tr(CATEGORY_LABEL[doc.category] ?? 'Dokument')}
           </Text>
           <Text style={{ fontSize: 13, fontFamily: 'Helvetica-Bold', marginTop: 3, color: '#111' }}>{doc.name}</Text>
         </View>
