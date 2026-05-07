@@ -191,12 +191,12 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
             }}
           >
             {loading
-              ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> {Capacitor.isNativePlatform() ? 'Öffne Google Play…' : 'Weiterleitung zu Stripe…'}</>
+              ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> {Capacitor.isNativePlatform() ? t('Öffne Google Play…') : t('Weiterleitung zu Stripe…')}</>
               : <><Sparkles size={14} /> {Capacitor.isNativePlatform()
-                  ? 'Jetzt upgraden — PATH Pro'
+                  ? t('Jetzt upgraden — PATH Pro')
                   : plan === 'yearly'
-                    ? 'Jetzt upgraden — CHF 49 / Jahr'
-                    : 'Jetzt upgraden — CHF 5 / Monat'
+                    ? t('Jetzt upgraden — CHF 49 / Jahr')
+                    : t('Jetzt upgraden — CHF 5 / Monat')
                 }</>
             }
           </button>
@@ -209,10 +209,10 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
 
           <p style={{ margin: 0, fontSize: 11, color: 'rgba(var(--rgb-fg),0.3)', textAlign: 'center' }}>
             {Capacitor.isNativePlatform()
-              ? 'Abrechnung über Google Play · Jederzeit kündbar'
+              ? t('Abrechnung über Google Play · Jederzeit kündbar')
               : plan === 'yearly'
-                ? 'Sichere Zahlung via Stripe · Jährliche Abrechnung · Jederzeit kündbar'
-                : 'Sichere Zahlung via Stripe · Monatlich kündbar'}
+                ? t('Sichere Zahlung via Stripe · Jährliche Abrechnung · Jederzeit kündbar')
+                : t('Sichere Zahlung via Stripe · Monatlich kündbar')}
           </p>
         </div>
       </div>

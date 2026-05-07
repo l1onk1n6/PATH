@@ -50,7 +50,7 @@ export default function ShareModal({ resumeId, token, onClose }: Props) {
 
   async function copy() {
     if (!shareUrl) return;
-    const nativeSheet = await shareLink(shareUrl, 'Lebenslauf teilen');
+    const nativeSheet = await shareLink(shareUrl, t('Lebenslauf teilen'));
     if (nativeSheet) return;
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -110,7 +110,7 @@ export default function ShareModal({ resumeId, token, onClose }: Props) {
                 <Eye size={14} /> {views} Aufruf{views === 1 ? '' : 'e'}
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'rgba(var(--rgb-fg), 0.55)' }}>
-                <Clock size={14} /> {lastViewedAt ? relativeTime(lastViewedAt) : 'Noch nicht aufgerufen'}
+                <Clock size={14} /> {lastViewedAt ? relativeTime(lastViewedAt) : t('Noch nicht aufgerufen')}
               </span>
             </div>
 

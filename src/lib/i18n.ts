@@ -231,6 +231,17 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Für Direktbewerbungen ohne offene Stelle': 'For direct applications without an open position',
     'Auf das Wesentliche reduziert, maximal wirkungsvoll': 'Reduced to the essentials, maximally effective',
     'Text mit KI verbessern': 'Improve text with AI',
+    'Öffne Google Play…': 'Opening Google Play…',
+    'Weiterleitung zu Stripe…': 'Redirecting to Stripe…',
+    'Jetzt upgraden — PATH Pro': 'Upgrade now — PATH Pro',
+    'Jetzt upgraden — CHF 49 / Jahr': 'Upgrade now — CHF 49 / year',
+    'Jetzt upgraden — CHF 5 / Monat': 'Upgrade now — CHF 5 / month',
+    'Abrechnung über Google Play · Jederzeit kündbar':
+      'Billed via Google Play · cancel anytime',
+    'Sichere Zahlung via Stripe · Jährliche Abrechnung · Jederzeit kündbar':
+      'Secure payment via Stripe · yearly billing · cancel anytime',
+    'Sichere Zahlung via Stripe · Monatlich kündbar':
+      'Secure payment via Stripe · cancel monthly',
     'Weiter': 'Next',
     'Zurück zur Liste': 'Back to list',
     'Keine Daten': 'No data',
