@@ -391,6 +391,10 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Gutschriften': 'Credits',
     'Kopiert!': 'Copied!',
     'Bald': 'Soon',
+    '«{name}» überschreitet dein Free-Limit von {n} Mappen. Upgrade auf Pro oder lösche andere Mappen um diese wieder zu bearbeiten.':
+      '«{name}» exceeds your free limit of {n} applications. Upgrade to Pro or delete other applications to edit it again.',
+    'Alle Features freigeschaltet': 'All features unlocked',
+    'Grundfunktionen — kostenlos': 'Basic features — free',
     'Job-Beschreibung ist zu kurz oder leer.': 'Job description is too short or empty.',
     'Sehr gute Übereinstimmung — der Lebenslauf passt thematisch sauber zur Stelle.':
       'Very good match — the resume matches the role thematically.',
