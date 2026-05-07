@@ -133,8 +133,8 @@ export default function SkillsEditor() {
                     const snapshot = skill;
                     const idx = i;
                     removeSkill(resume.id, skill.id);
-                    const label = skill.name || 'Fähigkeit';
-                    showUndo(`Fähigkeit «${label}» gelöscht`, () => restoreItemAt(resume.id, 'skills', snapshot, idx));
+                    const label = skill.name || t('Fähigkeit');
+                    showUndo(t('Fähigkeit «{label}» gelöscht').replace('{label}', label), () => restoreItemAt(resume.id, 'skills', snapshot, idx));
                   }}
                   style={{ padding: 6, flexShrink: 0 }}
                 >
@@ -200,8 +200,8 @@ export default function SkillsEditor() {
                     const snapshot = lang;
                     const idx = resume.languages.findIndex(l => l.id === lang.id);
                     removeLanguage(resume.id, lang.id);
-                    const label = lang.name || 'Sprache';
-                    showUndo(`Sprache «${label}» gelöscht`, () => restoreItemAt(resume.id, 'languages', snapshot, idx));
+                    const label = lang.name || t('Sprache');
+                    showUndo(t('Sprache «{label}» gelöscht').replace('{label}', label), () => restoreItemAt(resume.id, 'languages', snapshot, idx));
                   }}
                   style={{ padding: 6, flexShrink: 0 }}
                 >

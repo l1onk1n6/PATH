@@ -82,8 +82,8 @@ export default function ExperienceEditor() {
                   const snapshot = job;
                   const idx = resume.workExperience.findIndex(w => w.id === job.id);
                   removeWorkExperience(resume.id, job.id);
-                  const label = job.company || job.position || 'Eintrag';
-                  showUndo(`Erfahrung «${label}» gelöscht`, () => restoreItemAt(resume.id, 'workExperience', snapshot, idx));
+                  const label = job.company || job.position || t('Eintrag');
+                  showUndo(t('Erfahrung «{label}» gelöscht').replace('{label}', label), () => restoreItemAt(resume.id, 'workExperience', snapshot, idx));
                 }}
                 style={{ padding: 6 }}
               >
