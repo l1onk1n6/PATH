@@ -1,6 +1,7 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
+import { useT } from '../../../lib/i18n';
 
 function SideLabel({ children }: { children: React.ReactNode }) {
   return <div style={{ fontSize: 8.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(255,255,255,0.5)', marginBottom: 9, marginTop: 16 }}>{children}</div>;
@@ -16,6 +17,7 @@ function MainHeading({ children, color }: { children: React.ReactNode; color: st
 }
 
 export default function CorporateTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -41,7 +43,7 @@ export default function CorporateTemplate({ resume }: { resume: Resume }) {
         )}
 
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 14 }}>
-          <SideLabel>Kontakt</SideLabel>
+          <SideLabel>{t("Kontakt")}</SideLabel>
           <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.65)', lineHeight: 2 }}>
             {info.email && <div>{info.email}</div>}
             {info.phone && <div>{info.phone}</div>}
@@ -54,7 +56,7 @@ export default function CorporateTemplate({ resume }: { resume: Resume }) {
 
         {skills.length > 0 && (
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 14 }}>
-            <SideLabel>Kernkompetenzen</SideLabel>
+            <SideLabel>{t("Kernkompetenzen")}</SideLabel>
             {skills.map(skill => (
               <div key={skill.id} style={{ marginBottom: 7 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, marginBottom: 3, color: 'rgba(255,255,255,0.85)' }}>
@@ -72,7 +74,7 @@ export default function CorporateTemplate({ resume }: { resume: Resume }) {
 
         {languages.length > 0 && (
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 14 }}>
-            <SideLabel>Sprachen</SideLabel>
+            <SideLabel>{t("Sprachen")}</SideLabel>
             {languages.map(lang => (
               <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 10.5, marginBottom: 5, color: 'rgba(255,255,255,0.8)' }}>
                 <span style={{ fontWeight: 700 }}>{lang.name}</span>
@@ -93,7 +95,7 @@ export default function CorporateTemplate({ resume }: { resume: Resume }) {
 
         {workExperience.length > 0 && (
           <div style={{ marginBottom: 22 }}>
-            <MainHeading color={color}>Berufserfahrung</MainHeading>
+            <MainHeading color={color}>{t("Berufserfahrung")}</MainHeading>
             {workExperience.map(job => (
               <div key={job.id} style={{ marginBottom: 14, paddingBottom: 12, borderBottom: '1px solid #f0f0f0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -102,7 +104,7 @@ export default function CorporateTemplate({ resume }: { resume: Resume }) {
                     <div style={{ fontSize: 11.5, color, fontWeight: 700 }}>{job.company}{job.location ? ` · ${job.location}` : ''}</div>
                   </div>
                   <div style={{ fontSize: 10, color: '#888', textAlign: 'right', flexShrink: 0 }}>
-                    {formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? 'heute' : formatDate(job.endDate)}
+                    {formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? t('heute') : formatDate(job.endDate)}
                   </div>
                 </div>
                 {job.description && <p style={{ fontSize: 11, color: '#555', lineHeight: 1.6, margin: '5px 0 0' }}>{job.description}</p>}
@@ -113,7 +115,7 @@ export default function CorporateTemplate({ resume }: { resume: Resume }) {
 
         {education.length > 0 && (
           <div style={{ marginBottom: 22 }}>
-            <MainHeading color={color}>Ausbildung</MainHeading>
+            <MainHeading color={color}>{t("Ausbildung")}</MainHeading>
             {education.map(edu => (
               <div key={edu.id} style={{ marginBottom: 10 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -133,7 +135,7 @@ export default function CorporateTemplate({ resume }: { resume: Resume }) {
 
         {certificates.length > 0 && (
           <div>
-            <MainHeading color={color}>Zertifikate</MainHeading>
+            <MainHeading color={color}>{t("Zertifikate")}</MainHeading>
             {certificates.map(cert => (
               <div key={cert.id} style={{ marginBottom: 7, fontSize: 11 }}>
                 <span style={{ fontWeight: 700 }}>{cert.name}</span>

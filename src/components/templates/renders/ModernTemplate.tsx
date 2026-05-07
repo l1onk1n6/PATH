@@ -116,7 +116,7 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
                   </div>
                   <div style={{ fontSize: 10, color: '#9696a8', textAlign: 'right', flexShrink: 0 }}>
                     {job.location && <div>{job.location}</div>}
-                    <div>{formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? t('heute') : formatDate(job.endDate)}</div>
+                    <div>{formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? t(t('heute')) : formatDate(job.endDate)}</div>
                   </div>
                 </div>
                 {job.description && <p style={{ fontSize: 11, color: '#555', marginTop: 5, lineHeight: 1.65 }}>{job.description}</p>}

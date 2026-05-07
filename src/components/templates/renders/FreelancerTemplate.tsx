@@ -1,8 +1,10 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
+import { useT } from '../../../lib/i18n';
 
 export default function FreelancerTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages, projects, certificates } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -13,7 +15,7 @@ export default function FreelancerTemplate({ resume }: { resume: Resume }) {
       <div style={{ padding: '32px 32px 24px', borderBottom: `1px solid #222` }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <div style={{ fontSize: 10, color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 6 }}>Portfolio · Lebenslauf</div>
+            <div style={{ fontSize: 10, color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 6 }}>{t("Portfolio · Lebenslauf")}</div>
             <h1 style={{ margin: 0, fontSize: 32, fontWeight: 900, letterSpacing: '-1px', color: '#fff' }}>{name}</h1>
             {info.title && (
               <div style={{ fontSize: 14, color: '#aaa', marginTop: 6, fontWeight: 400 }}>{info.title}</div>
@@ -39,7 +41,7 @@ export default function FreelancerTemplate({ resume }: { resume: Resume }) {
 
           {projects.length > 0 && (
             <div style={{ marginBottom: 28 }}>
-              <h2 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 16 }}>Projekte</h2>
+              <h2 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 16 }}>{t("Projekte")}</h2>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 {projects.map(proj => (
                   <div key={proj.id} style={{ background: '#1a1a1a', borderRadius: 8, padding: '12px 14px', border: `1px solid #282828` }}>
@@ -60,7 +62,7 @@ export default function FreelancerTemplate({ resume }: { resume: Resume }) {
 
           {workExperience.length > 0 && (
             <div style={{ marginBottom: 28 }}>
-              <h2 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 16 }}>Erfahrung</h2>
+              <h2 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 16 }}>{t("Erfahrung")}</h2>
               {workExperience.map(job => (
                 <div key={job.id} style={{ marginBottom: 16, display: 'flex', gap: 14 }}>
                   <div style={{ width: 2, background: `${color}40`, borderRadius: 1, flexShrink: 0 }} />
@@ -68,7 +70,7 @@ export default function FreelancerTemplate({ resume }: { resume: Resume }) {
                     <div style={{ fontWeight: 700, fontSize: 13, color: '#fff' }}>{job.position}</div>
                     <div style={{ fontSize: 12, color, fontWeight: 600 }}>{job.company}</div>
                     <div style={{ fontSize: 10, color: '#555', marginBottom: 6 }}>
-                      {formatDate(job.startDate)} – {job.current ? 'Heute' : formatDate(job.endDate)} {job.location ? `· ${job.location}` : ''}
+                      {formatDate(job.startDate)} – {job.current ? t('heute') : formatDate(job.endDate)} {job.location ? `· ${job.location}` : ''}
                     </div>
                     {job.description && <p style={{ fontSize: 11, color: '#999', lineHeight: 1.6, margin: 0 }}>{job.description}</p>}
                   </div>
@@ -79,7 +81,7 @@ export default function FreelancerTemplate({ resume }: { resume: Resume }) {
 
           {education.length > 0 && (
             <div>
-              <h2 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 16 }}>Ausbildung</h2>
+              <h2 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 16 }}>{t("Ausbildung")}</h2>
               {education.map(edu => (
                 <div key={edu.id} style={{ marginBottom: 10, display: 'flex', gap: 14 }}>
                   <div style={{ width: 2, background: `${color}30`, borderRadius: 1, flexShrink: 0 }} />
@@ -98,7 +100,7 @@ export default function FreelancerTemplate({ resume }: { resume: Resume }) {
         <div style={{ padding: '24px 20px' }}>
           {skills.length > 0 && (
             <div style={{ marginBottom: 24 }}>
-              <h2 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 14 }}>Skills</h2>
+              <h2 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 14 }}>{t("Skills")}</h2>
               {skills.map(sk => (
                 <div key={sk.id} style={{ marginBottom: 8 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#ccc', marginBottom: 4 }}>
@@ -115,7 +117,7 @@ export default function FreelancerTemplate({ resume }: { resume: Resume }) {
 
           {languages.length > 0 && (
             <div style={{ marginBottom: 24 }}>
-              <h2 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 14 }}>Sprachen</h2>
+              <h2 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 14 }}>{t("Sprachen")}</h2>
               {languages.map(lang => (
                 <div key={lang.id} style={{ marginBottom: 8, fontSize: 11 }}>
                   <div style={{ color: '#ddd', fontWeight: 600 }}>{lang.name}</div>
@@ -127,7 +129,7 @@ export default function FreelancerTemplate({ resume }: { resume: Resume }) {
 
           {certificates.length > 0 && (
             <div>
-              <h2 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 14 }}>Zertifikate</h2>
+              <h2 style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 14 }}>{t("Zertifikate")}</h2>
               {certificates.map(cert => (
                 <div key={cert.id} style={{ marginBottom: 8, padding: '6px 8px', background: '#1a1a1a', borderRadius: 6, borderLeft: `2px solid ${color}` }}>
                   <div style={{ fontSize: 11, color: '#ddd', fontWeight: 600 }}>{cert.name}</div>

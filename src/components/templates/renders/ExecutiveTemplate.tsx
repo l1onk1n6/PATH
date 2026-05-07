@@ -1,8 +1,10 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SkillDots, SafeImg } from './shared';
+import { useT } from '../../../lib/i18n';
 
 export default function ExecutiveTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -27,14 +29,14 @@ export default function ExecutiveTemplate({ resume }: { resume: Resume }) {
 
         {skills.length > 0 && (
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Kompetenzen</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>{t("Kompetenzen")}</div>
             {skills.map(skill => <SkillDots key={skill.id} skill={skill} color={color} />)}
           </div>
         )}
 
         {languages.length > 0 && (
           <div>
-            <div style={{ fontSize: 10, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Sprachen</div>
+            <div style={{ fontSize: 10, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>{t("Sprachen")}</div>
             {languages.map(lang => (
               <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 4, color: 'rgba(255,255,255,0.8)' }}>
                 <span>{lang.name}</span>
@@ -49,14 +51,14 @@ export default function ExecutiveTemplate({ resume }: { resume: Resume }) {
       <div style={{ flex: 1, padding: '24px 20px' }}>
         {info.summary && (
           <div style={{ marginBottom: 20, paddingBottom: 16, borderBottom: `2px solid ${color}` }}>
-            <h2 style={{ fontSize: 11, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Executive Summary</h2>
+            <h2 style={{ fontSize: 11, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>{t("Executive Summary")}</h2>
             <p style={{ fontSize: 11, color: '#444', lineHeight: 1.6 }}>{info.summary}</p>
           </div>
         )}
 
         {workExperience.length > 0 && (
           <div style={{ marginBottom: 20 }}>
-            <h2 style={{ fontSize: 11, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Berufliche Laufbahn</h2>
+            <h2 style={{ fontSize: 11, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>{t("Berufliche Laufbahn")}</h2>
             {workExperience.map(job => (
               <div key={job.id} style={{ marginBottom: 14, paddingLeft: 12, borderLeft: `2px solid ${color}30` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -65,7 +67,7 @@ export default function ExecutiveTemplate({ resume }: { resume: Resume }) {
                     <div style={{ fontSize: 11, color, fontWeight: 600 }}>{job.company} · {job.location}</div>
                   </div>
                   <div style={{ fontSize: 10, color: '#888' }}>
-                    {formatDate(job.startDate)} – {job.current ? 'Heute' : formatDate(job.endDate)}
+                    {formatDate(job.startDate)} – {job.current ? t('heute') : formatDate(job.endDate)}
                   </div>
                 </div>
                 {job.description && <p style={{ fontSize: 11, color: '#555', marginTop: 4, lineHeight: 1.5 }}>{job.description}</p>}
@@ -76,7 +78,7 @@ export default function ExecutiveTemplate({ resume }: { resume: Resume }) {
 
         {education.length > 0 && (
           <div>
-            <h2 style={{ fontSize: 11, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Ausbildung</h2>
+            <h2 style={{ fontSize: 11, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>{t("Ausbildung")}</h2>
             {education.map(edu => (
               <div key={edu.id} style={{ marginBottom: 10 }}>
                 <div style={{ fontWeight: 700, fontSize: 12 }}>{edu.degree} – {edu.field}</div>

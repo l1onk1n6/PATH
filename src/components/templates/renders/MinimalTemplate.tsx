@@ -67,7 +67,7 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
                       {job.company && <span style={{ fontSize: 11.5, color, fontWeight: 600 }}> · {job.company}</span>}
                     </div>
                     <span style={{ fontSize: 10, color: '#8e8e93', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                      {formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? t('heute') : formatDate(job.endDate)}
+                      {formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? t(t('heute')) : formatDate(job.endDate)}
                     </span>
                   </div>
                   {job.location && <div style={{ fontSize: 10, color: '#8e8e93', marginTop: 1 }}>{job.location}</div>}

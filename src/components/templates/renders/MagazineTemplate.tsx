@@ -1,8 +1,10 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SkillBar, SafeImg } from './shared';
+import { useT } from '../../../lib/i18n';
 
 export default function MagazineTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages, projects } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -38,14 +40,14 @@ export default function MagazineTemplate({ resume }: { resume: Resume }) {
 
         {skills.length > 0 && (
           <div style={{ marginBottom: 18 }}>
-            <div style={{ fontSize: 9, color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Skills</div>
+            <div style={{ fontSize: 9, color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>{t("Skills")}</div>
             {skills.map(sk => <SkillBar key={sk.id} skill={sk} color={color} />)}
           </div>
         )}
 
         {languages.length > 0 && (
           <div>
-            <div style={{ fontSize: 9, color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Sprachen</div>
+            <div style={{ fontSize: 9, color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>{t("Sprachen")}</div>
             {languages.map(lang => (
               <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 5, color: '#ccc' }}>
                 <span>{lang.name}</span>
@@ -66,7 +68,7 @@ export default function MagazineTemplate({ resume }: { resume: Resume }) {
 
         {workExperience.length > 0 && (
           <div style={{ marginBottom: 22 }}>
-            <h2 style={{ fontSize: 13, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#1a1a1a', marginBottom: 14, borderLeft: `4px solid ${color}`, paddingLeft: 10 }}>Erfahrung</h2>
+            <h2 style={{ fontSize: 13, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#1a1a1a', marginBottom: 14, borderLeft: `4px solid ${color}`, paddingLeft: 10 }}>{t("Erfahrung")}</h2>
             {workExperience.map(job => (
               <div key={job.id} style={{ marginBottom: 14 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -76,7 +78,7 @@ export default function MagazineTemplate({ resume }: { resume: Resume }) {
                   </div>
                   <div style={{ fontSize: 10, color: '#aaa', textAlign: 'right' }}>
                     <div>{job.location}</div>
-                    <div>{formatDate(job.startDate)} – {job.current ? 'Heute' : formatDate(job.endDate)}</div>
+                    <div>{formatDate(job.startDate)} – {job.current ? t('heute') : formatDate(job.endDate)}</div>
                   </div>
                 </div>
                 {job.description && <p style={{ fontSize: 11, color: '#555', marginTop: 5, lineHeight: 1.6 }}>{job.description}</p>}
@@ -87,7 +89,7 @@ export default function MagazineTemplate({ resume }: { resume: Resume }) {
 
         {education.length > 0 && (
           <div style={{ marginBottom: 22 }}>
-            <h2 style={{ fontSize: 13, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#1a1a1a', marginBottom: 14, borderLeft: `4px solid ${color}`, paddingLeft: 10 }}>Ausbildung</h2>
+            <h2 style={{ fontSize: 13, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#1a1a1a', marginBottom: 14, borderLeft: `4px solid ${color}`, paddingLeft: 10 }}>{t("Ausbildung")}</h2>
             {education.map(edu => (
               <div key={edu.id} style={{ marginBottom: 10 }}>
                 <div style={{ fontWeight: 700, fontSize: 12 }}>{edu.degree} – {edu.field}</div>
@@ -100,7 +102,7 @@ export default function MagazineTemplate({ resume }: { resume: Resume }) {
 
         {projects.length > 0 && (
           <div>
-            <h2 style={{ fontSize: 13, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#1a1a1a', marginBottom: 14, borderLeft: `4px solid ${color}`, paddingLeft: 10 }}>Projekte</h2>
+            <h2 style={{ fontSize: 13, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#1a1a1a', marginBottom: 14, borderLeft: `4px solid ${color}`, paddingLeft: 10 }}>{t("Projekte")}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               {projects.map(proj => (
                 <div key={proj.id} style={{ background: '#f8f8f8', borderRadius: 6, padding: '10px 12px' }}>

@@ -1,8 +1,10 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
+import { useT } from '../../../lib/i18n';
 
 export default function VibrantTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -44,7 +46,7 @@ export default function VibrantTemplate({ resume }: { resume: Resume }) {
           )}
           {workExperience.length > 0 && (
             <div style={{ marginBottom: 20 }}>
-              <h2 style={{ fontSize: 12, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14, paddingBottom: 6, borderBottom: `2px solid ${color}20` }}>Erfahrung</h2>
+              <h2 style={{ fontSize: 12, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14, paddingBottom: 6, borderBottom: `2px solid ${color}20` }}>{t("Erfahrung")}</h2>
               {workExperience.map(job => (
                 <div key={job.id} style={{ marginBottom: 14 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -54,7 +56,7 @@ export default function VibrantTemplate({ resume }: { resume: Resume }) {
                     </div>
                     <div style={{ fontSize: 10, color: '#999', textAlign: 'right' }}>
                       <div>{job.location}</div>
-                      <div>{formatDate(job.startDate)} – {job.current ? 'Heute' : formatDate(job.endDate)}</div>
+                      <div>{formatDate(job.startDate)} – {job.current ? t('heute') : formatDate(job.endDate)}</div>
                     </div>
                   </div>
                   {job.description && <p style={{ fontSize: 11, color: '#666', marginTop: 5, lineHeight: 1.6 }}>{job.description}</p>}
@@ -64,7 +66,7 @@ export default function VibrantTemplate({ resume }: { resume: Resume }) {
           )}
           {education.length > 0 && (
             <div>
-              <h2 style={{ fontSize: 12, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14, paddingBottom: 6, borderBottom: `2px solid ${color}20` }}>Ausbildung</h2>
+              <h2 style={{ fontSize: 12, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14, paddingBottom: 6, borderBottom: `2px solid ${color}20` }}>{t("Ausbildung")}</h2>
               {education.map(edu => (
                 <div key={edu.id} style={{ marginBottom: 10 }}>
                   <div style={{ fontWeight: 700, fontSize: 12 }}>{edu.degree}</div>
@@ -79,7 +81,7 @@ export default function VibrantTemplate({ resume }: { resume: Resume }) {
         <div>
           {skills.length > 0 && (
             <div style={{ marginBottom: 18 }}>
-              <h2 style={{ fontSize: 11, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Skills</h2>
+              <h2 style={{ fontSize: 11, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>{t("Skills")}</h2>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {skills.map(sk => (
                   <span key={sk.id} style={{
@@ -94,7 +96,7 @@ export default function VibrantTemplate({ resume }: { resume: Resume }) {
           )}
           {languages.length > 0 && (
             <div>
-              <h2 style={{ fontSize: 11, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Sprachen</h2>
+              <h2 style={{ fontSize: 11, fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>{t("Sprachen")}</h2>
               {languages.map(lang => (
                 <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 6 }}>
                   <span style={{ fontWeight: 600, color: '#333' }}>{lang.name}</span>
