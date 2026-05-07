@@ -83,11 +83,11 @@ export default function TemplateSelector() {
                 {/* Info */}
                 <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 3 }}>{tmpl.name}</div>
                 <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.5)', marginBottom: 6, lineHeight: 1.3 }}>
-                  {tmpl.description}
+                  {t(tmpl.description)}
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                   {tmpl.tags.map((tag) => (
-                    <span key={tag} className="badge" style={{ fontSize: 10 }}>{tag}</span>
+                    <span key={tag} className="badge" style={{ fontSize: 10 }}>{t(tag)}</span>
                   ))}
                 </div>
               </div>
