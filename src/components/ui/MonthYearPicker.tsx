@@ -14,8 +14,9 @@ interface Props {
   style?: React.CSSProperties;
 }
 
-export default function MonthYearPicker({ value, onChange, disabled, placeholder = 'Monat / Jahr', style }: Props) {
-  const _t = useT(); void _t;
+export default function MonthYearPicker({ value, onChange, disabled, placeholder, style }: Props) {
+  const t = useT();
+  const ph = placeholder ?? t('Monat / Jahr');
   const [open, setOpen]         = useState(false);
   const [dropPos, setDropPos]   = useState<{ top: number; left: number; width: number } | null>(null);
   const triggerRef              = useRef<HTMLButtonElement>(null);
@@ -23,7 +24,7 @@ export default function MonthYearPicker({ value, onChange, disabled, placeholder
 
   const parsed      = value ? { year: parseInt(value.slice(0, 4)), month: parseInt(value.slice(5, 7)) - 1 } : null;
   const [viewYear, setViewYear] = useState(parsed?.year ?? new Date().getFullYear());
-  const displayText = parsed ? `${MONTHS_FULL[parsed.month]} ${parsed.year}` : '';
+  const displayText = parsed ? `${t(MONTHS_FULL[parsed.month])} ${parsed.year}` : '';
 
   // Sync viewYear when external value prop changes (Adjusting State on Prop Change)
   const [prevValue, setPrevValue] = useState(value);
@@ -113,7 +114,7 @@ export default function MonthYearPicker({ value, onChange, disabled, placeholder
                 boxShadow: sel ? '0 2px 8px rgba(0,122,255,0.4)' : 'none',
                 fontFamily: 'var(--font-sf)',
               }}>
-              {m}
+              {t(m)}
             </button>
           );
         })}
@@ -124,12 +125,12 @@ export default function MonthYearPicker({ value, onChange, disabled, placeholder
         <button type="button"
           style={{ fontSize: 12, color: 'var(--ios-red)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 2px', fontFamily: 'var(--font-sf)' }}
           onClick={() => { onChange(''); setOpen(false); }}>
-          Löschen
+          {t('Löschen')}
         </button>
         <button type="button"
           style={{ fontSize: 12, color: 'var(--ios-blue)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 2px', fontFamily: 'var(--font-sf)' }}
           onClick={pickNow}>
-          Aktueller Monat
+          {t('Aktueller Monat')}
         </button>
       </div>
     </div>,
@@ -151,7 +152,7 @@ export default function MonthYearPicker({ value, onChange, disabled, placeholder
         }}
       >
         <span style={{ color: displayText ? '#fff' : 'rgba(var(--rgb-fg),0.35)', fontSize: 14 }}>
-          {displayText || placeholder}
+          {displayText || ph}
         </span>
         <ChevronDown size={14} style={{ opacity: 0.45, flexShrink: 0, transition: 'transform 0.15s', transform: open ? 'rotate(180deg)' : 'none' }} />
       </button>
