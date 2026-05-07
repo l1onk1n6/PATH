@@ -3,8 +3,10 @@ import { Database, ExternalLink, CheckCircle, AlertCircle } from 'lucide-react';
 import { saveSupabaseConfig, resetSupabaseClient, isSupabaseConfigured } from '../lib/supabase';
 import { useAuthStore } from '../store/authStore';
 import { validateSupabaseUrl, validateSupabaseKey } from '../lib/security';
+import { useT } from '../lib/i18n';
 
 export default function SetupPage() {
+  const t = useT();
   const [url, setUrl] = useState(localStorage.getItem('aicv-supabase-url') || '');
   const [key, setKey] = useState(localStorage.getItem('aicv-supabase-key') || '');
   const [saved, setSaved] = useState(false);
@@ -14,11 +16,11 @@ export default function SetupPage() {
   async function handleSave() {
     setValidationError('');
     if (!validateSupabaseUrl(url)) {
-      setValidationError('Ungültige URL. Format: https://xxx.supabase.co');
+      setValidationError(t('Ungültige URL. Format: https://xxx.supabase.co'));
       return;
     }
     if (!validateSupabaseKey(key)) {
-      setValidationError('Ungültiger API-Key. Muss mit "eyJ" beginnen.');
+      setValidationError(t('Ungültiger API-Key. Muss mit "eyJ" beginnen.'));
       return;
     }
     saveSupabaseConfig(url.trim(), key.trim());
@@ -44,20 +46,20 @@ export default function SetupPage() {
         </div>
 
         <h1 style={{ textAlign: 'center', fontSize: 22, fontWeight: 700, margin: '0 0 8px', letterSpacing: '-0.4px' }}>
-          Supabase konfigurieren
+          {t('Supabase konfigurieren')}
         </h1>
         <p style={{ textAlign: 'center', color: 'rgba(var(--rgb-fg),0.5)', fontSize: 14, marginBottom: 28, lineHeight: 1.5 }}>
-          Verbinden Sie Ihr eigenes Supabase-Projekt für sichere Cloud-Synchronisation.
+          {t('Verbinden Sie Ihr eigenes Supabase-Projekt für sichere Cloud-Synchronisation.')}
         </p>
 
         {/* Instructions */}
         <div className="glass-card" style={{ padding: '12px 16px', marginBottom: 24, borderRadius: 'var(--radius-sm)' }}>
-          <div className="section-label" style={{ marginBottom: 8 }}>So richten Sie Supabase ein</div>
+          <div className="section-label" style={{ marginBottom: 8 }}>{t('So richten Sie Supabase ein')}</div>
           <ol style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: 'rgba(var(--rgb-fg),0.6)', lineHeight: 2 }}>
-            <li>Kostenloses Konto auf <a href="https://supabase.com" target="_blank" rel="noreferrer" style={{ color: 'var(--ios-blue)' }}>supabase.com</a> erstellen</li>
-            <li>Neues Projekt anlegen</li>
-            <li>SQL Editor → <code style={{ background: 'rgba(var(--rgb-fg),0.1)', padding: '1px 5px', borderRadius: 4 }}>supabase/schema.sql</code> ausführen</li>
-            <li>Settings → API → URL & anon key kopieren</li>
+            <li>{t('Kostenloses Konto auf supabase.com erstellen')} (<a href="https://supabase.com" target="_blank" rel="noreferrer" style={{ color: 'var(--ios-blue)' }}>supabase.com</a>)</li>
+            <li>{t('Neues Projekt anlegen')}</li>
+            <li>{t('SQL Editor → schema.sql ausführen')} — <code style={{ background: 'rgba(var(--rgb-fg),0.1)', padding: '1px 5px', borderRadius: 4 }}>supabase/schema.sql</code></li>
+            <li>{t('Settings → API → URL & anon key kopieren')}</li>
           </ol>
           <a
             href="https://supabase.com/dashboard"
@@ -65,13 +67,13 @@ export default function SetupPage() {
             className="btn-glass btn-sm"
             style={{ marginTop: 10, display: 'inline-flex', fontSize: 12 }}
           >
-            <ExternalLink size={12} /> Supabase Dashboard öffnen
+            <ExternalLink size={12} /> {t('Supabase Dashboard öffnen')}
           </a>
         </div>
 
         {/* Form */}
         <div style={{ marginBottom: 12 }}>
-          <label className="section-label">Project URL</label>
+          <label className="section-label">{t('Project URL')}</label>
           <input
             className="input-glass"
             placeholder="https://xxxxxxxxxxxx.supabase.co"
@@ -80,7 +82,7 @@ export default function SetupPage() {
           />
         </div>
         <div style={{ marginBottom: 24 }}>
-          <label className="section-label">anon / public Key</label>
+          <label className="section-label">{t('anon / public Key')}</label>
           <input
             className="input-glass"
             placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
@@ -107,8 +109,8 @@ export default function SetupPage() {
           style={{ width: '100%', justifyContent: 'center', padding: '13px 20px' }}
         >
           {saved
-            ? <><CheckCircle size={16} /> Gespeichert – Seite wird neu geladen…</>
-            : 'Verbindung herstellen'
+            ? <><CheckCircle size={16} /> {t('Gespeichert – Seite wird neu geladen…')}</>
+            : t('Verbindung herstellen')
           }
         </button>
 
@@ -118,7 +120,7 @@ export default function SetupPage() {
             onClick={() => window.location.reload()}
             style={{ width: '100%', justifyContent: 'center', marginTop: 10 }}
           >
-            Überspringen (bereits konfiguriert)
+            {t('Überspringen (bereits konfiguriert)')}
           </button>
         )}
       </div>
