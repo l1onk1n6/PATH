@@ -1,5 +1,6 @@
 import type { Resume } from '../types/resume';
 import { getSupabase, isSupabaseConfigured } from './supabase';
+import { tr } from './i18n';
 
 export interface ResumeVersion {
   id: string;
@@ -58,7 +59,7 @@ export async function listVersions(resumeId: string): Promise<{ data: ResumeVers
     .limit(MAX_VERSIONS);
   if (error) {
     console.error('listVersions error:', error);
-    return { data: [], error: error.message ?? 'Unbekannter Fehler' };
+    return { data: [], error: error.message ?? tr('Unbekannter Fehler') };
   }
   return { data: (data ?? []) as ResumeVersion[], error: null };
 }
@@ -73,9 +74,9 @@ export function relativeTime(dateStr: string): string {
   const mins  = Math.floor(diff / 60_000);
   const hours = Math.floor(diff / 3_600_000);
   const days  = Math.floor(diff / 86_400_000);
-  if (mins  < 1)  return 'Gerade eben';
-  if (mins  < 60) return `Vor ${mins} Min.`;
-  if (hours < 24) return `Vor ${hours} Std.`;
-  if (days  < 7)  return `Vor ${days} Tag${days === 1 ? '' : 'en'}`;
+  if (mins  < 1)  return tr('Gerade eben');
+  if (mins  < 60) return tr('Vor {n} Min.').replace('{n}', String(mins));
+  if (hours < 24) return tr('Vor {n} Std.').replace('{n}', String(hours));
+  if (days  < 7)  return (days === 1 ? tr('Vor 1 Tag') : tr('Vor {n} Tagen').replace('{n}', String(days)));
   return new Date(dateStr).toLocaleDateString('de-CH', { day: 'numeric', month: 'short', year: 'numeric' });
 }
