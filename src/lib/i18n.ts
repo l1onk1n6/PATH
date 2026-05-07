@@ -324,6 +324,16 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Pro': 'Pro',
     'Pro-Aktivierung läuft…': 'Activating Pro…',
     'Pro wird aktiviert…': 'Activating Pro…',
+    'Angemeldet als': 'Signed in as',
+    'Letzte Anmeldung': 'Last sign-in',
+    'Deine Daten werden ausschliesslich für die App-Funktionalität verwendet':
+      'Your data is used exclusively for app functionality',
+    'Keine Weitergabe an Dritte': 'Not shared with third parties',
+    'Speicherung auf Supabase-Servern (EU/Schweiz)': 'Stored on Supabase servers (EU/Switzerland)',
+    'Passwörter werden gehasht gespeichert (bcrypt)': 'Passwords are stored hashed (bcrypt)',
+    'Datenexport jederzeit möglich (DSGVO Art. 20)': 'Data export available at any time (GDPR Art. 20)',
+    'Freunde einladen, 1 Monat gratis': 'Invite friends, 1 month free',
+    'Einladung zu PATH': 'Invitation to PATH',
     'Zahlung war erfolgreich. Lade die Seite in einer Minute neu oder kontaktiere uns.':
       'Payment was successful. Reload the page in a minute or contact us.',
     'Aktivierung verzögert': 'Activation delayed',

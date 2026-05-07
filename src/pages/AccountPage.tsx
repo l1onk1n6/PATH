@@ -731,11 +731,11 @@ function SecuritySection() {
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 10, opacity: 0.6 }}>{t('AKTIVE SITZUNG')}</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>Angemeldet als</span>
+            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>{t('Angemeldet als')}</span>
             <span style={{ fontWeight: 500 }}>{user?.email ?? '—'}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>Letzte Anmeldung</span>
+            <span style={{ color: 'rgba(var(--rgb-fg),0.5)' }}>{t('Letzte Anmeldung')}</span>
             <span style={{ fontWeight: 500 }}>
               {user?.last_sign_in_at
                 ? new Date(user.last_sign_in_at).toLocaleString('de-CH', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -779,7 +779,7 @@ function ReferralSection() {
   }, [user]);
 
   async function copyLink() {
-    const nativeSheet = await shareLink(refLink, 'Einladung zu PATH');
+    const nativeSheet = await shareLink(refLink, t('Einladung zu PATH'));
     if (nativeSheet) return;
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -788,7 +788,7 @@ function ReferralSection() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div className="glass-card" style={{ padding: 20, background: 'rgba(0,122,255,0.06)', border: '1px solid rgba(0,122,255,0.2)' }}>
-        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>Freunde einladen, 1 Monat gratis</div>
+        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>{t('Freunde einladen, 1 Monat gratis')}</div>
         <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.55)', lineHeight: 1.65, margin: 0 }}>
           Teile deinen persönlichen Link. Wenn sich jemand über deinen Link registriert und ein Pro-Abo abschliesst, bekommst du automatisch CHF 5.00 auf dein Konto gutgeschrieben.
         </p>
@@ -816,7 +816,7 @@ function ReferralSection() {
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>{t('DEINE STATISTIK')}</div>
         {stats === null ? (
-          <div style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.3)' }}>Lädt…</div>
+          <div style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.3)' }}>{t('Lädt…')}</div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
             {[
@@ -859,7 +859,7 @@ function PrivacySection() {
             <button key={label} type="button" onClick={() => openExternal(href)}
               className="btn-glass"
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', fontSize: 13, width: '100%', textAlign: 'left' }}>
-              {label}
+              {t(label)}
               <ExternalLink size={14} style={{ opacity: 0.5 }} />
             </button>
           ))}
@@ -869,11 +869,11 @@ function PrivacySection() {
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>{t('DATENVERARBEITUNG')}</div>
         <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', lineHeight: 1.8 }}>
-          <li>Deine Daten werden ausschliesslich für die App-Funktionalität verwendet</li>
-          <li>Keine Weitergabe an Dritte</li>
-          <li>Speicherung auf Supabase-Servern (EU/Schweiz)</li>
-          <li>Passwörter werden gehasht gespeichert (bcrypt)</li>
-          <li>Datenexport jederzeit möglich (DSGVO Art. 20)</li>
+          <li>{t('Deine Daten werden ausschliesslich für die App-Funktionalität verwendet')}</li>
+          <li>{t('Keine Weitergabe an Dritte')}</li>
+          <li>{t('Speicherung auf Supabase-Servern (EU/Schweiz)')}</li>
+          <li>{t('Passwörter werden gehasht gespeichert (bcrypt)')}</li>
+          <li>{t('Datenexport jederzeit möglich (DSGVO Art. 20)')}</li>
         </ul>
       </div>
 
