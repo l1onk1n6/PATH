@@ -188,7 +188,7 @@ function PlanSection() {
               )}
             </div>
             <div style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', marginTop: 2 }}>
-              {isPro ? 'Alle Features freigeschaltet' : 'Grundfunktionen — kostenlos'}
+              {isPro ? t('Alle Features freigeschaltet') : t('Grundfunktionen — kostenlos')}
             </div>
             {isPro && !isGift && (() => {
               const ts = user?.user_metadata?.subscription_period_end as number | undefined;

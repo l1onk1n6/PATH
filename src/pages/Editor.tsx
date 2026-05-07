@@ -115,8 +115,9 @@ export default function Editor() {
         </div>
         <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 700 }}>{t('Mappe eingefroren')}</h3>
         <p style={{ color: 'rgba(var(--rgb-fg),0.5)', fontSize: 13, marginBottom: 20 }}>
-          «{resume.name || 'Bewerbungsmappe'}» überschreitet dein Free-Limit von {limits.resumes} Mappen.
-          Upgrade auf Pro oder lösche andere Mappen um diese wieder zu bearbeiten.
+          {t('«{name}» überschreitet dein Free-Limit von {n} Mappen. Upgrade auf Pro oder lösche andere Mappen um diese wieder zu bearbeiten.')
+            .replace('{name}', resume.name || t('Bewerbungsmappe'))
+            .replace('{n}', String(limits.resumes))}
         </p>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button className="btn-glass" onClick={() => navigate('/')}>← Dashboard</button>
@@ -365,7 +366,7 @@ function MappeRename({ renaming, value, currentName, onValueChange, onStart, onC
     >
       <Pencil size={14} style={{ opacity: 0.6, flexShrink: 0 }} />
       <span style={{ fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {currentName || 'Bewerbungsmappe'}
+        {currentName || t('Bewerbungsmappe')}
       </span>
     </button>
   );
