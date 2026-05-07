@@ -635,6 +635,12 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Fähigkeit «{label}» gelöscht': 'Skill «{label}» deleted',
     'Sprache «{label}» gelöscht': 'Language «{label}» deleted',
     'Projekt «{label}» gelöscht': 'Project «{label}» deleted',
+    'Sektion hinzufügen': 'Add section',
+    'Erste Sektion anlegen': 'Create first section',
+    'Publikationen, Ehrenamt, Interessen, Auszeichnungen — gestalte deinen CV flexibel.':
+      'Publications, volunteering, interests, awards — shape your CV flexibly.',
+    'Erstelle eigene Abschnitte wie Projekte, Publikationen oder Zertifikate — mit PATH Pro.':
+      'Create your own sections like projects, publications or certificates — with PATH Pro.',
     'Fachkundig': 'Proficient',
     'Experte': 'Expert',
     'Projektname': 'Project name',
