@@ -60,7 +60,7 @@ export default function DocumentUpload() {
     setUploadingCount(c => c + acceptedFiles.length);
     for (const file of acceptedFiles) {
       const res = await uploadDocument(resume.id, file, 'other');
-      if (!res.ok) setSizeError(res.error ?? 'Upload fehlgeschlagen');
+      if (!res.ok) setSizeError(res.error ?? t('Upload fehlgeschlagen'));
     }
     setUploadingCount(c => Math.max(0, c - acceptedFiles.length));
   }, [resume, uploadDocument, totalUsedBytes, totalLimitBytes, limits.documentsMb]);
@@ -123,8 +123,8 @@ export default function DocumentUpload() {
         )}
         <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 4 }}>
           {uploadingCount > 0
-            ? `Lädt ${uploadingCount} Datei${uploadingCount === 1 ? '' : 'en'} hoch…`
-            : storageFull ? 'Speicher voll' : isDragActive ? 'Dateien hier ablegen...' : 'Dokumente hochladen'}
+            ? (uploadingCount === 1 ? t('Lädt {n} Datei hoch…') : t('Lädt {n} Dateien hoch…')).replace('{n}', String(uploadingCount))
+            : storageFull ? t('Speicher voll') : isDragActive ? t('Dateien hier ablegen...') : t('Dokumente hochladen')}
         </div>
         <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.4)' }}>
           {storageFull

@@ -242,6 +242,12 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
       'Secure payment via Stripe · yearly billing · cancel anytime',
     'Sichere Zahlung via Stripe · Monatlich kündbar':
       'Secure payment via Stripe · cancel monthly',
+    'Speicher voll': 'Storage full',
+    'Dateien hier ablegen...': 'Drop files here…',
+    'Dokumente hochladen': 'Upload documents',
+    'Lädt {n} Datei hoch…': 'Uploading {n} file…',
+    'Lädt {n} Dateien hoch…': 'Uploading {n} files…',
+    'Upload fehlgeschlagen': 'Upload failed',
     'Weiter': 'Next',
     'Zurück zur Liste': 'Back to list',
     'Keine Daten': 'No data',
