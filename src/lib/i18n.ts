@@ -595,6 +595,8 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Beruflicher Werdegang': 'Professional background',
     'Forschung & Projekte': 'Research & projects',
     'heute': 'present',
+    'Ihr Name': 'Your name',
+    'Kein Anschreiben-Text vorhanden.': 'No cover letter text available.',
     'Was PATH kann': 'What PATH can do',
     'Mit Beispieldaten starten': 'Start with sample data',
     'Empfohlen — du kannst alle Daten später bearbeiten':

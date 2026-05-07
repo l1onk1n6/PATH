@@ -17,6 +17,7 @@ import type { HeadingStyle } from './shared-utils';
 import { alphaHex, readableOn, MUTED_COLOR, MUTED_DARK, groupSkillsByCategory, dateRange, ensureProtocol, displayUrl } from './shared-utils';
 import { SectionHeading, Section, WorkEntry, EduEntry, SkillBar, SkillDots, SkillChips, LanguageRow, CertItem, DescriptionBlock } from './shared';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
+import { tr } from '../../../lib/i18n';
 
 // ─────────────────────────────────────────────────────────────
 //  Variant-API
@@ -94,7 +95,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
   // weiss sein \xE2\x80\x94 sonst unleserlich. WCAG-konformer Fallback.
   const bannerText = variant.bannerText ?? readableOn(bannerBg);
 
-  const name = [info.firstName, info.lastName].filter(Boolean).join(' ') || 'Ihr Name';
+  const name = [info.firstName, info.lastName].filter(Boolean).join(' ') || tr('Ihr Name');
 
   // ── Kontakt-Liste ────────────────────────────────────────
   const contacts = buildContacts(info);
@@ -176,7 +177,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
   ) : null;
 
   const WorkSection = () => resume.workExperience.length > 0 ? (
-    <Section title="Berufserfahrung" color={accent} kind={headingStyle}>
+    <Section title={tr("Berufserfahrung")} color={accent} kind={headingStyle}>
       {sortWorkExperience(resume.workExperience).map(job => (
         <WorkEntry key={job.id} job={job} color={accent} textColor={text} mutedColor={muted} boldFont={boldFont} />
       ))}
@@ -184,7 +185,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
   ) : null;
 
   const EduSection = () => resume.education.length > 0 ? (
-    <Section title="Ausbildung" color={accent} kind={headingStyle}>
+    <Section title={tr("Ausbildung")} color={accent} kind={headingStyle}>
       {sortEducation(resume.education).map(edu => (
         <EduEntry key={edu.id} edu={edu} color={accent} textColor={text} mutedColor={muted} boldFont={boldFont} />
       ))}
@@ -192,7 +193,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
   ) : null;
 
   const ProjectsSection = () => (resume.projects ?? []).length > 0 ? (
-    <Section title="Projekte" color={accent} kind={headingStyle}>
+    <Section title={tr("Projekte")} color={accent} kind={headingStyle}>
       {resume.projects.map(p => (
         <View key={p.id} wrap={false} style={{ marginBottom: 12 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
@@ -242,7 +243,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
     const color = inverse ? sidebarText : text;
     return (
       <View style={{ marginBottom: 14 }}>
-        <SectionHeading color={inverse ? sidebarText : accent} kind={headingStyle}>Kontakt</SectionHeading>
+        <SectionHeading color={inverse ? sidebarText : accent} kind={headingStyle}>{tr("Kontakt")}</SectionHeading>
         {contacts.map((c, i) => (
           <View key={i} style={{ marginBottom: 5 }}>
             {c.href
@@ -266,7 +267,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
       return <>{skills.map(s => <SkillBar key={s.id} skill={s} color={accent} textColor={sText} trackColor={alphaHex(sText, 0.12)} />)}</>;
     };
     return (
-      <Section title="Fähigkeiten" color={inverse ? sidebarText : accent} kind={headingStyle}>
+      <Section title={tr("Fähigkeiten")} color={inverse ? sidebarText : accent} kind={headingStyle}>
         {groups.map((g, i) => (
           <View key={i} wrap={false} style={{ marginBottom: i < groups.length - 1 ? 8 : 0 }}>
             {g.category ? (
@@ -286,7 +287,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
     const sText = inverse ? sidebarText : text;
     const sMuted = inverse ? alphaHex(sidebarText, 0.7) : muted;
     return (
-      <Section title="Sprachen" color={inverse ? sidebarText : accent} kind={headingStyle}>
+      <Section title={tr("Sprachen")} color={inverse ? sidebarText : accent} kind={headingStyle}>
         {resume.languages.map(l => <LanguageRow key={l.id} lang={l} textColor={sText} mutedColor={sMuted} />)}
       </Section>
     );
@@ -297,7 +298,7 @@ export function StandardPdf({ resume, variant = {} }: Props) {
     const sText = inverse ? sidebarText : text;
     const sMuted = inverse ? alphaHex(sidebarText, 0.7) : MUTED_DARK;
     return (
-      <Section title="Zertifikate" color={inverse ? sidebarText : accent} kind={headingStyle}>
+      <Section title={tr("Zertifikate")} color={inverse ? sidebarText : accent} kind={headingStyle}>
         {resume.certificates.map(c => <CertItem key={c.id} cert={c} textColor={sText} mutedColor={sMuted} boldFont={boldFont} linkColor={inverse ? sidebarText : accent} />)}
       </Section>
     );

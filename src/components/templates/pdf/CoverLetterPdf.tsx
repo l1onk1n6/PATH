@@ -11,6 +11,7 @@
  */
 import { Document, Page, View, Text, Link } from '@react-pdf/renderer';
 import type { Resume } from '../../../types/resume';
+import { tr } from '../../../lib/i18n';
 
 interface Props { resume: Resume }
 
@@ -52,7 +53,7 @@ export default function CoverLetterPdf({ resume }: Props) {
         {cl.subject ? <Text style={styles.subject}>{cl.subject}</Text> : null}
 
         {/* Body */}
-        {cl.body ? <Text style={styles.body}>{cl.body}</Text> : <Text style={styles.bodyEmpty}>Kein Anschreiben-Text vorhanden.</Text>}
+        {cl.body ? <Text style={styles.body}>{cl.body}</Text> : <Text style={styles.bodyEmpty}>{tr('Kein Anschreiben-Text vorhanden.')}</Text>}
 
         {/* Closing */}
         <View style={styles.closingBlock}>

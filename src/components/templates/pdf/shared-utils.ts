@@ -1,4 +1,5 @@
 import type { Skill } from '../../../types/resume';
+import { tr } from '../../../lib/i18n';
 
 // ─────────────────────────────────────────────────────────────
 //  Formatierung
@@ -32,7 +33,7 @@ export function formatDate(dateStr: string) {
 
 export function dateRange(start: string, end: string, current?: boolean) {
   const s = formatDate(start);
-  const e = current ? 'heute' : formatDate(end);
+  const e = current ? tr('heute') : formatDate(end);
   if (!s && !e) return '';
   if (s && e) return `${s} – ${e}`;
   return s || e;

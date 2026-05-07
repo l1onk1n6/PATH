@@ -7,6 +7,7 @@ import type { Resume } from '../../../types/resume';
 import { alphaHex, dateRange, formatDate, ensureProtocol, displayUrl } from './shared-utils';
 import { DescriptionBlock } from './shared';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
+import { tr } from '../../../lib/i18n';
 
 function SH({ children, accent }: { children: string; accent: string }) {
   return (
@@ -28,7 +29,7 @@ function SH({ children, accent }: { children: string; accent: string }) {
 export default function ElegantPdf({ resume }: { resume: Resume }) {
   const info = resume.personalInfo;
   const accent = resume.accentColor || '#1a1a2e';
-  const name = [info.firstName, info.lastName].filter(Boolean).join(' ') || 'Ihr Name';
+  const name = [info.firstName, info.lastName].filter(Boolean).join(' ') || tr('Ihr Name');
 
   const contacts: string[] = [];
   if (info.email) contacts.push(info.email);
@@ -60,7 +61,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
 
         {resume.workExperience.length > 0 ? (
           <>
-            <SH accent={accent}>Berufserfahrung</SH>
+            <SH accent={accent}>{tr("Berufserfahrung")}</SH>
             {sortWorkExperience(resume.workExperience).map(job => (
               <View key={job.id} wrap={false} style={{ marginBottom: 14 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 3 }}>
@@ -78,7 +79,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
 
         {resume.education.length > 0 ? (
           <>
-            <SH accent={accent}>Ausbildung</SH>
+            <SH accent={accent}>{tr("Ausbildung")}</SH>
             {sortEducation(resume.education).map(edu => (
               <View key={edu.id} style={{ marginBottom: 8 }} wrap={false}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -99,7 +100,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
             <View style={{ flex: 1 }}>
               {resume.skills.length > 0 ? (
                 <>
-                  <SH accent={accent}>Fähigkeiten</SH>
+                  <SH accent={accent}>{tr("Fähigkeiten")}</SH>
                   <Text style={{ fontSize: 10.5, lineHeight: 1.7, textAlign: 'center' }}>
                     {resume.skills.map(s => s.name).join('  ·  ')}
                   </Text>
@@ -107,7 +108,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
               ) : null}
               {resume.languages.length > 0 ? (
                 <>
-                  <SH accent={accent}>Sprachen</SH>
+                  <SH accent={accent}>{tr("Sprachen")}</SH>
                   <View style={{ alignItems: 'center' }}>
                     {resume.languages.map(l => (
                       <Text key={l.id} style={{ fontSize: 10.5, marginBottom: 2 }}>
@@ -120,7 +121,7 @@ export default function ElegantPdf({ resume }: { resume: Resume }) {
             </View>
             {(resume.certificates ?? []).length > 0 ? (
               <View style={{ flex: 1 }}>
-                <SH accent={accent}>Zertifikate</SH>
+                <SH accent={accent}>{tr("Zertifikate")}</SH>
                 <View style={{ alignItems: 'center' }}>
                   {resume.certificates.map(c => {
                     const titleStyle = { fontSize: 10.5, fontFamily: 'Times-Bold', color: c.url ? accent : '#1c1c1e' };
