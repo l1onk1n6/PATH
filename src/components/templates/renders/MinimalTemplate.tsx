@@ -1,6 +1,7 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
+import { useT } from '../../../lib/i18n';
 
 function SectionHeading({ children, color }: { children: React.ReactNode; color: string }) {
   return (
@@ -12,6 +13,7 @@ function SectionHeading({ children, color }: { children: React.ReactNode; color:
 }
 
 export default function MinimalTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -56,7 +58,7 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
         <div>
           {workExperience.length > 0 && (
             <div style={{ marginBottom: 20 }}>
-              <SectionHeading color={color}>Berufserfahrung</SectionHeading>
+              <SectionHeading color={color}>{t("Berufserfahrung")}</SectionHeading>
               {workExperience.map(job => (
                 <div key={job.id} style={{ marginBottom: 13 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
@@ -65,7 +67,7 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
                       {job.company && <span style={{ fontSize: 11.5, color, fontWeight: 600 }}> · {job.company}</span>}
                     </div>
                     <span style={{ fontSize: 10, color: '#8e8e93', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                      {formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? 'heute' : formatDate(job.endDate)}
+                      {formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? t('heute') : formatDate(job.endDate)}
                     </span>
                   </div>
                   {job.location && <div style={{ fontSize: 10, color: '#8e8e93', marginTop: 1 }}>{job.location}</div>}
@@ -77,7 +79,7 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
 
           {education.length > 0 && (
             <div>
-              <SectionHeading color={color}>Ausbildung</SectionHeading>
+              <SectionHeading color={color}>{t("Ausbildung")}</SectionHeading>
               {education.map(edu => (
                 <div key={edu.id} style={{ marginBottom: 10 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
@@ -90,7 +92,7 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
                     </span>
                   </div>
                   {edu.institution && <div style={{ fontSize: 11, color, fontWeight: 500 }}>{edu.institution}</div>}
-                  {edu.grade && <div style={{ fontSize: 10, color: '#8e8e93' }}>Note: {edu.grade}</div>}
+                  {edu.grade && <div style={{ fontSize: 10, color: '#8e8e93' }}>{t('Note')}: {edu.grade}</div>}
                 </div>
               ))}
             </div>
@@ -101,7 +103,7 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
         <div>
           {skills.length > 0 && (
             <div style={{ marginBottom: 18 }}>
-              <SectionHeading color={color}>Fähigkeiten</SectionHeading>
+              <SectionHeading color={color}>{t("Fähigkeiten")}</SectionHeading>
               {skills.map(skill => (
                 <div key={skill.id} style={{ marginBottom: 7 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 3 }}>
@@ -117,7 +119,7 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
 
           {languages.length > 0 && (
             <div style={{ marginBottom: 18 }}>
-              <SectionHeading color={color}>Sprachen</SectionHeading>
+              <SectionHeading color={color}>{t("Sprachen")}</SectionHeading>
               {languages.map(lang => (
                 <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 5, alignItems: 'center' }}>
                   <span style={{ fontWeight: 500 }}>{lang.name}</span>
@@ -129,7 +131,7 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
 
           {certificates.length > 0 && (
             <div>
-              <SectionHeading color={color}>Zertifikate</SectionHeading>
+              <SectionHeading color={color}>{t("Zertifikate")}</SectionHeading>
               {certificates.map(cert => (
                 <div key={cert.id} style={{ marginBottom: 7 }}>
                   <div style={{ fontSize: 11, fontWeight: 600 }}>{cert.name}</div>

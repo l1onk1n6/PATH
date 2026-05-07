@@ -589,6 +589,12 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Verstanden': 'Got it',
     'Speicher': 'Storage',
     'Foto': 'Photo',
+    'Kontakt': 'Contact',
+    'Kurzprofil': 'Profile',
+    'Akademischer Werdegang': 'Academic background',
+    'Beruflicher Werdegang': 'Professional background',
+    'Forschung & Projekte': 'Research & projects',
+    'heute': 'present',
     'Was PATH kann': 'What PATH can do',
     'Mit Beispieldaten starten': 'Start with sample data',
     'Empfohlen — du kannst alle Daten später bearbeiten':
