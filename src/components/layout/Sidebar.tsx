@@ -47,7 +47,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         <div style={{ marginBottom: 16, filter: 'drop-shadow(0 3px 8px rgba(52,199,89,0.4))' }}>
           <LogoIcon size={32} />
         </div>
-        <button className="btn-glass btn-icon" onClick={onToggleCollapse} title="Seitenleiste einblenden"
+        <button className="btn-glass btn-icon" onClick={onToggleCollapse} title={t("Seitenleiste einblenden")}
           style={{ padding: 8, marginBottom: 8, boxShadow: 'none', background: 'rgba(var(--rgb-fg),0.06)', border: '1px solid rgba(var(--rgb-fg),0.1)' }}>
           <PanelLeftOpen size={15} />
         </button>
@@ -65,7 +65,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
           </button>
         ))}
         <div style={{ flex: 1 }} />
-        <button className="btn-glass btn-icon" onClick={() => signOut()} title="Abmelden" style={{ padding: 9, boxShadow: 'none' }}>
+        <button className="btn-glass btn-icon" onClick={() => signOut()} title={t('Abmelden')} style={{ padding: 9, boxShadow: 'none' }}>
           <LogOut size={15} />
         </button>
       </aside>
@@ -99,7 +99,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, paddingLeft: 4 }}>
         <LogoFull size={32} />
         {onToggleCollapse && (
-          <button className="btn-glass btn-icon btn-sm" onClick={onToggleCollapse} title="Seitenleiste einklappen"
+          <button className="btn-glass btn-icon btn-sm" onClick={onToggleCollapse} title={t("Seitenleiste einklappen")}
             style={{ padding: 6, boxShadow: 'none', opacity: 0.6, background: 'transparent', border: 'none', flexShrink: 0 }}>
             <PanelLeftClose size={15} />
           </button>

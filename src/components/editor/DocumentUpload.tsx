@@ -213,7 +213,7 @@ export default function DocumentUpload() {
                 download={doc.name}
                 className="btn-glass btn-sm btn-icon"
                 style={{ padding: 7, color: '#fff', display: 'flex', alignItems: 'center' }}
-                title="Herunterladen"
+                title={t("Herunterladen")}
               >
                 <ExternalLink size={14} />
               </a>
@@ -222,7 +222,7 @@ export default function DocumentUpload() {
                 className="btn-glass btn-danger btn-icon"
                 onClick={() => removeDocument(resume.id, doc.id)}
                 style={{ padding: 7 }}
-                title="Entfernen"
+                title={t("Entfernen")}
               >
                 <Trash2 size={14} />
               </button>

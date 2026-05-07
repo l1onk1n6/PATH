@@ -305,7 +305,7 @@ export default function Tracker() {
                           style={{ flex: 1 }} />
                         {app.url && (
                           <a href={app.url} target="_blank" rel="noopener noreferrer"
-                            className="btn-glass" title="Inserat öffnen"
+                            className="btn-glass" title={t("Inserat öffnen")}
                             style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 12px', borderRadius: 'var(--radius-sm)' }}>
                             <ExternalLink size={14} />
                           </a>

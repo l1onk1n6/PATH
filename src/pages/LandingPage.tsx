@@ -236,7 +236,7 @@ export default function LandingPage() {
               background: 'rgba(var(--rgb-fg),0.1)', border: '1px solid rgba(var(--rgb-fg),0.2)',
               color: '#fff', fontFamily: 'monospace', cursor: 'default',
             }}
-              title="Gutschein-Code kopieren"
+              title={t("Gutschein-Code kopieren")}
               onClick={() => navigator.clipboard?.writeText('START25')}
             >
               START25

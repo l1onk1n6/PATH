@@ -336,7 +336,7 @@ export default function Dashboard() {
           <button
             className="btn-glass btn-sm"
             onClick={() => { setBulkMode(v => !v); setSelected(new Set()); }}
-            title="Mehrere Mappen auswählen"
+            title={t("Mehrere Mappen auswählen")}
             style={bulkMode ? { background: 'rgba(0,122,255,0.18)', border: '1px solid rgba(0,122,255,0.4)' } : undefined}
           >
             {bulkMode ? <CheckSquare size={14} /> : <Square size={14} />} {!isMobile && t('Auswählen')}
@@ -375,7 +375,7 @@ export default function Dashboard() {
               <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 8 }}>
                 <input
                   className="input-glass"
-                  placeholder="Vollständiger Name..."
+                  placeholder={t("Vollständiger Name...")}
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
@@ -604,7 +604,7 @@ export default function Dashboard() {
                               {!frozen && !isPersonFrozen && (
                                 <button
                                   className="btn-glass btn-icon"
-                                  title="Aktionen"
+                                  title={t("Aktionen")}
                                   style={{ padding: 6, color: r.shareToken ? 'var(--ios-blue)' : undefined }}
                                   ref={el => { menuBtnRefs.current[r.id] = el; }}
                                   onClick={(e) => {
@@ -636,7 +636,7 @@ export default function Dashboard() {
 
                     {/* Neue Mappe — only for non-frozen persons */}
                     {!isPersonFrozen && addingResumeForPersonId === person.id ? (
-                      <input className="input-glass" placeholder="Name der Mappe…" value={newResumeName} autoFocus
+                      <input className="input-glass" placeholder={t("Name der Mappe…")} value={newResumeName} autoFocus
                         onClick={(e) => e.stopPropagation()}
                         onChange={(e) => setNewResumeName(e.target.value)}
                         onKeyDown={(e) => {
@@ -647,7 +647,7 @@ export default function Dashboard() {
                         style={{ fontSize: 14, padding: '8px 12px', width: '100%' }}
                       />
                     ) : !isPersonFrozen ? (
-                      <div title="Neue Bewerbungsmappe"
+                      <div title={t("Neue Bewerbungsmappe")}
                         style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, fontSize: 13, border: '1px dashed rgba(var(--rgb-fg),0.2)', background: 'rgba(var(--rgb-fg),0.03)', cursor: 'pointer', opacity: 0.6, color: 'rgba(var(--rgb-fg),0.6)' }}
                         onClick={(e) => { e.stopPropagation(); setAddingResumeForPersonId(person.id); setNewResumeName(''); }}>
                         <FolderPlus size={15} /> Neue Bewerbungsmappe

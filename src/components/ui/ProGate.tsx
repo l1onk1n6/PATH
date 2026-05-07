@@ -304,7 +304,7 @@ export default function ProGate({ featureId, children, badge = false }: ProGateP
         <div
           style={{ position: 'relative', display: 'inline-flex', marginRight: 6 }}
           onClick={() => setShowModal(true)}
-          title="Pro-Feature"
+          title={t("Pro-Feature")}
         >
           <div style={{ opacity: 0.4, pointerEvents: 'none', filter: 'grayscale(0.5)' }}>{children}</div>
           <span style={{
@@ -326,7 +326,7 @@ export default function ProGate({ featureId, children, badge = false }: ProGateP
       <div
         style={{ position: 'relative', cursor: 'pointer' }}
         onClick={() => setShowModal(true)}
-        title="Pro-Feature — klicken für mehr Infos"
+        title={t("Pro-Feature — klicken für mehr Infos")}
       >
         <div style={{ opacity: 0.35, pointerEvents: 'none', filter: 'grayscale(0.4)' }}>{children}</div>
         <div style={{

@@ -45,7 +45,7 @@ export default function CustomSectionEditor() {
       {sections.length === 0 && (
         <EmptyState
           icon={LayoutList}
-          title="Eigene Sektionen"
+          title={t("Eigene Sektionen")}
           description="Publikationen, Ehrenamt, Interessen, Auszeichnungen — gestalte deinen CV flexibel."
           ctaLabel="Erste Sektion anlegen"
           onCta={() => addCustomSection(resume.id)}
@@ -56,7 +56,7 @@ export default function CustomSectionEditor() {
         <div key={section.id} className="glass-card" style={{ padding: 16 }}>
           {/* Section header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <span title="Verschieben" style={{ display: 'flex', flexShrink: 0 }}>
+            <span title={t("Verschieben")} style={{ display: 'flex', flexShrink: 0 }}>
               <GripVertical size={16} style={{ opacity: 0.3, cursor: 'grab' }} />
             </span>
             <input

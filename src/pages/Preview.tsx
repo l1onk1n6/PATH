@@ -228,7 +228,7 @@ export default function Preview() {
                 className="btn-glass btn-sm btn-icon"
                 onClick={() => setTemplatePickerOpen(true)}
                 style={{ padding: 9 }}
-                title="Templates"
+                title={t("Templates")}
               >
                 <Layers size={18} />
               </button>
@@ -265,7 +265,7 @@ export default function Preview() {
               className="btn-glass btn-primary btn-sm"
               onClick={handleExportMappe}
               disabled={exporting}
-              title="Ganze Mappe herunterladen"
+              title={t("Ganze Mappe herunterladen")}
               style={{ opacity: exporting ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px' }}
             >
               {exporting
@@ -278,8 +278,8 @@ export default function Preview() {
               className="btn-glass btn-primary btn-sm"
               onClick={() => setDownloadMenuOpen(v => !v)}
               disabled={exporting}
-              title="Weitere Download-Optionen"
-              aria-label="Weitere Download-Optionen"
+              title={t("Weitere Download-Optionen")}
+              aria-label={t("Weitere Download-Optionen")}
               style={{ padding: '7px 8px' }}
             >
               <ChevronDown size={14} style={{ transform: downloadMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />

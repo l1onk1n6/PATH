@@ -4,7 +4,7 @@ import { useUndoToast } from '../../lib/undoToast';
 import { useT } from '../../lib/i18n';
 
 export default function UndoToaster() {
-  const _t = useT(); void _t;
+  const tr = useT();
   const toasts   = useUndoToast(s => s.toasts);
   const dismiss  = useUndoToast(s => s.dismiss);
   const [, tick] = useState(0);
@@ -12,7 +12,7 @@ export default function UndoToaster() {
   // re-render every 100ms so progress bars animate smoothly
   useEffect(() => {
     if (toasts.length === 0) return;
-    const id = setInterval(() => tick(t => t + 1), 100);
+    const id = setInterval(() => tick(n => n + 1), 100);
     return () => clearInterval(id);
   }, [toasts.length]);
 
@@ -59,11 +59,11 @@ export default function UndoToaster() {
                 color: 'var(--ios-blue)', boxShadow: 'none',
               }}
             >
-              <RotateCcw size={12} /> Rückgängig
+              <RotateCcw size={12} /> {tr('Rückgängig')}
             </button>
             <button
               onClick={() => dismiss(t.id)}
-              aria-label="Schliessen"
+              aria-label={tr("Schliessen")}
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(var(--rgb-fg),0.4)', padding: 4, display: 'flex' }}
             >
               <X size={14} />

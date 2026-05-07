@@ -49,7 +49,7 @@ export default function SkillsEditor() {
           <EmptyState
             compact
             icon={Zap}
-            title="Fähigkeiten hinzufügen"
+            title={t("Fähigkeiten hinzufügen")}
             description="Tools, Frameworks, Methoden — mit Niveau-Bewertung."
             ctaLabel="Erste Fähigkeit"
             onCta={() => addSkill(resume.id)}
@@ -214,7 +214,7 @@ export default function SkillsEditor() {
             <EmptyState
               compact
               icon={Globe}
-              title="Sprachen hinzufügen"
+              title={t("Sprachen hinzufügen")}
               description="Welche Sprachen sprichst du und auf welchem Niveau?"
               ctaLabel="Sprache hinzufügen"
               onCta={() => addLanguage(resume.id)}
