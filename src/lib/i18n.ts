@@ -144,6 +144,11 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Link teilen': 'Share link',
     'Link teilen · aktiv': 'Share link · active',
     'Ø Vollst.': 'Ø Compl.',
+    'Hinzugefügt': 'Added',
+    'Zu Tracker': 'To tracker',
+    'Wird generiert…': 'Generating…',
+    'Verbessert…': 'Improving…',
+    'Verbessern': 'Improve',
     'Link teilen ·  aktiv': 'Share link · active',
     'ATS-Score prüfen': 'Check ATS score',
 

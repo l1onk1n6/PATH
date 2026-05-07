@@ -369,8 +369,8 @@ export default function CoverLetterEditor() {
               style={{ fontSize: 11, gap: 5, background: trackerAdded ? 'rgba(52,199,89,0.15)' : undefined, border: trackerAdded ? '1px solid rgba(52,199,89,0.3)' : undefined, color: trackerAdded ? '#34C759' : undefined }}
             >
               {trackerAdded
-                ? <><Check size={12} /> Hinzugefügt</>
-                : <><ClipboardList size={12} /> Zu Tracker</>}
+                ? <><Check size={12} /> {t('Hinzugefügt')}</>
+                : <><ClipboardList size={12} /> {t('Zu Tracker')}</>}
             </button>
           )}
         </div>
@@ -485,8 +485,8 @@ export default function CoverLetterEditor() {
               }}
             >
               {generatingCL
-                ? <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> Wird generiert…</>
-                : <><Sparkles size={14} /> Anschreiben generieren</>}
+                ? <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> {t('Wird generiert…')}</>
+                : <><Sparkles size={14} /> {t('Anschreiben generieren')}</>}
             </button>
           </div>
         )}
@@ -503,8 +503,8 @@ export default function CoverLetterEditor() {
             title={!isPro ? t('Pro-Feature') : t('Text mit KI verbessern')}
           >
             {improvingBody
-              ? <><Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> Verbessert…</>
-              : <><Wand2 size={12} /> Verbessern{!isPro && ' ✦'}</>}
+              ? <><Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> {t('Verbessert…')}</>
+              : <><Wand2 size={12} /> {t('Verbessern')}{!isPro && ' ✦'}</>}
           </button>
         </div>
         <textarea
