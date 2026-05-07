@@ -319,7 +319,7 @@ export default function CoverLetterEditor() {
               <button
                 className="btn-glass btn-icon"
                 style={{ padding: 8, color: (resume.reminderDays?.length ?? 0) > 0 ? 'var(--ios-blue)' : undefined }}
-                title="Deadline-Reminder"
+                title={t("Deadline-Reminder")}
                 onClick={() => isPro ? setShowReminder(v => !v) : setShowUpgrade(true)}
               >
                 {(resume.reminderDays?.length ?? 0) > 0 ? <Bell size={14} /> : <BellOff size={14} />}

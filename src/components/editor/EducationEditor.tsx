@@ -26,7 +26,7 @@ export default function EducationEditor() {
           <GraduationCap size={10} style={{ display: 'inline' }} />
           {education.length} Einträge
           {education.length > 1 && (
-            <span title="Automatisch nach Datum sortiert (neueste zuerst)"
+            <span title={t("Automatisch nach Datum sortiert (neueste zuerst)")}
               style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 10, color: 'rgba(var(--rgb-fg),0.4)', fontWeight: 500, marginLeft: 4 }}>
               <CalendarClock size={10} /> nach Datum
             </span>
@@ -40,7 +40,7 @@ export default function EducationEditor() {
       {education.length === 0 && (
         <EmptyState
           icon={GraduationCap}
-          title="Ausbildung hinzufügen"
+          title={t("Ausbildung hinzufügen")}
           description="Schule, Lehre, Studium — alles was zu deinem Bildungsweg gehört."
           ctaLabel="Ersten Eintrag anlegen"
           onCta={() => addEducation(resume.id)}

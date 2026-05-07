@@ -212,7 +212,7 @@ export default function Editor() {
                   <button
                     onClick={() => move(id, -1)}
                     disabled={i === 0}
-                    title="Nach oben"
+                    title={t("Nach oben")}
                     style={{
                       background: 'rgba(var(--rgb-fg),0.06)', border: '1px solid var(--border-subtle)',
                       borderRadius: 4, padding: 1, cursor: i === 0 ? 'not-allowed' : 'pointer',
@@ -224,7 +224,7 @@ export default function Editor() {
                   <button
                     onClick={() => move(id, 1)}
                     disabled={i === orderedSections.length - 1}
-                    title="Nach unten"
+                    title={t("Nach unten")}
                     style={{
                       background: 'rgba(var(--rgb-fg),0.06)', border: '1px solid var(--border-subtle)',
                       borderRadius: 4, padding: 1, cursor: i === orderedSections.length - 1 ? 'not-allowed' : 'pointer',
@@ -333,6 +333,7 @@ interface MappeRenameProps {
 }
 
 function MappeRename({ renaming, value, currentName, onValueChange, onStart, onCommit, onCancel }: MappeRenameProps) {
+  const t = useT();
   if (renaming) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
@@ -343,13 +344,13 @@ function MappeRename({ renaming, value, currentName, onValueChange, onStart, onC
           maxLength={80}
           onChange={(e) => onValueChange(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') onCommit(); if (e.key === 'Escape') onCancel(); }}
-          placeholder="Name der Bewerbungsmappe"
+          placeholder={t("Name der Bewerbungsmappe")}
           style={{ fontSize: 13, padding: '7px 10px', width: 240, maxWidth: '60vw' }}
         />
-        <button className="btn-glass btn-icon btn-sm" onClick={onCommit} title="Speichern" style={{ padding: 6 }}>
+        <button className="btn-glass btn-icon btn-sm" onClick={onCommit} title={t("Speichern")} style={{ padding: 6 }}>
           <Check size={14} style={{ color: 'var(--ios-green)' }} />
         </button>
-        <button className="btn-glass btn-icon btn-sm" onClick={onCancel} title="Abbrechen" style={{ padding: 6 }}>
+        <button className="btn-glass btn-icon btn-sm" onClick={onCancel} title={t("Abbrechen")} style={{ padding: 6 }}>
           <X size={14} />
         </button>
       </div>
@@ -359,7 +360,7 @@ function MappeRename({ renaming, value, currentName, onValueChange, onStart, onC
     <button
       className="btn-glass btn-sm"
       onClick={onStart}
-      title="Bewerbungsmappe umbenennen"
+      title={t("Bewerbungsmappe umbenennen")}
       style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', maxWidth: '100%' }}
     >
       <Pencil size={14} style={{ opacity: 0.6, flexShrink: 0 }} />

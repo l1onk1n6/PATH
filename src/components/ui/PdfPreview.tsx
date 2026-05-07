@@ -38,6 +38,7 @@ export default function PdfPreview({ bytes, building, error }: Props) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function DesktopIframePreview({ bytes, building, error }: Props) {
+  const t = useT();
   const [url, setUrl] = useState<string | null>(null);
   const currentUrlRef = useRef<string | null>(null);
 
@@ -63,7 +64,7 @@ function DesktopIframePreview({ bytes, building, error }: Props) {
         <ErrorOverlay message={error} />
       ) : url ? (
         <iframe
-          title="Vorschau"
+          title={t("Vorschau")}
           src={url}
           style={{ width: '100%', height: '100%', border: 'none', background: '#555' }}
         />

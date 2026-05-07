@@ -26,7 +26,7 @@ export default function ExperienceEditor() {
           <Briefcase size={10} style={{ display: 'inline' }} />
           {jobs.length} Einträge
           {jobs.length > 1 && (
-            <span title="Automatisch nach Datum sortiert (neueste zuerst)"
+            <span title={t("Automatisch nach Datum sortiert (neueste zuerst)")}
               style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 10, color: 'rgba(var(--rgb-fg),0.4)', fontWeight: 500, marginLeft: 4 }}>
               <CalendarClock size={10} /> nach Datum
             </span>
@@ -40,7 +40,7 @@ export default function ExperienceEditor() {
       {jobs.length === 0 && (
         <EmptyState
           icon={Briefcase}
-          title="Berufserfahrung hinzufügen"
+          title={t("Berufserfahrung hinzufügen")}
           description="Erfasse deine bisherigen Stationen — Firma, Rolle, Zeitraum und was du bewirkt hast."
           ctaLabel="Ersten Eintrag anlegen"
           onCta={() => addWorkExperience(resume.id)}

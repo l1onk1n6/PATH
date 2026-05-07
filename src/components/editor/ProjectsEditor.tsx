@@ -166,7 +166,7 @@ export default function ProjectsEditor() {
           <EmptyState
             compact
             icon={FolderOpen}
-            title="Projekte hinzufügen"
+            title={t("Projekte hinzufügen")}
             description="Nebenprojekte, Open Source, Praktika — alles was dich auszeichnet."
             ctaLabel="Projekt anlegen"
             onCta={() => addProject(resume.id)}
@@ -293,7 +293,7 @@ export default function ProjectsEditor() {
           <EmptyState
             compact
             icon={Award}
-            title="Zertifikate hinzufügen"
+            title={t("Zertifikate hinzufügen")}
             description="Abschlüsse, Weiterbildungen, Online-Kurse."
             ctaLabel="Zertifikat anlegen"
             onCta={() => addCertificate(resume.id)}
