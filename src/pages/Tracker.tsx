@@ -35,6 +35,7 @@ const SORT_OPTIONS = [
 
 
 function TypeBadge({ type }: { type: ApplicationType }) {
+  const t = useT();
   const cfg = TYPE_CONFIG[type];
   return (
     <span style={{
@@ -45,7 +46,7 @@ function TypeBadge({ type }: { type: ApplicationType }) {
       background: 'rgba(var(--rgb-fg),0.06)',
       border: '1px solid rgba(var(--rgb-fg),0.1)',
     }}>
-      {cfg.icon} {cfg.label}
+      {cfg.icon} {t(cfg.label)}
     </span>
   );
 }
@@ -156,7 +157,7 @@ export default function Tracker() {
                 cursor: 'pointer', opacity: filter !== 'all' && filter !== s ? 0.5 : 1,
                 transition: 'opacity 0.15s',
               }} onClick={() => setFilter(filter === s ? 'all' : s)}>
-                {counts[s]} {cfg.label}
+                {counts[s]} {t(cfg.label)}
               </div>
             );
           })}
@@ -170,7 +171,7 @@ export default function Tracker() {
             <CustomSelect
               value={filter}
               onChange={(v) => setFilter(v as ApplicationStatus | 'all')}
-              options={[{ value: 'all', label: 'Alle Status' }, ...ALL_STATUSES.map((s) => ({ value: s, label: STATUS_CONFIG[s].label }))]}
+              options={[{ value: 'all', label: t('Alle Status') }, ...ALL_STATUSES.map((s) => ({ value: s, label: t(STATUS_CONFIG[s].label) }))]}
               style={{ fontSize: 12, padding: '6px 10px' }}
             />
           </div>
@@ -178,7 +179,7 @@ export default function Tracker() {
             <CustomSelect
               value={sort}
               onChange={(v) => setSort(v)}
-              options={SORT_OPTIONS}
+              options={SORT_OPTIONS.map(o => ({ ...o, label: t(o.label) }))}
               style={{ fontSize: 12, padding: '6px 10px' }}
             />
           </div>
@@ -268,7 +269,7 @@ export default function Tracker() {
                           outline: isActive ? `1px solid ${cfg.color}30` : '1px solid rgba(var(--rgb-fg),0.08)',
                         }}
                       >
-                        {cfg.label}
+                        {t(cfg.label)}
                       </button>
                     );
                   })}
@@ -294,7 +295,7 @@ export default function Tracker() {
                       <CustomSelect
                         value={app.status}
                         onChange={(v) => updateApplication(app.id, { status: v as ApplicationStatus })}
-                        options={ALL_STATUSES.map((s) => ({ value: s, label: STATUS_CONFIG[s].label }))}
+                        options={ALL_STATUSES.map((s) => ({ value: s, label: t(STATUS_CONFIG[s].label) }))}
                       />
                     </div>
                     <div>
@@ -328,14 +329,14 @@ export default function Tracker() {
                   <div style={{ marginBottom: 10 }}>
                     <label className="section-label">{t('Bewerbungsart')}</label>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
-                      {ALL_TYPES.map((t) => {
-                        const isActive = appType === t;
-                        const cfg = TYPE_CONFIG[t];
+                      {ALL_TYPES.map((typeKey) => {
+                        const isActive = appType === typeKey;
+                        const cfg = TYPE_CONFIG[typeKey];
                         return (
                           <button
-                            key={t}
+                            key={typeKey}
                             type="button"
-                            onClick={() => updateApplication(app.id, { type: t })}
+                            onClick={() => updateApplication(app.id, { type: typeKey })}
                             style={{
                               display: 'inline-flex',
                               alignItems: 'center',
@@ -351,7 +352,7 @@ export default function Tracker() {
                               transition: 'all 0.15s',
                             }}
                           >
-                            {cfg.icon} {cfg.label}
+                            {cfg.icon} {t(cfg.label)}
                           </button>
                         );
                       })}
