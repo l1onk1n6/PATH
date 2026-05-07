@@ -114,7 +114,7 @@ export default function SkillsEditor() {
                     <button
                       key={lvl}
                       onClick={() => updateSkill(resume.id, skill.id, { level: lvl as 1|2|3|4|5 })}
-                      title={LEVEL_LABELS[lvl - 1]}
+                      title={t(LEVEL_LABELS[lvl - 1])}
                       style={{
                         width: 16, height: 16, borderRadius: '50%',
                         background: skill.level >= lvl ? LEVEL_COLORS[skill.level - 1] : 'rgba(var(--rgb-fg),0.15)',
@@ -125,7 +125,7 @@ export default function SkillsEditor() {
                   ))}
                 </div>
                 <span style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.45)', minWidth: 70 }}>
-                  {LEVEL_LABELS[skill.level - 1]}
+                  {t(LEVEL_LABELS[skill.level - 1])}
                 </span>
                 <button
                   className="btn-glass btn-danger btn-icon"
@@ -189,7 +189,7 @@ export default function SkillsEditor() {
                   style={{ flex: 1, fontSize: 13, padding: '8px 10px' }}
                 >
                   {LANG_LEVELS.map((lvl) => (
-                    <option key={lvl} value={lvl}>{lvl}</option>
+                    <option key={lvl} value={lvl}>{t(lvl)}</option>
                   ))}
                 </select>
                 {/* Platzhalter in der Breite der Skills-Niveau-Spalte (5 Dots 16px + 4 Gaps 4px + 70px Label) */}

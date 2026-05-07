@@ -204,7 +204,7 @@ export default function DocumentUpload() {
                 style={{ width: 120, fontSize: 12, padding: '6px 8px' }}
               >
                 {CATEGORIES.map((cat) => (
-                  <option key={cat.value} value={cat.value}>{cat.label}</option>
+                  <option key={cat.value} value={cat.value}>{t(cat.label)}</option>
                 ))}
               </select>
 

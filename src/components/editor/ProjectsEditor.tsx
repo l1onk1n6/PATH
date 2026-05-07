@@ -250,8 +250,8 @@ export default function ProjectsEditor() {
                     const snapshot = cert;
                     const idx = i;
                     removeCertificate(resume.id, cert.id);
-                    const label = cert.name || 'Zertifikat';
-                    showUndo(`Zertifikat «${label}» gelöscht`, () => restoreItemAt(resume.id, 'certificates', snapshot, idx));
+                    const label = cert.name || t('Zertifikat');
+                    showUndo(t('Zertifikat «{label}» gelöscht').replace('{label}', label), () => restoreItemAt(resume.id, 'certificates', snapshot, idx));
                   }}
                   style={{ padding: 6 }}
                 >
