@@ -150,7 +150,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
           <button onClick={() => setShowUpgrade(true)} className="btn-glass"
             style={{ width: '100%', justifyContent: 'center', padding: '8px 12px', background: 'linear-gradient(135deg, rgba(255,159,10,0.12), rgba(255,55,95,0.1))', border: '1px solid rgba(255,159,10,0.25)', boxShadow: 'none', fontSize: 12, gap: 7 }}>
             <Sparkles size={14} style={{ color: '#FF9F0A' }} />
-            <span style={{ fontWeight: 600, color: '#FF9F0A' }}>Auf Pro upgraden</span>
+            <span style={{ fontWeight: 600, color: '#FF9F0A' }}>{t('Auf Pro upgraden')}</span>
           </button>
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 11, color: '#FF9F0A', padding: '4px 0' }}>
@@ -159,7 +159,7 @@ export default function Sidebar({ onClose, collapsed = false, onToggleCollapse }
         )}
         <button className="btn-glass btn-sm" onClick={() => signOut()}
           style={{ width: '100%', justifyContent: 'center', padding: '8px 10px', boxShadow: 'none', fontSize: 12 }}>
-          <LogOut size={14} /> Abmelden
+          <LogOut size={14} /> {t('Abmelden')}
         </button>
       </div>
     </aside>
@@ -211,6 +211,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
     onSelectPerson, onSelectResume, onAddPerson, onAddResume, onDeleteResume,
     isMobile,
   } = props;
+  const t = useT();
 
   const [open, setOpen] = useState(false);
   const [panelPos, setPanelPos] = useState<{ top: number; left: number } | null>(null);
@@ -240,9 +241,9 @@ function MappeSwitcher(props: MappeSwitcherProps) {
   useEffect(() => {
     if (!open) return;
     const onDoc = (e: MouseEvent) => {
-      const t = e.target as Node;
-      const insideTrigger = triggerRef.current?.contains(t);
-      const insidePanel   = panelRef.current?.contains(t);
+      const target = e.target as Node;
+      const insideTrigger = triggerRef.current?.contains(target);
+      const insidePanel   = panelRef.current?.contains(target);
       if (!insideTrigger && !insidePanel) setOpen(false);
     };
     document.addEventListener('mousedown', onDoc);
@@ -353,7 +354,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
                         {dname}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
-                        <span style={{ fontSize: 10, color: 'rgba(var(--rgb-fg),0.4)' }}>{personResumes.length} {personResumes.length === 1 ? 'Mappe' : 'Mappen'}</span>
+                        <span style={{ fontSize: 10, color: 'rgba(var(--rgb-fg),0.4)' }}>{personResumes.length} {personResumes.length === 1 ? t('Mappe') : t('Mappen')}</span>
                         {isFrozenP && <Lock size={9} style={{ color: '#FF9F0A', flexShrink: 0 }} />}
                       </div>
                     </div>
@@ -366,7 +367,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
             <div style={{ flex: 1, overflowY: 'auto', padding: '6px 5px', minWidth: 0 }}>
               {!focusedPerson ? (
                 <div style={{ padding: '24px 8px', textAlign: 'center', color: 'rgba(var(--rgb-fg),0.35)', fontSize: 12 }}>
-                  Person auswählen
+                  {t('Person auswählen')}
                 </div>
               ) : (
                 <>
@@ -375,19 +376,19 @@ function MappeSwitcher(props: MappeSwitcherProps) {
                     fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase',
                     color: 'rgba(var(--rgb-fg),0.3)', padding: '4px 8px 8px',
                   }}>
-                    Mappen
+                    {t('Mappen')}
                   </div>
 
                   {focusedResumes.length === 0 && (
                     <div style={{ padding: '12px 8px', textAlign: 'center', color: 'rgba(var(--rgb-fg),0.35)', fontSize: 12 }}>
-                      Keine Mappen vorhanden
+                      {t('Keine Mappen vorhanden')}
                     </div>
                   )}
 
                   {focusedResumes.map((r, idx) => {
                     const isResumeFrozen = focusedFrozen || frozenResumeIds.has(r.id);
                     const isActiveR = r.id === activeResume?.id;
-                    const name = r.name || `Bewerbungsmappe ${idx + 1}`;
+                    const name = r.name || t('Bewerbungsmappe {n}').replace('{n}', String(idx + 1));
                     return (
                       <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 3 }}>
                         <button
@@ -419,7 +420,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
                         {focusedResumes.length > 1 && !isResumeFrozen && (
                           <button
                             onClick={() => onDeleteResume(r.id)}
-                            title="Mappe löschen"
+                            title={t('Mappe löschen')}
                             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 5, opacity: 0.28, color: 'inherit', flexShrink: 0, display: 'flex' }}
                           >
                             <Trash2 size={12} />
@@ -440,7 +441,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
               <div style={{ width: LEFT_W, flexShrink: 0, display: 'flex', gap: 4, padding: '5px 6px', borderRight: '1px solid rgba(var(--rgb-fg),0.09)' }}>
                 <input
                   className="input-glass"
-                  placeholder="Name..."
+                  placeholder={t('Name...')}
                   value={newPersonName}
                   onChange={(e) => setNewPersonName(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') submitNewPerson(); if (e.key === 'Escape') { setAddingPerson(false); setNewPersonName(''); } }}
@@ -459,7 +460,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
                   cursor: 'pointer', color: 'rgba(var(--rgb-fg),0.5)', fontSize: 12, padding: '0 8px',
                 }}
               >
-                <Plus size={14} /> Neue Person
+                <Plus size={14} /> {t('Neue Person')}
               </button>
             )}
 
@@ -475,7 +476,7 @@ function MappeSwitcher(props: MappeSwitcherProps) {
                 fontSize: 12, padding: '0 8px',
               }}
             >
-              <FilePlus size={14} /> Neue Mappe
+              <FilePlus size={14} /> {t('Neue Mappe')}
             </button>
           </div>
         </div>
