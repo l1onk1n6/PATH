@@ -242,7 +242,7 @@ export default function Tracker() {
                     <TypeBadge type={appType} />
                     <button
                       className="btn-glass btn-danger btn-icon"
-                      onClick={(e) => { e.stopPropagation(); if (confirm('Bewerbung löschen?')) removeApplication(app.id); }}
+                      onClick={(e) => { e.stopPropagation(); if (confirm(t('Bewerbung löschen?'))) removeApplication(app.id); }}
                       style={{ padding: 6 }}
                     >
                       <Trash2 size={12} />
