@@ -69,7 +69,7 @@ function DesktopIframePreview({ bytes, building, error }: Props) {
           style={{ width: '100%', height: '100%', border: 'none', background: '#555' }}
         />
       ) : (
-        <SpinnerOverlay label={building ? 'Vorschau wird aufgebaut…' : undefined} />
+        <SpinnerOverlay label={building ? t('Vorschau wird aufgebaut…') : undefined} />
       )}
     </div>
   );
@@ -80,6 +80,7 @@ function DesktopIframePreview({ bytes, building, error }: Props) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function MobileCanvasPreview({ bytes, building, error }: Props) {
+  const t = useT();
   const containerRef = useRef<HTMLDivElement>(null);
   const [pageCount, setPageCount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -137,7 +138,7 @@ function MobileCanvasPreview({ bytes, building, error }: Props) {
         await doc.cleanup();
       } catch (err) {
         console.error('PdfPreview render failed:', err);
-        if (!cancelled) setRenderError('Die Vorschau konnte nicht geladen werden.');
+        if (!cancelled) setRenderError(t('Die Vorschau konnte nicht geladen werden.'));
       } finally {
         if (!cancelled) setLoading(false);
       }
