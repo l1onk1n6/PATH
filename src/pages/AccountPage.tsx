@@ -271,9 +271,9 @@ function PlanSection() {
             return (
               <div key={label} style={{ marginBottom: 10 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                  <span style={{ color: 'rgba(var(--rgb-fg),0.6)' }}>{label}</span>
+                  <span style={{ color: 'rgba(var(--rgb-fg),0.6)' }}>{t(label)}</span>
                   <span style={{ fontWeight: 600, color: enabled ? 'var(--ios-green)' : 'rgba(var(--rgb-fg),0.3)' }}>
-                    {enabled ? '✓ Aktiv' : '—'}
+                    {enabled ? `✓ ${t('Aktiv')}` : '—'}
                   </span>
                 </div>
               </div>
@@ -283,7 +283,7 @@ function PlanSection() {
           return (
             <div key={label} style={{ marginBottom: 10 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
-                <span style={{ color: 'rgba(var(--rgb-fg),0.6)' }}>{label}</span>
+                <span style={{ color: 'rgba(var(--rgb-fg),0.6)' }}>{t(label)}</span>
                 <span style={{ fontWeight: 600, color: used !== null ? color : 'rgba(var(--rgb-fg),0.5)' }}>
                   {used !== null ? `${used} / ${maxDisplay}` : maxDisplay}
                 </span>
@@ -324,7 +324,7 @@ function PlanSection() {
                     ? 'rgba(var(--rgb-fg),0.22)'
                     : '#FF9F0A',
                 }}>
-                  {status === 'active' ? '✓ Aktiv' : status === 'soon' ? 'Bald' : 'PRO'}
+                  {status === 'active' ? `✓ ${t('Aktiv')}` : status === 'soon' ? t('Bald') : 'PRO'}
                 </span>
               </div>
             );
@@ -808,7 +808,7 @@ function ReferralSection() {
             {copied
               ? <Check size={14} style={{ color: 'var(--ios-green)' }} />
               : <Copy size={14} />}
-            {copied ? 'Kopiert!' : 'Kopieren'}
+            {copied ? t('Kopiert!') : t('Kopieren')}
           </button>
         </div>
       </div>
@@ -832,7 +832,7 @@ function ReferralSection() {
                 <div style={{ fontSize: 26, fontWeight: 700, color: value > 0 ? 'var(--ios-green)' : 'rgba(var(--rgb-fg),0.45)' }}>
                   {value}
                 </div>
-                <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 4 }}>{label}</div>
+                <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 4 }}>{t(label)}</div>
               </div>
             ))}
           </div>
