@@ -1,6 +1,7 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
+import { useT } from '../../../lib/i18n';
 
 function SectionHeading({ children, color }: { children: React.ReactNode; color: string }) {
   return (
@@ -15,6 +16,7 @@ function SectionHeading({ children, color }: { children: React.ReactNode; color:
 }
 
 export default function ElegantTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -64,7 +66,7 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
         <div>
           {workExperience.length > 0 && (
             <div style={{ marginBottom: 22 }}>
-              <SectionHeading color={color}>Berufserfahrung</SectionHeading>
+              <SectionHeading color={color}>{t("Berufserfahrung")}</SectionHeading>
               {workExperience.map(job => (
                 <div key={job.id} style={{ marginBottom: 14 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -74,7 +76,7 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
                     </div>
                     <div style={{ fontSize: 10, color: '#999', textAlign: 'right', flexShrink: 0 }}>
                       {job.location && <div>{job.location}</div>}
-                      <div>{formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? 'heute' : formatDate(job.endDate)}</div>
+                      <div>{formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? t('heute') : formatDate(job.endDate)}</div>
                     </div>
                   </div>
                   {job.description && <p style={{ fontSize: 11, color: '#555', marginTop: 4, lineHeight: 1.65 }}>{job.description}</p>}
@@ -85,7 +87,7 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
 
           {education.length > 0 && (
             <div>
-              <SectionHeading color={color}>Ausbildung</SectionHeading>
+              <SectionHeading color={color}>{t("Ausbildung")}</SectionHeading>
               {education.map(edu => (
                 <div key={edu.id} style={{ marginBottom: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -96,7 +98,7 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
                     </div>
                     <div style={{ fontSize: 10, color: '#999', textAlign: 'right', flexShrink: 0 }}>
                       <div>{formatDate(edu.startDate)}{edu.startDate ? ' – ' : ''}{formatDate(edu.endDate)}</div>
-                      {edu.grade && <div>Note {edu.grade}</div>}
+                      {edu.grade && <div>{t('Note')} {edu.grade}</div>}
                     </div>
                   </div>
                 </div>
@@ -109,7 +111,7 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
         <div>
           {skills.length > 0 && (
             <div style={{ marginBottom: 20 }}>
-              <SectionHeading color={color}>Fähigkeiten</SectionHeading>
+              <SectionHeading color={color}>{t("Fähigkeiten")}</SectionHeading>
               {skills.map(skill => (
                 <div key={skill.id} style={{ marginBottom: 7 }}>
                   <div style={{ fontSize: 11, fontWeight: 500, marginBottom: 3 }}>{skill.name}</div>
@@ -123,7 +125,7 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
 
           {languages.length > 0 && (
             <div style={{ marginBottom: 20 }}>
-              <SectionHeading color={color}>Sprachen</SectionHeading>
+              <SectionHeading color={color}>{t("Sprachen")}</SectionHeading>
               {languages.map(lang => (
                 <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 6, borderBottom: '1px dotted #e0d8cc', paddingBottom: 5 }}>
                   <span style={{ fontStyle: 'italic' }}>{lang.name}</span>
@@ -135,7 +137,7 @@ export default function ElegantTemplate({ resume }: { resume: Resume }) {
 
           {certificates.length > 0 && (
             <div>
-              <SectionHeading color={color}>Zertifikate</SectionHeading>
+              <SectionHeading color={color}>{t("Zertifikate")}</SectionHeading>
               {certificates.map(cert => (
                 <div key={cert.id} style={{ marginBottom: 7 }}>
                   <div style={{ fontSize: 11, fontWeight: 600 }}>{cert.name}</div>

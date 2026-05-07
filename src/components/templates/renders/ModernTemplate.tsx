@@ -1,6 +1,7 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
+import { useT } from '../../../lib/i18n';
 
 function SideLabel({ children }: { children: React.ReactNode }) {
   return <div style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.16em', color: 'rgba(255,255,255,0.55)', marginBottom: 10, marginTop: 18 }}>{children}</div>;
@@ -16,6 +17,7 @@ function MainLabel({ children, color }: { children: React.ReactNode; color: stri
 }
 
 export default function ModernTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -41,7 +43,7 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
         )}
 
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 14 }}>
-          <SideLabel>Kontakt</SideLabel>
+          <SideLabel>{t("Kontakt")}</SideLabel>
           <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', lineHeight: 1.9 }}>
             {info.email && <div>{info.email}</div>}
             {info.phone && <div>{info.phone}</div>}
@@ -54,7 +56,7 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
 
         {skills.length > 0 && (
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 14, marginTop: 14 }}>
-            <SideLabel>Fähigkeiten</SideLabel>
+            <SideLabel>{t("Fähigkeiten")}</SideLabel>
             {skills.map(skill => (
               <div key={skill.id} style={{ marginBottom: 8 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, marginBottom: 3 }}>
@@ -71,7 +73,7 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
 
         {languages.length > 0 && (
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 14, marginTop: 14 }}>
-            <SideLabel>Sprachen</SideLabel>
+            <SideLabel>{t("Sprachen")}</SideLabel>
             {languages.map(lang => (
               <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 10.5, marginBottom: 6, color: 'rgba(255,255,255,0.8)' }}>
                 <span style={{ fontWeight: 600 }}>{lang.name}</span>
@@ -83,7 +85,7 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
 
         {certificates.length > 0 && (
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 14, marginTop: 14 }}>
-            <SideLabel>Zertifikate</SideLabel>
+            <SideLabel>{t("Zertifikate")}</SideLabel>
             {certificates.map(cert => (
               <div key={cert.id} style={{ marginBottom: 8 }}>
                 <div style={{ fontSize: 10.5, fontWeight: 600, color: '#fff' }}>{cert.name}</div>
@@ -104,7 +106,7 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
 
         {workExperience.length > 0 && (
           <div style={{ marginBottom: 22 }}>
-            <MainLabel color={color}>Berufserfahrung</MainLabel>
+            <MainLabel color={color}>{t("Berufserfahrung")}</MainLabel>
             {workExperience.map(job => (
               <div key={job.id} style={{ marginBottom: 14, paddingLeft: 14, borderLeft: '2px solid #f0f0f5' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -114,7 +116,7 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
                   </div>
                   <div style={{ fontSize: 10, color: '#9696a8', textAlign: 'right', flexShrink: 0 }}>
                     {job.location && <div>{job.location}</div>}
-                    <div>{formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? 'heute' : formatDate(job.endDate)}</div>
+                    <div>{formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? t('heute') : formatDate(job.endDate)}</div>
                   </div>
                 </div>
                 {job.description && <p style={{ fontSize: 11, color: '#555', marginTop: 5, lineHeight: 1.65 }}>{job.description}</p>}
@@ -125,7 +127,7 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
 
         {education.length > 0 && (
           <div>
-            <MainLabel color={color}>Ausbildung</MainLabel>
+            <MainLabel color={color}>{t("Ausbildung")}</MainLabel>
             {education.map(edu => (
               <div key={edu.id} style={{ marginBottom: 12, paddingLeft: 14, borderLeft: '2px solid #f0f0f5' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -136,7 +138,7 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
                   </div>
                   <div style={{ fontSize: 10, color: '#9696a8', textAlign: 'right', flexShrink: 0 }}>
                     <div>{formatDate(edu.startDate)}{edu.startDate ? ' – ' : ''}{formatDate(edu.endDate)}</div>
-                    {edu.grade && <div>Note: {edu.grade}</div>}
+                    {edu.grade && <div>{t('Note')}: {edu.grade}</div>}
                   </div>
                 </div>
               </div>
