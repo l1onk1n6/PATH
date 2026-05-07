@@ -26,7 +26,7 @@ export default function CustomSectionEditor() {
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>{t('Eigene Sektionen')}</div>
           <div style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', maxWidth: 280 }}>
-            Erstelle eigene Abschnitte wie Projekte, Publikationen oder Zertifikate — mit PATH Pro.
+            {t('Erstelle eigene Abschnitte wie Projekte, Publikationen oder Zertifikate — mit PATH Pro.')}
           </div>
         </div>
         <button
@@ -34,7 +34,7 @@ export default function CustomSectionEditor() {
           onClick={() => setShowUpgrade(true)}
           style={{ padding: '10px 22px', fontWeight: 700, fontSize: 13, background: 'linear-gradient(135deg, rgba(255,159,10,0.3), rgba(255,55,95,0.2))', border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A' }}
         >
-          Upgrade auf Pro
+          {t('Upgrade auf Pro')}
         </button>
       </div>
     );
@@ -46,8 +46,8 @@ export default function CustomSectionEditor() {
         <EmptyState
           icon={LayoutList}
           title={t("Eigene Sektionen")}
-          description="Publikationen, Ehrenamt, Interessen, Auszeichnungen — gestalte deinen CV flexibel."
-          ctaLabel="Erste Sektion anlegen"
+          description={t('Publikationen, Ehrenamt, Interessen, Auszeichnungen — gestalte deinen CV flexibel.')}
+          ctaLabel={t('Erste Sektion anlegen')}
           onCta={() => addCustomSection(resume.id)}
         />
       )}
@@ -113,7 +113,7 @@ export default function CustomSectionEditor() {
             onClick={() => updateCustomSection(resume.id, section.id, { items: [...section.items, ''] })}
             style={{ marginTop: 8, fontSize: 12 }}
           >
-            <Plus size={12} /> Eintrag hinzufügen
+            <Plus size={12} /> {t('Eintrag hinzufügen')}
           </button>
 
           {/* Reorder buttons */}
@@ -141,7 +141,7 @@ export default function CustomSectionEditor() {
         onClick={() => addCustomSection(resume.id)}
         style={{ width: '100%' }}
       >
-        <Plus size={14} /> Sektion hinzufügen
+        <Plus size={14} /> {t('Sektion hinzufügen')}
       </button>
     </div>
   );
