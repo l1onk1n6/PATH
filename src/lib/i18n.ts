@@ -323,6 +323,9 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Free': 'Free',
     'Pro': 'Pro',
     'Pro-Aktivierung läuft…': 'Activating Pro…',
+    'Pro wird aktiviert…': 'Activating Pro…',
+    'Zahlung war erfolgreich. Lade die Seite in einer Minute neu oder kontaktiere uns.':
+      'Payment was successful. Reload the page in a minute or contact us.',
     'Aktivierung verzögert': 'Activation delayed',
     'Nochmals prüfen': 'Check again',
     'Zahlung bestätigt — warte auf Aktivierung (max. 15 Sek.)':

@@ -37,8 +37,7 @@ const NAV: { id: Section; label: string; icon: React.ComponentType<{ size: numbe
 // ── Section: Plan ──────────────────────────────────────────
 function PlanSection() {
   const { isPro, plan, limits } = usePlan();
-  const _t = useT();
-  void _t; // PlanSection-Migration folgt in eigenem PR
+  const t = useT();
 
   const { persons, resumes } = useResumeStore();
   const totalDocMb = Math.round(
@@ -133,8 +132,8 @@ function PlanSection() {
         <div className="glass-card" style={{ padding: '14px 16px', border: '1px solid rgba(52,199,89,0.4)', background: 'rgba(52,199,89,0.1)', display: 'flex', alignItems: 'center', gap: 10 }}>
           <CheckCircle size={18} style={{ color: 'var(--ios-green)', flexShrink: 0 }} />
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ios-green)' }}>Willkommen bei PATH Pro!</div>
-            <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.6)', marginTop: 2 }}>Dein Upgrade war erfolgreich. Alle Pro-Features sind jetzt aktiv.</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ios-green)' }}>{t('Willkommen bei PATH Pro!')}</div>
+            <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.6)', marginTop: 2 }}>{t('Dein Upgrade war erfolgreich. Alle Pro-Features sind jetzt aktiv.')}</div>
           </div>
         </div>
       )}
@@ -144,8 +143,8 @@ function PlanSection() {
         <div className="glass-card" style={{ padding: '14px 16px', border: '1px solid rgba(0,122,255,0.35)', background: 'rgba(0,122,255,0.08)', display: 'flex', alignItems: 'center', gap: 10 }}>
           <Loader2 size={18} style={{ color: 'var(--ios-blue)', flexShrink: 0, animation: 'spin 1s linear infinite' }} />
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ios-blue)' }}>Pro wird aktiviert…</div>
-            <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.5)', marginTop: 2 }}>Zahlung bestätigt — warte auf Aktivierung (max. 15 Sek.)</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ios-blue)' }}>{t('Pro wird aktiviert…')}</div>
+            <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.5)', marginTop: 2 }}>{t('Zahlung bestätigt — warte auf Aktivierung (max. 15 Sek.)')}</div>
           </div>
         </div>
       )}
@@ -155,11 +154,11 @@ function PlanSection() {
         <div className="glass-card" style={{ padding: '14px 16px', border: '1px solid rgba(255,159,10,0.4)', background: 'rgba(255,159,10,0.08)', display: 'flex', alignItems: 'center', gap: 10 }}>
           <AlertTriangle size={18} style={{ color: '#FF9F0A', flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#FF9F0A' }}>Aktivierung verzögert</div>
-            <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.5)', marginTop: 2 }}>Zahlung war erfolgreich. Lade die Seite in einer Minute neu oder kontaktiere uns.</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#FF9F0A' }}>{t('Aktivierung verzögert')}</div>
+            <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.5)', marginTop: 2 }}>{t('Zahlung war erfolgreich. Lade die Seite in einer Minute neu oder kontaktiere uns.')}</div>
           </div>
           <button className="btn-glass btn-sm" onClick={() => { setWebhookFailed(false); setWebhookPending(true); let a = 0; const p = async () => { await refreshUser(); a++; const { user: u } = useAuthStore.getState(); if (u?.user_metadata?.plan === 'pro') { setWebhookPending(false); setShowSuccess(true); } else if (a < 4) { setTimeout(p, 3000); } else { setWebhookPending(false); setWebhookFailed(true); } }; setTimeout(p, 1000); }} style={{ fontSize: 11, padding: '6px 10px', flexShrink: 0 }}>
-            Nochmals prüfen
+            {t('Nochmals prüfen')}
           </button>
         </div>
       )}
