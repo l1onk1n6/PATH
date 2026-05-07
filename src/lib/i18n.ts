@@ -368,6 +368,7 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Transparent & fair': 'Transparent & fair',
     'Kostenlos starten, bei Bedarf upgraden. Jederzeit kündbar.':
       'Start for free, upgrade when needed. Cancel anytime.',
+    'Jetzt sichern': 'Claim now',
     'Job-Beschreibung ist zu kurz oder leer.': 'Job description is too short or empty.',
     'Sehr gute Übereinstimmung — der Lebenslauf passt thematisch sauber zur Stelle.':
       'Very good match — the resume matches the role thematically.',
