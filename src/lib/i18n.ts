@@ -1204,8 +1204,8 @@ function initialLocale(): Locale {
   if (typeof window === 'undefined') return 'de';
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored === 'de' || stored === 'en') return stored;
-  // Browser-Praeferenz als Fallback
-  if (typeof navigator !== 'undefined' && /^en\b/i.test(navigator.language)) return 'en';
+  // Default = Deutsch. Sprache laesst sich ueber den Picker (LandingPage /
+  // AccountPage) umschalten und wird in localStorage persistiert.
   return 'de';
 }
 
