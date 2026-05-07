@@ -383,7 +383,7 @@ function ProfileCard() {
         id: user.id, phone, street, zip, city, country,
         updated_at: new Date().toISOString(),
       })
-      if (error) { setSaveErr('Speichern fehlgeschlagen.'); return }
+      if (error) { setSaveErr(t('Speichern fehlgeschlagen.')); return }
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
 
@@ -410,7 +410,7 @@ function ProfileCard() {
         </div>
         <div>
           <label className="section-label">{t('Strasse & Nr.')}</label>
-          <input className="input-glass" placeholder="Musterstrasse 1" value={street}
+          <input className="input-glass" placeholder={t('Musterstrasse 1')} value={street}
             onChange={e => setStreet(e.target.value)} style={{ width: '100%' }} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8 }}>
@@ -421,7 +421,7 @@ function ProfileCard() {
           </div>
           <div>
             <label className="section-label">{t('Ort')}</label>
-            <input className="input-glass" placeholder="Zürich" value={city}
+            <input className="input-glass" placeholder={t('Zürich')} value={city}
               onChange={e => setCity(e.target.value)} />
           </div>
         </div>
@@ -436,7 +436,7 @@ function ProfileCard() {
           disabled={saving} style={{ alignSelf: 'flex-end', gap: 6, marginTop: 4 }}>
           {saving ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> :
            saved  ? <CheckCircle size={14} style={{ color: '#34c759' }} /> : null}
-          {saved ? 'Gespeichert' : 'Speichern'}
+          {saved ? t('Gespeichert') : t('Speichern')}
         </button>
       </div>
     </div>
