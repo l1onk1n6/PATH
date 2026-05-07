@@ -540,6 +540,13 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Japanisch': 'Japanese',
     'Arabisch': 'Arabic',
 
+    // ── Shared Resume (public link) ──────────────────────
+    'Bewerbungsmappe wird geladen…': 'Loading application…',
+    'Bewerbungsmappe nicht gefunden': 'Application not found',
+    'Dieser Link ist ungültig oder wurde deaktiviert.': 'This link is invalid or has been disabled.',
+    'Die Mappe konnte nicht gerendert werden. Bitte lade die Seite neu.':
+      'The application could not be rendered. Please reload the page.',
+
     // ── Tracker ──────────────────────────────────────────
     'Bewerbungs-Tracker': 'Application tracker',
     'Noch keine Bewerbungen': 'No applications yet',

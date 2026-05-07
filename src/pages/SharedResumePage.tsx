@@ -5,8 +5,10 @@ import type { Resume } from '../types/resume';
 import { fetchSharedResume } from '../lib/db';
 import { buildMappePdfBytes } from '../lib/pdfRenderer';
 import PdfPreview from '../components/ui/PdfPreview';
+import { useT } from '../lib/i18n';
 
 export default function SharedResumePage() {
+  const t = useT();
   const [params] = useSearchParams();
   const token = params.get('t');
   const [resume, setResume] = useState<Resume | null>(null);
@@ -40,7 +42,7 @@ export default function SharedResumePage() {
         setPdfBytes(bytes);
       } catch (err) {
         console.error('Shared preview build failed:', err);
-        if (!cancelled) setBuildError('Die Mappe konnte nicht gerendert werden. Bitte lade die Seite neu.');
+        if (!cancelled) setBuildError(t('Die Mappe konnte nicht gerendert werden. Bitte lade die Seite neu.'));
       } finally {
         if (!cancelled) setBuilding(false);
       }
@@ -53,7 +55,7 @@ export default function SharedResumePage() {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
         <Loader2 size={28} style={{ animation: 'spin 1s linear infinite', color: 'var(--ios-blue)' }} />
-        <span style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)' }}>Bewerbungsmappe wird geladen…</span>
+        <span style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)' }}>{t('Bewerbungsmappe wird geladen…')}</span>
         <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
       </div>
     );
@@ -63,9 +65,9 @@ export default function SharedResumePage() {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, padding: 24, textAlign: 'center' }}>
         <AlertCircle size={40} style={{ opacity: 0.4 }} />
-        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>Bewerbungsmappe nicht gefunden</h2>
+        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>{t('Bewerbungsmappe nicht gefunden')}</h2>
         <p style={{ color: 'rgba(var(--rgb-fg),0.5)', fontSize: 14, maxWidth: 320 }}>
-          Dieser Link ist ungültig oder wurde deaktiviert.
+          {t('Dieser Link ist ungültig oder wurde deaktiviert.')}
         </p>
       </div>
     );
