@@ -540,6 +540,26 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Japanisch': 'Japanese',
     'Arabisch': 'Arabic',
 
+    // ── Setup (Supabase) ─────────────────────────────────
+    'Supabase konfigurieren': 'Configure Supabase',
+    'Verbinden Sie Ihr eigenes Supabase-Projekt für sichere Cloud-Synchronisation.':
+      'Connect your own Supabase project for secure cloud sync.',
+    'So richten Sie Supabase ein': 'How to set up Supabase',
+    'Kostenloses Konto auf supabase.com erstellen': 'Create a free account on supabase.com',
+    'Neues Projekt anlegen': 'Create a new project',
+    'SQL Editor → schema.sql ausführen': 'SQL Editor → run schema.sql',
+    'Settings → API → URL & anon key kopieren': 'Settings → API → copy URL & anon key',
+    'Supabase Dashboard öffnen': 'Open Supabase dashboard',
+    'Project URL': 'Project URL',
+    'anon / public Key': 'anon / public key',
+    'Ungültige URL. Format: https://xxx.supabase.co':
+      'Invalid URL. Format: https://xxx.supabase.co',
+    'Ungültiger API-Key. Muss mit "eyJ" beginnen.':
+      'Invalid API key. Must start with "eyJ".',
+    'Verbindung herstellen': 'Connect',
+    'Gespeichert – Seite wird neu geladen…': 'Saved – reloading page…',
+    'Überspringen (bereits konfiguriert)': 'Skip (already configured)',
+
     // ── Auth Callback ────────────────────────────────────
     'E-Mail wird bestätigt…': 'Confirming email…',
     'Bitte warte einen Moment.': 'Please wait a moment.',
