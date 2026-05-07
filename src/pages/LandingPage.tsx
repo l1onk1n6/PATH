@@ -278,7 +278,7 @@ export default function LandingPage() {
           }}
             onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 5px 18px rgba(255,159,10,0.5)'; }}
             onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 3px 12px rgba(255,159,10,0.35)'; }}>
-            Jetzt sichern
+            {t('Jetzt sichern')}
           </button>
         </div>
       )}
@@ -619,7 +619,7 @@ export default function LandingPage() {
                 background: 'rgba(52,199,89,0.15)', border: '1px solid rgba(52,199,89,0.3)',
                 fontSize: 14, fontWeight: 600, color: '#34C759', textAlign: 'center',
               }}>
-                Bald im Play Store
+                {t('Bald im Play Store')}
               </div>
             </div>
 
@@ -653,13 +653,13 @@ export default function LandingPage() {
                 background: 'rgba(0,122,255,0.15)', border: '1px solid rgba(0,122,255,0.3)',
                 fontSize: 14, fontWeight: 600, color: '#007AFF', textAlign: 'center',
               }}>
-                Bald im App Store
+                {t('Bald im App Store')}
               </div>
             </div>
           </div>
 
           <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.3)', margin: 0 }}>
-            Web-App bereits jetzt kostenlos nutzbar — Apps folgen in Kürze.
+            {t('Web-App bereits jetzt kostenlos nutzbar — Apps folgen in Kürze.')}
           </p>
         </div>
       </section>
@@ -671,16 +671,16 @@ export default function LandingPage() {
       }}>
         <div style={{ maxWidth: 600, margin: '0 auto' }}>
           <h2 style={{ fontSize: isMobile ? 30 : 44, fontWeight: 800, margin: '0 0 20px', letterSpacing: '-1px', lineHeight: 1.1 }}>
-            Bereit für deine{' '}
+            {t('Bereit für deine')}{' '}
             <span style={{
               background: 'linear-gradient(135deg, #007AFF, #34C759)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
             }}>
-              Traumstelle?
+              {t('Traumstelle?')}
             </span>
           </h2>
           <p style={{ fontSize: 17, color: 'rgba(var(--rgb-fg),0.55)', margin: '0 0 36px', lineHeight: 1.6 }}>
-            Erstelle in wenigen Minuten einen Lebenslauf, der überzeugt. Kostenlos, ohne Kreditkarte.
+            {t('Erstelle in wenigen Minuten einen Lebenslauf, der überzeugt. Kostenlos, ohne Kreditkarte.')}
           </p>
           <button onClick={() => setShowAuth('register')} style={{
             display: 'inline-flex', alignItems: 'center', gap: 10,
