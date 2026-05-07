@@ -343,6 +343,9 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     "So funktioniert's": 'How it works',
     'Preise': 'Pricing',
     'Keine Kreditkarte nötig': 'No credit card required',
+    'Professionelle Vorlagen': 'Professional templates',
+    'KI-Features (Claude AI)': 'AI features (Claude AI)',
+    'PDF-Export': 'PDF export',
     'Job-Beschreibung ist zu kurz oder leer.': 'Job description is too short or empty.',
     'Sehr gute Übereinstimmung — der Lebenslauf passt thematisch sauber zur Stelle.':
       'Very good match — the resume matches the role thematically.',

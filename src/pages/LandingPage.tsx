@@ -393,7 +393,7 @@ export default function LandingPage() {
           ].map(([val, label]) => (
             <div key={label} style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.5px', color: '#fff' }}>{val}</div>
-              <div style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 4 }}>{label}</div>
+              <div style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 4 }}>{t(label)}</div>
             </div>
           ))}
         </div>
@@ -725,7 +725,7 @@ export default function LandingPage() {
                 style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.4)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', transition: 'color 0.2s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = 'rgba(var(--rgb-fg),0.8)')}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(var(--rgb-fg),0.4)')}>
-                {label}
+                {t(label)}
               </button>
             ))}
           </div>
@@ -942,7 +942,7 @@ function MockAppPreview() {
         ].map(({ label, pct, color }) => (
           <div key={label} style={{ marginBottom: 12 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 5, color: 'rgba(var(--rgb-fg),0.6)' }}>
-              <span>{label}</span>
+              <span>{t(label)}</span>
               <span style={{ color }}>{pct}%</span>
             </div>
             <div style={{ height: 4, borderRadius: 2, background: 'rgba(var(--rgb-fg),0.06)', overflow: 'hidden' }}>
