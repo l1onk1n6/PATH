@@ -182,6 +182,23 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Kein Konto mit dieser E-Mail-Adresse gefunden.': 'No account found for this email address.',
     'Anonyme Anmeldung ist nicht aktiviert.': 'Anonymous sign-in is not enabled.',
     'Ein unbekannter Fehler ist aufgetreten.': 'An unknown error occurred.',
+
+    // ── User-Error-Helpers ───────────────────────────────
+    'Bitte versuche es erneut.': 'Please try again.',
+    'Falls das Problem bestehen bleibt, melde dich bitte bei uns unter {email}.':
+      'If the problem persists, please contact us at {email}.',
+    'Die Version konnte nicht gespeichert werden': 'The version could not be saved',
+    'Die Änderungen wurden gespeichert, aber die Synchronisation hat nicht funktioniert':
+      'The changes were saved, but synchronisation did not work',
+    'Die Übersetzung hat nicht funktioniert': 'The translation did not work',
+    'Der LinkedIn-Import hat nicht funktioniert': 'The LinkedIn import did not work',
+    'Der Kauf konnte nicht abgeschlossen werden': 'The purchase could not be completed',
+    'Der Checkout konnte nicht gestartet werden': 'Checkout could not be started',
+    'Die Abo-Verwaltung konnte nicht geöffnet werden': 'Subscription management could not be opened',
+    'Das Abo-Portal konnte nicht geöffnet werden': 'The subscription portal could not be opened',
+    'Der PDF-Export hat nicht funktioniert': 'PDF export did not work',
+    'Der Anschreiben-Export hat nicht funktioniert': 'Cover letter export did not work',
+    'Der Mappen-Export hat nicht funktioniert': 'Application export did not work',
     'Wir haben dir einen Link zum Zurücksetzen deines Passworts geschickt. Bitte prüfe dein Postfach.': 'We sent you a link to reset your password. Please check your inbox.',
     'Gib deine E-Mail-Adresse ein. Wir senden dir einen Link zum Zurücksetzen.': 'Enter your email address. We will send you a reset link.',
     'Wir haben dir einen Anmeldelink an': 'We sent you a sign-in link to',
@@ -805,6 +822,16 @@ export const useI18n = create<I18nStore>((set) => ({
 export function useT() {
   const locale = useI18n(s => s.locale);
   return (key: string): string => TRANSLATIONS[locale][key] ?? key;
+}
+
+/**
+ * Nicht-reaktive Translator-Funktion fuer Helfer ausserhalb von React
+ * (z. B. lib/userError). Liefert die aktuelle Uebersetzung, ohne dass
+ * eine Komponente re-rendert.
+ */
+export function tr(key: string): string {
+  const locale = useI18n.getState().locale;
+  return TRANSLATIONS[locale][key] ?? key;
 }
 
 /** Locale am App-Start ans <html lang="..."> binden. */
