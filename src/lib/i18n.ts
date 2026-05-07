@@ -272,6 +272,77 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
       'Which languages do you speak and at what level?',
     'Schule, Lehre, Studium — alles was zu deinem Bildungsweg gehört.':
       'School, apprenticeship, university — everything that belongs to your education.',
+
+    // ── LandingPage Features ─────────────────────────────
+    '15+ professionelle Vorlagen': '15+ professional templates',
+    'Von klassisch bis modern – für jede Branche und jeden Stil. Pixelgenaue PDFs direkt aus dem Browser.':
+      'From classic to modern – for every industry and style. Pixel-perfect PDFs directly from the browser.',
+    'PDF-Export mit einem Klick': 'PDF export with one click',
+    'Druckfertiges PDF in Sekunden – perfekt formatiert für Online-Bewerbungen und den Postversand.':
+      'Print-ready PDF in seconds – perfectly formatted for online applications and postal mail.',
+    'Alle Bewerbungen im Überblick: Status, Deadline, Notizen und verknüpfte Unterlagen an einem Ort.':
+      'All applications at a glance: status, deadline, notes and linked documents in one place.',
+    'Verpasse keine Bewerbungsfrist mehr – automatische Erinnerungen für alle offenen Bewerbungen.':
+      'Never miss an application deadline – automatic reminders for all open applications.',
+    'Online teilen': 'Share online',
+    'Erstelle einen öffentlichen Link zu deinem Lebenslauf – ideal für LinkedIn, E-Mail und digitale Bewerbungen.':
+      'Create a public link to your resume – ideal for LinkedIn, email and digital applications.',
+    'Speichere Versionen deines CVs und stelle frühere Stände jederzeit wieder her.':
+      'Save versions of your CV and restore earlier states anytime.',
+    'Mehrsprachig': 'Multilingual',
+    'KI-gestützte Übersetzung deines Lebenslaufs in jede Sprache – für internationale Bewerbungen.':
+      'AI-powered translation of your resume into any language – for international applications.',
+    'Füge beliebige Sektionen hinzu – Publikationen, Projekte, Ehrenamt und mehr.':
+      'Add any sections – publications, projects, volunteering and more.',
+    'Mehrere Personen & Mappen': 'Multiple people & applications',
+    'Verwalte CVs für verschiedene Personen oder erstelle mehrere Versionen für verschiedene Stellen.':
+      'Manage CVs for different people or create multiple versions for different positions.',
+    'Anschreiben-Vorlagen': 'Cover letter templates',
+    '4 professionelle Strukturen als Startpunkt – individuell anpassbar, mit KI-Unterstützung.':
+      '4 professional structures as a starting point – individually customizable, with AI support.',
+    'Strukturierter Editor': 'Structured editor',
+    'Alle Sektionen – Person, Erfahrung, Ausbildung, Skills, Projekte – übersichtlich und intuitiv.':
+      'All sections – person, experience, education, skills, projects – clear and intuitive.',
+    'DSGVO-konform & sicher': 'GDPR-compliant & secure',
+    'Deine Daten bleiben in der Schweiz. Kein Tracking, keine Weitergabe an Dritte.':
+      'Your data stays in Switzerland. No tracking, no sharing with third parties.',
+    'Anschreiben generieren': 'Generate cover letter',
+    'Stelle, Unternehmen und Ton eingeben – Claude AI schreibt in Sekunden ein vollständiges, individuelles Anschreiben.':
+      'Enter position, company and tone – Claude AI writes a complete, customized cover letter in seconds.',
+    'Texte verbessern': 'Improve texts',
+    'Bestehende Formulierungen professionell optimieren, umschreiben oder auf Stelle zuschneiden – mit einem Klick.':
+      'Optimize existing wording professionally, rewrite or tailor to the role – with one click.',
+    'LinkedIn-Import': 'LinkedIn import',
+    'LinkedIn-Profiltext einfügen – die KI erkennt automatisch Name, Erfahrungen, Ausbildung und Skills.':
+      'Paste LinkedIn profile text – the AI automatically detects name, experience, education and skills.',
+    'Automatische Übersetzung': 'Automatic translation',
+    'Den gesamten Lebenslauf in jede Sprache übersetzen – Deutsch, Englisch, Französisch, Italienisch und mehr.':
+      'Translate the entire resume into any language – German, English, French, Italian and more.',
+    'Kostenlos registrieren, keine Kreditkarte nötig.': 'Sign up for free, no credit card required.',
+    'Vorlage wählen': 'Choose template',
+    'Passende Vorlage für deine Branche und deinen Stil aussuchen.':
+      'Pick a fitting template for your industry and style.',
+    'Daten eintragen': 'Enter data',
+    'Lebenslauf ausfüllen – oder per LinkedIn-Import & KI in Sekunden befüllen.':
+      'Fill in the resume – or populate it in seconds via LinkedIn import & AI.',
+    'PDF herunterladen': 'Download PDF',
+    'Mit einem Klick als druckfertiges PDF exportieren.': 'Export as a print-ready PDF with one click.',
+    '1 Person, 3 Mappen': '1 person, 3 applications',
+    '6 Templates': '6 templates',
+    '5 PDF-Exporte / Monat': '5 PDF exports / month',
+    '1 Share-Link': '1 share link',
+    'LinkedIn-Import (KI)': 'LinkedIn import (AI)',
+    'DSGVO-konform': 'GDPR-compliant',
+    '5 Personen, 60 Mappen': '5 people, 60 applications',
+    'Alle 15+ Templates': 'All 15+ templates',
+    'Unbegrenzte PDF-Exporte': 'Unlimited PDF exports',
+    '10 Share-Links': '10 share links',
+    'KI-Assistent – Anschreiben & Texte (Claude AI)': 'AI assistant – cover letter & texts (Claude AI)',
+    'KI-Übersetzung in alle Sprachen': 'AI translation into all languages',
+    'Features': 'Features',
+    "So funktioniert's": 'How it works',
+    'Preise': 'Pricing',
+    'Keine Kreditkarte nötig': 'No credit card required',
     'Job-Beschreibung ist zu kurz oder leer.': 'Job description is too short or empty.',
     'Sehr gute Übereinstimmung — der Lebenslauf passt thematisch sauber zur Stelle.':
       'Very good match — the resume matches the role thematically.',

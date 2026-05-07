@@ -177,7 +177,7 @@ export default function LandingPage() {
         {/* Nav links – desktop only */}
         {!isMobile && (
           <div style={{ display: 'flex', gap: 32, fontSize: 14, color: 'rgba(var(--rgb-fg),0.65)' }}>
-            {[['features', 'Features'], ['how', 'So funktioniert\'s'], ['pricing', 'Preise']].map(([id, label]) => (
+            {[['features', t('Features')], ['how', t("So funktioniert's")], ['pricing', t('Preise')]].map(([id, label]) => (
               <button key={id} onClick={() => scrollTo(id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: 'inherit', padding: 0, transition: 'color 0.2s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(var(--rgb-fg),0.65)')}>
@@ -361,9 +361,9 @@ export default function LandingPage() {
           </div>
 
           <div style={{ display: 'flex', gap: 20, marginTop: 28, flexWrap: 'wrap' }}>
-            {['Kostenlos starten', 'Keine Kreditkarte nötig', 'DSGVO-konform'].map(t => (
-              <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)' }}>
-                <Check size={14} style={{ color: '#34C759', flexShrink: 0 }} /> {t}
+            {['Kostenlos starten', 'Keine Kreditkarte nötig', 'DSGVO-konform'].map(label => (
+              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)' }}>
+                <Check size={14} style={{ color: '#34C759', flexShrink: 0 }} /> {t(label)}
               </div>
             ))}
           </div>
@@ -432,8 +432,8 @@ export default function LandingPage() {
               }}>
                 <Icon size={20} style={{ color }} />
               </div>
-              <h3 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 10px' }}>{title}</h3>
-              <p style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)', margin: 0, lineHeight: 1.6 }}>{desc}</p>
+              <h3 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 10px' }}>{t(title)}</h3>
+              <p style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)', margin: 0, lineHeight: 1.6 }}>{t(desc)}</p>
             </div>
           ))}
         </div>
@@ -473,10 +473,10 @@ export default function LandingPage() {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{title}</h3>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{t(title)}</h3>
                     <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 99, background: 'rgba(175,82,222,0.25)', color: '#CF9FFF', letterSpacing: '0.04em', flexShrink: 0 }}>{badge}</span>
                   </div>
-                  <p style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.55)', margin: 0, lineHeight: 1.65 }}>{desc}</p>
+                  <p style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.55)', margin: 0, lineHeight: 1.65 }}>{t(desc)}</p>
                 </div>
               </div>
             ))}
@@ -525,8 +525,8 @@ export default function LandingPage() {
                 }}>
                   {num}
                 </div>
-                <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>{title}</h3>
-                <p style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)', margin: 0, lineHeight: 1.6 }}>{desc}</p>
+                <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px' }}>{t(title)}</h3>
+                <p style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)', margin: 0, lineHeight: 1.6 }}>{t(desc)}</p>
               </div>
             ))}
           </div>
@@ -796,7 +796,7 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
             {FREE_FEATURES.map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14 }}>
                 <Check size={15} style={{ color: 'rgba(var(--rgb-fg),0.35)', flexShrink: 0 }} />
-                <span style={{ color: 'rgba(var(--rgb-fg),0.65)' }}>{f}</span>
+                <span style={{ color: 'rgba(var(--rgb-fg),0.65)' }}>{t(f)}</span>
               </div>
             ))}
           </div>
@@ -856,7 +856,7 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
             {PRO_FEATURES.map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14 }}>
                 <Check size={15} style={{ color: '#34C759', flexShrink: 0 }} />
-                <span>{f}</span>
+                <span>{t(f)}</span>
               </div>
             ))}
           </div>
