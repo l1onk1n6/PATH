@@ -423,6 +423,8 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     // ── Editor: Template ─────────────────────────────────
     'Akzentfarbe': 'Accent color',
     'Template auswählen': 'Choose template',
+    'Template wählen': 'Choose template',
+    'Eigene Farbe': 'Custom color',
 
     // ── Editor: General ──────────────────────────────────
     'Drag & Drop oder Pfeiltasten zum Sortieren': 'Drag & drop or arrow keys to reorder',
