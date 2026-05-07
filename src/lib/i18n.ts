@@ -540,6 +540,28 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Japanisch': 'Japanese',
     'Arabisch': 'Arabic',
 
+    // ── Auth Callback ────────────────────────────────────
+    'E-Mail wird bestätigt…': 'Confirming email…',
+    'Bitte warte einen Moment.': 'Please wait a moment.',
+    'E-Mail bestätigt!': 'Email confirmed!',
+    'Dein Konto ist jetzt aktiv. Du wirst weitergeleitet…': 'Your account is now active. Redirecting…',
+    'Anmeldung läuft…': 'Signing you in…',
+    'Du wirst gleich eingeloggt.': 'You will be logged in shortly.',
+    'Erfolgreich angemeldet!': 'Successfully signed in!',
+    'Du wirst zur App weitergeleitet…': 'Redirecting to the app…',
+    'Passwort-Reset wird vorbereitet…': 'Preparing password reset…',
+    'Bereit!': 'Ready!',
+    'Du kannst jetzt dein neues Passwort setzen.': 'You can now set a new password.',
+    'Einladung wird verarbeitet…': 'Processing invitation…',
+    'Gleich kannst du dein Konto einrichten.': 'You can set up your account in a moment.',
+    'Einladung angenommen!': 'Invitation accepted!',
+    'Du wirst weitergeleitet…': 'Redirecting…',
+    'Wird verarbeitet…': 'Processing…',
+    'Fertig!': 'Done!',
+    'Fehler aufgetreten': 'An error occurred',
+    'Der Link ist ungültig oder abgelaufen.': 'The link is invalid or has expired.',
+    'Das Formular zum Passwort setzen erscheint gleich…': 'The password form will appear shortly…',
+
     // ── Shared Resume (public link) ──────────────────────
     'Bewerbungsmappe wird geladen…': 'Loading application…',
     'Bewerbungsmappe nicht gefunden': 'Application not found',
