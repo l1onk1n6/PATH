@@ -1,4 +1,5 @@
 import type { Person, Resume } from '../types/resume';
+import { tr } from './i18n';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -18,5 +19,5 @@ export function displayPersonName(person: Person | null | undefined, resume?: Re
   const pi = resume?.personalInfo;
   const fromResume = [pi?.firstName, pi?.lastName].filter(Boolean).join(' ').trim();
   if (fromResume) return fromResume;
-  return 'Mein Profil';
+  return tr('Mein Profil');
 }

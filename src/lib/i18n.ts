@@ -249,6 +249,13 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Lädt {n} Dateien hoch…': 'Uploading {n} files…',
     'Upload fehlgeschlagen': 'Upload failed',
     'Bewerbung löschen?': 'Delete application?',
+    'Mein Profil': 'My profile',
+    'Unbekannter Fehler': 'Unknown error',
+    'Gerade eben': 'Just now',
+    'Vor {n} Min.': '{n} min ago',
+    'Vor {n} Std.': '{n} h ago',
+    'Vor 1 Tag': '1 day ago',
+    'Vor {n} Tagen': '{n} days ago',
     'Job-Beschreibung ist zu kurz oder leer.': 'Job description is too short or empty.',
     'Sehr gute Übereinstimmung — der Lebenslauf passt thematisch sauber zur Stelle.':
       'Very good match — the resume matches the role thematically.',
