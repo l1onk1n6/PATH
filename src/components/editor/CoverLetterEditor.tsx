@@ -346,14 +346,14 @@ export default function CoverLetterEditor() {
           <button
             key={tpl.id}
             className="btn-glass btn-sm"
-            title={tpl.desc}
+            title={t(tpl.desc)}
             onClick={() => {
               if (cl.body.trim()) { setConfirmOverwrite('template'); setPendingTemplate(tpl.body); }
               else { update('body', tpl.body); }
             }}
             style={{ gap: 5, boxShadow: 'none' }}
           >
-            <span>{tpl.emoji}</span> {tpl.label}
+            <span>{tpl.emoji}</span> {t(tpl.label)}
           </button>
         ))}
       </div>
@@ -500,7 +500,7 @@ export default function CoverLetterEditor() {
             style={{ fontSize: 11, gap: 5, opacity: !isPro || !cl.body.trim() ? 0.45 : 1 }}
             onClick={handleImproveBody}
             disabled={improvingBody || !cl.body.trim()}
-            title={!isPro ? 'Pro-Feature' : 'Text mit KI verbessern'}
+            title={!isPro ? t('Pro-Feature') : t('Text mit KI verbessern')}
           >
             {improvingBody
               ? <><Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> Verbessert…</>
