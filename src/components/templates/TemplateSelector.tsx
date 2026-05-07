@@ -3,6 +3,7 @@ import { useResumeStore } from '../../store/resumeStore';
 import { TEMPLATES } from './templateConfig';
 import TemplateMiniPreview from './TemplateMiniPreview';
 import type { TemplateId } from '../../types/resume';
+import { useT } from '../../lib/i18n';
 
 const ACCENT_COLORS = [
   '#007AFF', '#5856D6', '#AF52DE', '#FF2D55', '#FF3B30',
@@ -11,6 +12,7 @@ const ACCENT_COLORS = [
 ];
 
 export default function TemplateSelector() {
+  const t = useT();
   const { getActiveResume, setTemplate, setAccentColor } = useResumeStore();
   const resume = getActiveResume();
 
@@ -21,7 +23,7 @@ export default function TemplateSelector() {
       {/* Template Grid */}
       <div className="section-label" style={{ marginBottom: 12 }}>
         <Palette size={10} style={{ display: 'inline', marginRight: 4 }} />
-        Template wählen
+        {t('Template wählen')}
       </div>
 
       <div style={{
@@ -95,7 +97,7 @@ export default function TemplateSelector() {
       </div>
 
       {/* Accent Color */}
-      <div className="section-label" style={{ marginBottom: 10 }}>Akzentfarbe</div>
+      <div className="section-label" style={{ marginBottom: 10 }}>{t('Akzentfarbe')}</div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {ACCENT_COLORS.map((color) => (
           <button
@@ -119,7 +121,7 @@ export default function TemplateSelector() {
         ))}
 
         {/* Custom color */}
-        <label title="Eigene Farbe" style={{ position: 'relative', cursor: 'pointer' }}>
+        <label title={t('Eigene Farbe')} style={{ position: 'relative', cursor: 'pointer' }}>
           <div style={{
             width: 28, height: 28, borderRadius: '50%',
             background: 'conic-gradient(red, yellow, green, blue, red)',
