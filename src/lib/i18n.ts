@@ -152,6 +152,8 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Jetzt starten — CHF 49 / Jahr': 'Start now — CHF 49 / year',
     'Jetzt PATH Pro holen': 'Get PATH Pro now',
     'Dokument': 'Document',
+    'Allgemein': 'General',
+    'Upload in Storage fehlgeschlagen': 'Storage upload failed',
     'Link teilen ·  aktiv': 'Share link · active',
     'ATS-Score prüfen': 'Check ATS score',
 

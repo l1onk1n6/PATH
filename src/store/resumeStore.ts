@@ -9,6 +9,7 @@ import type {
 import * as db from '../lib/db';
 import { LIMITS, getPlanFromMetadata } from '../lib/plan';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
+import { tr } from '../lib/i18n';
 
 async function getCurrentPlan() {
   if (!isSupabaseConfigured()) return 'free' as const;
@@ -132,13 +133,13 @@ interface ResumeStore {
 }
 
 // ── Default resume ────────────────────────────────────────
-function createDefaultResume(personId: string, name = 'Bewerbungsmappe'): Resume {
+function createDefaultResume(personId: string, name?: string): Resume {
   return {
     id: uuidv4(), personId,
-    name, status: 'entwurf', jobUrl: '', deadline: '', reminderDays: [],
+    name: name ?? tr('Bewerbungsmappe'), status: 'entwurf', jobUrl: '', deadline: '', reminderDays: [],
     templateId: 'minimal', accentColor: '#007AFF',
     personalInfo: { firstName: '', lastName: '', title: '', email: '', phone: '', street: '', location: '', website: '', linkedin: '', github: '', summary: '' },
-    coverLetter: { recipient: '', subject: '', body: '', closing: 'Mit freundlichen Grüssen' },
+    coverLetter: { recipient: '', subject: '', body: '', closing: tr('Mit freundlichen Grüssen') },
     workExperience: [], education: [], skills: [], languages: [],
     projects: [], certificates: [], documents: [], customSections: [],
     createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
@@ -230,7 +231,7 @@ export const useResumeStore = create<ResumeStore>()(
           set({ limitError: `Maximale Anzahl Personen (${limit}) für deinen Plan erreicht.` });
           return null;
         }
-        const resume = createDefaultResume('', 'Bewerbungsmappe 1');
+        const resume = createDefaultResume('', `${tr('Bewerbungsmappe')} 1`);
         const person: Person = { id: uuidv4(), name, resumeIds: [resume.id], activeResumeId: resume.id, createdAt: new Date().toISOString() };
         resume.personId = person.id;
         set((s) => ({ persons: [...s.persons, person], resumes: [...s.resumes, resume], activePersonId: person.id, activeResumeId: resume.id }));
@@ -438,7 +439,7 @@ export const useResumeStore = create<ResumeStore>()(
       },
 
       addSkill: (resumeId) => {
-        const item: Skill = { id: uuidv4(), name: '', level: 3, category: 'Allgemein' };
+        const item: Skill = { id: uuidv4(), name: '', level: 3, category: tr('Allgemein') };
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, skills: [...r.skills, item], updatedAt: new Date().toISOString() } : r) }));
         queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
@@ -534,7 +535,7 @@ export const useResumeStore = create<ResumeStore>()(
           uploadedAt: new Date().toISOString(),
         };
         const storagePath = await db.uploadDocumentFile(item, file);
-        if (!storagePath) return { ok: false, error: 'Upload in Storage fehlgeschlagen' };
+        if (!storagePath) return { ok: false, error: tr('Upload in Storage fehlgeschlagen') };
 
         // Metadaten speichern, Signed URL fuer sofortige Anzeige holen
         await db.upsertDocument(resumeId, item, { storagePath });
@@ -595,7 +596,7 @@ export const useResumeStore = create<ResumeStore>()(
 
       // ── Custom sections ──────────────────────────────────
       addCustomSection: (resumeId) => {
-        const item: CustomSection = { id: uuidv4(), title: 'Eigene Sektion', items: [''] };
+        const item: CustomSection = { id: uuidv4(), title: tr('Eigene Sektion'), items: [''] };
         set((s) => ({ resumes: s.resumes.map(r => r.id === resumeId ? { ...r, customSections: [...(r.customSections ?? []), item], updatedAt: new Date().toISOString() } : r) }));
         queueSave(`resume-${resumeId}`, () => { const r = get().resumes.find(r => r.id === resumeId); if (r) db.upsertResume(r); });
       },
