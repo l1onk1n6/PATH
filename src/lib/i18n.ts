@@ -162,6 +162,7 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'App nicht konfiguriert.': 'App not configured.',
     'Bitte VITE_SUPABASE_URL und VITE_SUPABASE_ANON_KEY als GitHub Secrets setzen.':
       'Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY as GitHub Secrets.',
+    'Ungültige Datei.': 'Invalid file.',
     'Link teilen ·  aktiv': 'Share link · active',
     'ATS-Score prüfen': 'Check ATS score',
 

@@ -30,7 +30,7 @@ export default function PersonalInfoEditor() {
     if (!file || !resume) return;
     const { valid, error } = validatePhotoFile(file, limits.photoMb);
     if (!valid) {
-      setPhotoError(error ?? 'Ungültige Datei.');
+      setPhotoError(error ?? t('Ungültige Datei.'));
       e.target.value = '';
       return;
     }
