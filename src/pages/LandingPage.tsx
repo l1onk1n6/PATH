@@ -870,7 +870,7 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
           }}
             onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 32px rgba(0,122,255,0.4)'; }}
             onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,122,255,0.3)'; }}>
-            <Sparkles size={15} /> {isYearly ? 'Jetzt starten — CHF 49 / Jahr' : 'Jetzt PATH Pro holen'}
+            <Sparkles size={15} /> {isYearly ? t('Jetzt starten — CHF 49 / Jahr') : t('Jetzt PATH Pro holen')}
           </button>
 
           <div style={{ textAlign: 'center', marginTop: 12, fontSize: 12, color: 'rgba(var(--rgb-fg),0.3)' }}>

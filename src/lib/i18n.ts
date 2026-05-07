@@ -149,6 +149,8 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Wird generiert…': 'Generating…',
     'Verbessert…': 'Improving…',
     'Verbessern': 'Improve',
+    'Jetzt starten — CHF 49 / Jahr': 'Start now — CHF 49 / year',
+    'Jetzt PATH Pro holen': 'Get PATH Pro now',
     'Link teilen ·  aktiv': 'Share link · active',
     'ATS-Score prüfen': 'Check ATS score',
 
