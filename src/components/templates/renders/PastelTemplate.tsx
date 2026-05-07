@@ -51,7 +51,7 @@ export default function PastelTemplate({ resume }: { resume: Resume }) {
         <div>
           {workExperience.length > 0 && (
             <>
-              <SectionTitle color={color} pastelBg={pastelBg} pastelBorder={pastelBorder} title="Berufserfahrung" />
+              <SectionTitle color={color} pastelBg={pastelBg} pastelBorder={pastelBorder} title={t("Berufserfahrung")} />
               {workExperience.map(job => (
                 <div key={job.id} style={{ marginBottom: 14, background: '#fff', borderRadius: 10, padding: '10px 14px', border: `1px solid #f0f0f0`, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -71,7 +71,7 @@ export default function PastelTemplate({ resume }: { resume: Resume }) {
 
           {education.length > 0 && (
             <>
-              <SectionTitle color={color} pastelBg={pastelBg} pastelBorder={pastelBorder} title="Ausbildung" />
+              <SectionTitle color={color} pastelBg={pastelBg} pastelBorder={pastelBorder} title={t("Ausbildung")} />
               {education.map(edu => (
                 <div key={edu.id} style={{ marginBottom: 10, background: '#fff', borderRadius: 10, padding: '10px 14px', border: `1px solid #f0f0f0`, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                   <div style={{ fontWeight: 700, fontSize: 12 }}>{edu.degree}{edu.field ? ` · ${edu.field}` : ''}</div>
@@ -86,7 +86,7 @@ export default function PastelTemplate({ resume }: { resume: Resume }) {
         <div>
           {skills.length > 0 && (
             <>
-              <SectionTitle color={color} pastelBg={pastelBg} pastelBorder={pastelBorder} title="Skills" />
+              <SectionTitle color={color} pastelBg={pastelBg} pastelBorder={pastelBorder} title={t("Skills")} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {skills.map(sk => (
                   <div key={sk.id}>
@@ -102,7 +102,7 @@ export default function PastelTemplate({ resume }: { resume: Resume }) {
 
           {languages.length > 0 && (
             <>
-              <SectionTitle color={color} pastelBg={pastelBg} pastelBorder={pastelBorder} title="Sprachen" />
+              <SectionTitle color={color} pastelBg={pastelBg} pastelBorder={pastelBorder} title={t("Sprachen")} />
               {languages.map(lang => (
                 <div key={lang.id} style={{ marginBottom: 6, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11 }}>
                   <span style={{ fontWeight: 600, color: '#555' }}>{lang.name}</span>
@@ -114,7 +114,7 @@ export default function PastelTemplate({ resume }: { resume: Resume }) {
 
           {certificates.length > 0 && (
             <>
-              <SectionTitle color={color} pastelBg={pastelBg} pastelBorder={pastelBorder} title="Zertifikate" />
+              <SectionTitle color={color} pastelBg={pastelBg} pastelBorder={pastelBorder} title={t("Zertifikate")} />
               {certificates.map(cert => (
                 <div key={cert.id} style={{ marginBottom: 6, fontSize: 11, background: pastelBg, borderRadius: 8, padding: '5px 8px' }}>
                   <div style={{ fontWeight: 600, color: '#555' }}>{cert.name}</div>
