@@ -1,8 +1,10 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
+import { useT } from '../../../lib/i18n';
 
 export default function StartupTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages, projects } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -98,7 +100,7 @@ export default function StartupTemplate({ resume }: { resume: Resume }) {
           <div>
             {education.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <h2 style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#111', marginBottom: 10 }}>Ausbildung</h2>
+                <h2 style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#111', marginBottom: 10 }}>{t("Ausbildung")}</h2>
                 {education.map(edu => (
                   <div key={edu.id} style={{ marginBottom: 8, background: '#fafafa', borderRadius: 8, padding: '8px 10px' }}>
                     <div style={{ fontWeight: 700, fontSize: 11, color: '#111' }}>{edu.degree}</div>
@@ -111,7 +113,7 @@ export default function StartupTemplate({ resume }: { resume: Resume }) {
 
             {skills.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <h2 style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#111', marginBottom: 10 }}>Skills</h2>
+                <h2 style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#111', marginBottom: 10 }}>{t("Skills")}</h2>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
                   {skills.map(sk => (
                     <span key={sk.id} style={{
@@ -127,7 +129,7 @@ export default function StartupTemplate({ resume }: { resume: Resume }) {
 
             {languages.length > 0 && (
               <div>
-                <h2 style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#111', marginBottom: 10 }}>Sprachen</h2>
+                <h2 style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#111', marginBottom: 10 }}>{t("Sprachen")}</h2>
                 {languages.map(lang => (
                   <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 4 }}>
                     <span style={{ fontWeight: 600, color: '#333' }}>{lang.name}</span>

@@ -59,7 +59,7 @@ export default function AcademicTemplate({ resume }: { resume: Resume }) {
                   <strong style={{ fontSize: 12 }}>{job.position}</strong><br />
                   <span style={{ fontSize: 11, fontStyle: 'italic', color: '#444' }}>{job.company}{job.location ? `, ${job.location}` : ''}</span>
                 </div>
-                <div style={{ fontSize: 10, color: '#888' }}>{formatDate(job.startDate)} – {job.current ? t('heute') : formatDate(job.endDate)}</div>
+                <div style={{ fontSize: 10, color: '#888' }}>{formatDate(job.startDate)} – {job.current ? t(t('heute')) : formatDate(job.endDate)}</div>
               </div>
               {job.description && <p style={{ fontSize: 10, color: '#555', marginTop: 4, lineHeight: 1.5 }}>{job.description}</p>}
             </div>

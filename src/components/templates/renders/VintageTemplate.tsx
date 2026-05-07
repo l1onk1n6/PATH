@@ -1,7 +1,9 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
+import { useT } from '../../../lib/i18n';
 
 export default function VintageTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -10,7 +12,7 @@ export default function VintageTemplate({ resume }: { resume: Resume }) {
     <div style={{ fontFamily: '"Playfair Display", "Palatino Linotype", Georgia, serif', background: '#faf7f2', minHeight: '297mm', padding: '28px 32px', color: '#2c2416' }}>
       {/* Ornamental header */}
       <div style={{ textAlign: 'center', borderBottom: `3px double ${color}`, paddingBottom: 16, marginBottom: 20 }}>
-        <div style={{ fontSize: 9, letterSpacing: '0.4em', textTransform: 'uppercase', color: '#888', marginBottom: 8 }}>Curriculum Vitae</div>
+        <div style={{ fontSize: 9, letterSpacing: '0.4em', textTransform: 'uppercase', color: '#888', marginBottom: 8 }}>{t("Curriculum Vitae")}</div>
         <h1 style={{ margin: 0, fontSize: 32, fontWeight: 700, letterSpacing: '0.05em', color: '#1a1206' }}>{name}</h1>
         {info.title && <div style={{ fontSize: 14, color, fontStyle: 'italic', marginTop: 4 }}>{info.title}</div>}
         <div style={{ fontSize: 10, color: '#888', marginTop: 10, display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
@@ -38,7 +40,7 @@ export default function VintageTemplate({ resume }: { resume: Resume }) {
                   <div style={{ fontWeight: 700, fontSize: 13 }}>{job.position}</div>
                   <div style={{ fontSize: 12, color, fontStyle: 'italic' }}>{job.company}</div>
                   <div style={{ fontSize: 10, color: '#888', marginBottom: 4 }}>
-                    {formatDate(job.startDate)} – {job.current ? 'Heute' : formatDate(job.endDate)} | {job.location}
+                    {formatDate(job.startDate)} – {job.current ? t('heute') : formatDate(job.endDate)} | {job.location}
                   </div>
                   {job.description && <p style={{ fontSize: 11, color: '#555', lineHeight: 1.6 }}>{job.description}</p>}
                 </div>

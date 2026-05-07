@@ -1,8 +1,10 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
+import { useT } from '../../../lib/i18n';
 
 export default function TimelineTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -29,7 +31,7 @@ export default function TimelineTemplate({ resume }: { resume: Resume }) {
         <div>
           {workExperience.length > 0 && (
             <div style={{ marginBottom: 22 }}>
-              <h2 style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16, color: '#1a1a1a' }}>Berufserfahrung</h2>
+              <h2 style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16, color: '#1a1a1a' }}>{t("Berufserfahrung")}</h2>
               <div style={{ position: 'relative', paddingLeft: 20, borderLeft: `2px solid ${color}20` }}>
                 {workExperience.map((job, i) => (
                   <div key={job.id} style={{ marginBottom: 16, position: 'relative' }}>
@@ -51,7 +53,7 @@ export default function TimelineTemplate({ resume }: { resume: Resume }) {
                         color: i === 0 ? '#fff' : '#888',
                         fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0,
                       }}>
-                        {formatDate(job.startDate)} – {job.current ? 'Heute' : formatDate(job.endDate)}
+                        {formatDate(job.startDate)} – {job.current ? t('heute') : formatDate(job.endDate)}
                       </span>
                     </div>
                     {job.description && <p style={{ fontSize: 11, color: '#666', marginTop: 4, lineHeight: 1.5 }}>{job.description}</p>}
@@ -63,7 +65,7 @@ export default function TimelineTemplate({ resume }: { resume: Resume }) {
 
           {education.length > 0 && (
             <div>
-              <h2 style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16, color: '#1a1a1a' }}>Ausbildung</h2>
+              <h2 style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 16, color: '#1a1a1a' }}>{t("Ausbildung")}</h2>
               <div style={{ position: 'relative', paddingLeft: 20, borderLeft: `2px solid ${color}20` }}>
                 {education.map((edu, i) => (
                   <div key={edu.id} style={{ marginBottom: 14, position: 'relative' }}>
@@ -86,7 +88,7 @@ export default function TimelineTemplate({ resume }: { resume: Resume }) {
         <div>
           {skills.length > 0 && (
             <div style={{ marginBottom: 16 }}>
-              <h2 style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 12, color: '#1a1a1a' }}>Skills</h2>
+              <h2 style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 12, color: '#1a1a1a' }}>{t("Skills")}</h2>
               {skills.map(sk => (
                 <div key={sk.id} style={{ marginBottom: 7 }}>
                   <div style={{ fontSize: 11, marginBottom: 3, display: 'flex', justifyContent: 'space-between' }}>
@@ -102,7 +104,7 @@ export default function TimelineTemplate({ resume }: { resume: Resume }) {
           )}
           {languages.length > 0 && (
             <div>
-              <h2 style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Sprachen</h2>
+              <h2 style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>{t("Sprachen")}</h2>
               {languages.map(lang => (
                 <div key={lang.id} style={{ marginBottom: 6 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 2 }}>

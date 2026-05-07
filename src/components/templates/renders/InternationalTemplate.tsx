@@ -1,8 +1,10 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
+import { useT } from '../../../lib/i18n';
 
 export default function InternationalTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -36,7 +38,7 @@ export default function InternationalTemplate({ resume }: { resume: Resume }) {
               <tbody>
                 <tr>
                   <td style={{ width: 140, verticalAlign: 'top', paddingRight: 16, paddingTop: 2 }}>
-                    <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color }}>Profil</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color }}>{t("Profil")}</span>
                   </td>
                   <td>
                     <p style={{ fontSize: 12, color: '#444', lineHeight: 1.8, margin: 0 }}>{info.summary}</p>
@@ -50,7 +52,7 @@ export default function InternationalTemplate({ resume }: { resume: Resume }) {
         {workExperience.length > 0 && (
           <div style={{ marginBottom: 16 }}>
             <div style={{ borderTop: `1px solid ${color}40`, paddingTop: 14, marginBottom: 12 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color }}>Berufserfahrung</span>
+              <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color }}>{t("Berufserfahrung")}</span>
             </div>
             {workExperience.map(job => (
               <table key={job.id} style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 12 }}>
@@ -58,7 +60,7 @@ export default function InternationalTemplate({ resume }: { resume: Resume }) {
                   <tr>
                     <td style={{ width: 140, verticalAlign: 'top', paddingRight: 16, fontSize: 10, color: '#888', lineHeight: 1.6 }}>
                       <div>{formatDate(job.startDate)} –</div>
-                      <div>{job.current ? 'Heute' : formatDate(job.endDate)}</div>
+                      <div>{job.current ? t('heute') : formatDate(job.endDate)}</div>
                       {job.location && <div style={{ marginTop: 4, color: '#aaa' }}>{job.location}</div>}
                     </td>
                     <td style={{ verticalAlign: 'top' }}>
@@ -76,7 +78,7 @@ export default function InternationalTemplate({ resume }: { resume: Resume }) {
         {education.length > 0 && (
           <div style={{ marginBottom: 16 }}>
             <div style={{ borderTop: `1px solid ${color}40`, paddingTop: 14, marginBottom: 12 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color }}>Ausbildung</span>
+              <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color }}>{t("Ausbildung")}</span>
             </div>
             {education.map(edu => (
               <table key={edu.id} style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 10 }}>
@@ -101,7 +103,7 @@ export default function InternationalTemplate({ resume }: { resume: Resume }) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, borderTop: `1px solid ${color}40`, paddingTop: 14 }}>
           {skills.length > 0 && (
             <div>
-              <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color, marginBottom: 10 }}>Kenntnisse</div>
+              <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color, marginBottom: 10 }}>{t("Kenntnisse")}</div>
               {skills.map(sk => (
                 <div key={sk.id} style={{ fontSize: 11, color: '#555', marginBottom: 4, display: 'flex', justifyContent: 'space-between' }}>
                   <span>{sk.name}</span>
@@ -113,7 +115,7 @@ export default function InternationalTemplate({ resume }: { resume: Resume }) {
 
           {languages.length > 0 && (
             <div>
-              <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color, marginBottom: 10 }}>Sprachen</div>
+              <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color, marginBottom: 10 }}>{t("Sprachen")}</div>
               {languages.map(lang => (
                 <div key={lang.id} style={{ fontSize: 11, color: '#555', marginBottom: 5 }}>
                   <div style={{ fontWeight: 600 }}>{lang.name}</div>
@@ -125,7 +127,7 @@ export default function InternationalTemplate({ resume }: { resume: Resume }) {
 
           {certificates.length > 0 && (
             <div>
-              <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color, marginBottom: 10 }}>Zertifikate</div>
+              <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color, marginBottom: 10 }}>{t("Zertifikate")}</div>
               {certificates.map(cert => (
                 <div key={cert.id} style={{ fontSize: 11, color: '#555', marginBottom: 5 }}>
                   <div style={{ fontWeight: 600 }}>{cert.name}</div>

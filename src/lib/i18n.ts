@@ -597,6 +597,16 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'heute': 'present',
     'Ihr Name': 'Your name',
     'Kein Anschreiben-Text vorhanden.': 'No cover letter text available.',
+    'Erfahrung': 'Experience',
+    'Kernkompetenzen': 'Core competencies',
+    'Curriculum Vitae': 'Curriculum Vitae',
+    'Kompetenzen': 'Competencies',
+    'Executive Summary': 'Executive Summary',
+    'Berufliche Laufbahn': 'Career history',
+    'Portfolio · Lebenslauf': 'Portfolio · Resume',
+    'Über mich': 'About me',
+    'Profil': 'Profile',
+    'Kenntnisse': 'Skills & knowledge',
     'Was PATH kann': 'What PATH can do',
     'Mit Beispieldaten starten': 'Start with sample data',
     'Empfohlen — du kannst alle Daten später bearbeiten':
@@ -716,7 +726,7 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Ausbildung:': 'Education:',
     'Kenntnisse:': 'Skills:',
     'Einträge': 'entries',
-    'Skills': 'skills',
+    'Skills': 'Skills',
     'Es konnten keine Daten erkannt werden. Stelle sicher, dass du den vollständigen LinkedIn-Profiltext eingefügt hast.':
       'No data could be detected. Make sure you pasted the full LinkedIn profile text.',
     'Die Daten werden zu deinem aktuellen Lebenslauf hinzugefügt (bestehende Einträge bleiben erhalten).':

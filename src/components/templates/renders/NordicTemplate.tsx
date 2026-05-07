@@ -1,6 +1,7 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
+import { useT } from '../../../lib/i18n';
 
 function SectionHeading({ children, color }: { children: React.ReactNode; color: string }) {
   return (
@@ -12,6 +13,7 @@ function SectionHeading({ children, color }: { children: React.ReactNode; color:
 }
 
 export default function NordicTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -59,13 +61,13 @@ export default function NordicTemplate({ resume }: { resume: Resume }) {
           <div>
             {workExperience.length > 0 && (
               <div style={{ marginBottom: 22 }}>
-                <SectionHeading color={color}>Berufserfahrung</SectionHeading>
+                <SectionHeading color={color}>{t("Berufserfahrung")}</SectionHeading>
                 {workExperience.map(job => (
                   <div key={job.id} style={{ marginBottom: 14, paddingLeft: 12, borderLeft: `2px solid ${color}` }}>
                     <div style={{ fontWeight: 700, fontSize: 12.5, color: '#1a202c' }}>{job.position}</div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2, gap: 8 }}>
                       <span style={{ fontSize: 11.5, color, fontWeight: 600 }}>{job.company}</span>
-                      <span style={{ fontSize: 10, color: '#a0aec0', flexShrink: 0 }}>{formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? 'heute' : formatDate(job.endDate)}</span>
+                      <span style={{ fontSize: 10, color: '#a0aec0', flexShrink: 0 }}>{formatDate(job.startDate)}{job.startDate ? ' – ' : ''}{job.current ? t('heute') : formatDate(job.endDate)}</span>
                     </div>
                     {job.location && <div style={{ fontSize: 10, color: '#a0aec0' }}>{job.location}</div>}
                     {job.description && <p style={{ fontSize: 11, color: '#718096', marginTop: 5, lineHeight: 1.65 }}>{job.description}</p>}
@@ -76,7 +78,7 @@ export default function NordicTemplate({ resume }: { resume: Resume }) {
 
             {education.length > 0 && (
               <div>
-                <SectionHeading color={color}>Ausbildung</SectionHeading>
+                <SectionHeading color={color}>{t("Ausbildung")}</SectionHeading>
                 {education.map(edu => (
                   <div key={edu.id} style={{ marginBottom: 11, paddingLeft: 12, borderLeft: '2px solid #e2e8f0' }}>
                     <div style={{ fontWeight: 700, fontSize: 12, color: '#1a202c' }}>{edu.degree}{edu.field ? ` – ${edu.field}` : ''}</div>
@@ -95,7 +97,7 @@ export default function NordicTemplate({ resume }: { resume: Resume }) {
           <div>
             {skills.length > 0 && (
               <div style={{ marginBottom: 20 }}>
-                <SectionHeading color={color}>Skills</SectionHeading>
+                <SectionHeading color={color}>{t("Skills")}</SectionHeading>
                 {skills.map(skill => (
                   <div key={skill.id} style={{ marginBottom: 8 }}>
                     <div style={{ fontSize: 11, fontWeight: 500, marginBottom: 3, color: '#2d3748' }}>{skill.name}</div>
@@ -109,7 +111,7 @@ export default function NordicTemplate({ resume }: { resume: Resume }) {
 
             {languages.length > 0 && (
               <div style={{ marginBottom: 20 }}>
-                <SectionHeading color={color}>Sprachen</SectionHeading>
+                <SectionHeading color={color}>{t("Sprachen")}</SectionHeading>
                 {languages.map(lang => (
                   <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 6, color: '#4a5568' }}>
                     <span style={{ fontWeight: 600 }}>{lang.name}</span>
@@ -121,7 +123,7 @@ export default function NordicTemplate({ resume }: { resume: Resume }) {
 
             {certificates.length > 0 && (
               <div>
-                <SectionHeading color={color}>Zertifikate</SectionHeading>
+                <SectionHeading color={color}>{t("Zertifikate")}</SectionHeading>
                 {certificates.map(cert => (
                   <div key={cert.id} style={{ marginBottom: 7 }}>
                     <div style={{ fontSize: 11, fontWeight: 600 }}>{cert.name}</div>

@@ -1,6 +1,7 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
+import { useT } from '../../../lib/i18n';
 
 function SectionTitle({ title, color, pastelBg, pastelBorder }: { title: string; color: string; pastelBg: string; pastelBorder: string }) {
   return (
@@ -14,6 +15,7 @@ function SectionTitle({ title, color, pastelBg, pastelBorder }: { title: string;
 }
 
 export default function PastelTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -58,7 +60,7 @@ export default function PastelTemplate({ resume }: { resume: Resume }) {
                       <div style={{ fontSize: 12, color, fontWeight: 600 }}>{job.company}</div>
                     </div>
                     <span style={{ fontSize: 10, color: '#aaa', background: pastelBg, padding: '2px 8px', borderRadius: 10, whiteSpace: 'nowrap' }}>
-                      {formatDate(job.startDate)} – {job.current ? 'Heute' : formatDate(job.endDate)}
+                      {formatDate(job.startDate)} – {job.current ? t('heute') : formatDate(job.endDate)}
                     </span>
                   </div>
                   {job.description && <p style={{ fontSize: 11, color: '#777', marginTop: 6, lineHeight: 1.6 }}>{job.description}</p>}

@@ -1,7 +1,9 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
+import { useT } from '../../../lib/i18n';
 
 export default function GeometricTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages, projects } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -45,14 +47,14 @@ export default function GeometricTemplate({ resume }: { resume: Resume }) {
               <div style={{ marginBottom: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                   <div style={{ width: 12, height: 12, background: color, borderRadius: 2, transform: 'rotate(45deg)' }} />
-                  <h2 style={{ margin: 0, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#333' }}>Berufserfahrung</h2>
+                  <h2 style={{ margin: 0, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#333' }}>{t("Berufserfahrung")}</h2>
                 </div>
                 {workExperience.map(job => (
                   <div key={job.id} style={{ marginBottom: 14, paddingLeft: 16, borderLeft: `2px solid ${color}30` }}>
                     <div style={{ fontWeight: 700, fontSize: 13, color: '#111' }}>{job.position}</div>
                     <div style={{ fontSize: 12, color, fontWeight: 600 }}>{job.company}</div>
                     <div style={{ fontSize: 10, color: '#999', marginBottom: 4 }}>
-                      {formatDate(job.startDate)} – {job.current ? 'Heute' : formatDate(job.endDate)} {job.location ? `· ${job.location}` : ''}
+                      {formatDate(job.startDate)} – {job.current ? t('heute') : formatDate(job.endDate)} {job.location ? `· ${job.location}` : ''}
                     </div>
                     {job.description && <p style={{ fontSize: 11, color: '#666', lineHeight: 1.5 }}>{job.description}</p>}
                   </div>
@@ -64,7 +66,7 @@ export default function GeometricTemplate({ resume }: { resume: Resume }) {
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                   <div style={{ width: 12, height: 12, background: color, borderRadius: 2, transform: 'rotate(45deg)' }} />
-                  <h2 style={{ margin: 0, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#333' }}>Projekte</h2>
+                  <h2 style={{ margin: 0, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#333' }}>{t("Projekte")}</h2>
                 </div>
                 {projects.map(proj => (
                   <div key={proj.id} style={{ marginBottom: 10, padding: '8px 12px', background: '#f8f8f8', borderRadius: 8 }}>
@@ -81,7 +83,7 @@ export default function GeometricTemplate({ resume }: { resume: Resume }) {
               <div style={{ marginBottom: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                   <div style={{ width: 12, height: 12, background: color, borderRadius: 2, transform: 'rotate(45deg)' }} />
-                  <h2 style={{ margin: 0, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#333' }}>Ausbildung</h2>
+                  <h2 style={{ margin: 0, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#333' }}>{t("Ausbildung")}</h2>
                 </div>
                 {education.map(edu => (
                   <div key={edu.id} style={{ marginBottom: 12, paddingLeft: 16, borderLeft: `2px solid ${color}30` }}>
@@ -97,7 +99,7 @@ export default function GeometricTemplate({ resume }: { resume: Resume }) {
               <div style={{ marginBottom: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                   <div style={{ width: 12, height: 12, background: color, borderRadius: 2, transform: 'rotate(45deg)' }} />
-                  <h2 style={{ margin: 0, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#333' }}>Skills</h2>
+                  <h2 style={{ margin: 0, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#333' }}>{t("Skills")}</h2>
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {skills.map(sk => (
@@ -117,7 +119,7 @@ export default function GeometricTemplate({ resume }: { resume: Resume }) {
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                   <div style={{ width: 12, height: 12, background: color, borderRadius: 2, transform: 'rotate(45deg)' }} />
-                  <h2 style={{ margin: 0, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#333' }}>Sprachen</h2>
+                  <h2 style={{ margin: 0, fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#333' }}>{t("Sprachen")}</h2>
                 </div>
                 {languages.map(lang => (
                   <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 12, marginBottom: 6, padding: '4px 8px', background: `${color}08`, borderRadius: 4 }}>

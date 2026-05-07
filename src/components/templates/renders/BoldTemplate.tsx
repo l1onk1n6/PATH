@@ -1,8 +1,10 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
 import { SafeImg } from './shared';
+import { useT } from '../../../lib/i18n';
 
 export default function BoldTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -36,13 +38,13 @@ export default function BoldTemplate({ resume }: { resume: Resume }) {
 
           {workExperience.length > 0 && (
             <div style={{ marginBottom: 20 }}>
-              <h2 style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 14 }}>Erfahrung</h2>
+              <h2 style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 14 }}>{t("Erfahrung")}</h2>
               {workExperience.map(job => (
                 <div key={job.id} style={{ marginBottom: 16 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div style={{ fontWeight: 800, fontSize: 14, letterSpacing: '-0.3px' }}>{job.position}</div>
                     <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', flexShrink: 0 }}>
-                      {formatDate(job.startDate)} – {job.current ? 'Heute' : formatDate(job.endDate)}
+                      {formatDate(job.startDate)} – {job.current ? t('heute') : formatDate(job.endDate)}
                     </div>
                   </div>
                   <div style={{ fontSize: 11, color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>{job.company}</div>
@@ -55,7 +57,7 @@ export default function BoldTemplate({ resume }: { resume: Resume }) {
 
           {education.length > 0 && (
             <div>
-              <h2 style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 14 }}>Ausbildung</h2>
+              <h2 style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 14 }}>{t("Ausbildung")}</h2>
               {education.map(edu => (
                 <div key={edu.id} style={{ marginBottom: 10 }}>
                   <div style={{ fontWeight: 800, fontSize: 13 }}>{edu.degree}</div>
@@ -70,7 +72,7 @@ export default function BoldTemplate({ resume }: { resume: Resume }) {
         <div>
           {skills.length > 0 && (
             <div style={{ marginBottom: 20 }}>
-              <h2 style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 12 }}>Skills</h2>
+              <h2 style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 12 }}>{t("Skills")}</h2>
               {skills.map(sk => (
                 <div key={sk.id} style={{ marginBottom: 7 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 3 }}>
@@ -86,7 +88,7 @@ export default function BoldTemplate({ resume }: { resume: Resume }) {
 
           {languages.length > 0 && (
             <div>
-              <h2 style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 12 }}>Sprachen</h2>
+              <h2 style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color, marginBottom: 12 }}>{t("Sprachen")}</h2>
               {languages.map(lang => (
                 <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, fontSize: 11, marginBottom: 5 }}>
                   <span style={{ fontWeight: 600 }}>{lang.name}</span>

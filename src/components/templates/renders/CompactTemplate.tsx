@@ -1,5 +1,6 @@
 import type { Resume } from '../../../types/resume';
 import { fullName, formatDate } from './shared-utils';
+import { useT } from '../../../lib/i18n';
 
 function Section({ title, color }: { title: string; color: string }) {
   return (
@@ -10,6 +11,7 @@ function Section({ title, color }: { title: string; color: string }) {
 }
 
 export default function CompactTemplate({ resume }: { resume: Resume }) {
+  const t = useT();
   const { personalInfo: info, workExperience, education, skills, languages, certificates } = resume;
   const color = resume.accentColor;
   const name = fullName(resume);
@@ -42,7 +44,7 @@ export default function CompactTemplate({ resume }: { resume: Resume }) {
             <div key={job.id} style={{ marginBottom: 7 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ fontWeight: 700 }}>{job.position}</span>
-                <span style={{ color: '#888', fontSize: 10 }}>{formatDate(job.startDate)} – {job.current ? 'Heute' : formatDate(job.endDate)}</span>
+                <span style={{ color: '#888', fontSize: 10 }}>{formatDate(job.startDate)} – {job.current ? t('heute') : formatDate(job.endDate)}</span>
               </div>
               <div style={{ color: '#555', fontSize: 10 }}>{job.company}{job.location ? ` | ${job.location}` : ''}</div>
               {job.description && <div style={{ fontSize: 10, color: '#666', marginTop: 2, lineHeight: 1.4 }}>{job.description}</div>}
