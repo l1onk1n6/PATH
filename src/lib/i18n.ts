@@ -142,6 +142,8 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Heute': 'Today',
     'Duplizieren': 'Duplicate',
     'Link teilen': 'Share link',
+    'Link teilen · aktiv': 'Share link · active',
+    'Ø Vollst.': 'Ø Compl.',
     'Link teilen ·  aktiv': 'Share link · active',
     'ATS-Score prüfen': 'Check ATS score',
 
@@ -956,7 +958,7 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Erfahrungen:': 'Experience:',
     'Ausbildung:': 'Education:',
     'Kenntnisse:': 'Skills:',
-    'Einträge': 'entries',
+    'Einträge': 'Entries',
     'Skills': 'Skills',
     'Es konnten keine Daten erkannt werden. Stelle sicher, dass du den vollständigen LinkedIn-Profiltext eingefügt hast.':
       'No data could be detected. Make sure you pasted the full LinkedIn profile text.',
