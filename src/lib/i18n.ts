@@ -609,6 +609,26 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Was du mit Pro bekommst': 'What you get with Pro',
     'Unbegrenzte Bewerbungsmappen': 'Unlimited applications',
     'Unbegrenzte Personen': 'Unlimited people',
+    // ── Editor: Section labels (additional) ──────────────
+    'Aufgaben & Erfolge': 'Tasks & achievements',
+    'Fähigkeit': 'Skill',
+    'Sprache (z.B. Englisch)': 'Language (e.g. English)',
+    'Fachrichtung': 'Field of study',
+    'Institution': 'Institution',
+    'Note / GPA': 'Grade / GPA',
+    'Schwerpunkte & Erfolge': 'Focus & achievements',
+    'Technologien (Komma-getrennt)': 'Technologies (comma-separated)',
+    'Zertifikat': 'Certificate',
+    'Zertifikat-Link': 'Certificate link',
+    'Änderungen seit dieser Version': 'Changes since this version',
+    'Geänderte Felder': 'Changed fields',
+    'Titel der Sektion…': 'Section title…',
+    'z.B. Informatik': 'e.g. Computer Science',
+    'z.B. TU Berlin': 'e.g. TU Berlin',
+    'z.B. 1,5 oder 3.8': 'e.g. 1.5 or 3.8',
+    'z.B. AWS Certified': 'e.g. AWS Certified',
+    'z.B. Amazon Web Services': 'e.g. Amazon Web Services',
+
     // ── Cover Letter Editor ──────────────────────────────
     'Bestehenden Text überschreiben?': 'Overwrite existing text?',
     'Der KI-Assistent ersetzt deinen aktuellen Anschreiben-Text.':

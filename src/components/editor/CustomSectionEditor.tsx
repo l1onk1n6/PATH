@@ -7,7 +7,7 @@ import EmptyState from '../ui/EmptyState';
 import { useT } from '../../lib/i18n';
 
 export default function CustomSectionEditor() {
-  const _t = useT(); void _t;
+  const t = useT();
   const { getActiveResume, addCustomSection, updateCustomSection, removeCustomSection, reorderCustomSections } = useResumeStore();
   const { limits } = usePlan();
   const [showUpgrade, setShowUpgrade] = useState(false);
@@ -24,7 +24,7 @@ export default function CustomSectionEditor() {
           <Lock size={22} style={{ color: '#FF9F0A' }} />
         </div>
         <div>
-          <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Eigene Sektionen</div>
+          <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>{t('Eigene Sektionen')}</div>
           <div style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', maxWidth: 280 }}>
             Erstelle eigene Abschnitte wie Projekte, Publikationen oder Zertifikate — mit PATH Pro.
           </div>
@@ -61,7 +61,7 @@ export default function CustomSectionEditor() {
             </span>
             <input
               className="input-glass"
-              placeholder="Titel der Sektion…"
+              placeholder={t('Titel der Sektion…')}
               value={section.title} maxLength={100}
               onChange={(e) => updateCustomSection(resume.id, section.id, { title: e.target.value })}
               style={{ flex: 1, fontWeight: 600, fontSize: 14 }}

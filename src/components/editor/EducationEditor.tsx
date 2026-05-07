@@ -102,13 +102,13 @@ export default function EducationEditor() {
                     onChange={(e) => updateEducation(resume.id, edu.id, { degree: e.target.value })} />
                 </div>
                 <div>
-                  <label className="section-label">Fachrichtung</label>
-                  <input className="input-glass" placeholder="z.B. Informatik" value={edu.field} maxLength={150}
+                  <label className="section-label">{t('Fachrichtung')}</label>
+                  <input className="input-glass" placeholder={t('z.B. Informatik')} value={edu.field} maxLength={150}
                     onChange={(e) => updateEducation(resume.id, edu.id, { field: e.target.value })} />
                 </div>
                 <div>
-                  <label className="section-label">Institution</label>
-                  <input className="input-glass" placeholder="z.B. TU Berlin" value={edu.institution} maxLength={150}
+                  <label className="section-label">{t('Institution')}</label>
+                  <input className="input-glass" placeholder={t('z.B. TU Berlin')} value={edu.institution} maxLength={150}
                     onChange={(e) => updateEducation(resume.id, edu.id, { institution: e.target.value })} />
                 </div>
                 <div>
@@ -125,13 +125,13 @@ export default function EducationEditor() {
                   <MonthYearPicker value={edu.endDate} onChange={(v) => updateEducation(resume.id, edu.id, { endDate: v })} />
                 </div>
                 <div>
-                  <label className="section-label">Note / GPA</label>
-                  <input className="input-glass" placeholder="z.B. 1,5 oder 3.8" value={edu.grade} maxLength={20}
+                  <label className="section-label">{t('Note / GPA')}</label>
+                  <input className="input-glass" placeholder={t('z.B. 1,5 oder 3.8')} value={edu.grade} maxLength={20}
                     onChange={(e) => updateEducation(resume.id, edu.id, { grade: e.target.value })} />
                 </div>
               </div>
               <div>
-                <label className="section-label">Schwerpunkte & Erfolge</label>
+                <label className="section-label">{t('Schwerpunkte & Erfolge')}</label>
                 <textarea
                   className="input-glass"
                   placeholder={'Pro Zeile ein Stichpunkt:\nSchwerpunkt Software Engineering\nAbschlussarbeit "Skalierbare Microservices"\nAustauschsemester in Kopenhagen'}

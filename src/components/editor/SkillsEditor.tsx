@@ -58,7 +58,7 @@ export default function SkillsEditor() {
 
         {skills.length > 0 && (
           <div style={{ display: 'flex', gap: 10, paddingLeft: isMobile ? 32 : 22, paddingRight: 38, marginBottom: 4 }}>
-            <span style={{ flex: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>Fähigkeit</span>
+            <span style={{ flex: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>{t('Fähigkeit')}</span>
             <span style={{ flex: 1, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>{t('Kategorie')}</span>
             <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)', minWidth: 114 }}>{t('Niveau')}</span>
           </div>
@@ -163,7 +163,7 @@ export default function SkillsEditor() {
 
         {languages.length > 0 && (
           <div style={{ display: 'flex', gap: 10, paddingLeft: isMobile ? 32 : 22, paddingRight: 38, marginBottom: 4 }}>
-            <span style={{ flex: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>Sprache</span>
+            <span style={{ flex: 2, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>{t('Sprache')}</span>
             <span style={{ flex: 1, fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'rgba(var(--rgb-fg),0.35)' }}>{t('Niveau')}</span>
             <span style={{ width: 166, flexShrink: 0 }} />
           </div>
@@ -177,7 +177,7 @@ export default function SkillsEditor() {
                 <div style={{ width: isMobile ? 20 : 14, flexShrink: 0 }} />
                 <input
                   className="input-glass"
-                  placeholder="Sprache (z.B. Englisch)"
+                  placeholder={t('Sprache (z.B. Englisch)')}
                   value={lang.name} maxLength={60}
                   onChange={(e) => updateLanguage(resume.id, lang.id, { name: e.target.value })}
                   style={{ flex: 2, fontSize: 13, padding: '8px 10px' }}
