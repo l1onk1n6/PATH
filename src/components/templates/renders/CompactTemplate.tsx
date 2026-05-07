@@ -39,7 +39,7 @@ export default function CompactTemplate({ resume }: { resume: Resume }) {
 
       {workExperience.length > 0 && (
         <>
-          <Section color={color} title="Berufserfahrung" />
+          <Section color={color} title={t("Berufserfahrung")} />
           {workExperience.map(job => (
             <div key={job.id} style={{ marginBottom: 7 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -55,7 +55,7 @@ export default function CompactTemplate({ resume }: { resume: Resume }) {
 
       {education.length > 0 && (
         <>
-          <Section color={color} title="Ausbildung" />
+          <Section color={color} title={t("Ausbildung")} />
           {education.map(edu => (
             <div key={edu.id} style={{ marginBottom: 5 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -71,7 +71,7 @@ export default function CompactTemplate({ resume }: { resume: Resume }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 2 }}>
         {skills.length > 0 && (
           <div>
-            <Section color={color} title="Fähigkeiten" />
+            <Section color={color} title={t("Fähigkeiten")} />
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
               {skills.map(sk => (
                 <span key={sk.id} style={{ fontSize: 10, padding: '1px 7px', border: `1px solid ${color}50`, borderRadius: 2, color: '#444' }}>{sk.name}</span>
@@ -82,7 +82,7 @@ export default function CompactTemplate({ resume }: { resume: Resume }) {
         <div>
           {languages.length > 0 && (
             <>
-              <Section color={color} title="Sprachen" />
+              <Section color={color} title={t("Sprachen")} />
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {languages.map(lang => (
                   <span key={lang.id} style={{ fontSize: 10, color: '#444' }}>{lang.name} ({lang.level})</span>
@@ -92,7 +92,7 @@ export default function CompactTemplate({ resume }: { resume: Resume }) {
           )}
           {certificates.length > 0 && (
             <>
-              <Section color={color} title="Zertifikate" />
+              <Section color={color} title={t("Zertifikate")} />
               {certificates.map(cert => (
                 <div key={cert.id} style={{ fontSize: 10, color: '#444', marginBottom: 2 }}>
                   {cert.name} – {cert.issuer}

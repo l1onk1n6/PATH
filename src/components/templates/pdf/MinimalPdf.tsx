@@ -7,11 +7,12 @@ import type { Resume } from '../../../types/resume';
 import { Section, WorkEntry, EduEntry, SkillBar, LanguageRow, CertItem, DescriptionBlock } from './shared';
 import { ensureProtocol, displayUrl } from './shared-utils';
 import { sortWorkExperience, sortEducation } from '../../../lib/sortByDate';
+import { tr } from '../../../lib/i18n';
 
 export default function MinimalPdf({ resume }: { resume: Resume }) {
   const info = resume.personalInfo;
   const accent = resume.accentColor || '#007AFF';
-  const name = [info.firstName, info.lastName].filter(Boolean).join(' ') || 'Ihr Name';
+  const name = [info.firstName, info.lastName].filter(Boolean).join(' ') || tr('Ihr Name');
 
   const contacts: Array<{ text: string; href?: string }> = [];
   if (info.email) contacts.push({ text: info.email, href: `mailto:${info.email}` });
@@ -51,7 +52,7 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
         <View style={styles.columns}>
           <View style={styles.mainCol}>
             {resume.workExperience.length > 0 ? (
-              <Section title="Berufserfahrung" color={accent} kind="line">
+              <Section title={tr("Berufserfahrung")} color={accent} kind="line">
                 {sortWorkExperience(resume.workExperience).map(job => (
                   <WorkEntry key={job.id} job={job} color={accent} />
                 ))}
@@ -59,7 +60,7 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
             ) : null}
 
             {resume.education.length > 0 ? (
-              <Section title="Ausbildung" color={accent} kind="line">
+              <Section title={tr("Ausbildung")} color={accent} kind="line">
                 {sortEducation(resume.education).map(edu => (
                   <EduEntry key={edu.id} edu={edu} color={accent} />
                 ))}
@@ -67,7 +68,7 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
             ) : null}
 
             {(resume.projects ?? []).length > 0 ? (
-              <Section title="Projekte" color={accent} kind="line">
+              <Section title={tr("Projekte")} color={accent} kind="line">
                 {resume.projects.map(p => (
                   <View key={p.id} wrap={false} style={{ marginBottom: 10 }}>
                     <Text style={{ fontSize: 10.5, fontFamily: 'Helvetica-Bold' }}>{p.name}</Text>
@@ -80,17 +81,17 @@ export default function MinimalPdf({ resume }: { resume: Resume }) {
 
           <View style={styles.sideCol}>
             {resume.skills.length > 0 ? (
-              <Section title="Fähigkeiten" color={accent} kind="line">
+              <Section title={tr("Fähigkeiten")} color={accent} kind="line">
                 {resume.skills.map(s => <SkillBar key={s.id} skill={s} color={accent} />)}
               </Section>
             ) : null}
             {resume.languages.length > 0 ? (
-              <Section title="Sprachen" color={accent} kind="line">
+              <Section title={tr("Sprachen")} color={accent} kind="line">
                 {resume.languages.map(l => <LanguageRow key={l.id} lang={l} />)}
               </Section>
             ) : null}
             {(resume.certificates ?? []).length > 0 ? (
-              <Section title="Zertifikate" color={accent} kind="line">
+              <Section title={tr("Zertifikate")} color={accent} kind="line">
                 {resume.certificates.map(c => <CertItem key={c.id} cert={c} linkColor={accent} />)}
               </Section>
             ) : null}
