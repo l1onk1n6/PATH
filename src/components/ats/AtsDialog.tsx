@@ -53,7 +53,7 @@ export default function AtsDialog({ onClose }: Props) {
             <div>
               <div style={{ fontSize: 16, fontWeight: 700 }}>{t('ATS-Score')}</div>
               <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.5)', marginTop: 2 }}>
-                {personName} · {resume?.name || 'Bewerbungsmappe'}
+                {personName} · {resume?.name || t('Bewerbungsmappe')}
               </div>
             </div>
           </div>
@@ -67,12 +67,11 @@ export default function AtsDialog({ onClose }: Props) {
           {!result ? (
             <>
               <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.6)', marginBottom: 14, lineHeight: 1.5 }}>
-                Füge die komplette Stellenanzeige ein. Die Analyse vergleicht relevante Keywords aus dem
-                Inserat mit deinem aktuellen Lebenslauf, gibt einen Score und konkrete Hinweise.
+                {t('Füge die komplette Stellenanzeige ein. Die Analyse vergleicht relevante Keywords aus dem Inserat mit deinem aktuellen Lebenslauf, gibt einen Score und konkrete Hinweise.')}
               </p>
               <textarea
                 className="input-glass"
-                placeholder="Stellenanzeige hier einfügen — Titel, Aufgaben, Anforderungen, Skills…"
+                placeholder={t('Stellenanzeige hier einfügen — Titel, Aufgaben, Anforderungen, Skills…')}
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
                 rows={10}
@@ -80,7 +79,7 @@ export default function AtsDialog({ onClose }: Props) {
               />
               <div style={{ display: 'flex', gap: 8, justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)' }}>
-                  {jobDescription.trim().split(/\s+/).filter(Boolean).length} Wörter · lokal verarbeitet, kein Upload
+                  {jobDescription.trim().split(/\s+/).filter(Boolean).length} {t('Wörter · lokal verarbeitet, kein Upload')}
                 </div>
                 <button
                   className="btn-glass btn-primary"
@@ -89,9 +88,9 @@ export default function AtsDialog({ onClose }: Props) {
                   style={{ padding: '10px 18px', gap: 8 }}
                 >
                   {running ? (
-                    <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> Analysiere…</>
+                    <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> {t('Analysiere…')}</>
                   ) : (
-                    <><Sparkles size={14} /> Analyse starten</>
+                    <><Sparkles size={14} /> {t('Analyse starten')}</>
                   )}
                 </button>
               </div>
@@ -110,6 +109,7 @@ export default function AtsDialog({ onClose }: Props) {
 }
 
 function AtsResultView({ result, onAgain, scoreColor }: { result: AtsAnalysis; onAgain: () => void; scoreColor: string }) {
+  const t = useT();
   return (
     <div>
       {/* Score Hero */}
@@ -124,13 +124,15 @@ function AtsResultView({ result, onAgain, scoreColor }: { result: AtsAnalysis; o
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           }}>
             <div style={{ fontSize: 24, fontWeight: 800, color: scoreColor, lineHeight: 1 }}>{result.score}</div>
-            <div style={{ fontSize: 9, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 2 }}>von 100</div>
+            <div style={{ fontSize: 9, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 2 }}>{t('von 100')}</div>
           </div>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Match-Score</div>
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>{t('Match-Score')}</div>
           <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.6)', lineHeight: 1.5 }}>
-            {result.matched.length} von {result.totalJdKeywords} relevanten Keywords sind im Lebenslauf vorhanden.
+            {t('{n} von {total} relevanten Keywords sind im Lebenslauf vorhanden.')
+              .replace('{n}', String(result.matched.length))
+              .replace('{total}', String(result.totalJdKeywords))}
           </div>
         </div>
       </div>
@@ -138,7 +140,7 @@ function AtsResultView({ result, onAgain, scoreColor }: { result: AtsAnalysis; o
       {/* Tips */}
       {result.tips.length > 0 && (
         <div style={{ background: 'rgba(0,122,255,0.08)', border: '1px solid rgba(0,122,255,0.2)', borderRadius: 10, padding: '12px 14px', marginBottom: 18 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--ios-blue)', letterSpacing: '0.06em', marginBottom: 6, textTransform: 'uppercase' }}>Empfehlungen</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--ios-blue)', letterSpacing: '0.06em', marginBottom: 6, textTransform: 'uppercase' }}>{t('Empfehlungen')}</div>
           <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: 'rgba(var(--rgb-fg),0.8)', lineHeight: 1.6 }}>
             {result.tips.map((t, i) => <li key={i}>{t}</li>)}
           </ul>
@@ -148,23 +150,23 @@ function AtsResultView({ result, onAgain, scoreColor }: { result: AtsAnalysis; o
       {/* Two columns: matched + missing */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12, marginBottom: 18 }}>
         <KeywordList
-          title="Im CV vorhanden"
+          title={t('Im CV vorhanden')}
           icon={<CheckCircle size={13} style={{ color: 'var(--ios-green)' }} />}
           color="var(--ios-green)"
           items={result.matched}
-          empty="Noch keine Keywords gematcht."
+          empty={t('Noch keine Keywords gematcht.')}
         />
         <KeywordList
-          title="Fehlt im CV"
+          title={t('Fehlt im CV')}
           icon={<AlertCircle size={13} style={{ color: '#FF9500' }} />}
           color="#FF9500"
           items={result.missing}
-          empty="Keine wichtigen Lücken — passt!"
+          empty={t('Keine wichtigen Lücken — passt!')}
         />
       </div>
 
       <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-        <button className="btn-glass" onClick={onAgain}>Andere Stelle prüfen</button>
+        <button className="btn-glass" onClick={onAgain}>{t('Andere Stelle prüfen')}</button>
       </div>
     </div>
   );
@@ -177,6 +179,7 @@ function KeywordList({ title, icon, color, items, empty }: {
   items: { keyword: string; jdCount: number }[];
   empty: string;
 }) {
+  const t = useT();
   return (
     <div style={{ background: 'rgba(var(--rgb-fg),0.03)', border: '1px solid rgba(var(--rgb-fg),0.08)', borderRadius: 10, padding: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
@@ -195,7 +198,7 @@ function KeywordList({ title, icon, color, items, empty }: {
                 background: 'rgba(var(--rgb-fg),0.05)', border: '1px solid rgba(var(--rgb-fg),0.1)',
                 display: 'inline-flex', alignItems: 'center', gap: 4,
               }}
-              title={`${jdCount}× in der Stellenanzeige`}
+              title={t('{n}× in der Stellenanzeige').replace('{n}', String(jdCount))}
             >
               {keyword}
               {jdCount > 1 && <span style={{ fontSize: 9, color: 'rgba(var(--rgb-fg),0.4)' }}>×{jdCount}</span>}
@@ -203,7 +206,7 @@ function KeywordList({ title, icon, color, items, empty }: {
           ))}
           {items.length > 24 && (
             <span style={{ fontSize: 10, color: 'rgba(var(--rgb-fg),0.3)', alignSelf: 'center' }}>
-              +{items.length - 24} weitere
+              {t('+{n} weitere').replace('{n}', String(items.length - 24))}
             </span>
           )}
         </div>

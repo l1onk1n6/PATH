@@ -609,6 +609,27 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Was du mit Pro bekommst': 'What you get with Pro',
     'Unbegrenzte Bewerbungsmappen': 'Unlimited applications',
     'Unbegrenzte Personen': 'Unlimited people',
+    // ── ATS Dialog ───────────────────────────────────────
+    'Füge die komplette Stellenanzeige ein. Die Analyse vergleicht relevante Keywords aus dem Inserat mit deinem aktuellen Lebenslauf, gibt einen Score und konkrete Hinweise.':
+      'Paste the complete job posting. The analysis compares relevant keywords from the posting with your current resume, gives a score and concrete tips.',
+    'Stellenanzeige hier einfügen — Titel, Aufgaben, Anforderungen, Skills…':
+      'Paste job posting here — title, tasks, requirements, skills…',
+    'Wörter · lokal verarbeitet, kein Upload': 'words · processed locally, no upload',
+    'Analysiere…': 'Analysing…',
+    'Analyse starten': 'Start analysis',
+    'von 100': 'of 100',
+    'Match-Score': 'Match score',
+    '{n} von {total} relevanten Keywords sind im Lebenslauf vorhanden.':
+      '{n} of {total} relevant keywords are present in the resume.',
+    'Empfehlungen': 'Recommendations',
+    'Im CV vorhanden': 'Present in CV',
+    'Fehlt im CV': 'Missing in CV',
+    'Noch keine Keywords gematcht.': 'No keywords matched yet.',
+    'Keine wichtigen Lücken — passt!': 'No important gaps — looks good!',
+    'Andere Stelle prüfen': 'Check another posting',
+    '{n}× in der Stellenanzeige': '{n}× in the job posting',
+    '+{n} weitere': '+{n} more',
+
     // ── Editor: Section labels (additional) ──────────────
     'Aufgaben & Erfolge': 'Tasks & achievements',
     'Fähigkeit': 'Skill',
