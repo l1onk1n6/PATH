@@ -16,7 +16,7 @@ function truncate(s: string, max = 80): string {
 }
 
 export default function VersionDiffModal({ version, current, onClose }: Props) {
-  const _t = useT(); void _t;
+  const t = useT();
   const diff = computeDiff(version.snapshot as Resume, current);
 
   return (
@@ -40,7 +40,7 @@ export default function VersionDiffModal({ version, current, onClose }: Props) {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--border-subtle)' }}>
           <div>
-            <div style={{ fontSize: 15, fontWeight: 700 }}>Änderungen seit dieser Version</div>
+            <div style={{ fontSize: 15, fontWeight: 700 }}>{t('Änderungen seit dieser Version')}</div>
             <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg), 0.5)', marginTop: 2 }}>
               {version.label || new Date(version.created_at).toLocaleString('de-CH')}
             </div>
@@ -95,7 +95,7 @@ export default function VersionDiffModal({ version, current, onClose }: Props) {
               {/* Feld-Aenderungen */}
               {diff.fields.length > 0 && (
                 <div style={{ marginTop: diff.lists.length > 0 ? 6 : 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Geänderte Felder</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>{t('Geänderte Felder')}</div>
                   {diff.fields.map((f, i) => (
                     <div key={i} style={{
                       marginBottom: 10, padding: '8px 10px',

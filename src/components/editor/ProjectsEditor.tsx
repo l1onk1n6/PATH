@@ -139,7 +139,7 @@ export default function ProjectsEditor() {
                     <MonthYearPicker value={project.endDate} onChange={(v) => updateProject(resume.id, project.id, { endDate: v })} />
                   </div>
                   <div style={{ gridColumn: isMobile ? 'auto' : 'span 2' }}>
-                    <label className="section-label">Technologien (Komma-getrennt)</label>
+                    <label className="section-label">{t('Technologien (Komma-getrennt)')}</label>
                     <TechnologiesInput
                       value={project.technologies}
                       onChange={(techs) => updateProject(resume.id, project.id, { technologies: techs })}
@@ -265,22 +265,22 @@ export default function ProjectsEditor() {
               <div style={{ marginTop: 12 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
                   <div>
-                    <label className="section-label">Zertifikat</label>
-                    <input className="input-glass" placeholder="z.B. AWS Certified" value={cert.name} maxLength={150}
+                    <label className="section-label">{t('Zertifikat')}</label>
+                    <input className="input-glass" placeholder={t('z.B. AWS Certified')} value={cert.name} maxLength={150}
                       onChange={(e) => updateCertificate(resume.id, cert.id, { name: e.target.value })} />
                   </div>
                   <div>
                     <label className="section-label">{t('Aussteller')}</label>
-                    <input className="input-glass" placeholder="z.B. Amazon Web Services" value={cert.issuer} maxLength={150}
+                    <input className="input-glass" placeholder={t('z.B. Amazon Web Services')} value={cert.issuer} maxLength={150}
                       onChange={(e) => updateCertificate(resume.id, cert.id, { issuer: e.target.value })} />
                   </div>
                   <div>
                     <label className="section-label">{t('Datum')}</label>
-                    <MonthYearPicker value={cert.date} onChange={(v) => updateCertificate(resume.id, cert.id, { date: v })} placeholder="Monat / Jahr" />
+                    <MonthYearPicker value={cert.date} onChange={(v) => updateCertificate(resume.id, cert.id, { date: v })} />
                   </div>
                   <div>
                     <label className="section-label">{t('URL')}</label>
-                    <input className="input-glass" placeholder="Zertifikat-Link" value={cert.url} maxLength={300}
+                    <input className="input-glass" placeholder={t('Zertifikat-Link')} value={cert.url} maxLength={300}
                       onChange={(e) => updateCertificate(resume.id, cert.id, { url: e.target.value })} />
                   </div>
                 </div>

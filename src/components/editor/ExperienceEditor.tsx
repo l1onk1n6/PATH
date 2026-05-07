@@ -102,7 +102,7 @@ export default function ExperienceEditor() {
                     onChange={(e) => updateWorkExperience(resume.id, job.id, { position: e.target.value })} />
                 </div>
                 <div>
-                  <label className="section-label">Unternehmen</label>
+                  <label className="section-label">{t('Unternehmen')}</label>
                   <input className="input-glass" placeholder={t('z.B. Tech GmbH')} value={job.company} maxLength={150}
                     onChange={(e) => updateWorkExperience(resume.id, job.id, { company: e.target.value })} />
                 </div>
@@ -128,7 +128,7 @@ export default function ExperienceEditor() {
                 </div>
               </div>
               <div>
-                <label className="section-label">Aufgaben & Erfolge</label>
+                <label className="section-label">{t('Aufgaben & Erfolge')}</label>
                 <textarea className="input-glass"
                   placeholder={'Pro Zeile ein Stichpunkt — System formatiert als Aufzählung:\nEntwicklung und Betreuung von Microsoft-Power-Platform-Lösungen\nKonzeption von M365-Teams-Strukturen\nLeitung IT-Projekte'}
                   value={job.description} maxLength={1500}
