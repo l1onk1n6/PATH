@@ -154,6 +154,7 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Dokument': 'Document',
     'Allgemein': 'General',
     'Upload in Storage fehlgeschlagen': 'Storage upload failed',
+    'Supabase nicht konfiguriert': 'Supabase not configured',
     'Link teilen ·  aktiv': 'Share link · active',
     'ATS-Score prüfen': 'Check ATS score',
 
