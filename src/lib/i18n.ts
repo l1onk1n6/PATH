@@ -369,6 +369,18 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Kostenlos starten, bei Bedarf upgraden. Jederzeit kündbar.':
       'Start for free, upgrade when needed. Cancel anytime.',
     'Jetzt sichern': 'Claim now',
+    'Offen': 'Open',
+    'Beworben': 'Applied',
+    'Angebot': 'Offer',
+    'Zurückgezogen': 'Withdrawn',
+    'Online-Portal': 'Online portal',
+    'Postalisch': 'By mail',
+    'Persönlich': 'In person',
+    'Telefonisch': 'By phone',
+    'Datum (neu zuerst)': 'Date (newest first)',
+    'Datum (alt zuerst)': 'Date (oldest first)',
+    'Firma (A–Z)': 'Company (A–Z)',
+    'Alle Status': 'All statuses',
     'Job-Beschreibung ist zu kurz oder leer.': 'Job description is too short or empty.',
     'Sehr gute Übereinstimmung — der Lebenslauf passt thematisch sauber zur Stelle.':
       'Very good match — the resume matches the role thematically.',
