@@ -242,7 +242,7 @@ export default function Dashboard() {
               </div>
               <div style={{ height: 1, background: 'rgba(var(--rgb-fg),0.07)', margin: '4px 0' }} />
               {([
-                { icon: Share2, label: mr.shareToken ? 'Link teilen ·  aktiv' : 'Link teilen', color: mr.shareToken ? 'var(--ios-blue)' : undefined,
+                { icon: Share2, label: mr.shareToken ? t('Link teilen · aktiv') : t('Link teilen'), color: mr.shareToken ? 'var(--ios-blue)' : undefined,
                   action: () => { setShareModalResumeId(mr.id); setMenuOpenResumeId(null); } },
                 { icon: Pencil, label: t('Umbenennen'),
                   action: () => { setRenamingResumeId(mr.id); setRenameValue(mr.name || t('Bewerbungsmappe')); setMenuOpenResumeId(null); } },
@@ -316,7 +316,7 @@ export default function Dashboard() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
               <div>
                 <div style={{ fontSize: isMobile ? 20 : 26, fontWeight: 700, letterSpacing: '-1px' }}>{value}</div>
-                <div style={{ fontSize: isMobile ? 10 : 12, color: 'rgba(var(--rgb-fg),0.5)', marginTop: 2 }}>{label}</div>
+                <div style={{ fontSize: isMobile ? 10 : 12, color: 'rgba(var(--rgb-fg),0.5)', marginTop: 2 }}>{t(label)}</div>
               </div>
               <div style={{
                 width: isMobile ? 32 : 40, height: isMobile ? 32 : 40, borderRadius: isMobile ? 8 : 12,
