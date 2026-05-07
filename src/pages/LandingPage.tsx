@@ -3,7 +3,7 @@ import { LogoIcon } from '../components/layout/Logo';
 import AuthPage from './AuthPage';
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { openExternal } from '../lib/openExternal';
-import { useT } from '../lib/i18n';
+import { useT, useI18n } from '../lib/i18n';
 import {
   FileText, Sparkles, Globe, Clock, Share2, Download,
   Check, ChevronRight, ArrowRight, Star, ClipboardList, Mail, Import,
@@ -108,6 +108,8 @@ function useCountdown(deadline: Date) {
 
 export default function LandingPage() {
   const t = useT();
+  const locale = useI18n(s => s.locale);
+  const setLocale = useI18n(s => s.setLocale);
   const [showAuth, setShowAuth] = useState<false | 'login' | 'register'>(false);
   const [scrolled, setScrolled] = useState(false);
   const isMobile = useIsMobile();
@@ -189,6 +191,30 @@ export default function LandingPage() {
 
         {/* Auth buttons */}
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {/* Sprach-Picker — DE als Default; Auswahl persistiert via localStorage */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: 3, borderRadius: 10, background: 'rgba(var(--rgb-fg),0.05)', border: '1px solid rgba(var(--rgb-fg),0.08)' }}>
+            {(['de', 'en'] as const).map(code => (
+              <button
+                key={code}
+                onClick={() => setLocale(code)}
+                aria-pressed={locale === code}
+                aria-label={code === 'de' ? 'Deutsch' : 'English'}
+                style={{
+                  border: 'none', cursor: 'pointer',
+                  fontSize: 12, fontWeight: 700, letterSpacing: '0.04em',
+                  padding: '5px 10px', borderRadius: 8,
+                  textTransform: 'uppercase',
+                  background: locale === code ? 'rgba(0,122,255,0.18)' : 'transparent',
+                  color: locale === code ? '#fff' : 'rgba(var(--rgb-fg),0.55)',
+                  transition: 'background 0.15s, color 0.15s',
+                }}
+                onMouseEnter={e => { if (locale !== code) e.currentTarget.style.color = '#fff'; }}
+                onMouseLeave={e => { if (locale !== code) e.currentTarget.style.color = 'rgba(var(--rgb-fg),0.55)'; }}
+              >
+                {code}
+              </button>
+            ))}
+          </div>
           <button onClick={() => setShowAuth('login')} style={{
             background: 'none', border: 'none', cursor: 'pointer',
             color: 'rgba(var(--rgb-fg),0.65)', fontSize: 14, padding: '8px 14px',
@@ -196,7 +222,7 @@ export default function LandingPage() {
           }}
             onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
             onMouseLeave={e => (e.currentTarget.style.color = 'rgba(var(--rgb-fg),0.65)')}>
-            Anmelden
+            {t('Anmelden')}
           </button>
           <button onClick={() => setShowAuth('register')} style={{
             background: 'rgba(0,122,255,0.9)', border: 'none', cursor: 'pointer',
