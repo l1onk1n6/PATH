@@ -210,7 +210,7 @@ function PlanSection() {
                 style={{ padding: '8px 14px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}
               >
                 {portalLoading ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <CreditCard size={12} />}
-                Abo verwalten
+                {t('Abo verwalten')}
               </button>
               <button
                 onClick={handlePortal}
@@ -222,9 +222,9 @@ function PlanSection() {
                   display: 'flex', alignItems: 'center', gap: 4,
                   textDecoration: 'underline', textUnderlineOffset: 3,
                 }}
-                title="Kündigung läuft über das Abo-Portal"
+                title={t('Kündigung läuft über das Abo-Portal')}
               >
-                <XCircle size={12} /> Abo kündigen
+                <XCircle size={12} /> {t('Abo kündigen')}
               </button>
             </div>
           ) : !isPro ? (
@@ -714,15 +714,15 @@ function SecuritySection() {
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 12, opacity: 0.6 }}>{t('PASSWORT')}</div>
         <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', marginBottom: 12 }}>
-          Wir senden einen Link an {user?.email} zum Zurücksetzen des Passworts.
+          {t('Wir senden einen Link an')} {user?.email} {t('zum Zurücksetzen des Passworts.')}
         </p>
         {sent ? (
           <div style={{ fontSize: 13, color: 'var(--ios-green)', display: 'flex', alignItems: 'center', gap: 6 }}>
-            ✓ E-Mail gesendet — bitte prüfe dein Postfach.
+            ✓ {t('E-Mail gesendet — bitte prüfe dein Postfach.')}
           </div>
         ) : (
           <button className="btn-glass btn-sm" onClick={handleReset} disabled={loading} style={{ gap: 6 }}>
-            <KeyRound size={14} /> Passwort zurücksetzen
+            <KeyRound size={14} /> {t('Passwort zurücksetzen')}
           </button>
         )}
       </div>

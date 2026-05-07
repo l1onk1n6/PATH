@@ -345,6 +345,8 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
       'Your upgrade was successful. All Pro features are active now.',
     'Auf Pro upgraden': 'Upgrade to Pro',
     'Abo verwalten': 'Manage subscription',
+    'Abo kündigen': 'Cancel subscription',
+    'Kündigung läuft über das Abo-Portal': 'Cancellation runs through the subscription portal',
     'Upgrade auf Pro': 'Upgrade to Pro',
     'Verfügbar': 'Available',
 
