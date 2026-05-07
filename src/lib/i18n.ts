@@ -196,7 +196,6 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Der Checkout konnte nicht gestartet werden': 'Checkout could not be started',
     'Die Abo-Verwaltung konnte nicht geöffnet werden': 'Subscription management could not be opened',
     'Das Abo-Portal konnte nicht geöffnet werden': 'The subscription portal could not be opened',
-    'Die Vorschau konnte nicht aufgebaut werden': 'The preview could not be built',
     'Der PDF-Export hat nicht funktioniert': 'PDF export did not work',
     'Der Anschreiben-Export hat nicht funktioniert': 'Cover letter export did not work',
     'Der Mappen-Export hat nicht funktioniert': 'Application export did not work',
