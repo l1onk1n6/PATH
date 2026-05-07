@@ -256,6 +256,22 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Vor {n} Std.': '{n} h ago',
     'Vor 1 Tag': '1 day ago',
     'Vor {n} Tagen': '{n} days ago',
+    'Projekt anlegen': 'Create project',
+    'Zertifikat anlegen': 'Add certificate',
+    'Ersten Eintrag anlegen': 'Create first entry',
+    'Erste Fähigkeit': 'First skill',
+    'Nebenprojekte, Open Source, Praktika — alles was dich auszeichnet.':
+      'Side projects, open source, internships — everything that sets you apart.',
+    'Abschlüsse, Weiterbildungen, Online-Kurse.':
+      'Degrees, further training, online courses.',
+    'Erfasse deine bisherigen Stationen — Firma, Rolle, Zeitraum und was du bewirkt hast.':
+      'Capture your previous positions — company, role, time period and your impact.',
+    'Tools, Frameworks, Methoden — mit Niveau-Bewertung.':
+      'Tools, frameworks, methods — with level rating.',
+    'Welche Sprachen sprichst du und auf welchem Niveau?':
+      'Which languages do you speak and at what level?',
+    'Schule, Lehre, Studium — alles was zu deinem Bildungsweg gehört.':
+      'School, apprenticeship, university — everything that belongs to your education.',
     'Job-Beschreibung ist zu kurz oder leer.': 'Job description is too short or empty.',
     'Sehr gute Übereinstimmung — der Lebenslauf passt thematisch sauber zur Stelle.':
       'Very good match — the resume matches the role thematically.',

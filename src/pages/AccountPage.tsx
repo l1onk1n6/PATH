@@ -517,7 +517,7 @@ function EmailChangeCard() {
               disabled={loading || !newEmail.trim() || newEmail.trim().toLowerCase() === (user?.email ?? '').toLowerCase()}
               style={{ gap: 6 }}
             >
-              <Mail size={14} /> {loading ? 'Wird gesendet…' : 'Bestätigung senden'}
+              <Mail size={14} /> {loading ? t('Wird gesendet…') : t('Bestätigung senden')}
             </button>
             <button type="button" className="btn-glass btn-sm" onClick={cancel} disabled={loading}>
               Abbrechen

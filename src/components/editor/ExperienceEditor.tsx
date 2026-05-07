@@ -41,8 +41,8 @@ export default function ExperienceEditor() {
         <EmptyState
           icon={Briefcase}
           title={t("Berufserfahrung hinzufügen")}
-          description="Erfasse deine bisherigen Stationen — Firma, Rolle, Zeitraum und was du bewirkt hast."
-          ctaLabel="Ersten Eintrag anlegen"
+          description={t('Erfasse deine bisherigen Stationen — Firma, Rolle, Zeitraum und was du bewirkt hast.')}
+          ctaLabel={t('Ersten Eintrag anlegen')}
           onCta={() => addWorkExperience(resume.id)}
         />
       )}

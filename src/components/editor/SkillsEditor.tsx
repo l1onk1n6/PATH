@@ -50,8 +50,8 @@ export default function SkillsEditor() {
             compact
             icon={Zap}
             title={t("Fähigkeiten hinzufügen")}
-            description="Tools, Frameworks, Methoden — mit Niveau-Bewertung."
-            ctaLabel="Erste Fähigkeit"
+            description={t('Tools, Frameworks, Methoden — mit Niveau-Bewertung.')}
+            ctaLabel={t('Erste Fähigkeit')}
             onCta={() => addSkill(resume.id)}
           />
         )}
@@ -215,8 +215,8 @@ export default function SkillsEditor() {
               compact
               icon={Globe}
               title={t("Sprachen hinzufügen")}
-              description="Welche Sprachen sprichst du und auf welchem Niveau?"
-              ctaLabel="Sprache hinzufügen"
+              description={t('Welche Sprachen sprichst du und auf welchem Niveau?')}
+              ctaLabel={t('Sprache hinzufügen')}
               onCta={() => addLanguage(resume.id)}
             />
           )}
