@@ -346,6 +346,28 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Professionelle Vorlagen': 'Professional templates',
     'KI-Features (Claude AI)': 'AI features (Claude AI)',
     'PDF-Export': 'PDF export',
+    'KI-gestützte Bewerbungsmappe': 'AI-powered application',
+    'Dein Lebenslauf.': 'Your resume.',
+    'Professionell.': 'Professional.',
+    'In Minuten.': 'In minutes.',
+    'PATH hilft dir, überzeugende Bewerbungsunterlagen zu erstellen — mit modernen Vorlagen, KI-Unterstützung und PDF-Export mit einem Klick.':
+      'PATH helps you create convincing application documents — with modern templates, AI support and one-click PDF export.',
+    'Preise ansehen': 'See pricing',
+    'Alles was du brauchst': 'Everything you need',
+    'Von der ersten Idee bis zum fertigen PDF — PATH begleitet dich durch den gesamten Bewerbungsprozess.':
+      'From the first idea to the finished PDF — PATH accompanies you throughout the entire application process.',
+    'KI übernimmt die schwere Arbeit': 'AI does the heavy lifting',
+    'Claude AI – eines der leistungsfähigsten Sprachmodelle der Welt – ist direkt in PATH integriert.':
+      'Claude AI – one of the most powerful language models in the world – is integrated directly into PATH.',
+    'In 4 Schritten zur Bewerbung': '4 steps to your application',
+    'Einfach und schnell — ohne komplizierte Software.': 'Simple and fast — no complicated software.',
+    'PATH kommt auf': 'PATH is coming to',
+    'Android & iOS': 'Android & iOS',
+    'Alle deine Bewerbungsunterlagen immer dabei — bearbeiten, exportieren und teilen, direkt vom Handy.':
+      'All your application documents always with you — edit, export and share, directly from your phone.',
+    'Transparent & fair': 'Transparent & fair',
+    'Kostenlos starten, bei Bedarf upgraden. Jederzeit kündbar.':
+      'Start for free, upgrade when needed. Cancel anytime.',
     'Job-Beschreibung ist zu kurz oder leer.': 'Job description is too short or empty.',
     'Sehr gute Übereinstimmung — der Lebenslauf passt thematisch sauber zur Stelle.':
       'Very good match — the resume matches the role thematically.',
