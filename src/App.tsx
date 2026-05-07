@@ -24,10 +24,12 @@ import OnboardingModal from './components/ui/OnboardingModal';
 import { isOnboardingDone } from './lib/onboarding';
 import UndoToaster from './components/ui/UndoToaster';
 import ShortcutsHelp from './components/ui/ShortcutsHelp';
+import { useT } from './lib/i18n';
 
 const APP_VERSION = '1.8.0';
 
 function AppShell() {
+  const t = useT();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -174,9 +176,11 @@ function AppShell() {
             <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(255,149,0,0.15)', border: '1px solid rgba(255,149,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               <ShieldAlert size={22} style={{ color: '#FF9500' }} />
             </div>
-            <h2 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 8px' }}>Sitzung läuft ab</h2>
+            <h2 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 8px' }}>{t('Sitzung läuft ab')}</h2>
             <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', margin: '0 0 20px', lineHeight: 1.5 }}>
-              Du wirst in <strong style={{ color: '#FF9500' }}>{countdown} Sekunden</strong> automatisch abgemeldet.
+              {t('Du wirst in {n} Sekunden automatisch abgemeldet.').split('{n}').map((part, i) => i === 0
+                ? <span key={i}>{part}</span>
+                : <span key={i}><strong style={{ color: '#FF9500' }}>{countdown}</strong>{part}</span>)}
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
               <button
@@ -184,14 +188,14 @@ function AppShell() {
                 onClick={stayLoggedIn}
                 style={{ flex: 1, justifyContent: 'center', padding: '11px 16px', fontWeight: 600 }}
               >
-                Angemeldet bleiben
+                {t('Angemeldet bleiben')}
               </button>
               <button
                 className="btn-glass btn-danger"
                 onClick={signOut}
                 style={{ padding: '11px 16px' }}
               >
-                Abmelden
+                {t('Abmelden')}
               </button>
             </div>
           </div>
@@ -242,6 +246,7 @@ function getAuthTypeFromUrl() {
 }
 
 export default function App() {
+  const t = useT();
   const { user, loading, initialize, passwordRecovery } = useAuthStore();
   const { syncFromCloud } = useResumeStore();
   const [authType] = useState(() => getAuthTypeFromUrl());
@@ -304,7 +309,7 @@ export default function App() {
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, padding: 24, textAlign: 'center' }}>
         <span style={{ fontSize: 32 }}>⚙️</span>
         <p style={{ color: 'rgba(var(--rgb-fg),0.5)', fontSize: 14, maxWidth: 320 }}>
-          App nicht konfiguriert.<br />Bitte VITE_SUPABASE_URL und VITE_SUPABASE_ANON_KEY als GitHub Secrets setzen.
+          {t('App nicht konfiguriert.')}<br />{t('Bitte VITE_SUPABASE_URL und VITE_SUPABASE_ANON_KEY als GitHub Secrets setzen.')}
         </p>
       </div>
     );
@@ -314,7 +319,7 @@ export default function App() {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12 }}>
         <Loader2 size={28} style={{ animation: 'spin 1s linear infinite', color: 'var(--ios-blue)' }} />
-        <span style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)' }}>Verbinde…</span>
+        <span style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)' }}>{t('Verbinde…')}</span>
         <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
       </div>
     );

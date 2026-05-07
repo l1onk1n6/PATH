@@ -155,6 +155,13 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Allgemein': 'General',
     'Upload in Storage fehlgeschlagen': 'Storage upload failed',
     'Supabase nicht konfiguriert': 'Supabase not configured',
+    'Sitzung läuft ab': 'Session expiring',
+    'Du wirst in {n} Sekunden automatisch abgemeldet.':
+      'You will be signed out automatically in {n} seconds.',
+    'Angemeldet bleiben': 'Stay signed in',
+    'App nicht konfiguriert.': 'App not configured.',
+    'Bitte VITE_SUPABASE_URL und VITE_SUPABASE_ANON_KEY als GitHub Secrets setzen.':
+      'Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY as GitHub Secrets.',
     'Link teilen ·  aktiv': 'Share link · active',
     'ATS-Score prüfen': 'Check ATS score',
 
