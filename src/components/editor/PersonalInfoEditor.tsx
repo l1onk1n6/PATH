@@ -73,7 +73,7 @@ export default function PersonalInfoEditor() {
               ) : (
                 <div style={{ textAlign: 'center', color: 'rgba(var(--rgb-fg),0.4)' }}>
                   <Camera size={20} />
-                  <div style={{ fontSize: 9, marginTop: 3 }}>Foto</div>
+                  <div style={{ fontSize: 9, marginTop: 3 }}>{t('Foto')}</div>
                 </div>
               )}
             </div>

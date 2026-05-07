@@ -27,6 +27,7 @@ async function startCheckout(plan: 'monthly' | 'yearly'): Promise<string | null>
 
 // ── Upgrade Modal ──────────────────────────────────────────
 export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; highlightId?: string }) {
+  const t = useT();
   const [loading, setLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
   const [plan, setPlan] = useState<'monthly' | 'yearly'>('yearly');
@@ -112,7 +113,7 @@ export function UpgradeModal({ onClose, highlightId }: { onClose: () => void; hi
                   }}
                 >
                   {p === 'monthly' ? (
-                    <>Monatlich <span style={{ fontSize: 12, fontWeight: 500 }}>CHF 5</span></>
+                    <>{t('Monatlich')} <span style={{ fontSize: 12, fontWeight: 500 }}>CHF 5</span></>
                   ) : (
                     <>
                       Jährlich <span style={{ fontSize: 12, fontWeight: 500 }}>CHF 49</span>
@@ -229,7 +230,7 @@ interface ProGateProps {
 }
 
 export default function ProGate({ featureId, children, badge = false }: ProGateProps) {
-  const _t = useT(); void _t;
+  const t = useT();
   const { isPro } = usePlan();
   const [showModal, setShowModal] = useState(false);
   const [showSoon, setShowSoon] = useState(false);
@@ -278,7 +279,7 @@ export default function ProGate({ featureId, children, badge = false }: ProGateP
               <div style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.55)', marginBottom: 16 }}>
                 {feature.description}
               </div>
-              <button className="btn-glass btn-primary btn-sm" onClick={() => setShowSoon(false)}>Verstanden</button>
+              <button className="btn-glass btn-primary btn-sm" onClick={() => setShowSoon(false)}>{t('Verstanden')}</button>
             </div>
           </div>
         )}

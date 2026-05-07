@@ -29,7 +29,7 @@ const MAX_FILE_MB = 10;
 const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
 
 export default function DocumentUpload() {
-  const _t = useT(); void _t;
+  const t = useT();
   const { getActiveResume, uploadDocument, removeDocument, updateDocumentCategory, reorderDocuments, resumes } = useResumeStore();
   const resume = getActiveResume();
   const { limits } = usePlan();
@@ -93,7 +93,7 @@ export default function DocumentUpload() {
       {/* Storage bar */}
       <div style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)', marginBottom: 5 }}>
-          <span>Speicher</span>
+          <span>{t('Speicher')}</span>
           <span style={{ color: storageFullPct >= 1 ? 'var(--ios-red)' : storageFullPct >= 0.8 ? '#FF9F0A' : 'rgba(var(--rgb-fg),0.4)' }}>
             {formatBytes(totalUsedBytes)} / {limits.documentsMb} MB
           </span>

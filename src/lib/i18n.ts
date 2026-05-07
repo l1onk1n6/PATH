@@ -586,6 +586,9 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Wir legen dein erstes Profil an.': 'We\'ll create your first profile.',
     'Profil anlegen': 'Create profile',
     'Erstelle…': 'Creating…',
+    'Verstanden': 'Got it',
+    'Speicher': 'Storage',
+    'Foto': 'Photo',
     'Was PATH kann': 'What PATH can do',
     'Mit Beispieldaten starten': 'Start with sample data',
     'Empfohlen — du kannst alle Daten später bearbeiten':
