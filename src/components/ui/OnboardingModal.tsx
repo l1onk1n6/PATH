@@ -174,7 +174,7 @@ export default function OnboardingModal({ onClose }: Props) {
             <button className="btn-glass btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '13px', fontWeight: 700, gap: 8 }}
               disabled={!name.trim() || creating}
               onClick={handleCreate}>
-              {creating ? 'Erstelle…' : <>Profil anlegen <ArrowRight size={15} /></>}
+              {creating ? t('Erstelle…') : <>{t('Profil anlegen')} <ArrowRight size={15} /></>}
             </button>
             <button onClick={skip} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(var(--rgb-fg),0.3)', fontSize: 12, fontFamily: 'var(--font-sf)', width: '100%' }}>
               Überspringen
