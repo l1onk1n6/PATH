@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { UpgradeModal } from '../ui/ProGate';
 import { displayPersonName } from '../../lib/displayName';
 import { isSupabaseConfigured } from '../../lib/supabase';
+import { useT } from '../../lib/i18n';
 
 interface Props {
   isMobile?: boolean;
@@ -13,6 +14,7 @@ interface Props {
 }
 
 function SaveStatusPill({ isMobile }: { isMobile?: boolean }) {
+  const t = useT();
   const savePending = useResumeStore(s => s.savePending);
   const syncing     = useResumeStore(s => s.syncing);
   const cloudOn     = isSupabaseConfigured();
@@ -25,27 +27,27 @@ function SaveStatusPill({ isMobile }: { isMobile?: boolean }) {
     prevPendingRef.current = savePending;
     if (prev && !savePending) {
       setJustSaved(true);
-      const t = setTimeout(() => setJustSaved(false), 1600);
-      return () => clearTimeout(t);
+      const id = setTimeout(() => setJustSaved(false), 1600);
+      return () => clearTimeout(id);
     }
   }, [savePending]);
 
   let Icon: typeof Cloud = Cloud;
-  let text = 'Synchronisiert';
+  let text = t('Synchronisiert');
   let color = 'rgba(var(--rgb-fg),0.45)';
   let bg = 'transparent';
   let border = '1px solid transparent';
 
   if (!cloudOn) {
-    Icon = CloudOff; text = 'Lokal'; color = 'rgba(var(--rgb-fg),0.4)';
+    Icon = CloudOff; text = t('Lokal'); color = 'rgba(var(--rgb-fg),0.4)';
   } else if (syncing) {
-    Icon = Loader2; text = 'Synchronisiert…'; color = '#007AFF';
+    Icon = Loader2; text = t('Synchronisiert…'); color = '#007AFF';
     bg = 'rgba(0,122,255,0.1)'; border = '1px solid rgba(0,122,255,0.25)';
   } else if (savePending) {
-    Icon = Loader2; text = 'Speichert…'; color = '#FF9F0A';
+    Icon = Loader2; text = t('Speichert…'); color = '#FF9F0A';
     bg = 'rgba(255,159,10,0.1)'; border = '1px solid rgba(255,159,10,0.25)';
   } else if (justSaved) {
-    Icon = Check; text = 'Gespeichert'; color = '#34C759';
+    Icon = Check; text = t('Gespeichert'); color = '#34C759';
     bg = 'rgba(52,199,89,0.12)'; border = '1px solid rgba(52,199,89,0.3)';
   }
 
@@ -69,6 +71,7 @@ function SaveStatusPill({ isMobile }: { isMobile?: boolean }) {
 }
 
 export default function Header({ isMobile, onMenuToggle }: Props) {
+  const t = useT();
   const navigate = useNavigate();
   const location = useLocation();
   const { getActivePerson, getActiveResume } = useResumeStore();
@@ -79,18 +82,18 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
   const resume = getActiveResume();
 
   const pageTitle: Record<string, string> = {
-    '/': 'Dashboard',
-    '/editor': 'Editor',
-    '/preview': 'Vorschau',
-    '/account': 'Konto',
-    '/tracker': 'Bewerbungs-Tracker',
+    '/': t('Dashboard'),
+    '/editor': t('Editor'),
+    '/preview': t('Vorschau'),
+    '/account': t('Konto'),
+    '/tracker': t('Bewerbungs-Tracker'),
   };
 
   const title = pageTitle[location.pathname] ?? 'PATH';
   const personName = displayPersonName(person, resume);
   const subtitle = person
     ? `${personName}${resume?.personalInfo.title ? ` · ${resume.personalInfo.title}` : ''}`
-    : 'Kein Profil ausgewählt';
+    : t('Kein Profil ausgewählt');
 
   return (
     <header
@@ -111,7 +114,7 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
           <button
             className="btn-glass btn-icon"
             onClick={onMenuToggle}
-            aria-label="Menü öffnen"
+            aria-label={t('Menü öffnen')}
             style={{ padding: 8, flexShrink: 0, boxShadow: 'none' }}
           >
             <Menu size={18} />
@@ -146,7 +149,7 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
               : '1px solid rgba(var(--rgb-fg),0.15)',
             color: isPro ? '#FF9F0A' : 'rgba(var(--rgb-fg),0.45)',
           }}
-          title={isPro ? 'PATH Pro — alle Features aktiv' : 'Upgrade auf PATH Pro'}
+          title={isPro ? t('PATH Pro — alle Features aktiv') : t('Upgrade auf PATH Pro')}
         >
           {isPro && <Sparkles size={14} />}
           {isPro ? 'PRO' : plan.toUpperCase()}
@@ -156,14 +159,14 @@ export default function Header({ isMobile, onMenuToggle }: Props) {
           <>
             <button className="btn-glass btn-sm" onClick={() => navigate('/preview')}>
               <Eye size={18} />
-              {!isMobile && ' Vorschau'}
+              {!isMobile && ` ${t('Vorschau')}`}
             </button>
           </>
         )}
         {location.pathname === '/preview' && (
           <button className="btn-glass btn-sm" onClick={() => navigate('/editor')}>
             <Edit3 size={18} />
-            {!isMobile && ' Bearbeiten'}
+            {!isMobile && ` ${t('Bearbeiten')}`}
           </button>
         )}
       </div>

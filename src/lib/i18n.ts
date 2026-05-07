@@ -181,10 +181,16 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Lädt…': 'Loading…',
     'Verbinde…': 'Connecting…',
     'Synchronisiert': 'Synced',
+    'Synchronisiert…': 'Syncing…',
     'Speichert…': 'Saving…',
     'Gespeichert': 'Saved',
+    'Lokal': 'Local',
     'Offline': 'Offline',
     'Heute aktiv': 'Active today',
+    'Menü öffnen': 'Open menu',
+    'Kein Profil ausgewählt': 'No profile selected',
+    'PATH Pro — alle Features aktiv': 'PATH Pro — all features active',
+    'Upgrade auf PATH Pro': 'Upgrade to PATH Pro',
 
     // ── Dashboard (additional) ───────────────────────────
     'Vollständigkeit': 'Completeness',
