@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function VersionHistoryPanel({ resumeId }: Props) {
-  const _t = useT(); void _t;
+  const t = useT();
   const { resumes, updateResume } = useResumeStore();
   const resume = resumes.find(r => r.id === resumeId);
 
@@ -83,9 +83,9 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
             <History size={15} />
           </div>
           <div>
-            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>Versionshistorie</h2>
+            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{t('Versionshistorie')}</h2>
             <p style={{ margin: 0, fontSize: 12, color: 'rgba(var(--rgb-fg),0.4)', marginTop: 2 }}>
-              Bis zu 20 gespeicherte Versionen pro Mappe
+              {t('Bis zu 20 gespeicherte Versionen pro Mappe')}
             </p>
           </div>
         </div>
@@ -109,7 +109,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
           <div style={{ display: 'flex', gap: 8 }}>
             <input
               className="input-glass"
-              placeholder="Bezeichnung (optional, z.B. «vor Überarbeitung»)"
+              placeholder={t('Bezeichnung (optional, z.B. «vor Überarbeitung»)')}
               value={labelInput}
               onChange={e => setLabelInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSave()}
@@ -118,10 +118,10 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
             />
             <button className="btn-glass btn-sm btn-primary" onClick={handleSave} disabled={saving} style={{ gap: 5, flexShrink: 0 }}>
               {saving ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Plus size={12} />}
-              Speichern
+              {t('Speichern')}
             </button>
             <button className="btn-glass btn-sm" onClick={() => setShowLabel(false)} style={{ flexShrink: 0 }}>
-              Abbrechen
+              {t('Abbrechen')}
             </button>
           </div>
         ) : (
@@ -130,7 +130,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
             onClick={() => setShowLabel(true)}
             style={{ gap: 8, width: '100%', justifyContent: 'center', padding: '10px 16px' }}
           >
-            <Plus size={14} /> Aktuelle Version speichern
+            <Plus size={14} /> {t('Aktuelle Version speichern')}
           </button>
         )}
       </div>
@@ -138,13 +138,13 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
       {/* Version list */}
       {loading ? (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: 8, color: 'rgba(var(--rgb-fg),0.3)', fontSize: 13 }}>
-          <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Lädt…
+          <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> {t('Lädt…')}
         </div>
       ) : versions.length === 0 && !error ? (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: 'rgba(var(--rgb-fg),0.3)' }}>
           <Clock size={32} style={{ margin: '0 auto 12px', opacity: 0.4 }} />
-          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Noch keine Versionen gespeichert</div>
-          <div style={{ fontSize: 12 }}>Speichere manuell eine Version um Änderungen festzuhalten.</div>
+          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>{t('Noch keine Versionen gespeichert')}</div>
+          <div style={{ fontSize: 12 }}>{t('Speichere manuell eine Version um Änderungen festzuhalten.')}</div>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto' }}>
@@ -169,7 +169,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
               {/* Info */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: v.label ? 600 : 400, color: v.label ? '#fff' : 'rgba(var(--rgb-fg),0.65)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {v.label ?? 'Version'}
+                  {v.label ?? t('Version')}
                 </div>
                 <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.35)', marginTop: 2 }}>
                   {relativeTime(v.created_at)} · {new Date(v.created_at).toLocaleString('de-CH', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
@@ -189,10 +189,10 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
                       {restoring === v.id
                         ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />
                         : <RotateCcw size={12} />}
-                      Bestätigen
+                      {t('Bestätigen')}
                     </button>
                     <button className="btn-glass btn-sm" onClick={() => setConfirmId(null)} style={{ fontSize: 11 }}>
-                      Nein
+                      {t('Nein')}
                     </button>
                   </>
                 ) : (
@@ -200,7 +200,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
                     <button
                       className="btn-glass btn-sm"
                       onClick={() => setDiffVersion(v)}
-                      title="Mit aktuellem Stand vergleichen"
+                      title={t('Mit aktuellem Stand vergleichen')}
                       style={{ padding: '6px 8px' }}
                     >
                       <GitCompare size={14} />
@@ -208,7 +208,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
                     <button
                       className="btn-glass btn-sm"
                       onClick={() => setConfirmId(v.id)}
-                      title="Wiederherstellen"
+                      title={t('Wiederherstellen')}
                       style={{ padding: '6px 8px' }}
                     >
                       <RotateCcw size={14} />
@@ -216,7 +216,7 @@ export default function VersionHistoryPanel({ resumeId }: Props) {
                     <button
                       className="btn-glass btn-sm btn-danger"
                       onClick={() => handleDelete(v.id)}
-                      title="Löschen"
+                      title={t('Löschen')}
                       style={{ padding: '6px 8px' }}
                     >
                       <Trash2 size={14} />
