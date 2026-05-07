@@ -1,52 +1,57 @@
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { LogoIcon } from '../components/layout/Logo';
 import { useAuthStore } from '../store/authStore';
+import { useT } from '../lib/i18n';
 
 type AuthType = 'signup' | 'magiclink' | 'recovery' | 'invite' | 'unknown';
 type Status = 'loading' | 'success' | 'error';
 
-const CONFIG: Record<AuthType, { icon: string; title: string; subtitle: string; successTitle: string; successSubtitle: string }> = {
-  signup: {
-    icon: '✉️',
-    title: 'E-Mail wird bestätigt…',
-    subtitle: 'Bitte warte einen Moment.',
-    successTitle: 'E-Mail bestätigt!',
-    successSubtitle: 'Dein Konto ist jetzt aktiv. Du wirst weitergeleitet…',
-  },
-  magiclink: {
-    icon: '⚡',
-    title: 'Anmeldung läuft…',
-    subtitle: 'Du wirst gleich eingeloggt.',
-    successTitle: 'Erfolgreich angemeldet!',
-    successSubtitle: 'Du wirst zur App weitergeleitet…',
-  },
-  recovery: {
-    icon: '🔐',
-    title: 'Passwort-Reset wird vorbereitet…',
-    subtitle: 'Bitte warte einen Moment.',
-    successTitle: 'Bereit!',
-    successSubtitle: 'Du kannst jetzt dein neues Passwort setzen.',
-  },
-  invite: {
-    icon: '🎉',
-    title: 'Einladung wird verarbeitet…',
-    subtitle: 'Gleich kannst du dein Konto einrichten.',
-    successTitle: 'Einladung angenommen!',
-    successSubtitle: 'Du wirst weitergeleitet…',
-  },
-  unknown: {
-    icon: '🔗',
-    title: 'Wird verarbeitet…',
-    subtitle: 'Bitte warte einen Moment.',
-    successTitle: 'Fertig!',
-    successSubtitle: 'Du wirst weitergeleitet…',
-  },
+const ICONS: Record<AuthType, string> = {
+  signup: '✉️',
+  magiclink: '⚡',
+  recovery: '🔐',
+  invite: '🎉',
+  unknown: '🔗',
 };
 
 export default function AuthCallbackPage({ authType }: { authType: AuthType }) {
+  const t = useT();
   const { user, passwordRecovery, error } = useAuthStore();
 
-  const cfg = CONFIG[authType];
+  const config: Record<AuthType, { title: string; subtitle: string; successTitle: string; successSubtitle: string }> = {
+    signup: {
+      title: t('E-Mail wird bestätigt…'),
+      subtitle: t('Bitte warte einen Moment.'),
+      successTitle: t('E-Mail bestätigt!'),
+      successSubtitle: t('Dein Konto ist jetzt aktiv. Du wirst weitergeleitet…'),
+    },
+    magiclink: {
+      title: t('Anmeldung läuft…'),
+      subtitle: t('Du wirst gleich eingeloggt.'),
+      successTitle: t('Erfolgreich angemeldet!'),
+      successSubtitle: t('Du wirst zur App weitergeleitet…'),
+    },
+    recovery: {
+      title: t('Passwort-Reset wird vorbereitet…'),
+      subtitle: t('Bitte warte einen Moment.'),
+      successTitle: t('Bereit!'),
+      successSubtitle: t('Du kannst jetzt dein neues Passwort setzen.'),
+    },
+    invite: {
+      title: t('Einladung wird verarbeitet…'),
+      subtitle: t('Gleich kannst du dein Konto einrichten.'),
+      successTitle: t('Einladung angenommen!'),
+      successSubtitle: t('Du wirst weitergeleitet…'),
+    },
+    unknown: {
+      title: t('Wird verarbeitet…'),
+      subtitle: t('Bitte warte einen Moment.'),
+      successTitle: t('Fertig!'),
+      successSubtitle: t('Du wirst weitergeleitet…'),
+    },
+  };
+
+  const cfg = { ...config[authType], icon: ICONS[authType] };
 
   const status: Status = error
     ? 'error'
@@ -99,7 +104,7 @@ export default function AuthCallbackPage({ authType }: { authType: AuthType }) {
             <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.4)', margin: 0 }}>{cfg.successSubtitle}</p>
             {authType === 'recovery' && (
               <p style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.25)', marginTop: 16 }}>
-                Das Formular zum Passwort setzen erscheint gleich…
+                {t('Das Formular zum Passwort setzen erscheint gleich…')}
               </p>
             )}
           </>
@@ -115,16 +120,16 @@ export default function AuthCallbackPage({ authType }: { authType: AuthType }) {
             }}>
               <XCircle size={36} style={{ color: '#ff3b30' }} />
             </div>
-            <h2 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 8px', letterSpacing: '-0.3px' }}>Fehler aufgetreten</h2>
+            <h2 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 8px', letterSpacing: '-0.3px' }}>{t('Fehler aufgetreten')}</h2>
             <p style={{ fontSize: 13, color: 'rgba(255,59,48,0.8)', margin: '0 0 20px', lineHeight: 1.5 }}>
-              {errorMsg || 'Der Link ist ungültig oder abgelaufen.'}
+              {errorMsg || t('Der Link ist ungültig oder abgelaufen.')}
             </p>
             <button
               className="btn-glass"
               onClick={() => window.location.href = window.location.pathname}
               style={{ width: '100%', justifyContent: 'center', padding: '12px 20px' }}
             >
-              Zurück zur Anmeldung
+              {t('Zurück zur Anmeldung')}
             </button>
           </>
         )}
