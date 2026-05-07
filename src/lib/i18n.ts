@@ -154,6 +154,34 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Sitzung abgelaufen. Bitte melde dich erneut an.': 'Session expired. Please sign in again.',
     'Verbindungsfehler. Bitte prüfe deine Internetverbindung.': 'Connection error. Please check your internet connection.',
     'Zu viele Anfragen. Bitte warte einige Minuten.': 'Too many requests. Please wait a few minutes.',
+    'Bitte bestätige zuerst deine E-Mail-Adresse. Prüfe dein Postfach.':
+      'Please confirm your email address first. Check your inbox.',
+    'Diese E-Mail-Adresse ist ungültig.': 'This email address is invalid.',
+    'Die neue E-Mail-Adresse muss sich von der bisherigen unterscheiden.':
+      'The new email address must differ from the current one.',
+    'Das Passwort muss mindestens 6 Zeichen lang sein.':
+      'The password must be at least 6 characters long.',
+    'Das Passwort muss mindestens 8 Zeichen lang sein.':
+      'The password must be at least 8 characters long.',
+    'Das neue Passwort muss sich vom alten unterscheiden.':
+      'The new password must differ from the old one.',
+    'Der Link ist abgelaufen oder ungültig. Bitte fordere einen neuen an.':
+      'The link is expired or invalid. Please request a new one.',
+    'Der Link ist abgelaufen. Bitte fordere einen neuen an.':
+      'The link has expired. Please request a new one.',
+    'Der Link ist ungültig oder abgelaufen. Bitte fordere einen neuen an.':
+      'The link is invalid or has expired. Please request a new one.',
+    'Der Code ist abgelaufen. Bitte fordere einen neuen an.':
+      'The code has expired. Please request a new one.',
+    'Dieser Anmeldeweg ist nicht aktiviert.': 'This sign-in method is not enabled.',
+    'Zu viele E-Mails angefordert. Bitte warte einige Minuten.':
+      'Too many emails requested. Please wait a few minutes.',
+    'Zeitüberschreitung. Bitte versuche es erneut.': 'Request timed out. Please try again.',
+    'Die Registrierung ist momentan deaktiviert.': 'Sign-up is currently disabled.',
+    'Diese E-Mail-Adresse ist nicht zugelassen.': 'This email address is not allowed.',
+    'Kein Konto mit dieser E-Mail-Adresse gefunden.': 'No account found for this email address.',
+    'Anonyme Anmeldung ist nicht aktiviert.': 'Anonymous sign-in is not enabled.',
+    'Ein unbekannter Fehler ist aufgetreten.': 'An unknown error occurred.',
     'Wir haben dir einen Link zum Zurücksetzen deines Passworts geschickt. Bitte prüfe dein Postfach.': 'We sent you a link to reset your password. Please check your inbox.',
     'Gib deine E-Mail-Adresse ein. Wir senden dir einen Link zum Zurücksetzen.': 'Enter your email address. We will send you a reset link.',
     'Wir haben dir einen Anmeldelink an': 'We sent you a sign-in link to',
