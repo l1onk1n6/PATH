@@ -4,6 +4,7 @@ import { useResumeStore } from '../../store/resumeStore';
 import { usePlan } from '../../lib/plan';
 import { translateFields } from '../../lib/ai';
 import { userError } from '../../lib/userError';
+import { useT } from '../../lib/i18n';
 import { UpgradeModal } from '../ui/ProGate';
 import type { Resume } from '../../types/resume';
 
@@ -72,11 +73,12 @@ function applyTranslations(r: Resume, t: Record<string, string>): void {
 }
 
 export default function TranslateDialog({ onClose }: { onClose: () => void }) {
+  const t = useT();
   const { getActiveResume, updateResume } = useResumeStore();
   const { isPro } = usePlan();
   const resume = getActiveResume();
 
-  const [language, setLanguage] = useState('Englisch');
+  const [language, setLanguage] = useState<string>('Englisch');
   const [custom, setCustom]     = useState('');
   const [loading, setLoading]   = useState(false);
   const [done, setDone]         = useState(false);
@@ -95,7 +97,7 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
     const resumeId = resume!.id;
     const fields = collectFields(resume!);
     const count = Object.keys(fields).length;
-    if (count === 0) { setError('Kein übersetzbarer Text gefunden.'); setLoading(false); return; }
+    if (count === 0) { setError(t('Kein übersetzbarer Text gefunden.')); setLoading(false); return; }
 
     const translated = await translateFields(fields, lang);
     if (!translated) { setError(userError('Die Übersetzung hat nicht funktioniert')); setLoading(false); return; }
@@ -134,8 +136,8 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
               <Languages size={16} />
             </div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 15 }}>Lebenslauf übersetzen</div>
-              <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)' }}>Alle Textfelder werden übersetzt</div>
+              <div style={{ fontWeight: 700, fontSize: 15 }}>{t('Lebenslauf übersetzen')}</div>
+              <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)' }}>{t('Alle Textfelder werden übersetzt')}</div>
             </div>
           </div>
           <button className="btn-glass btn-icon" onClick={onClose} style={{ padding: 6 }}><X size={14} /></button>
@@ -144,12 +146,12 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
         {done ? (
           <div style={{ textAlign: 'center', padding: '20px 0' }}>
             <CheckCircle size={40} style={{ color: 'var(--ios-green)', margin: '0 auto 12px' }} />
-            <div style={{ fontWeight: 600 }}>Übersetzung abgeschlossen!</div>
+            <div style={{ fontWeight: 600 }}>{t('Übersetzung abgeschlossen!')}</div>
           </div>
         ) : (
           <>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 8, opacity: 0.7 }}>Zielsprache</label>
+              <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 8, opacity: 0.7 }}>{t('Zielsprache')}</label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {LANGUAGES.map(lang => (
                   <button key={lang} className="btn-glass btn-sm"
@@ -159,7 +161,7 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
                       background: language === lang ? 'rgba(0,122,255,0.25)' : 'rgba(var(--rgb-fg),0.07)',
                       border: language === lang ? '1px solid rgba(0,122,255,0.5)' : '1px solid rgba(var(--rgb-fg),0.12)',
                     }}>
-                    {lang}
+                    {t(lang)}
                   </button>
                 ))}
                 <button className="btn-glass btn-sm"
@@ -169,18 +171,17 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
                     background: language === 'Andere…' ? 'rgba(0,122,255,0.25)' : 'rgba(var(--rgb-fg),0.07)',
                     border: language === 'Andere…' ? '1px solid rgba(0,122,255,0.5)' : '1px solid rgba(var(--rgb-fg),0.12)',
                   }}>
-                  Andere…
+                  {t('Andere…')}
                 </button>
               </div>
               {language === 'Andere…' && (
-                <input className="input-glass" placeholder="Sprache eingeben…" value={custom}
+                <input className="input-glass" placeholder={t('Sprache eingeben…')} value={custom}
                   onChange={e => setCustom(e.target.value)} style={{ marginTop: 8, width: '100%', fontSize: 13 }} autoFocus />
               )}
             </div>
 
             <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.4)', marginBottom: 16, padding: '8px 12px', background: 'rgba(var(--rgb-fg),0.04)', borderRadius: 8 }}>
-              Übersetzt: Zusammenfassung, Berufserfahrung, Ausbildung, Projekte, eigene Sektionen, Anschreiben.
-              Namen, Daten und Kontaktdaten bleiben unverändert.
+              {t('Übersetzt: Zusammenfassung, Berufserfahrung, Ausbildung, Projekte, eigene Sektionen, Anschreiben. Namen, Daten und Kontaktdaten bleiben unverändert.')}
             </div>
 
             {error && <div style={{ fontSize: 12, color: 'var(--ios-red)', marginBottom: 12 }}>{error}</div>}
@@ -188,8 +189,8 @@ export default function TranslateDialog({ onClose }: { onClose: () => void }) {
             <button className="btn-glass btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '11px', fontWeight: 700 }}
               onClick={handleTranslate} disabled={loading || (!targetLang.trim())}>
               {loading
-                ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> Übersetze…</>
-                : <><Languages size={15} /> Jetzt übersetzen</>}
+                ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> {t('Übersetze…')}</>
+                : <><Languages size={15} /> {t('Jetzt übersetzen')}</>}
             </button>
           </>
         )}
