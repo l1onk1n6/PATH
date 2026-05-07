@@ -106,8 +106,8 @@ export default function ProjectsEditor() {
                     const snapshot = project;
                     const idx = i;
                     removeProject(resume.id, project.id);
-                    const label = project.name || 'Projekt';
-                    showUndo(`Projekt «${label}» gelöscht`, () => restoreItemAt(resume.id, 'projects', snapshot, idx));
+                    const label = project.name || t('Projekt');
+                    showUndo(t('Projekt «{label}» gelöscht').replace('{label}', label), () => restoreItemAt(resume.id, 'projects', snapshot, idx));
                   }}
                   style={{ padding: 6 }}
                 >

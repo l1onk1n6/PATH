@@ -82,8 +82,8 @@ export default function EducationEditor() {
                   const snapshot = edu;
                   const idx = resume.education.findIndex(x => x.id === edu.id);
                   removeEducation(resume.id, edu.id);
-                  const label = edu.institution || edu.degree || 'Eintrag';
-                  showUndo(`Ausbildung «${label}» gelöscht`, () => restoreItemAt(resume.id, 'education', snapshot, idx));
+                  const label = edu.institution || edu.degree || t('Eintrag');
+                  showUndo(t('Ausbildung «{label}» gelöscht').replace('{label}', label), () => restoreItemAt(resume.id, 'education', snapshot, idx));
                 }}
                 style={{ padding: 6 }}
               >
