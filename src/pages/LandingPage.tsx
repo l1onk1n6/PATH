@@ -206,7 +206,7 @@ export default function LandingPage() {
           }}
             onMouseEnter={e => { e.currentTarget.style.background = '#007AFF'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,122,255,0.9)'; e.currentTarget.style.transform = 'none'; }}>
-            Kostenlos starten
+            {t('Kostenlos starten')}
           </button>
         </div>
       </nav>
@@ -299,7 +299,7 @@ export default function LandingPage() {
             background: 'rgba(175,82,222,0.15)', border: '1px solid rgba(175,82,222,0.3)',
             color: '#CF9FFF', marginBottom: 28, letterSpacing: '0.04em',
           }}>
-            <Sparkles size={12} /> KI-gestützte Bewerbungsmappe
+            <Sparkles size={12} /> {t('KI-gestützte Bewerbungsmappe')}
           </div>
 
           <h1 style={{
@@ -309,16 +309,16 @@ export default function LandingPage() {
             lineHeight: 1.08,
             letterSpacing: '-1.5px',
           }}>
-            Dein Lebenslauf.{' '}
+            {t('Dein Lebenslauf.')}{' '}
             <span style={{
               background: 'linear-gradient(135deg, #007AFF 0%, #5AC8FA 50%, #34C759 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
             }}>
-              Professionell.
+              {t('Professionell.')}
             </span>
-            <br />In Minuten.
+            <br />{t('In Minuten.')}
           </h1>
 
           <p style={{
@@ -328,8 +328,7 @@ export default function LandingPage() {
             lineHeight: 1.65,
             maxWidth: 480,
           }}>
-            PATH hilft dir, überzeugende Bewerbungsunterlagen zu erstellen —
-            mit modernen Vorlagen, KI-Unterstützung und PDF-Export mit einem Klick.
+            {t('PATH hilft dir, überzeugende Bewerbungsunterlagen zu erstellen — mit modernen Vorlagen, KI-Unterstützung und PDF-Export mit einem Klick.')}
           </p>
 
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -356,7 +355,7 @@ export default function LandingPage() {
             }}
               onMouseEnter={e => { e.currentTarget.style.background = 'rgba(var(--rgb-fg),0.13)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'rgba(var(--rgb-fg),0.08)'; e.currentTarget.style.transform = 'none'; }}>
-              Preise ansehen
+              {t('Preise ansehen')}
             </button>
           </div>
 
@@ -403,10 +402,10 @@ export default function LandingPage() {
       <section id="features" style={{ padding: isMobile ? '80px 24px' : '100px 48px', maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 60 }}>
           <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
-            Alles was du brauchst
+            {t('Alles was du brauchst')}
           </h2>
           <p style={{ fontSize: 17, color: 'rgba(var(--rgb-fg),0.5)', margin: 0, maxWidth: 520, marginInline: 'auto', lineHeight: 1.6 }}>
-            Von der ersten Idee bis zum fertigen PDF — PATH begleitet dich durch den gesamten Bewerbungsprozess.
+            {t('Von der ersten Idee bis zum fertigen PDF — PATH begleitet dich durch den gesamten Bewerbungsprozess.')}
           </p>
         </div>
 
@@ -452,10 +451,10 @@ export default function LandingPage() {
               <Brain size={14} /> POWERED BY CLAUDE AI
             </div>
             <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
-              KI übernimmt die schwere Arbeit
+              {t('KI übernimmt die schwere Arbeit')}
             </h2>
             <p style={{ fontSize: 17, color: 'rgba(var(--rgb-fg),0.5)', margin: 0, maxWidth: 520, marginInline: 'auto', lineHeight: 1.6 }}>
-              Claude AI – eines der leistungsfähigsten Sprachmodelle der Welt – ist direkt in PATH integriert.
+              {t('Claude AI – eines der leistungsfähigsten Sprachmodelle der Welt – ist direkt in PATH integriert.')}
             </p>
           </div>
 
@@ -494,10 +493,10 @@ export default function LandingPage() {
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 60 }}>
             <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
-              In 4 Schritten zur Bewerbung
+              {t('In 4 Schritten zur Bewerbung')}
             </h2>
             <p style={{ fontSize: 17, color: 'rgba(var(--rgb-fg),0.5)', margin: 0, lineHeight: 1.6 }}>
-              Einfach und schnell — ohne komplizierte Software.
+              {t('Einfach und schnell — ohne komplizierte Software.')}
             </p>
           </div>
 
@@ -572,16 +571,16 @@ export default function LandingPage() {
           </div>
 
           <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
-            PATH kommt auf{' '}
+            {t('PATH kommt auf')}{' '}
             <span style={{
               background: 'linear-gradient(135deg, #34C759 0%, #007AFF 100%)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
             }}>
-              Android & iOS
+              {t('Android & iOS')}
             </span>
           </h2>
           <p style={{ fontSize: 17, color: 'rgba(var(--rgb-fg),0.5)', margin: '0 auto 52px', maxWidth: 520, lineHeight: 1.65 }}>
-            Alle deine Bewerbungsunterlagen immer dabei — bearbeiten, exportieren und teilen, direkt vom Handy.
+            {t('Alle deine Bewerbungsunterlagen immer dabei — bearbeiten, exportieren und teilen, direkt vom Handy.')}
           </p>
 
           {/* Platform cards */}
@@ -756,10 +755,10 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
     <section id="pricing" style={{ padding: isMobile ? '80px 24px' : '100px 48px', maxWidth: 1000, margin: '0 auto' }}>
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
         <h2 style={{ fontSize: isMobile ? 30 : 42, fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.8px' }}>
-          Transparent & fair
+          {t('Transparent & fair')}
         </h2>
         <p style={{ fontSize: 17, color: 'rgba(var(--rgb-fg),0.5)', margin: '0 0 28px', lineHeight: 1.6 }}>
-          Kostenlos starten, bei Bedarf upgraden. Jederzeit kündbar.
+          {t('Kostenlos starten, bei Bedarf upgraden. Jederzeit kündbar.')}
         </p>
 
         {/* Billing Toggle */}
@@ -807,7 +806,7 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
           }}
             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(var(--rgb-fg),0.13)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'rgba(var(--rgb-fg),0.08)')}>
-            Kostenlos starten
+            {t('Kostenlos starten')}
           </button>
         </div>
 
