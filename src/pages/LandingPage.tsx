@@ -605,7 +605,7 @@ export default function LandingPage() {
                 <AndroidIcon />
               </div>
               <div>
-                <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 6 }}>Android</div>
+                <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 6 }}>{t('Android')}</div>
                 <div style={{ fontSize: 14, color: 'rgba(var(--rgb-fg),0.5)', lineHeight: 1.5 }}>{t('Google Play Store')}</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', textAlign: 'left' }}>
@@ -776,8 +776,8 @@ function PricingSection({ isMobile, onRegister }: { isMobile: boolean; onRegiste
                 display: 'flex', alignItems: 'center', gap: 7,
               }}
             >
-              {b === 'monthly' ? 'Monatlich' : (
-                <>Jährlich <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: 'rgba(52,199,89,0.3)', color: '#34C759', border: '1px solid rgba(52,199,89,0.4)' }}>−18%</span></>
+              {b === 'monthly' ? t('Monatlich') : (
+                <>{t('Jährlich')} <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: 'rgba(52,199,89,0.3)', color: '#34C759', border: '1px solid rgba(52,199,89,0.4)' }}>−18%</span></>
               )}
             </button>
           ))}
@@ -924,7 +924,7 @@ function MockAppPreview() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
           <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #34C759, #00C7BE)', flexShrink: 0 }} />
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700 }}>Max Mustermann</div>
+            <div style={{ fontSize: 13, fontWeight: 700 }}>{t('Max Mustermann')}</div>
             <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)' }}>{t('Softwareentwickler')}</div>
           </div>
           <div style={{ marginLeft: 'auto', fontSize: 10, padding: '3px 8px', borderRadius: 99, background: 'rgba(0,122,255,0.15)', border: '1px solid rgba(0,122,255,0.25)', color: 'var(--ios-blue)' }}>

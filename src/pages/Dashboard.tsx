@@ -487,7 +487,7 @@ export default function Dashboard() {
                         )}
                       </div>
                       {isPersonFrozen ? (
-                        <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.35)', marginTop: 2 }}>Upgrade auf Pro zum Bearbeiten</div>
+                        <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.35)', marginTop: 2 }}>{t('Upgrade auf Pro zum Bearbeiten')}</div>
                       ) : personResumes[0]?.personalInfo.title ? (
                         <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {personResumes[0].personalInfo.title}
