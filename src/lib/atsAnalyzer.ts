@@ -1,5 +1,6 @@
 import type { Resume } from '../types/resume';
 import { parseBulletLines } from '../components/templates/pdf/shared-utils';
+import { tr } from './i18n';
 
 /**
  * Sehr einfacher client-seitiger ATS-Analyzer:
@@ -75,7 +76,7 @@ export interface AtsAnalysis {
 export function analyzeAts(resume: Resume, jobDescription: string): AtsAnalysis {
   const jd = tokenize(jobDescription);
   if (jd.length === 0) {
-    return { score: 0, matched: [], missing: [], tips: ['Job-Beschreibung ist zu kurz oder leer.'], totalJdKeywords: 0 };
+    return { score: 0, matched: [], missing: [], tips: [tr('Job-Beschreibung ist zu kurz oder leer.')], totalJdKeywords: 0 };
   }
 
   const jdFreq = freq(jd);
@@ -107,23 +108,23 @@ export function analyzeAts(resume: Resume, jobDescription: string): AtsAnalysis 
   // Tipps
   const tips: string[] = [];
   if (score >= 80) {
-    tips.push('Sehr gute Übereinstimmung — der Lebenslauf passt thematisch sauber zur Stelle.');
+    tips.push(tr('Sehr gute Übereinstimmung — der Lebenslauf passt thematisch sauber zur Stelle.'));
   } else if (score >= 60) {
-    tips.push('Solide Basis. Ergaenze die unten gelisteten Keywords dort wo sie inhaltlich passen.');
+    tips.push(tr('Solide Basis. Ergaenze die unten gelisteten Keywords dort wo sie inhaltlich passen.'));
   } else if (score >= 40) {
-    tips.push('Mittlere Übereinstimmung. Fokussiere die Berufserfahrung-Beschreibungen auf die fehlenden Begriffe.');
+    tips.push(tr('Mittlere Übereinstimmung. Fokussiere die Berufserfahrung-Beschreibungen auf die fehlenden Begriffe.'));
   } else {
-    tips.push('Geringe Übereinstimmung. Pruefe ob die Stelle wirklich zu deinem Profil passt — oder ueberarbeite Summary, Skills und Aufgabenbeschreibungen mit den Begriffen aus der JD.');
+    tips.push(tr('Geringe Übereinstimmung. Pruefe ob die Stelle wirklich zu deinem Profil passt — oder ueberarbeite Summary, Skills und Aufgabenbeschreibungen mit den Begriffen aus der JD.'));
   }
   if (missing.length > 0) {
     const top3 = missing.slice(0, 3).map(m => m.keyword).join(', ');
     tips.push(`Hochfrequent in der JD aber im CV nicht erwaehnt: ${top3}.`);
   }
   if (resume.skills.length < 5) {
-    tips.push('Skills-Sektion ist sehr kurz — viele ATS-Systeme parsen Skills bevorzugt aus dieser Sektion.');
+    tips.push(tr('Skills-Sektion ist sehr kurz — viele ATS-Systeme parsen Skills bevorzugt aus dieser Sektion.'));
   }
   if (!resume.personalInfo.summary || resume.personalInfo.summary.length < 80) {
-    tips.push('Eine 2–3 Zeilen Kurzzusammenfassung oben erhoeht den Match deutlich, weil Keywords prominent platziert sind.');
+    tips.push(tr('Eine 2–3 Zeilen Kurzzusammenfassung oben erhoeht den Match deutlich, weil Keywords prominent platziert sind.'));
   }
 
   return { score, matched, missing, tips, totalJdKeywords: top.length };

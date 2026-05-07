@@ -248,6 +248,20 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Lädt {n} Datei hoch…': 'Uploading {n} file…',
     'Lädt {n} Dateien hoch…': 'Uploading {n} files…',
     'Upload fehlgeschlagen': 'Upload failed',
+    'Bewerbung löschen?': 'Delete application?',
+    'Job-Beschreibung ist zu kurz oder leer.': 'Job description is too short or empty.',
+    'Sehr gute Übereinstimmung — der Lebenslauf passt thematisch sauber zur Stelle.':
+      'Very good match — the resume matches the role thematically.',
+    'Solide Basis. Ergaenze die unten gelisteten Keywords dort wo sie inhaltlich passen.':
+      'Solid base. Add the listed keywords where they fit contextually.',
+    'Mittlere Übereinstimmung. Fokussiere die Berufserfahrung-Beschreibungen auf die fehlenden Begriffe.':
+      'Medium match. Focus the work experience descriptions on the missing terms.',
+    'Geringe Übereinstimmung. Pruefe ob die Stelle wirklich zu deinem Profil passt — oder ueberarbeite Summary, Skills und Aufgabenbeschreibungen mit den Begriffen aus der JD.':
+      'Low match. Check whether the role actually fits your profile — or revise summary, skills and task descriptions with the terms from the JD.',
+    'Skills-Sektion ist sehr kurz — viele ATS-Systeme parsen Skills bevorzugt aus dieser Sektion.':
+      'Skills section is very short — many ATS systems prefer to parse skills from this section.',
+    'Eine 2–3 Zeilen Kurzzusammenfassung oben erhoeht den Match deutlich, weil Keywords prominent platziert sind.':
+      'A 2–3 line summary at the top significantly improves the match because keywords are placed prominently.',
     'Weiter': 'Next',
     'Zurück zur Liste': 'Back to list',
     'Keine Daten': 'No data',
