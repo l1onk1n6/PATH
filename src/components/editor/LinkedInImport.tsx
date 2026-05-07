@@ -47,7 +47,7 @@ export default function LinkedInImportDialog({ onClose }: Props) {
     setError('');
     try {
       const supabase = getSupabase();
-      if (!supabase) throw new Error('Supabase nicht konfiguriert');
+      if (!supabase) throw new Error(t('Supabase nicht konfiguriert'));
 
       const { data, error: fnError } = await supabase.functions.invoke('parse-linkedin', {
         body: { text },

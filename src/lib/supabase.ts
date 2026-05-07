@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { tr } from './i18n';
 
 // Werte entweder aus Build-Zeit-Env-Vars oder aus localStorage (Setup-Seite)
 function getConfig() {
@@ -33,7 +34,7 @@ let _client: ReturnType<typeof createClient> | null = null;
 export function getSupabase() {
   if (_client) return _client;
   const { url, key } = getConfig();
-  if (!url || !key) throw new Error('Supabase nicht konfiguriert');
+  if (!url || !key) throw new Error(tr('Supabase nicht konfiguriert'));
   _client = createClient(url, key);
   return _client;
 }
