@@ -1,4 +1,5 @@
 import type { EditorSection } from '../types/resume';
+import { updateUserPrefs } from './userPrefs';
 
 const STORAGE_KEY = 'path-section-order';
 
@@ -31,6 +32,14 @@ export function getSectionOrder(knownIds: EditorSection[]): EditorSection[] {
 }
 
 export function setSectionOrder(order: EditorSection[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
+  } catch { /* storage voll */ }
+  updateUserPrefs({ sectionOrder: order });
+}
+
+/** Aus Cloud-Prefs uebernehmen, ohne erneut zurueckzupushen. */
+export function applyCloudSectionOrder(order: EditorSection[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
   } catch { /* storage voll */ }

@@ -18,6 +18,7 @@ import AccountPage from './pages/AccountPage';
 import Tracker from './pages/Tracker';
 import { useAuthStore } from './store/authStore';
 import { useResumeStore } from './store/resumeStore';
+import { useTrackerStore } from './store/trackerStore';
 import { isSupabaseConfigured, getSupabase } from './lib/supabase';
 import { useIsMobile } from './hooks/useBreakpoint';
 import OnboardingModal from './components/ui/OnboardingModal';
@@ -249,6 +250,7 @@ export default function App() {
   const t = useT();
   const { user, loading, initialize, passwordRecovery } = useAuthStore();
   const { syncFromCloud } = useResumeStore();
+  const syncTracker = useTrackerStore(s => s.syncFromCloud);
   const [authType] = useState(() => getAuthTypeFromUrl());
 
   // Pre-Rendering-Modus (scripts/prerender.mjs setzt ?prerender=1):
@@ -266,8 +268,11 @@ export default function App() {
   }, [initialize, isPrerender]);
 
   useEffect(() => {
-    if (user && !passwordRecovery) syncFromCloud();
-  }, [user, passwordRecovery, syncFromCloud]);
+    if (user && !passwordRecovery) {
+      syncFromCloud();
+      syncTracker();
+    }
+  }, [user, passwordRecovery, syncFromCloud, syncTracker]);
 
   // RevenueCat auf der nativen App mit Supabase-User-ID verknuepfen, damit
   // Pro-Entitlements pro User getrackt werden und nach (Re-)Login der Status
