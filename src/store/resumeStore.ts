@@ -10,6 +10,9 @@ import * as db from '../lib/db';
 import { LIMITS, getPlanFromMetadata } from '../lib/plan';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 import { tr } from '../lib/i18n';
+import { fetchUserPrefs, updateUserPrefs } from '../lib/userPrefs';
+import { applyCloudLocale } from '../lib/i18n';
+import { applyCloudSectionOrder } from '../lib/sectionOrder';
 
 async function getCurrentPlan() {
   if (!isSupabaseConfigured()) return 'free' as const;
@@ -158,9 +161,13 @@ export const useResumeStore = create<ResumeStore>()(
         notifySaving = (v) => set({ savePending: v });
         set({ syncing: true });
         try {
-          const [cloudPersons, cloudResumes, cloudDocs] = await Promise.all([
-            db.fetchPersons(), db.fetchResumes(), db.fetchDocuments(),
+          const [cloudPersons, cloudResumes, cloudDocs, prefs] = await Promise.all([
+            db.fetchPersons(), db.fetchResumes(), db.fetchDocuments(), fetchUserPrefs(),
           ]);
+
+          // Geräteübergreifende Präferenzen anwenden (lokale Werte überschreiben).
+          if (prefs.locale === 'de' || prefs.locale === 'en') applyCloudLocale(prefs.locale);
+          if (Array.isArray(prefs.sectionOrder)) applyCloudSectionOrder(prefs.sectionOrder);
 
           // Lazy-Migration: Altbestand mit base64 data_url in Storage verschieben.
           // Laeuft asynchron im Hintergrund, blockiert den Sync nicht.
@@ -200,22 +207,36 @@ export const useResumeStore = create<ResumeStore>()(
               documents: cloudDocs.filter(d => d.resumeId === r.id).map(({ resumeId: _rid, ...d }) => d),
             }));
             // Falls noch keine Auswahl existiert (z.B. Erstanmeldung auf einem
-            // neuen Geraet), die erste Person + deren gespeicherten oder ersten
-            // Lebenslauf aktiv setzen, damit Editor/Vorschau direkt Inhalt haben.
+            // neuen Geraet), zuerst Cloud-Preferenz versuchen, dann lokal,
+            // dann erste verfuegbare Person/Resume.
             const current = get();
-            const keepPerson = persons.some(p => p.id === current.activePersonId);
-            const keepResume = resumes.some(r => r.id === current.activeResumeId);
-            const firstPerson = keepPerson ? null : persons[0] ?? null;
-            const firstResumeOfPerson = firstPerson
-              ? resumes.find(r => r.id === firstPerson.activeResumeId)
-                ?? resumes.find(r => r.personId === firstPerson.id)
-                ?? null
-              : null;
+            const cloudPersonValid = prefs.activePersonId && persons.some(p => p.id === prefs.activePersonId);
+            const cloudResumeValid = prefs.activeResumeId && resumes.some(r => r.id === prefs.activeResumeId);
+            const localPersonValid = persons.some(p => p.id === current.activePersonId);
+            const localResumeValid = resumes.some(r => r.id === current.activeResumeId);
+
+            const personId = cloudPersonValid
+              ? prefs.activePersonId!
+              : localPersonValid
+                ? current.activePersonId!
+                : persons[0]?.id ?? null;
+
+            const resumeId = cloudResumeValid
+              ? prefs.activeResumeId!
+              : localResumeValid
+                ? current.activeResumeId!
+                : (() => {
+                    const p = persons.find(x => x.id === personId);
+                    return p ? (resumes.find(r => r.id === p.activeResumeId)?.id
+                      ?? resumes.find(r => r.personId === p.id)?.id
+                      ?? null) : null;
+                  })();
+
             set({
               persons,
               resumes,
-              activePersonId: keepPerson ? current.activePersonId : firstPerson?.id ?? null,
-              activeResumeId: keepResume ? current.activeResumeId : firstResumeOfPerson?.id ?? null,
+              activePersonId: personId,
+              activeResumeId: resumeId,
             });
           }
         } finally {
@@ -262,7 +283,9 @@ export const useResumeStore = create<ResumeStore>()(
 
       setActivePerson: (id) => {
         const person = get().persons.find((p) => p.id === id);
-        set({ activePersonId: id, activeResumeId: person?.activeResumeId ?? null });
+        const resumeId = person?.activeResumeId ?? null;
+        set({ activePersonId: id, activeResumeId: resumeId });
+        updateUserPrefs({ activePersonId: id, activeResumeId: resumeId });
       },
 
       // ── Resumes ─────────────────────────────────────────
@@ -330,6 +353,7 @@ export const useResumeStore = create<ResumeStore>()(
         const resume = get().resumes.find(r => r.id === id);
         if (!resume) return;
         set((s) => ({ activeResumeId: id, persons: s.persons.map(p => p.id === resume.personId ? { ...p, activeResumeId: id } : p) }));
+        updateUserPrefs({ activePersonId: resume.personId, activeResumeId: id });
       },
 
       duplicateResume: (id) => {

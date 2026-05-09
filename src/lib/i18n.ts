@@ -11,6 +11,7 @@
  * bricht.
  */
 import { create } from 'zustand';
+import { updateUserPrefs } from './userPrefs';
 
 export type Locale = 'de' | 'en';
 
@@ -1215,8 +1216,16 @@ export const useI18n = create<I18nStore>((set) => ({
     try { localStorage.setItem(STORAGE_KEY, locale); } catch { /* ignore */ }
     document.documentElement.setAttribute('lang', locale);
     set({ locale });
+    updateUserPrefs({ locale });
   },
 }));
+
+/** Aus Cloud-Prefs uebernehmen, ohne erneut zurueckzupushen. */
+export function applyCloudLocale(locale: Locale) {
+  try { localStorage.setItem(STORAGE_KEY, locale); } catch { /* ignore */ }
+  document.documentElement.setAttribute('lang', locale);
+  useI18n.setState({ locale });
+}
 
 /**
  * Reaktive Translator-Funktion fuer Komponenten. Liefert eine Function,

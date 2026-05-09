@@ -5,6 +5,7 @@
  */
 import { getSupabase, isSupabaseConfigured } from './supabase';
 import type { Person, Resume, UploadedDocument, ApplicationStatus } from '../types/resume';
+import type { Application } from '../store/trackerStore';
 
 function sb() {
   return getSupabase();
@@ -266,6 +267,68 @@ export async function migrateDocumentToStorage(_resumeId: string, doc: UploadedD
     console.warn('[db] migrateDocumentToStorage', e);
     return null;
   }
+}
+
+// ── Applications (Bewerbungs-Tracker) ──────────────────────
+
+export async function fetchApplications(): Promise<Application[]> {
+  if (!isSupabaseConfigured()) return [];
+  try {
+    const { data, error } = await sb().from('applications').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data ?? []).map(rowToApplication);
+  } catch (e) {
+    console.warn('[db] fetchApplications', e);
+    return [];
+  }
+}
+
+export async function upsertApplication(app: Application): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  try {
+    const uid = await userId();
+    if (!uid) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (sb().from('applications') as any).upsert({
+      id: app.id,
+      user_id: uid,
+      company: app.company,
+      position: app.position,
+      status: app.status,
+      type: app.type,
+      applied_date: app.appliedDate,
+      deadline: app.deadline,
+      notes: app.notes,
+      url: app.url,
+      resume_id: app.resumeId,
+    });
+  } catch (e) {
+    console.warn('[db] upsertApplication', e);
+  }
+}
+
+export async function deleteApplication(id: string): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  try {
+    await sb().from('applications').delete().eq('id', id);
+  } catch (e) {
+    console.warn('[db] deleteApplication', e);
+  }
+}
+
+function rowToApplication(row: Record<string, unknown>): Application {
+  return {
+    id: row.id as string,
+    company: (row.company as string) ?? '',
+    position: (row.position as string) ?? '',
+    status: ((row.status as Application['status']) ?? 'offen'),
+    type: ((row.type as Application['type']) ?? 'online'),
+    appliedDate: (row.applied_date as string) ?? '',
+    deadline: (row.deadline as string) ?? '',
+    notes: (row.notes as string) ?? '',
+    url: (row.url as string) ?? '',
+    resumeId: (row.resume_id as string) ?? '',
+  };
 }
 
 // ── Row mappers ────────────────────────────────────────────
