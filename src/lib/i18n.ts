@@ -880,7 +880,6 @@ const TRANSLATIONS: Record<Locale, Record<string, string>> = {
     'Projekte hinzufügen': 'Add projects',
     'Berufserfahrung hinzufügen': 'Add work experience',
     'Entfernen': 'Remove',
-    'Aktionen': 'Actions',
     'Zertifikate hinzufügen': 'Add certificates',
     'Seitenleiste einblenden': 'Show sidebar',
     'Ausbildung hinzufügen': 'Add education',
