@@ -183,7 +183,7 @@ function PlanSection() {
               PATH {isPro ? 'Pro' : 'Free'}
               {isGift && (
                 <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'rgba(52,199,89,0.15)', border: '1px solid rgba(52,199,89,0.3)', color: 'var(--ios-green)' }}>
-                  Geschenkt ✦
+                  {t('Geschenkt')} ✦
                 </span>
               )}
             </div>
@@ -193,10 +193,11 @@ function PlanSection() {
             {isPro && !isGift && (() => {
               const ts = user?.user_metadata?.subscription_period_end as number | undefined;
               if (!ts) return null;
-              const date = new Date(ts * 1000).toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
+              const locale = useI18n.getState().locale === 'en' ? 'en-GB' : 'de-CH';
+              const date = new Date(ts * 1000).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
               return (
                 <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.3)', marginTop: 4 }}>
-                  Verlängert am {date}
+                  {t('Verlängert am {date}').replace('{date}', date)}
                 </div>
               );
             })()}
@@ -238,7 +239,7 @@ function PlanSection() {
                 border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A',
               }}
             >
-              <Sparkles size={14} /> Upgrade
+              <Sparkles size={14} /> {t('Upgrade')}
             </button>
           ) : null}
         </div>
@@ -305,7 +306,7 @@ function PlanSection() {
             return (
               <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span style={{ fontSize: 15, opacity: status === 'soon' ? 0.4 : 1 }}>{f.icon}</span>
-                <span style={{ fontSize: 13, flex: 1, opacity: status === 'soon' ? 0.4 : 1 }}>{f.label}</span>
+                <span style={{ fontSize: 13, flex: 1, opacity: status === 'soon' ? 0.4 : 1 }}>{t(f.label)}</span>
                 <span style={{
                   fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4,
                   background: status === 'active'
@@ -665,14 +666,14 @@ function AccountSection() {
       <div className="glass-card" style={{ padding: 20 }}>
         <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, opacity: 0.6 }}>{t('APP-TOUR')}</div>
         <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.5)', marginBottom: 12 }}>
-          Zeige die Einführungstour erneut an.
+          {t('Zeige die Einführungstour erneut an.')}
         </p>
         <button
           className="btn-glass btn-sm"
           onClick={() => { resetOnboarding(); navigate('/'); }}
           style={{ gap: 6 }}
         >
-          <PlayCircle size={14} /> Tour neu starten
+          <PlayCircle size={14} /> {t('Tour neu starten')}
         </button>
       </div>
 
@@ -690,7 +691,7 @@ function AccountSection() {
           onClick={() => signOut()}
           style={{ gap: 6 }}
         >
-          <LogOut size={14} /> Abmelden
+          <LogOut size={14} /> {t('Abmelden')}
         </button>
       </div>
     </div>
@@ -790,7 +791,7 @@ function ReferralSection() {
       <div className="glass-card" style={{ padding: 20, background: 'rgba(0,122,255,0.06)', border: '1px solid rgba(0,122,255,0.2)' }}>
         <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>{t('Freunde einladen, 1 Monat gratis')}</div>
         <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.55)', lineHeight: 1.65, margin: 0 }}>
-          Teile deinen persönlichen Link. Wenn sich jemand über deinen Link registriert und ein Pro-Abo abschliesst, bekommst du automatisch CHF 5.00 auf dein Konto gutgeschrieben.
+          {t('Teile deinen persönlichen Link. Wenn sich jemand über deinen Link registriert und ein Pro-Abo abschliesst, bekommst du automatisch CHF 5.00 auf dein Konto gutgeschrieben.')}
         </p>
       </div>
 
@@ -883,14 +884,14 @@ function PrivacySection() {
           {t('Lade alle deine Daten als JSON-Datei herunter. Dokumentenanhänge (Base64) werden aus Datenschutzgründen nicht mitexportiert.')}
         </p>
         <button className="btn-glass btn-sm" onClick={exportGdprData} style={{ gap: 6 }}>
-          <Download size={14} /> Daten herunterladen
+          <Download size={14} /> {t('Daten herunterladen')}
         </button>
       </div>
 
 
       <div className="glass-card" style={{ padding: 20, border: '1px solid rgba(255,59,48,0.2)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 600, marginBottom: 8, color: 'var(--ios-red)', opacity: 0.9 }}>
-          <AlertTriangle size={14} /> GEFAHRENZONE
+          <AlertTriangle size={14} /> {t('GEFAHRENZONE')}
         </div>
         <p style={{ fontSize: 13, color: 'rgba(var(--rgb-fg),0.45)', marginBottom: 12 }}>
           {t('Zum Löschen deines Kontos kontaktiere uns bitte direkt — wir entfernen alle Daten innerhalb von 30 Tagen.')}
@@ -900,7 +901,7 @@ function PrivacySection() {
           className="btn-glass btn-danger"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 8, textDecoration: 'none', fontSize: 13, padding: '8px 14px' }}
         >
-          <Trash2 size={14} /> Konto löschen anfragen
+          <Trash2 size={14} /> {t('Konto löschen anfragen')}
         </a>
       </div>
     </div>
@@ -982,7 +983,7 @@ export default function AccountPage() {
                 <current.icon size={15} />
               </div>
             )}
-            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{current?.label}</h2>
+            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>{current ? t(current.label) : ''}</h2>
           </div>
         </div>
         {renderSection()}

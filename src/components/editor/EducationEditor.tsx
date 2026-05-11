@@ -24,16 +24,16 @@ export default function EducationEditor() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div className="section-label" style={{ marginBottom: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
           <GraduationCap size={10} style={{ display: 'inline' }} />
-          {education.length} Einträge
+          {education.length} {t('Einträge')}
           {education.length > 1 && (
             <span title={t("Automatisch nach Datum sortiert (neueste zuerst)")}
               style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 10, color: 'rgba(var(--rgb-fg),0.4)', fontWeight: 500, marginLeft: 4 }}>
-              <CalendarClock size={10} /> nach Datum
+              <CalendarClock size={10} /> {t('nach Datum')}
             </span>
           )}
         </div>
         <button className="btn-glass btn-primary btn-sm" onClick={() => addEducation(resume.id)}>
-          <Plus size={14} /> Hinzufügen
+          <Plus size={14} /> {t('Hinzufügen')}
         </button>
       </div>
 
@@ -60,7 +60,7 @@ export default function EducationEditor() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div style={{ fontWeight: 600, fontSize: 14 }}>
-                  {edu.degree || edu.institution || `Eintrag ${i + 1}`}
+                  {edu.degree || edu.institution || t('Eintrag {n}').replace('{n}', String(i + 1))}
                 </div>
                 {edu.institution && (
                   <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.55)', marginTop: 2 }}>
@@ -70,7 +70,7 @@ export default function EducationEditor() {
               </div>
               {(edu.startDate || edu.endDate) && (
                 <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.4)', flexShrink: 0, textAlign: 'right', whiteSpace: 'nowrap' }}>
-                  {edu.startDate || '—'} – {edu.endDate || 'heute'}
+                  {edu.startDate || '—'} – {edu.endDate || t('heute')}
                 </div>
               )}
             </div>
@@ -134,13 +134,13 @@ export default function EducationEditor() {
                 <label className="section-label">{t('Schwerpunkte & Erfolge')}</label>
                 <textarea
                   className="input-glass"
-                  placeholder={'Pro Zeile ein Stichpunkt:\nSchwerpunkt Software Engineering\nAbschlussarbeit "Skalierbare Microservices"\nAustauschsemester in Kopenhagen'}
+                  placeholder={t('Pro Zeile ein Stichpunkt:\nSchwerpunkt Software Engineering\nAbschlussarbeit "Skalierbare Microservices"\nAustauschsemester in Kopenhagen')}
                   value={edu.description} maxLength={1000}
                   rows={4}
                   onChange={(e) => updateEducation(resume.id, edu.id, { description: e.target.value })}
                 />
                 <div style={{ fontSize: 10, color: 'rgba(var(--rgb-fg),0.35)', marginTop: 4 }}>
-                  Tipp: Einfach tippen — pro Zeile ein Punkt. Bullets fügt das System automatisch ein.
+                  {t('Tipp: Einfach tippen — pro Zeile ein Punkt. Bullets fügt das System automatisch ein.')}
                 </div>
               </div>
             </div>
