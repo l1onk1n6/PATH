@@ -102,11 +102,11 @@ function ReminderPanel({ resumeId, deadline, reminderDays, onClose }: {
     <div className="glass-card animate-scale-in" style={{ marginTop: 8, padding: 14, border: '1px solid rgba(0,122,255,0.25)', background: 'rgba(0,122,255,0.06)' }}>
       <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
         <Bell size={12} style={{ color: 'var(--ios-blue)' }} />
-        E-Mail-Reminder vor Frist
+        {t('E-Mail-Reminder vor Frist')}
       </div>
       {!deadline && (
         <div style={{ fontSize: 12, color: 'rgba(var(--rgb-fg),0.4)', marginBottom: 10 }}>
-          Zuerst eine Bewerbungsfrist setzen.
+          {t('Zuerst eine Bewerbungsfrist setzen.')}
         </div>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
@@ -293,7 +293,7 @@ export default function CoverLetterEditor() {
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
         <div>
           <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
-            <Link size={12} /> Stellenausschreibung URL
+            <Link size={12} /> {t('Stellenausschreibung URL')}
           </label>
           <input
             className="input-glass"
@@ -305,7 +305,7 @@ export default function CoverLetterEditor() {
         </div>
         <div>
           <label style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
-            <Calendar size={12} /> Bewerbungsfrist
+            <Calendar size={12} /> {t('Bewerbungsfrist')}
           </label>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
             <input
@@ -410,7 +410,7 @@ export default function CoverLetterEditor() {
 
       <div>
         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
-          Betreff
+          {t('Betreff')}
         </label>
         <input
           className="input-glass"
@@ -437,7 +437,7 @@ export default function CoverLetterEditor() {
         >
           <Sparkles size={14} style={{ color: isPro ? '#FF9F0A' : 'rgba(var(--rgb-fg),0.4)' }} />
           <span style={{ fontSize: 13, fontWeight: 600, flex: 1, textAlign: 'left', color: isPro ? '#FF9F0A' : 'rgba(var(--rgb-fg),0.5)' }}>
-            KI-Assistent — Anschreiben generieren
+            {t('KI-Assistent — Anschreiben generieren')}
           </span>
           {!isPro && (
             <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 5px', borderRadius: 4, background: 'linear-gradient(135deg, #FF9F0A, #FF375F)', color: '#fff' }}>PRO</span>
@@ -450,7 +450,7 @@ export default function CoverLetterEditor() {
             {hasExistingBody && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, background: 'rgba(255,159,10,0.08)', border: '1px solid rgba(255,159,10,0.2)', fontSize: 12, color: '#FF9F0A' }}>
                 <AlertTriangle size={12} style={{ flexShrink: 0 }} />
-                Der bestehende Anschreiben-Text wird überschrieben.
+                {t('Der bestehende Anschreiben-Text wird überschrieben.')}
               </div>
             )}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
@@ -467,7 +467,7 @@ export default function CoverLetterEditor() {
             </div>
             <div>
               <label style={{ fontSize: 11, opacity: 0.6, display: 'block', marginBottom: 4 }}>
-                Stellenbeschreibung (optional, für bessere Ergebnisse)
+                {t('Stellenbeschreibung (optional, für bessere Ergebnisse)')}
               </label>
               <textarea className="input-glass" placeholder={t('Stellenbeschreibung hier einfügen…')} value={aiJobDesc}
                 onChange={e => setAiJobDesc(e.target.value)} rows={4}
@@ -519,7 +519,7 @@ export default function CoverLetterEditor() {
 
       <div>
         <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6, opacity: 0.7 }}>
-          Grussformel
+          {t('Grussformel')}
         </label>
         <textarea
           className="input-glass"

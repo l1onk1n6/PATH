@@ -482,7 +482,7 @@ export default function Dashboard() {
                         <span style={{ fontWeight: 700, fontSize: 15, color: isPersonFrozen ? '#FF9F0A' : undefined }}>{person.name}</span>
                         {isPersonFrozen && (
                           <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(255,159,10,0.2)', border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', flexShrink: 0 }}>
-                            EINGEFROREN
+                            {t('EINGEFROREN')}
                           </span>
                         )}
                       </div>
@@ -496,7 +496,7 @@ export default function Dashboard() {
                     </div>
                     {!isPersonFrozen && isActive && (
                       <div className="badge" style={{ background: 'rgba(0,122,255,0.2)', borderColor: 'rgba(0,122,255,0.4)', color: 'var(--ios-blue)', fontSize: 10, flexShrink: 0 }}>
-                        Aktiv
+                        {t('Aktiv')}
                       </div>
                     )}
                     {isPersonFrozen && (
@@ -566,7 +566,7 @@ export default function Dashboard() {
                             {/* Frozen icon or status dot */}
                             {frozen
                               ? <Lock size={12} style={{ color: '#FF9F0A', flexShrink: 0 }} />
-                              : <span title={`Status: ${APPLICATION_STATUS_LABELS[r.status ?? 'entwurf']} – klicken zum Ändern`}
+                              : <span title={t('Status: {status} – klicken zum Ändern').replace('{status}', t(APPLICATION_STATUS_LABELS[r.status ?? 'entwurf']))}
                                   style={{ width: 11, height: 11, borderRadius: '50%', background: statusColor, flexShrink: 0, cursor: 'pointer' }}
                                   onClick={(e) => { e.stopPropagation(); if (!bulkMode) setStatusMenuResumeId(r.id); }} />
                             }
@@ -580,7 +580,7 @@ export default function Dashboard() {
                                 </span>
                                 {frozen && (
                                   <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(255,159,10,0.2)', border: '1px solid rgba(255,159,10,0.4)', color: '#FF9F0A', flexShrink: 0 }}>
-                                    EINGEFROREN
+                                    {t('EINGEFROREN')}
                                   </span>
                                 )}
                               </div>
@@ -588,13 +588,13 @@ export default function Dashboard() {
                                 <div style={{ display: 'flex', gap: 8, marginTop: 3, alignItems: 'center' }}>
                                   <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, color: deadlineColor }}>
                                     <Clock size={12} />
-                                    {deadlineDiff! < 0 ? t('Abgelaufen') : `${Math.ceil(deadlineDiff!)} Tage`}
+                                    {deadlineDiff! < 0 ? t('Abgelaufen') : `${Math.ceil(deadlineDiff!)} ${t('Tage')}`}
                                   </span>
                                 </div>
                               )}
                               {frozen && (
                                 <div style={{ fontSize: 11, color: 'rgba(var(--rgb-fg),0.35)', marginTop: 2 }}>
-                                  Upgrade auf Pro zum Bearbeiten
+                                  {t('Upgrade auf Pro zum Bearbeiten')}
                                 </div>
                               )}
                             </div>
@@ -650,7 +650,7 @@ export default function Dashboard() {
                       <div title={t("Neue Bewerbungsmappe")}
                         style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, fontSize: 13, border: '1px dashed rgba(var(--rgb-fg),0.2)', background: 'rgba(var(--rgb-fg),0.03)', cursor: 'pointer', opacity: 0.6, color: 'rgba(var(--rgb-fg),0.6)' }}
                         onClick={(e) => { e.stopPropagation(); setAddingResumeForPersonId(person.id); setNewResumeName(''); }}>
-                        <FolderPlus size={15} /> Neue Bewerbungsmappe
+                        <FolderPlus size={15} /> {t('Neue Bewerbungsmappe')}
                       </div>
                     ) : null}
                   </div>
@@ -661,12 +661,12 @@ export default function Dashboard() {
                   <div style={{ display: 'flex', gap: 8 }}>
                     {isPersonFrozen ? (
                       <button className="btn-glass btn-sm" style={{ flex: 1, opacity: 0.5, cursor: 'not-allowed', color: '#FF9F0A' }} disabled>
-                        <Lock size={14} /> Eingefroren
+                        <Lock size={14} /> {t('Eingefroren')}
                       </button>
                     ) : (
                       <button className="btn-glass btn-primary btn-sm" style={{ flex: 1 }}
                         onClick={(e) => { e.stopPropagation(); setActivePerson(person.id); navigate('/editor'); }}>
-                        <Edit3 size={14} /> Bearbeiten
+                        <Edit3 size={14} /> {t('Bearbeiten')}
                       </button>
                     )}
                     {!isPersonFrozen && (
@@ -676,7 +676,7 @@ export default function Dashboard() {
                       </button>
                     )}
                     <button className="btn-glass btn-danger btn-icon"
-                      onClick={(e) => { e.stopPropagation(); if (confirm(`"${person.name}" wirklich löschen?`)) deletePerson(person.id); }}
+                      onClick={(e) => { e.stopPropagation(); if (confirm(t('"{name}" wirklich löschen?').replace('{name}', person.name))) deletePerson(person.id); }}
                       style={{ width: 34, height: 34, borderRadius: '50%', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <Trash2 size={14} />
                     </button>
