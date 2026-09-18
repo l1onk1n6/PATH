@@ -1,5 +1,16 @@
 // Grants or revokes Pro plan for any user — no Stripe required.
 //
+// JWT enforcement: OFF   (entspricht dem Live-Zustand; am 18.09.2026 gemessen:
+// GET ohne Header liefert das blanke "Forbidden" dieser Function, nicht den
+// Gateway-Fehler UNAUTHORIZED_NO_AUTH_HEADER — das Gateway laesst den Aufruf
+// also durch.) Die Tuer ist hier der Header x-admin-secret, den die Function
+// unten selbst prueft.
+//
+// Offen und bewusst NICHT in dieser Aenderung erledigt: sachlich gehoert diese
+// Function zusaetzlich hinter das Gateway. Das ist eine Umstellung des
+// Live-Zustands mit eigenem Test — der Marker hier haelt nur fest, was heute
+// gilt, damit der naechste Deploy die Tuer nicht nebenbei zuwirft.
+//
 // Secrets required: ADMIN_SECRET  (any random string you choose)
 //
 // Usage example:

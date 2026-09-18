@@ -157,9 +157,6 @@ function PlanSection() {
             <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ios-amber)' }}>{t('Aktivierung verzögert')}</div>
             <div style={{ fontSize: 12, color: 'var(--text-4)', marginTop: 2 }}>{t('Zahlung war erfolgreich. Lade die Seite in einer Minute neu oder kontaktiere uns.')}</div>
           </div>
-          <button className="btn-glass btn-sm" onClick={() => { setWebhookFailed(false); setWebhookPending(true); let a = 0; const p = async () => { await refreshUser(); a++; const { user: u } = useAuthStore.getState(); if (u?.user_metadata?.plan === 'pro') { setWebhookPending(false); setShowSuccess(true); } else if (a < 4) { setTimeout(p, 3000); } else { setWebhookPending(false); setWebhookFailed(true); } }; setTimeout(p, 1000); }} style={{ fontSize: 11, padding: '6px 10px', flexShrink: 0 }}>
-            {t('Nochmals prüfen')}
-          </button>
         </div>
       )}
 
