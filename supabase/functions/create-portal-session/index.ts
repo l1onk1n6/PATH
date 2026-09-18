@@ -1,4 +1,10 @@
 // Secrets required: STRIPE_SECRET_KEY
+//
+// JWT enforcement: OFF   (entspricht dem Live-Zustand; am 18.09.2026 gemessen:
+// GET ohne Authorization-Header liefert das blanke "Unauthorized" dieser Function,
+// nicht den Gateway-Fehler UNAUTHORIZED_NO_AUTH_HEADER — das Gateway laesst den
+// Aufruf also durch.) Ungefaehrlich, weil die Function den Token unten selbst
+// gegen Supabase prueft (admin.auth.getUser), Signatur eingeschlossen.
 
 import Stripe from 'npm:stripe@14'
 import { createClient } from 'npm:@supabase/supabase-js@2'

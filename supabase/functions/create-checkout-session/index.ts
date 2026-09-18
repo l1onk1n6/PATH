@@ -1,3 +1,17 @@
+// JWT enforcement: OFF   (entspricht dem Live-Zustand; am 18.09.2026 gemessen:
+// GET ohne Authorization-Header liefert das blanke "Unauthorized" dieser Function,
+// nicht den Gateway-Fehler UNAUTHORIZED_NO_AUTH_HEADER — das Gateway laesst den
+// Aufruf also durch.)
+//
+// ACHTUNG, der Marker beschreibt den Ist-Zustand und beschoenigt ihn nicht:
+// jwtPayload() unten DEKODIERT den Token nur, es prueft ihn nicht. Der Kommentar
+// "gateway already verified" dort ist falsch — das Gateway verifiziert fuer diese
+// Function gerade nicht. Damit kann ein selbstgebauter Token mit fremdem "sub"
+// eine Checkout-Sitzung fuer ein fremdes Konto oeffnen (Schaden begrenzt: der
+// Angreifer zahlt selbst). Die Reparatur ist dieselbe wie in
+// create-portal-session (admin.auth.getUser) und steht als eigener Punkt im
+// Board — sie gehoert nicht in eine Aufraeumarbeit an Kommentaren.
+
 import Stripe from 'npm:stripe@14'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 

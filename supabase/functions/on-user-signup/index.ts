@@ -1,5 +1,13 @@
 // Triggered via Supabase Database Webhook on auth.users INSERT
-// JWT enforcement: OFF  (wird vom DB-Webhook mit Service-Role-Key aufgerufen)
+//
+// JWT enforcement: AN — und das ist Absicht. Hier stand bis zum 18.09.2026 der
+// Marker "OFF"; live ist die Tuer aber ZU (am 18.09. gemessen: GET ohne Header
+// liefert UNAUTHORIZED_NO_AUTH_HEADER, also den Gateway-Fehler). Der naechste
+// Deploy haette sie mit --no-verify-jwt aufgestossen, ohne dass es jemand
+// wollte. Der Widerspruch ist aufgeloest, indem der Marker weg ist:
+// der Webhook ruft mit "Authorization: Bearer <SERVICE_ROLE_KEY>" auf, und der
+// Service-Role-Key IST ein gueltiger JWT — das Gateway laesst ihn durch. Es
+// braucht hier also gar keine Ausnahme.
 // Setup: Supabase Dashboard → Database → Webhooks → Create Webhook
 //   Table: users  |  Schema: auth  |  Event: INSERT
 //   Type: HTTP Request → POST → [this function's URL]

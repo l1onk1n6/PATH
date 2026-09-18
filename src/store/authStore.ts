@@ -205,19 +205,17 @@ export const useAuthStore = create<AuthStore>((set) => ({
     try {
       const supabase = getSupabase();
 
-      // Vor dem eigentlichen User-Refresh: Stripe-Abo live syncen.
-      // Stellt sicher dass Web-Pro auf Mobile und Mobile-Pro auf Web
-      // erscheint, auch wenn ein Webhook verpasst wurde.
-      const { data: { session: s0 } } = await supabase.auth.getSession();
-      if (s0?.access_token) {
-        try {
-          await supabase.functions.invoke('sync-subscription', {
-            headers: { Authorization: `Bearer ${s0.access_token}` },
-          });
-        } catch (e) {
-          console.warn('[auth] sync-subscription failed', e);
-        }
-      }
+      // Hier stand bis zum 18.09.2026 ein Aufruf der Edge Function
+      // `sync-subscription`, der das Stripe-Abo vor dem Refresh live abgleichen
+      // sollte. Die Function ist nie deployt worden — gemessen am 18.09.:
+      // GET .../functions/v1/sync-subscription → 404 NOT_FOUND, waehrend jede
+      // deployte Function 401 oder die eigene Antwort liefert. Der Aufruf lief
+      // also bei jeder Anmeldung und bei jedem Klick auf «Nochmals pruefen» ins
+      // Leere; der catch-Zweig hat den Fehlschlag still geschluckt.
+      // Entfernt auf Stefans Wort «Entfernen» (Board, 18.09.). Was bleibt, ist
+      // der ehrliche Teil: getUser() und refreshSession() holen die Metadaten
+      // frisch vom Server — sie koennen nur nicht herstellen, was der
+      // Stripe-Webhook nie geschrieben hat.
 
       // getUser() always fetches fresh metadata from the server (no JWT cache)
       const { data: userData } = await supabase.auth.getUser();
