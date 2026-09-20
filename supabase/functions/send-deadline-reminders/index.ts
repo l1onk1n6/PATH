@@ -3,9 +3,22 @@
 // (altes Mail-Template, andere Abfragelogik). Quelle ist das deployte Bundle,
 // die Typannotationen hat der Deploy-Schritt entfernt.
 //
-// JWT enforcement: OFF
+// JWT enforcement: ON. Die Ausnahme-Markerzeile ist hier bewusst entfernt:
+// .github/workflows/supabase-functions.yml:84 greppt nach ihrem Wortlaut und
+// haengt dann --no-verify-jwt an den Deploy. Achtung — der Grep ist eine reine
+// Textsuche ohne Kontext, der Wortlaut darf also auch in einem Kommentar nicht
+// wieder auftauchen, sonst deaktiviert er die Pruefung erneut. Ohne den Marker
+// rollt der Workflow diese Function mit Gateway-JWT-Pruefung aus (Zeile 90-93)
+// — so wie der Live-Zustand im Dashboard es bereits vorgibt.
+//
+// Das Gateway allein ist aber keine Tuer: der vorgesehene Aufrufer schickt den
+// anon-Key, und der ist oeffentlich (src/lib/supabase.ts:11, steckt als
+// VITE_SUPABASE_ANON_KEY im Browser-Bundle). Wirksam ist erst das eigene
+// Geheimnis im Header x-admin-secret, das diese Function unten selbst prueft —
+// gleiches Muster wie admin-set-plan/index.ts:36-40.
 //
 // Required Supabase secrets:
+//   ADMIN_SECRET  gleiches Geheimnis wie admin-set-plan (Header x-admin-secret)
 //   SMTP_HOST     e.g. smtp.hostinger.com
 //   SMTP_PORT     e.g. 587
 //   SMTP_USER     e.g. noreply@pixmatic.ch
@@ -23,7 +36,15 @@ function escapeHtml(value) {
 function singleLine(value) {
   return String(value ?? '').replace(/[\r\n]+/g, ' ').trim().slice(0, 120);
 }
-Deno.serve(async (_req)=>{
+Deno.serve(async (req)=>{
+  // Authentifizierung ueber Geheimnis-Header — vor jedem Sendecode, vor jedem
+  // Datenbankzugriff. Muster uebernommen aus admin-set-plan/index.ts:36-40.
+  const adminSecret = req.headers.get('x-admin-secret') ?? '';
+  if (!adminSecret || adminSecret !== Deno.env.get('ADMIN_SECRET')) {
+    return new Response('Forbidden', {
+      status: 403
+    });
+  }
   try {
     const admin = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
     // Fetch all unsent reminders that are due
