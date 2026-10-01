@@ -1,16 +1,15 @@
 // JWT enforcement: OFF   (entspricht dem Live-Zustand; am 18.09.2026 gemessen:
 // GET ohne Authorization-Header liefert das blanke "Unauthorized" dieser Function,
 // nicht den Gateway-Fehler UNAUTHORIZED_NO_AUTH_HEADER — das Gateway laesst den
-// Aufruf also durch.)
+// Aufruf also durch.) Ungefaehrlich, weil die Function den Token unten selbst
+// gegen Supabase prueft (admin.auth.getUser), Signatur eingeschlossen.
 //
-// ACHTUNG, der Marker beschreibt den Ist-Zustand und beschoenigt ihn nicht:
-// jwtPayload() unten DEKODIERT den Token nur, es prueft ihn nicht. Der Kommentar
-// "gateway already verified" dort ist falsch — das Gateway verifiziert fuer diese
-// Function gerade nicht. Damit kann ein selbstgebauter Token mit fremdem "sub"
-// eine Checkout-Sitzung fuer ein fremdes Konto oeffnen (Schaden begrenzt: der
-// Angreifer zahlt selbst). Die Reparatur ist dieselbe wie in
-// create-portal-session (admin.auth.getUser) und steht als eigener Punkt im
-// Board — sie gehoert nicht in eine Aufraeumarbeit an Kommentaren.
+// Vorher wurde hier nur der Payload base64-dekodiert (jwtPayload()), mit dem
+// Kommentar "gateway already verified". Das Gateway laeuft fuer diese Function
+// aber mit --no-verify-jwt — der Kommentar war falsch. Ein selbstgebauter Token
+// mit fremdem "sub" haette damit eine Checkout-Sitzung fuer ein fremdes Konto
+// geoeffnet (Schaden begrenzt: der Angreifer zahlt selbst). Fix wie in
+// create-portal-session: admin.auth.getUser(token) statt jwtPayload().
 
 import Stripe from 'npm:stripe@14'
 import { createClient } from 'npm:@supabase/supabase-js@2'
@@ -23,12 +22,6 @@ const cors = {
   'Access-Control-Allow-Origin':  '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-}
-
-/** Decode JWT payload without re-verifying (gateway already verified) */
-function jwtPayload(token: string): Record<string, unknown> {
-  const part = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
-  return JSON.parse(atob(part))
 }
 
 Deno.serve(async (req) => {
@@ -44,22 +37,20 @@ Deno.serve(async (req) => {
       return new Response('Unauthorized', { status: 401, headers: cors })
     }
 
-    let payload: Record<string, unknown>
-    try {
-      payload = jwtPayload(token)
-    } catch (e) {
-      console.log('[checkout] JWT decode failed:', e)
+    const admin = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+    )
+
+    // Der Token wird gegen Supabase geprueft, Signatur eingeschlossen.
+    const { data: authData, error: authErr } = await admin.auth.getUser(token)
+    const userId = authData?.user?.id
+    if (authErr || !userId) {
+      console.log('[checkout] token invalid → 401')
       return new Response('Unauthorized', { status: 401, headers: cors })
     }
-
-    const userId = payload.sub as string
-    const userEmail = payload.email as string | undefined
-    console.log('[checkout] userId:', userId ?? 'MISSING', '| role:', payload.role)
-
-    if (!userId) {
-      console.log('[checkout] no sub in JWT → 401')
-      return new Response('Unauthorized', { status: 401, headers: cors })
-    }
+    const userEmail = authData.user.email
+    console.log('[checkout] userId:', userId)
 
     // Optional body: { plan: 'monthly' | 'yearly' }
     let plan: 'monthly' | 'yearly' = 'monthly'
@@ -72,10 +63,6 @@ Deno.serve(async (req) => {
     console.log('[checkout] plan:', plan, '| priceId:', priceId)
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!)
-    const admin = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-    )
 
     // Find or create Stripe customer
     const { data: existing } = await admin
