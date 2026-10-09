@@ -1,3 +1,14 @@
+// Edge Function: stripe-webhook
+//
+// JWT enforcement: OFF — Stripe ruft ohne Authorization-Header auf. Der Schutz
+// ist die Signaturpruefung unten (constructEventAsync gegen
+// STRIPE_WEBHOOK_SECRET); ohne gueltige stripe-signature endet jeder Aufruf mit
+// 400. Vor dem 09.10.2026 fehlte diese Markerzeile: das Gateway wies jede
+// Zustellung mit 401 UNAUTHORIZED_NO_AUTH_HEADER ab, die Signaturpruefung kam
+// nie zum Zug, und die erste echte Zahlung waere verschluckt worden.
+// .github/workflows/supabase-functions.yml greppt den Wortlaut dieser Zeile und
+// haengt dann --no-verify-jwt an den Deploy.
+//
 // Secrets required in Supabase Dashboard → Edge Functions → Secrets:
 //   STRIPE_SECRET_KEY      = sk_live_...
 //   STRIPE_WEBHOOK_SECRET  = whsec_...
