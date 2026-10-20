@@ -1,0 +1,94 @@
+VORLAGE: neue Tabelle im Schema `public` anlegen
+================================================================================
+
+Diese Datei ist KEINE Migration und wird nicht ausgefuehrt. Sie endet auf
+`.sql.txt`, der Workflow `.github/workflows/supabase-migrations.yml` waehlt aber
+nur `supabase/migrations/*.sql` aus (`git diff ... -- 'supabase/migrations/*.sql'`).
+Ein Push, der nur diese Datei aendert, startet den Workflow zwar (der
+`paths:`-Filter lautet `supabase/migrations/**`), findet dann aber keine
+passende Datei und ueberspringt den Anwendungsschritt.
+
+Also: kopieren, umbenennen nach `YYYYMMDD_was_es_tut.sql`, ausfuellen.
+
+
+WARUM es diese Vorlage gibt
+--------------------------------------------------------------------------------
+Bis zum 30.10.2026 hat Supabase jede neue Tabelle im Schema `public`
+automatisch fuer die Data API freigegeben. Seit dem 30.10.2026 nicht mehr: eine
+neue Tabelle ist fuer `anon`, `authenticated` und `service_role` unsichtbar,
+bis ein GRANT sie freigibt. Wer das vergisst, merkt es erst zur Laufzeit —
+jede Abfrage antwortet mit "permission denied for table ...".
+
+Zwei Schranken, die beide gesetzt sein muessen und einander nicht ersetzen:
+
+  GRANT  entscheidet, ob eine Rolle die TABELLE ueberhaupt anfassen darf.
+  RLS    entscheidet, welche ZEILEN sie dabei sieht.
+
+Ein GRANT ohne RLS gibt die ganze Tabelle frei. RLS ohne GRANT sperrt alles.
+
+
+GERUEST
+--------------------------------------------------------------------------------
+
+-- YYYYMMDD_was_es_tut.sql
+-- Wozu die Tabelle da ist, in einem Satz.
+-- Idempotent (IF NOT EXISTS / DROP POLICY IF EXISTS), darf wiederholt laufen.
+
+-- ── 1. Tabelle ───────────────────────────────────────────────────────────────
+create table if not exists public.meine_tabelle (
+  id         uuid        primary key default gen_random_uuid(),
+  user_id    uuid        not null references auth.users(id) on delete cascade,
+  -- ... Nutzdaten ...
+  created_at timestamptz not null default now()
+);
+
+create index if not exists meine_tabelle_user_id_idx
+  on public.meine_tabelle (user_id);
+
+-- ── 2. RLS einschalten ───────────────────────────────────────────────────────
+-- Ohne diese Zeile sieht jeder mit dem oeffentlichen anon-Key ALLE Zeilen,
+-- sobald unten das GRANT steht. Nie weglassen.
+alter table public.meine_tabelle enable row level security;
+
+-- ── 3. Policies: welche ZEILEN ───────────────────────────────────────────────
+-- (select auth.uid()) statt auth.uid() — wird einmal pro Abfrage statt einmal
+-- pro Zeile ausgewertet (siehe 20260408_security_performance_fixes.sql).
+drop policy if exists "own meine_tabelle" on public.meine_tabelle;
+create policy "own meine_tabelle" on public.meine_tabelle
+  for all
+  to authenticated
+  using      ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+
+-- ── 4. Grants: welche TABELLE, welche Rolle, welche Operation ────────────────
+-- Eine Zeile Begruendung pro Rolle, mit Fundstelle im Code. Nur das vergeben,
+-- was eine Aufrufstelle wirklich braucht — nicht "grant all".
+
+-- authenticated: <Fundstelle, z. B. src/lib/db.ts:123 select/upsert/delete>
+grant select, insert, update, delete on table public.meine_tabelle to authenticated;
+
+-- service_role: nur wenn eine Edge Function die Tabelle anfasst. Fundstelle
+-- nennen. Faesst keine Function sie an, diese Zeile loeschen.
+-- grant select, insert, update on table public.meine_tabelle to service_role;
+
+-- anon: NUR mit belegtem oeffentlichem Pfad, und dann so eng wie moeglich.
+-- Vorbild resumes/documents: Lesen nur fuer die eine Zeile, deren Token den
+-- Header x-share-token trifft (20260909_secure_shared_read.sql). Ohne so einen
+-- Beleg bekommt anon nichts — besonders bei Personen- oder Zahlungsbezug.
+-- grant select on table public.meine_tabelle to anon;
+
+-- Sequenzen: nur falls die Tabelle eine serial-/identity-Spalte hat. Bei
+-- uuid-Schluesseln mit gen_random_uuid() (wie oben) entfaellt das.
+-- grant usage, select on sequence public.meine_tabelle_id_seq to authenticated;
+
+
+CHECKLISTE VOR DEM PR
+--------------------------------------------------------------------------------
+[ ] `alter table ... enable row level security;` steht drin.
+[ ] Jede Tabelle hat mindestens eine Policy — RLS ohne Policy sperrt alles.
+[ ] Jedes GRANT hat eine Begruendung mit Fundstelle als Kommentar darueber.
+[ ] `anon` kommt nur mit belegtem oeffentlichem Pfad vor.
+[ ] Kein `grant all ... to anon, authenticated, service_role` als Pauschale.
+[ ] Datei heisst `YYYYMMDD_*.sql` und liegt in `supabase/migrations/`.
+[ ] Bewusst: der Merge nach `main` schreibt sofort auf die PRODUKTIONS-
+    Datenbank (siehe Workflow). Es gibt keine Staging-Stufe und kein Rollback.
